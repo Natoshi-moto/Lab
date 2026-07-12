@@ -6,9 +6,12 @@
   },
   "active_audit": {
     "audit_id": "AUD-R002-CLAUDE-BLIND",
-    "execution_status": "READY_NOT_STARTED",
+    "evidence_commit": "4ef36f19364b6df8fe5e363bcd3b2508680eb1a6",
+    "execution_status": "COMPLETED_EVIDENCE_PRESERVED",
+    "observation_count": 18,
     "target_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8"
   },
+  "active_task": "TSK-R005-CLAUDE-RETEST-ADJUDICATION",
   "authoritative_store": "one_git_repository",
   "default_branch": "main",
   "entrypoints": {
