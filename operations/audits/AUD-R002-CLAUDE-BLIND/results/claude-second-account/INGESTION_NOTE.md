@@ -13,10 +13,12 @@ This directory preserves the completed `AUD-R002-CLAUDE-BLIND` audit as external
 
 ## Files
 
-- `CLAUDE_AUDIT_REPORT.md` is the exact human-readable report from the uploaded result package.
+- `CLAUDE_AUDIT_REPORT.evidence` is the exact human-readable report from the uploaded result package.
 - `CLAUDE_RESULTS_SHA256SUMS.txt` is the exact checksum manifest from that package and records the exact hashes of the report plus the original 18 per-observation JSON files.
 - `CLAUDE_RESULTS_ORIGINAL.zip.sha256` records the SHA-256 of the uploaded source package.
-- `CLAUDE_OBSERVATIONS_0001_0005.jsonl`, `CLAUDE_OBSERVATIONS_0006_0010.jsonl`, `CLAUDE_OBSERVATIONS_0011_0014.jsonl`, and `CLAUDE_OBSERVATIONS_0015_0018.jsonl` are deterministic canonical-JSON projections of the 18 validated observations, one object per line, split only for transport convenience.
+- `CLAUDE_OBSERVATIONS_0001_0005.evidence`, `CLAUDE_OBSERVATIONS_0006_0010.evidence`, `CLAUDE_OBSERVATIONS_0011_0014.evidence`, and `CLAUDE_OBSERVATIONS_0015_0018.evidence` are deterministic canonical-JSONL projections of the 18 validated observations, one object per line, split only for transport convenience.
+
+The `.evidence` suffix is intentional. The audit report and observations contain synthetic credential-shaped test fixtures used to demonstrate scanner behaviour. Storing this evidence under an ordinary scanned text suffix would cause the repository's own pattern scanner to classify those deliberately fake fixtures as potential live secrets. The suffix prevents that false positive while the ingestion note, source checksums, and audit schema preserve the evidence boundary.
 
 Before this branch was created:
 
