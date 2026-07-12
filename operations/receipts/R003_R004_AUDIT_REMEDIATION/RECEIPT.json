@@ -1,0 +1,47 @@
+{
+  "checks": [
+    "R002 hostile audit evidence preserved on main",
+    "AUDOBS-0011 independently reproduced from source and remediated with .env, .env.* and extensionless-file regressions",
+    "AUDOBS-0003 independently reproduced from source and remediated with frozen-pack manifest and Git-index bindings",
+    "AUDOBS-0012 remediated by explicit size-exclusion reporting and regression coverage",
+    "R003 and R004 GitHub Actions runs completed successfully",
+    "baseline-001 and the R001/R002 frozen target bytes were not modified"
+  ],
+  "claims": [
+    "The three named observations have implemented remediations on main with passing repository CI.",
+    "The complete R002 same-family differential evidence package is preserved on main."
+  ],
+  "commits": {
+    "audit_evidence_ingestion": "4ef36f19364b6df8fe5e363bcd3b2508680eb1a6",
+    "r003_secret_scan_filename_coverage": "ceb1c1e53f70fcdf8869e371704f1a1a6b733f65",
+    "r004_audit_integrity_and_scan_transparency": "57a9a525bd3a2d723d617435ac9a8c3ed9cd43e3"
+  },
+  "completed_at": "2026-07-12T23:40:00Z",
+  "non_claims": [
+    "Passing CI does not establish complete security, privacy or semantic correctness.",
+    "The remediations have not yet been retested by the original Claude auditor.",
+    "AUDOBS-0010, AUDOBS-0014, AUDOBS-0015 and AUDOBS-0016 remain unadjudicated.",
+    "The 18 observations are preserved as evidence projections rather than appended to the live JSONL ledger because their exact synthetic credential-shaped fixtures would intentionally trigger the repository secret scanner."
+  ],
+  "operation": "preserve-r002-evidence-and-remediate-three-reproduced-findings",
+  "receipt_id": "RCT-R003-R004-AUDIT-REMEDIATION",
+  "schema": "nexus.receipt/v1",
+  "source_audit": {
+    "audit_id": "AUD-R002-CLAUDE-BLIND",
+    "observation_count": 18,
+    "review_class": "SAME_FAMILY_DIFFERENTIAL",
+    "source_head": "084b3b9ee6a1434e38a5bf23eee8266c43b3522d",
+    "target_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+    "target_snapshot_sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603"
+  },
+  "workflow_runs": {
+    "r003": {
+      "conclusion": "success",
+      "run_id": 29213519824
+    },
+    "r004": {
+      "conclusion": "success",
+      "run_id": 29213749294
+    }
+  }
+}
