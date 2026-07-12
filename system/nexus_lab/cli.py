@@ -6,7 +6,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .audit import build_audit_pack, check_audit, ingest_observation
+from .audit import build_audit_pack, ingest_observation
+from .audit_integrity import verify_audit_integrity
 from .doctor import run_doctor
 from .github import github_bootstrap
 from .route import build_route
@@ -35,7 +36,7 @@ def parser() -> argparse.ArgumentParser:
     verify = sub.add_parser("verify", help="Verify repository, snapshots and audit ledgers")
     verify.add_argument("--snapshot", type=Path)
 
-    render = sub.add_parser("render-status", help="Regenerate STATUS.md from STATUS.json")
+    sub.add_parser("render-status", help="Regenerate STATUS.md from STATUS.json")
 
     freeze = sub.add_parser("freeze", help="Build a deterministic CANONICAL_AS_IS snapshot from a Git ref")
     freeze.add_argument("--ref", required=True)
@@ -56,7 +57,7 @@ def parser() -> argparse.ArgumentParser:
     audit_ingest.add_argument("--check-only", action="store_true")
     audit_ingest.add_argument("observation", type=Path)
 
-    audit_check = sub.add_parser("audit-check", help="Verify target and append-only audit ledger")
+    audit_check = sub.add_parser("audit-check", help="Verify target, immutable bindings and append-only audit ledger")
     audit_check.add_argument("--audit-id", required=True)
 
     github = sub.add_parser("github-bootstrap", help="Create or verify a private GitHub repository and push")
@@ -119,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
             observation = args.observation if args.observation.is_absolute() else root / args.observation
             emit(ingest_observation(root, args.audit_id, observation, check_only=args.check_only))
         elif args.command == "audit-check":
-            emit(check_audit(root, args.audit_id))
+            emit(verify_audit_integrity(root, args.audit_id))
         elif args.command == "github-bootstrap":
             emit(github_bootstrap(root, repo_name=args.repo_name))
         else:
