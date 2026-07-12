@@ -1,10 +1,13 @@
 {
   "active_tasks": [
-    "TSK-R002-CLAUDE-BLIND-AUDIT"
+    "TSK-R005-CLAUDE-RETEST-ADJUDICATION"
   ],
   "assurance_blocks": [
-    "R002_REMOTE_PUSH_NOT_YET_RECORDED",
-    "CLAUDE_EXTERNAL_AUDIT_NOT_YET_INGESTED"
+    "R002_OBSERVATIONS_PRESERVED_NOT_LEDGER_APPENDED",
+    "AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING",
+    "AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING",
+    "AUDOBS_0016_PROCESS_CONTRADICTION_PENDING",
+    "CLAUDE_RETEST_R003_R004_PENDING"
   ],
   "canonical_target": {
     "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
@@ -14,12 +17,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R002_AUDIT_READY_LOCAL_NOT_STARTED",
-  "current_round": "R002",
+  "current_mode": "R005_RETEST_AND_ADJUDICATION_READY",
+  "current_round": "R005",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R002_EXTERNAL_WITNESS_OVERLAY_BUILT_R001_SUPERSEDED_FOR_EXECUTION",
-  "next_action_id": "ACT-R002-PUSH_TAG_VERIFY_THEN_CLAUDE_AUDIT",
-  "open_assurance_blocks": 2,
+  "last_completed_action": "R002_EVIDENCE_PRESERVED_AND_AUDOBS_0011_0003_0012_REMEDIATED",
+  "next_action_id": "ACT-R005-CLAUDE-RETEST_AND_REMAINING_ADJUDICATION",
+  "open_assurance_blocks": 5,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v1"
 }
