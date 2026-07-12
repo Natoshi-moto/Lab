@@ -1,0 +1,20 @@
+{
+  "audit_id": "AUD-R002-CLAUDE-BLIND",
+  "audit_phase": "BLIND",
+  "mutation_authority": "NONE",
+  "nonclaim": "The target digest identifies bytes; it does not establish correctness, security or completeness.",
+  "review_class": "SAME_FAMILY_DIFFERENTIAL",
+  "route_pack": {
+    "path": "RTE-R002-CLAUDE-BLIND-AUDIT.zip",
+    "route_id": "RTE-R002-CLAUDE-BLIND-AUDIT",
+    "sha256": "816169d3e4bb930a52792af1113ac58cb9e234a3ea074bac6ea381756f446c2f"
+  },
+  "schema": "nexus.audit-target/v1",
+  "snapshot_id": "NEXUS-LAB-R001-BASELINE-001",
+  "target_archive_sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603",
+  "target_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+  "target_ref": "baseline-001",
+  "target_ref_object": "5e5331a61664335932d855160a4b26c4c3bae2a8",
+  "target_snapshot_path": "target/NEXUS_LAB_R001_BASELINE_001.zip",
+  "target_status": "CANONICAL_AS_IS"
+}

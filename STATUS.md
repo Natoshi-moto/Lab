@@ -5,19 +5,19 @@
 | Field | Value |
 |---|---|
 | Lab | `NEXUS-LAB` |
-| Round | `R001` |
-| Mode | `AUDIT_READY_LOCAL` |
+| Round | `R002` |
+| Mode | `R002_AUDIT_READY_LOCAL_NOT_STARTED` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `2` |
-| Last completed action | `FINAL_BASELINE_FROZEN_ROUTE_COMPILED_AND_BLIND_AUDIT_PACK_BUILT` |
-| Next action | `ACT-R001-CLAUDE-AUDIT` |
+| Last completed action | `R002_EXTERNAL_WITNESS_OVERLAY_BUILT_R001_SUPERSEDED_FOR_EXECUTION` |
+| Next action | `ACT-R002-PUSH_TAG_VERIFY_THEN_CLAUDE_AUDIT` |
 
 ## Active tasks
 
-- `TSK-R001-CLAUDE-BLIND-AUDIT`
+- `TSK-R002-CLAUDE-BLIND-AUDIT`
 
 ## Assurance blocks
 
-- `REMOTE_GITHUB_PUSH_NOT_YET_RECORDED`
+- `R002_REMOTE_PUSH_NOT_YET_RECORDED`
 - `CLAUDE_EXTERNAL_AUDIT_NOT_YET_INGESTED`

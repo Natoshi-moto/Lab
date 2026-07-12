@@ -1,9 +1,9 @@
 {
   "active_tasks": [
-    "TSK-R001-CLAUDE-BLIND-AUDIT"
+    "TSK-R002-CLAUDE-BLIND-AUDIT"
   ],
   "assurance_blocks": [
-    "REMOTE_GITHUB_PUSH_NOT_YET_RECORDED",
+    "R002_REMOTE_PUSH_NOT_YET_RECORDED",
     "CLAUDE_EXTERNAL_AUDIT_NOT_YET_INGESTED"
   ],
   "canonical_target": {
@@ -14,11 +14,11 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "AUDIT_READY_LOCAL",
-  "current_round": "R001",
+  "current_mode": "R002_AUDIT_READY_LOCAL_NOT_STARTED",
+  "current_round": "R002",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "FINAL_BASELINE_FROZEN_ROUTE_COMPILED_AND_BLIND_AUDIT_PACK_BUILT",
-  "next_action_id": "ACT-R001-CLAUDE-AUDIT",
+  "last_completed_action": "R002_EXTERNAL_WITNESS_OVERLAY_BUILT_R001_SUPERSEDED_FOR_EXECUTION",
+  "next_action_id": "ACT-R002-PUSH_TAG_VERIFY_THEN_CLAUDE_AUDIT",
   "open_assurance_blocks": 2,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v1"

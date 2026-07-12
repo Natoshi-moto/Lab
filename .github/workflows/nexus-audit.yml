@@ -49,6 +49,15 @@ jobs:
             echo "R001 audit overlay is not present on this historical revision."
           fi
 
+      - name: Verify R002 audit target when present
+        shell: bash
+        run: |
+          if [[ -f operations/audits/AUD-R002-CLAUDE-BLIND/TARGET.json ]]; then
+            ./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND
+          else
+            echo "R002 audit overlay is not present on this historical revision."
+          fi
+
       - name: Record evidence limits
         if: always()
         shell: bash

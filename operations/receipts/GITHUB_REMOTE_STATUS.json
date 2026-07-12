@@ -1,12 +1,12 @@
 {
-  "authenticated_session_available": false,
-  "checked_at": "2026-07-12T19:53:23Z",
+  "authenticated_session_available": true,
+  "checked_at": "2026-07-12T22:00:07Z",
   "expected_visibility": "PRIVATE",
-  "github_cli_available": false,
+  "github_cli_available": true,
   "nonclaim": "This is a statement about the build environment, not the operator account or future repository.",
-  "origin_configured": false,
-  "reason": "The build environment exposed no authenticated GitHub CLI session, writable GitHub connector or existing origin remote.",
+  "origin_configured": true,
+  "reason": "origin/main was read from the configured private remote as 08d20c94e7db1a8c43c4f16ffc90080bd92a6e3d before the R002 commit.",
   "schema": "nexus.remote-status/v1",
-  "status": "NOT_PERFORMED",
-  "unblock_command": "./nexus github-bootstrap --repo-name nexus-research-lab"
+  "status": "PRE_PUSH_REMOTE_VERIFIED",
+  "unblock_command": null
 }

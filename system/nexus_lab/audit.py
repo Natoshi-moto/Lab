@@ -18,6 +18,8 @@ from .util import (
     sha256_bytes,
     sha256_file,
     safe_join,
+    git,
+    resolve_commit,
     utc_now,
     validate_identifier,
 )
@@ -268,6 +270,16 @@ def check_audit(root: Path, audit_id: str) -> dict[str, Any]:
     target = load_json(audit_dir / "TARGET.json")
     snapshot = safe_join(audit_dir, target["target_snapshot_path"])
     verification = verify_snapshot(snapshot, expected_sha256=target["target_archive_sha256"])
+    if verification["source_commit"] != target["target_commit"]:
+        raise NexusError("Audit target_commit does not match the snapshot source commit.")
+    target_ref = target.get("target_ref")
+    if target_ref:
+        resolved_target_ref = resolve_commit(root, target_ref)
+        if resolved_target_ref != target["target_commit"]:
+            raise NexusError("Audit target_ref does not resolve to target_commit; the ref may have moved.")
+    target_ref_object = target.get("target_ref_object")
+    if target_ref_object and git(root, "rev-parse", target_ref) != target_ref_object:
+        raise NexusError("Audit target_ref object does not match TARGET.json; the tag may have been replaced.")
     route_record = target.get("route_pack")
     if route_record:
         from .route import verify_manifest_pack
@@ -275,6 +287,8 @@ def check_audit(root: Path, audit_id: str) -> dict[str, Any]:
         route_verification = verify_manifest_pack(route_path)
         if route_verification["archive_sha256"] != route_record["sha256"]:
             raise NexusError("Audit route pack digest does not match TARGET.json.")
+        if route_verification.get("baseline_commit") != target["target_commit"]:
+            raise NexusError("Audit route baseline is ambiguously bound to a different target commit.")
     records = _load_ledger(audit_dir / "ledger" / "AUDIT_OBSERVATIONS.jsonl")
     previous = ""
     seen: set[str] = set()

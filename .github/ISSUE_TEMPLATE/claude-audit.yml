@@ -1,6 +1,6 @@
 name: Claude blind audit observation
 description: Record or route a hash-bound R001 audit observation
-title: "[AUD-R001] "
+title: "[AUD-R002] "
 labels: ["audit", "claude", "observation"]
 body:
   - type: markdown

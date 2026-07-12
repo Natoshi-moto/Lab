@@ -69,11 +69,11 @@ def github_bootstrap(root: Path, *, repo_name: str) -> dict[str, Any]:
         result = _gh(root, "label", "create", label, "--description", description, "--force", check=False)
         labels.append({"label": label, "exit_code": result.returncode})
 
-    issue_body = root / "operations" / "audits" / "AUD-R001-CLAUDE-BLIND" / "GITHUB_ISSUE_BODY.md"
+    issue_body = root / "operations" / "audits" / "AUD-R002-CLAUDE-BLIND" / "GITHUB_ISSUE_BODY.md"
     issue_result = _gh(
         root,
         "issue", "create",
-        "--title", "AUD-R001: Claude blind audit of baseline-001",
+        "--title", "AUD-R002: Claude blind audit of baseline-001",
         "--body-file", str(issue_body),
         "--label", "audit,claude,observation",
         check=False,

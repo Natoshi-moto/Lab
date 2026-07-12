@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "claims": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "exit_code": {
+      "type": "integer"
+    },
+    "finished_at": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "array"
+    },
+    "non_claims": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "outputs": {
+      "type": "array"
+    },
+    "receipt_id": {
+      "type": "string"
+    },
+    "schema": {
+      "const": "nexus.receipt/v1"
+    },
+    "started_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "receipt_id",
+    "operation",
+    "started_at",
+    "finished_at",
+    "exit_code",
+    "inputs",
+    "outputs",
+    "claims",
+    "non_claims"
+  ],
+  "title": "Nexus Receipt",
+  "type": "object"
+}

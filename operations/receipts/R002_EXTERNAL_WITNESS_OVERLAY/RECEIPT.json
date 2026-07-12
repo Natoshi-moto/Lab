@@ -1,0 +1,52 @@
+{
+  "checks": [
+    "R002 route manifest and immutable baseline binding verified",
+    "R002 audit pack manifest and copied target archive verified",
+    "TARGET.json commit, annotated tag object, snapshot source commit and route baseline agree",
+    "archive substitution, moved target ref and target declaration mismatch regression tests pass",
+    "R001 audit directory has no worktree changes",
+    "baseline-001 tag object and dereferenced commit are unchanged",
+    "R002 inbox and ledger are empty; Claude audit was not started"
+  ],
+  "claims": [
+    "The R002 external-witness overlay passed the implemented deterministic, provenance, substitution and target-binding checks in this environment."
+  ],
+  "exit_code": 0,
+  "finished_at": "2026-07-12T22:00:07Z",
+  "inputs": [
+    {
+      "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+      "snapshot_sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603",
+      "tag": "baseline-001",
+      "tag_object": "5e5331a61664335932d855160a4b26c4c3bae2a8"
+    }
+  ],
+  "non_claims": [
+    "The Claude audit was not started.",
+    "A same-provider second account is not automatically independent corroboration.",
+    "Passing checks do not establish complete security, correctness or semantic validity.",
+    "Push and handoff tag results are reported after the one-commit overlay is created and are not claimed by this pre-commit receipt."
+  ],
+  "operation": "build-r002-external-witness-audit-overlay",
+  "outputs": [
+    {
+      "audit_id": "AUD-R002-CLAUDE-BLIND",
+      "path": "operations/audits/AUD-R002-CLAUDE-BLIND/AUD-R002-CLAUDE-BLIND.zip",
+      "sha256": "e7da2562015885ddb0163a3147b621c7fa4f7fe32014c53075cd92298b6b4b5e"
+    },
+    {
+      "path": "operations/routes/RTE-R002-CLAUDE-BLIND-AUDIT.zip",
+      "sha256": "816169d3e4bb930a52792af1113ac58cb9e234a3ea074bac6ea381756f446c2f",
+      "task_sha256": "e114a9c3a03fcd1349b87d3c10ecbc845b2931ec82a307c983fd2c197de0f5ed"
+    }
+  ],
+  "receipt_id": "RCT-R002-EXTERNAL-WITNESS-OVERLAY",
+  "schema": "nexus.receipt/v1",
+  "started_at": "2026-07-12T21:50:00Z",
+  "test_results": {
+    "audit_check": "PASS (0 observations; empty ledger)",
+    "doctor": "PASS",
+    "unittest": "PASS (29 tests)",
+    "verify": "PASS"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority": {
+      "type": "string"
+    },
+    "baseline_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "baseline_ref": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "excluded": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "included": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "output_contract": {
+      "type": "object"
+    },
+    "role": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "route_id": {
+      "type": "string"
+    },
+    "schema": {
+      "const": "nexus.route/v1"
+    },
+    "seat": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "unread_archive_notice": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "route_id",
+    "task_id",
+    "task_sha256",
+    "baseline_ref",
+    "baseline_commit",
+    "authority",
+    "included",
+    "excluded",
+    "output_contract",
+    "created_at"
+  ],
+  "title": "Nexus Route",
+  "type": "object"
+}

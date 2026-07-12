@@ -41,7 +41,7 @@ AUDIT_START_HERE.md
 
 ```bash
 ./nexus verify
-./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND
+./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND
 ```
 
 ## Where private data lives

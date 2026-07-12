@@ -103,6 +103,35 @@ class AuditTests(unittest.TestCase):
             with self.assertRaises(NexusError):
                 ingest_observation(root, "AUD-TEST", path, check_only=True)
 
+    def test_target_commit_must_match_snapshot_source_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.make_audit(root)
+            target_path = root / "operations/audits/AUD-TEST/TARGET.json"
+            target = json.loads(target_path.read_text(encoding="utf-8"))
+            target["target_commit"] = "0" * 40
+            target_path.write_text(json.dumps(target), encoding="utf-8")
+            with self.assertRaisesRegex(NexusError, "snapshot source commit"):
+                check_audit(root, "AUD-TEST")
+
+    def test_moved_target_ref_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            commit, _ = self.make_audit(root)
+            target_path = root / "operations/audits/AUD-TEST/TARGET.json"
+            target = json.loads(target_path.read_text(encoding="utf-8"))
+            target["target_ref"] = "moving-target"
+            target["target_ref_object"] = commit
+            target_path.write_text(json.dumps(target), encoding="utf-8")
+            from system.nexus_lab.util import git
+            git(root, "tag", "moving-target", commit)
+            (root / "payload.txt").write_text("replacement\n", encoding="utf-8")
+            git(root, "add", "payload.txt")
+            git(root, "commit", "-m", "replacement")
+            git(root, "tag", "-f", "moving-target")
+            with self.assertRaisesRegex(NexusError, "ref may have moved"):
+                check_audit(root, "AUD-TEST")
+
     def test_self_promoting_observation_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

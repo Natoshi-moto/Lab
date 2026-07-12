@@ -1,0 +1,33 @@
+{
+  "actual": "",
+  "audit_id": "AUD-R002-CLAUDE-BLIND",
+  "audit_layer": "APPARATUS",
+  "audit_phase": "BLIND",
+  "auditor": {
+    "model_family": "Anthropic",
+    "model_name": "",
+    "provider": "Anthropic",
+    "session_label": "second-account"
+  },
+  "claim": "",
+  "classification": "OBSERVATION",
+  "confidence": "NON_AUTHORITATIVE",
+  "created_at": "",
+  "evidence_refs": [],
+  "exact_location": [],
+  "expected": "",
+  "files_not_seen": [],
+  "files_seen": [],
+  "limitations": [],
+  "observation_id": "AUDOBS-R002-CLAUDE-0001",
+  "previous_record_hash": "",
+  "recommended_future_change": "",
+  "record_hash": "",
+  "reproduction": [],
+  "schema": "nexus.audit-observation/v1",
+  "severity": "UNASSESSED",
+  "status_authority": "NONE",
+  "suggested_next_test": "",
+  "target_archive_sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603",
+  "target_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8"
+}

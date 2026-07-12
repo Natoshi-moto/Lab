@@ -1,8 +1,8 @@
-# Claude audit start — AUD-R001-CLAUDE-BLIND
+# Claude audit start — AUD-R002-CLAUDE-BLIND
 
 ## Mission
 
-Independently test and attack the R001 Nexus repository as an **audit apparatus**, not as a coding task. The exact target is the Git tag `baseline-001` and the snapshot named in `operations/audits/AUD-R001-CLAUDE-BLIND/TARGET.json`.
+Independently test and attack the immutable R001 subject and R002 external-witness overlay as an **audit apparatus**, not as a coding task. The exact subject is the Git tag `baseline-001`, its target commit, and the archive named in `operations/audits/AUD-R002-CLAUDE-BLIND/TARGET.json`. The later overlay is not part of the subject tree.
 
 ## From Claude Code
 
@@ -31,11 +31,11 @@ Independently test and attack the R001 Nexus repository as an **audit apparatus*
 ## Return path
 
 ```text
-operations/audits/AUD-R001-CLAUDE-BLIND/inbox/claude/<observation-id>.json
+operations/audits/AUD-R002-CLAUDE-BLIND/inbox/claude/<observation-id>.json
 ```
 
 Validate locally with:
 
 ```bash
-./nexus audit-ingest --audit-id AUD-R001-CLAUDE-BLIND --check-only <file.json>
+./nexus audit-ingest --audit-id AUD-R002-CLAUDE-BLIND --check-only <file.json>
 ```

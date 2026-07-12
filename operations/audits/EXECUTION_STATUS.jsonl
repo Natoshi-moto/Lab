@@ -1,0 +1,2 @@
+{"audit_id":"AUD-R001-CLAUDE-BLIND","reason":"Replaced for execution by a clean overlay with explicit external-witness target binding; historical files remain unchanged.","status":"SUPERSEDED_FOR_EXECUTION","superseded_by":"AUD-R002-CLAUDE-BLIND"}
+{"audit_id":"AUD-R002-CLAUDE-BLIND","predecessor":"AUD-R001-CLAUDE-BLIND","status":"READY_NOT_STARTED","subject_commit":"7a8068fc6088b81cc9a7c94b49dc77e0abe592d8","subject_tag":"baseline-001"}

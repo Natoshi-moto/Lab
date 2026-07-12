@@ -19,7 +19,7 @@ R001 distinguishes **implemented mechanism**, **test**, **demonstrated property*
 ./nexus doctor
 python3 -m unittest discover -s tests -v
 ./nexus verify
-./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND
+./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND
 ```
 
 ## Audit from another Claude account
