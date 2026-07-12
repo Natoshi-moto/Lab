@@ -1,0 +1,12 @@
+{
+  "authenticated_session_available": false,
+  "checked_at": "2026-07-12T19:53:23Z",
+  "expected_visibility": "PRIVATE",
+  "github_cli_available": false,
+  "nonclaim": "This is a statement about the build environment, not the operator account or future repository.",
+  "origin_configured": false,
+  "reason": "The build environment exposed no authenticated GitHub CLI session, writable GitHub connector or existing origin remote.",
+  "schema": "nexus.remote-status/v1",
+  "status": "NOT_PERFORMED",
+  "unblock_command": "./nexus github-bootstrap --repo-name nexus-research-lab"
+}

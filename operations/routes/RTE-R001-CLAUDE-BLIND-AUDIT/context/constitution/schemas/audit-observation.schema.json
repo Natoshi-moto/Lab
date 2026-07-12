@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actual": {
+      "type": "string"
+    },
+    "audit_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "audit_layer": {
+      "enum": [
+        "ARCHIVE",
+        "APPARATUS",
+        "METHODOLOGY",
+        "PHILOSOPHY",
+        "ROUTING",
+        "PRIVACY",
+        "OPERATOR_FRICTION",
+        "OTHER"
+      ]
+    },
+    "audit_phase": {
+      "enum": [
+        "BLIND",
+        "BRIEFED"
+      ]
+    },
+    "auditor": {
+      "additionalProperties": false,
+      "properties": {
+        "model_family": {
+          "type": "string"
+        },
+        "model_name": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "session_label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "model_family",
+        "model_name",
+        "session_label"
+      ],
+      "type": "object"
+    },
+    "claim": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "classification": {
+      "enum": [
+        "OBSERVATION",
+        "SUSPECTED_DEFECT",
+        "ASSURANCE_GAP",
+        "PROCESS_CONTRADICTION",
+        "PHILOSOPHICAL_TENSION",
+        "ROUTING_FAILURE",
+        "UNABLE_TO_VERIFY",
+        "NO_FINDING_WITH_SCOPE",
+        "NONCOMPLIANT_MUTATION",
+        "RECLASSIFICATION_CANDIDATE"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "NON_AUTHORITATIVE",
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ]
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "exact_location": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "expected": {
+      "type": "string"
+    },
+    "files_not_seen": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "files_seen": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "observation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "previous_record_hash": {
+      "pattern": "^$|^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "recommended_future_change": {
+      "type": "string"
+    },
+    "record_hash": {
+      "pattern": "^$|^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "reproduction": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "schema": {
+      "const": "nexus.audit-observation/v1"
+    },
+    "severity": {
+      "enum": [
+        "UNASSESSED",
+        "INFO",
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ]
+    },
+    "status_authority": {
+      "const": "NONE"
+    },
+    "suggested_next_test": {
+      "type": "string"
+    },
+    "target_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "target_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "observation_id",
+    "audit_id",
+    "target_archive_sha256",
+    "target_commit",
+    "audit_phase",
+    "audit_layer",
+    "auditor",
+    "classification",
+    "claim",
+    "exact_location",
+    "files_seen",
+    "files_not_seen",
+    "evidence_refs",
+    "reproduction",
+    "expected",
+    "actual",
+    "severity",
+    "confidence",
+    "limitations",
+    "suggested_next_test",
+    "recommended_future_change",
+    "status_authority",
+    "created_at",
+    "previous_record_hash",
+    "record_hash"
+  ],
+  "title": "Nexus Audit Observation",
+  "type": "object"
+}

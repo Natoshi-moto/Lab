@@ -1,0 +1,14 @@
+{
+  "archive_path": "snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip",
+  "archive_sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603",
+  "deterministic_rebuild_observed": true,
+  "nonclaim": "Byte-identical rebuild in one environment does not establish universal reproducibility across every ZIP implementation or platform.",
+  "payload_file_count": 106,
+  "payload_manifest_sha256": "34e4337b94685c725e316db95b1c8caa3aac4e6cf1595a6bb8005728f16bfb24",
+  "profile": "full-private-git",
+  "schema": "nexus.snapshot-record/v1",
+  "snapshot_id": "NEXUS-LAB-R001-BASELINE-001",
+  "source_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+  "status": "CANONICAL_AS_IS",
+  "tag": "baseline-001"
+}

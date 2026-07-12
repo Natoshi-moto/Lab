@@ -6,12 +6,12 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R001` |
-| Mode | `BASELINE_CANDIDATE` |
-| Canonical target | None |
+| Mode | `AUDIT_READY_LOCAL` |
+| Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `2` |
-| Last completed action | `ROUTE_PROVENANCE_IDENTIFIER_AND_OVERWRITE_BOUNDARIES_HARDENED` |
-| Next action | `ACT-R001-FREEZE-BASELINE` |
+| Last completed action | `FINAL_BASELINE_FROZEN_ROUTE_COMPILED_AND_BLIND_AUDIT_PACK_BUILT` |
+| Next action | `ACT-R001-CLAUDE-AUDIT` |
 
 ## Active tasks
 

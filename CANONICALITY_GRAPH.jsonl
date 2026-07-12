@@ -1,0 +1,3 @@
+{"edge_id":"CANON-EDGE-001","from":"preaudit-001","reason":"pack-manifest verifier added","relationship":"SUPERSEDED_BY","to":"preaudit-002"}
+{"edge_id":"CANON-EDGE-002","from":"preaudit-002","reason":"route provenance and identifier boundaries hardened","relationship":"SUPERSEDED_BY","to":"baseline-001"}
+{"edge_id":"CANON-EDGE-003","from":"baseline-001","relationship":"AUDITED_BY_OVERLAY","target_sha256":"33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603","to":"AUD-R001-CLAUDE-BLIND"}

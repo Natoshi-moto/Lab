@@ -1,0 +1,45 @@
+{
+  "checks": [
+    "snapshot rebuilt twice byte-identically",
+    "snapshot internal and external manifests verified",
+    "route task, tagged-baseline schema, manifest and included-context bindings verified",
+    "audit pack and embedded route manifests verified",
+    "audit target and empty observation ledger verified"
+  ],
+  "claims": [
+    "The recorded artifacts passed the implemented deterministic, provenance and manifest checks in this environment."
+  ],
+  "exit_code": 0,
+  "finished_at": "2026-07-12T19:53:23Z",
+  "inputs": [
+    {
+      "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+      "file_count": 106,
+      "tag": "baseline-001"
+    }
+  ],
+  "non_claims": [
+    "No remote push was performed.",
+    "No external model independently reproduced the checks.",
+    "These checks do not establish complete security or semantic correctness."
+  ],
+  "operation": "final-freeze-route-and-audit-pack",
+  "outputs": [
+    {
+      "path": "snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip",
+      "sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603"
+    },
+    {
+      "path": "operations/routes/RTE-R001-CLAUDE-BLIND-AUDIT.zip",
+      "sha256": "8cd04352ebe3a0ca8844628e4ea5b5124d4aeb87d5b2907d620ab3db88642e06",
+      "task_sha256": "6cf847616e8c956af660ca0d61063d6f2d7d2cf623bf7f81024f8ef712df81e7"
+    },
+    {
+      "path": "operations/audits/AUD-R001-CLAUDE-BLIND/AUD-R001-CLAUDE-BLIND.zip",
+      "sha256": "345fd9f2ffad72bb12335ee5bc126723445493e31449b92dcdcf1a6482bb65bc"
+    }
+  ],
+  "receipt_id": "RCT-R001-FINAL-FREEZE-ROUTE-AUDIT",
+  "schema": "nexus.receipt/v1",
+  "started_at": "2026-07-12T19:52:13Z"
+}

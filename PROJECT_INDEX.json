@@ -1,0 +1,32 @@
+{
+  "active_target": {
+    "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+    "snapshot_sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603",
+    "tag": "baseline-001"
+  },
+  "authoritative_store": "one_git_repository",
+  "default_branch": "main",
+  "entrypoints": {
+    "all_ai": "AGENTS.md",
+    "audit": "AUDIT_START_HERE.md",
+    "claude": "CLAUDE.md",
+    "human": "README_START_HERE.md",
+    "next_action": "NEXT_ACTION.md",
+    "status": "STATUS.json"
+  },
+  "generated_indexes": [
+    "STATUS.md"
+  ],
+  "lab_id": "NEXUS-LAB",
+  "nonclaim": "This index improves navigation; it does not replace source objects or Git history.",
+  "roots": {
+    "constitution": "constitution",
+    "corpus": "corpus",
+    "domains": "domains",
+    "operations": "operations",
+    "programmes": "programmes",
+    "snapshots": "snapshots",
+    "system": "system"
+  },
+  "schema": "nexus.project-index/v1"
+}

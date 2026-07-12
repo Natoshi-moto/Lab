@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_read": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "allowed_write": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "approval_required": {
+      "type": "boolean"
+    },
+    "authority": {
+      "enum": [
+        "OBSERVE_ONLY",
+        "PROPOSE_ONLY",
+        "EXECUTE_DECLARED_ADAPTER"
+      ]
+    },
+    "baseline_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "data_classes": {
+      "items": {
+        "enum": [
+          "LAB_PRIVATE",
+          "PROVIDER_BOUND",
+          "ROUTE_ONLY",
+          "LOCAL_ONLY",
+          "SECRET"
+        ]
+      },
+      "type": "array"
+    },
+    "exclude_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "include_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "objective": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "output_contract": {
+      "additionalProperties": true,
+      "properties": {
+        "schema_path": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "schema_path"
+      ],
+      "type": "object"
+    },
+    "programme": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requested_role": {
+      "type": "string"
+    },
+    "required_checks": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "route_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "nexus.task/v1"
+    },
+    "seat": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "task_id": {
+      "pattern": "^TSK-[A-Z0-9-]+$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "task_id",
+    "objective",
+    "baseline_ref",
+    "authority",
+    "allowed_read",
+    "allowed_write",
+    "output_contract",
+    "data_classes"
+  ],
+  "title": "Nexus Task",
+  "type": "object"
+}

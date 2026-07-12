@@ -1,0 +1,38 @@
+{
+  "audit_pack": {
+    "path": "operations/audits/AUD-R001-CLAUDE-BLIND/AUD-R001-CLAUDE-BLIND.zip",
+    "sha256": "345fd9f2ffad72bb12335ee5bc126723445493e31449b92dcdcf1a6482bb65bc"
+  },
+  "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+  "nonclaims": [
+    "No remote GitHub mutation occurred in the build environment.",
+    "No external Claude audit result is included.",
+    "Audit-ready does not mean externally audited or production-ready."
+  ],
+  "open_assurance": [
+    "REMOTE_GITHUB_PUSH_NOT_YET_RECORDED",
+    "CLAUDE_EXTERNAL_AUDIT_NOT_YET_INGESTED"
+  ],
+  "release_id": "R001-BASELINE-001",
+  "route": {
+    "path": "operations/routes/RTE-R001-CLAUDE-BLIND-AUDIT.zip",
+    "sha256": "8cd04352ebe3a0ca8844628e4ea5b5124d4aeb87d5b2907d620ab3db88642e06",
+    "task_sha256": "6cf847616e8c956af660ca0d61063d6f2d7d2cf623bf7f81024f8ef712df81e7"
+  },
+  "schema": "nexus.release-record/v1",
+  "snapshot": {
+    "path": "snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip",
+    "sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603"
+  },
+  "status": "AUDIT_READY_LOCAL_NOT_REMOTE",
+  "tag": "baseline-001",
+  "verification": {
+    "audit_ledger": "PASS",
+    "audit_pack": "PASS",
+    "deterministic_rebuild": "PASS",
+    "doctor": "PASS",
+    "route_pack": "PASS",
+    "snapshot": "PASS",
+    "unit_tests": 27
+  }
+}
