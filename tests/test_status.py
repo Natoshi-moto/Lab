@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import unittest
+import tomllib
+from pathlib import Path
 
 from system.nexus_lab.status import render_status_markdown
 
 
 class StatusTests(unittest.TestCase):
+    def test_pyproject_is_valid_toml(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+        self.assertEqual(data["project"]["name"], "nexus-research-lab")
+
     def test_status_render_names_source_and_next_action(self) -> None:
         text = render_status_markdown({
             "lab_id": "LAB",

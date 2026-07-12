@@ -51,6 +51,8 @@ class RouteTests(unittest.TestCase):
             self.assertEqual(result["included_count"], 2)
             route = json.loads((out / "RTE-TEST-001" / "ROUTE.json").read_text(encoding="utf-8"))
             self.assertEqual(route["baseline_commit"], commit)
+            self.assertEqual(len(route["task_sha256"]), 64)
+            self.assertTrue((out / "RTE-TEST-001" / "TASK.json").is_file())
             self.assertEqual([x["path"] for x in route["included"]], ["docs/a.md", "docs/b.md"])
             self.assertIn("private", route["excluded"])
             with zipfile.ZipFile(out / "RTE-TEST-001.zip") as archive:
@@ -59,6 +61,27 @@ class RouteTests(unittest.TestCase):
                 self.assertIn("EXCLUSIONS.md", archive.namelist())
             verified = verify_manifest_pack(out / "RTE-TEST-001.zip")
             self.assertEqual(verified["kind"], "route")
+
+    def test_output_schema_is_read_from_tagged_baseline_not_live_worktree(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            commit = self.make_repo(root)
+            task_path = self.task(root, commit)
+            (root / "schema.json").write_text('{"changed":true}\n', encoding="utf-8")
+            out = root / "routes"
+            build_route(root, task_path, output_root=out)
+            schema = json.loads((out / "RTE-TEST-001" / "OUTPUT_SCHEMA.json").read_text(encoding="utf-8"))
+            self.assertEqual(schema, {"type": "object"})
+
+    def test_existing_route_id_is_not_overwritten(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            commit = self.make_repo(root)
+            task_path = self.task(root, commit)
+            out = root / "routes"
+            build_route(root, task_path, output_root=out)
+            with self.assertRaises(NexusError):
+                build_route(root, task_path, output_root=out)
 
     def test_route_rejects_path_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

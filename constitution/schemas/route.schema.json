@@ -51,6 +51,10 @@
     "task_id": {
       "type": "string"
     },
+    "task_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
     "unread_archive_notice": {
       "type": "string"
     }
@@ -59,6 +63,7 @@
     "schema",
     "route_id",
     "task_id",
+    "task_sha256",
     "baseline_ref",
     "baseline_commit",
     "authority",

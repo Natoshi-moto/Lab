@@ -1,7 +1,3 @@
-[build-system]
-requires = []
-build-backend = ""
-
 [project]
 name = "nexus-research-lab"
 version = "0.1.0"
@@ -11,3 +7,5 @@ dependencies = []
 
 [tool.nexus]
 standard_library_only = true
+entrypoint = "./nexus"
+install_required = false

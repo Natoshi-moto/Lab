@@ -14,6 +14,7 @@ from tests.helpers import init_git_repo
 
 class AuditTests(unittest.TestCase):
     def make_audit(self, root: Path) -> tuple[str, dict]:
+        root.mkdir(parents=True, exist_ok=True)
         (root / "NEXUS.json").write_text('{}\n', encoding="utf-8")
         (root / "docs").mkdir()
         (root / "docs" / "CLAUDE_AUDIT_GUIDE.md").write_text("# Test plan\n", encoding="utf-8")
@@ -61,6 +62,35 @@ class AuditTests(unittest.TestCase):
             report = check_audit(root, "AUD-TEST")
             self.assertEqual(report["observation_count"], 2)
             self.assertEqual(report["status"], "PASS")
+
+    def test_audit_and_observation_identifiers_reject_traversal(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "NEXUS.json").write_text('{}\n', encoding="utf-8")
+            (root / "docs").mkdir()
+            (root / "docs" / "CLAUDE_AUDIT_GUIDE.md").write_text("# Test\n", encoding="utf-8")
+            (root / "payload.txt").write_text("target\n", encoding="utf-8")
+            commit = init_git_repo(root)
+            snapshot = root / "target.zip"
+            build_snapshot(root, ref=commit, snapshot_id="TARGET", output=snapshot)
+            with self.assertRaises(NexusError):
+                build_audit_pack(root, audit_id="../../escape", target_snapshot=snapshot)
+
+            self.make_audit(root / "valid")
+            observation = self.observation(root / "valid")
+            observation["observation_id"] = "../escape"
+            path = root / "valid" / "bad-id.json"
+            path.write_text(json.dumps(observation), encoding="utf-8")
+            with self.assertRaises(NexusError):
+                ingest_observation(root / "valid", "AUD-TEST", path, check_only=True)
+
+    def test_existing_audit_is_not_overwritten(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.make_audit(root)
+            target = root / "snapshots" / "target.zip"
+            with self.assertRaises(NexusError):
+                build_audit_pack(root, audit_id="AUD-TEST", target_snapshot=target)
 
     def test_target_substitution_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

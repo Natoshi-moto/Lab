@@ -1,0 +1,53 @@
+{
+  "claims": [
+    "Doctor passed on the final candidate working tree.",
+    "All 27 discovered unit and adversarial tests passed."
+  ],
+  "coverage_notes": [
+    "route task and schema are baseline-bound",
+    "audit and observation identifiers reject traversal",
+    "existing route and audit IDs cannot overwrite prior outputs",
+    "worktree symlinks are reported",
+    "snapshot and pack tampering remains covered"
+  ],
+  "environment": {
+    "git": "git version 2.47.3",
+    "python": "3.13.5"
+  },
+  "exit_code": 0,
+  "finished_at": "2026-07-12T19:52:09Z",
+  "inputs": [
+    {
+      "path": "system/nexus_lab/"
+    },
+    {
+      "path": "tests/"
+    },
+    {
+      "path": "constitution/schemas/"
+    }
+  ],
+  "non_claims": [
+    "The active baseline commit and snapshot did not yet exist when this receipt was written.",
+    "No remote GitHub operation or external Claude audit was performed.",
+    "Passing tests do not establish complete security, privacy or semantic correctness."
+  ],
+  "operation": "final-baseline-candidate-local-verification",
+  "outputs": [
+    {
+      "path": "operations/receipts/R001_BASELINE_CANDIDATE_003/doctor.json",
+      "sha256": "9beb4ed708b6fb4e5efff6bfb77558817cadd57014edcf248f1bb36c3b0a372f"
+    },
+    {
+      "path": "operations/receipts/R001_BASELINE_CANDIDATE_003/unittest.stderr.txt",
+      "sha256": "fa2d0303eb267ce63624d50eb67c9c2c7218c10af24994fc4f27f4d859c2112f"
+    },
+    {
+      "path": "operations/receipts/R001_BASELINE_CANDIDATE_003/unittest.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "receipt_id": "RCT-R001-BASELINE-CANDIDATE-003",
+  "schema": "nexus.receipt/v1",
+  "started_at": "2026-07-12T00:00:00Z"
+}

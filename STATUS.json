@@ -10,7 +10,7 @@
   "current_mode": "BASELINE_CANDIDATE",
   "current_round": "R001",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "PACK_MANIFEST_VERIFICATION_ADDED_AND_PREAUDIT_COMMIT_PRESERVED",
+  "last_completed_action": "ROUTE_PROVENANCE_IDENTIFIER_AND_OVERWRITE_BOUNDARIES_HARDENED",
   "next_action_id": "ACT-R001-FREEZE-BASELINE",
   "open_assurance_blocks": 2,
   "open_defect_blocks": 0,

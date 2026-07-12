@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from .util import NexusError, git, list_files, load_json, sha256_file
+from .util import NexusError, git, list_files, load_json, safe_join, sha256_file
 
 REQUIRED_PATHS = [
     "NEXUS.json", "STATUS.json", "README_START_HERE.md", "NEXT_ACTION.md", "AGENTS.md", "CLAUDE.md",
@@ -28,6 +28,8 @@ def scan_secrets(root: Path) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     for path in list_files(root, exclude_dirs={".git", "derived", "__pycache__"}):
         rel = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            continue
         if path.suffix.lower() not in TEXT_SUFFIXES and path.name not in {"nexus", ".gitignore", ".gitattributes"}:
             continue
         if path.stat().st_size > 5 * 1024 * 1024:
@@ -52,6 +54,11 @@ def run_doctor(root: Path) -> dict[str, Any]:
     if missing:
         errors.extend(f"MISSING_REQUIRED_PATH {rel}" for rel in missing)
     checks.append({"check": "required_paths", "status": "PASS" if not missing else "FAIL", "count": len(REQUIRED_PATHS)})
+
+    symlinks = [path.relative_to(root).as_posix() for path in root.rglob("*") if ".git" not in path.relative_to(root).parts and path.is_symlink()]
+    if symlinks:
+        errors.extend(f"SYMLINK_IN_WORKTREE {path}" for path in symlinks)
+    checks.append({"check": "symlink_policy", "status": "PASS" if not symlinks else "FAIL", "findings": len(symlinks)})
 
     json_count = 0
     jsonl_count = 0
@@ -88,7 +95,7 @@ def run_doctor(root: Path) -> dict[str, Any]:
     source_record = root / "corpus/records/sources/SRC-2026-000001.json"
     if source_record.exists():
         record = load_json(source_record)
-        source = root / record["path"]
+        source = safe_join(root, record["path"])
         if not source.exists():
             errors.append("HANDOFF_SOURCE_MISSING")
         elif sha256_file(source) != record["sha256"]:

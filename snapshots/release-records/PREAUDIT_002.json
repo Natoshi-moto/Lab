@@ -1,0 +1,11 @@
+{
+  "commit": "ab6a56e6d46dcbbb04531207548956ce6f9ab443",
+  "external_distribution": false,
+  "nonclaim": "The tag and recorded digest preserve the earlier state; supersession does not rewrite it.",
+  "reason": "A final internal red-team pass bound task and output-schema bytes to the tagged baseline, rejected identifier traversal, prohibited in-place route/audit overwrite, added symlink policy checks, and strengthened route provenance verification.",
+  "record_id": "RELHIST-R001-PREAUDIT-002",
+  "schema": "nexus.release-history/v1",
+  "snapshot_sha256": "1299c02769eed0a44d59f12dcd620b2c8e3984f528e4f7f8e6ec81f513648564",
+  "status": "SUPERSEDED_BEFORE_EXTERNAL_AUDIT",
+  "tag": "preaudit-002"
+}

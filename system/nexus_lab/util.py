@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import stat
 import subprocess
 import tempfile
@@ -13,6 +14,15 @@ from typing import Any, Iterable, Mapping, Sequence
 
 class NexusError(RuntimeError):
     """Expected, user-actionable Nexus failure."""
+
+
+IDENTIFIER_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
+
+def validate_identifier(value: str, *, label: str = "identifier") -> str:
+    if not isinstance(value, str) or not IDENTIFIER_PATTERN.fullmatch(value):
+        raise NexusError(f"Unsafe {label}: {value!r}. Use 1-128 ASCII letters, digits, dot, underscore or dash; start with a letter or digit.")
+    return value
 
 
 def find_repo_root(start: Path | None = None) -> Path:
@@ -108,7 +118,7 @@ def git_commit_time(root: Path, commit: str) -> str:
 
 
 def validate_relative_path(value: str) -> PurePosixPath:
-    if not value or "\\" in value:
+    if not value or "\\" in value or any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
         raise NexusError(f"Unsafe or empty repository path: {value!r}")
     path = PurePosixPath(value)
     if path.is_absolute() or any(part in ("", ".", "..") for part in path.parts):

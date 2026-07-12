@@ -10,7 +10,7 @@
 | Canonical target | None |
 | Open defect blocks | `0` |
 | Open assurance blocks | `2` |
-| Last completed action | `PACK_MANIFEST_VERIFICATION_ADDED_AND_PREAUDIT_COMMIT_PRESERVED` |
+| Last completed action | `ROUTE_PROVENANCE_IDENTIFIER_AND_OVERWRITE_BOUNDARIES_HARDENED` |
 | Next action | `ACT-R001-FREEZE-BASELINE` |
 
 ## Active tasks
