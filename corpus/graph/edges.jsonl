@@ -1,0 +1,3 @@
+{"edge_id":"EDGE-000001","from_id":"SRC-2026-000001","from_type":"SOURCE","relationship":"INFORMED","to_id":"DEC-2026-000001","to_type":"DECISION"}
+{"edge_id":"EDGE-000002","from_id":"SRC-2026-000001","from_type":"SOURCE","relationship":"MOTIVATED","to_id":"CLM-2026-000001","to_type":"CLAIM"}
+{"edge_id":"EDGE-000003","from_id":"FAIL-2026-000001","from_type":"FAILURE","relationship":"GUARDS","to_id":"constitution/ROUTING.md","to_type":"POLICY"}

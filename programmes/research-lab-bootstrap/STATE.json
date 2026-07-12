@@ -1,0 +1,12 @@
+{
+  "active_task": "TSK-R001-CLAUDE-BLIND-AUDIT",
+  "baseline_ref": "baseline-001",
+  "open_assurance": [
+    "REMOTE_GITHUB_PUSH_NOT_YET_RECORDED",
+    "CLAUDE_EXTERNAL_AUDIT_NOT_YET_INGESTED"
+  ],
+  "programme": "research-lab-bootstrap",
+  "round": "R001",
+  "schema": "nexus.programme-state/v1",
+  "status": "BASELINE_CANDIDATE"
+}

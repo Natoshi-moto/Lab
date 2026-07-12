@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "created_at": {
+      "type": "string"
+    },
+    "created_by": {
+      "type": "object"
+    },
+    "data_class": {
+      "enum": [
+        "LAB_PRIVATE",
+        "PROVIDER_BOUND",
+        "ROUTE_ONLY",
+        "LOCAL_ONLY",
+        "SECRET"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "schema": {
+      "const": "nexus.object/v1"
+    },
+    "status": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "kind",
+    "status",
+    "title",
+    "created_at",
+    "created_by",
+    "data_class"
+  ],
+  "title": "Nexus Corpus Object",
+  "type": "object"
+}

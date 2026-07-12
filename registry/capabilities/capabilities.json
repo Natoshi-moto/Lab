@@ -1,0 +1,32 @@
+{
+  "capabilities": [
+    {
+      "effect": "READ",
+      "id": "corpus.read",
+      "scope_required": true
+    },
+    {
+      "effect": "WRITE_RETURN_ONLY",
+      "id": "route.return",
+      "scope_required": true
+    },
+    {
+      "effect": "APPEND_OBSERVATION",
+      "id": "audit.observe",
+      "scope_required": true
+    },
+    {
+      "effect": "BOUNDED_EXECUTION",
+      "human_approval_required": true,
+      "id": "adapter.execute",
+      "scope_required": true
+    },
+    {
+      "effect": "ACCEPTED_STATE_MUTATION",
+      "human_only": true,
+      "id": "main.merge",
+      "scope_required": true
+    }
+  ],
+  "schema": "nexus.capability-registry/v1"
+}

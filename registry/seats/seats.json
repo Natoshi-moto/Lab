@@ -1,0 +1,45 @@
+{
+  "note": "Seat records describe access and provenance. They do not confer epistemic authority.",
+  "schema": "nexus.seat-registry/v1",
+  "seats": [
+    {
+      "authority": [
+        "PURPOSE",
+        "APPROVE",
+        "MERGE",
+        "TAG",
+        "RELEASE"
+      ],
+      "id": "operator",
+      "kind": "human",
+      "provider": "local"
+    },
+    {
+      "account_label": "PRIMARY_UNSPECIFIED",
+      "allowed_data_classes": [
+        "LAB_PRIVATE",
+        "ROUTE_ONLY"
+      ],
+      "authority": [
+        "PROPOSE_ONLY"
+      ],
+      "id": "openai-chatgpt-primary",
+      "kind": "ai",
+      "provider": "openai"
+    },
+    {
+      "account_label": "SECOND_ACCOUNT_UNSPECIFIED",
+      "allowed_data_classes": [
+        "LAB_PRIVATE",
+        "ROUTE_ONLY"
+      ],
+      "authority": [
+        "OBSERVE_ONLY"
+      ],
+      "id": "anthropic-claude-auditor",
+      "kind": "ai",
+      "provider": "anthropic",
+      "review_class": "SAME_FAMILY_DIFFERENTIAL"
+    }
+  ]
+}

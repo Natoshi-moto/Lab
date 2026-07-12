@@ -1,0 +1,11 @@
+{
+  "object_refs": [
+    "SRC-2026-000001",
+    "DEC-2026-000001",
+    "CLM-2026-000001",
+    "Q-2026-000001",
+    "FAIL-2026-000001"
+  ],
+  "programme": "research-lab-bootstrap",
+  "schema": "nexus.programme-map/v1"
+}

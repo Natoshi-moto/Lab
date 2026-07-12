@@ -1,0 +1,29 @@
+{
+  "providers": [
+    {
+      "data_boundary": "PRIVATE_REPOSITORY",
+      "id": "github",
+      "kind": "repository_host",
+      "status": "DECLARED"
+    },
+    {
+      "data_boundary": "ACCOUNT_DEPENDENT",
+      "id": "openai",
+      "kind": "external_ai_provider",
+      "status": "DECLARED"
+    },
+    {
+      "data_boundary": "ACCOUNT_DEPENDENT",
+      "id": "anthropic",
+      "kind": "external_ai_provider",
+      "status": "DECLARED"
+    },
+    {
+      "data_boundary": "LOCAL",
+      "id": "local",
+      "kind": "operator_controlled_compute",
+      "status": "DECLARED"
+    }
+  ],
+  "schema": "nexus.provider-registry/v1"
+}

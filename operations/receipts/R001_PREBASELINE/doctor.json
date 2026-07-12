@@ -1,0 +1,47 @@
+{
+  "checks": [
+    {
+      "check": "required_paths",
+      "count": 16,
+      "status": "PASS"
+    },
+    {
+      "check": "json_parse",
+      "json_files": 21,
+      "jsonl_files": 5,
+      "status": "FAIL"
+    },
+    {
+      "check": "secret_patterns",
+      "findings": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "privacy_ignore_rules",
+      "status": "PASS"
+    },
+    {
+      "check": "seed_handoff_binding",
+      "status": "PASS"
+    },
+    {
+      "check": "git_repository",
+      "status": "WARN",
+      "worktree": "UNAVAILABLE"
+    }
+  ],
+  "claims": [
+    "Selected structural, parse, privacy-pattern and seed-source checks were executed."
+  ],
+  "errors": [
+    "INVALID_JSON operations/receipts/R001_PREBASELINE/doctor.json: Expecting value: line 1 column 1 (char 0)"
+  ],
+  "non_claims": [
+    "A PASS is not an exhaustive security, privacy or semantic audit."
+  ],
+  "schema": "nexus.doctor-report/v1",
+  "status": "FAIL",
+  "warnings": [
+    "GIT_NOT_INITIALIZED"
+  ]
+}

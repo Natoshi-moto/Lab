@@ -1,0 +1,50 @@
+# Python and editor state
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.jks
+*.keystore
+secrets/
+credentials/
+*.credentials.json
+
+# Local-only corpus payloads: commit manifests, never plaintext payloads
+corpus/local-only/*
+!corpus/local-only/README.md
+
+# Derived/rebuildable state
+derived/*
+!derived/.gitkeep
+
+# Temporary and transport files
+*.tmp
+*.swp
+*.bak
+*.log
+*.tar
+*.tar.gz
+*.7z
+*.zip
+!snapshots/**/*.zip
+!operations/routes/**/*.zip
+!operations/audits/**/*.zip
+
+# Claude local preferences and auto-memory
+CLAUDE.local.md
+.claude/settings.local.json

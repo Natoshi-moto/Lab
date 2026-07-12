@@ -1,0 +1,57 @@
+{
+  "checks": [
+    {
+      "command": "./nexus doctor --json",
+      "exit_code": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "5d6f31aa19c7c31ab5234b94c659158f905973ffe3cf729a6927e82c636b8cea"
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "stderr_sha256": "4d79059560bdcb75dd22e59872a19eb7b002746c7ec36ffdf1383f16d2a4b296",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "claims": [
+    "Doctor completed without error.",
+    "All 20 discovered tests passed in this environment."
+  ],
+  "environment": {
+    "git": "git version 2.47.3",
+    "platform": "Linux-4.4.0-x86_64-with-glibc2.41",
+    "python": "3.13.5"
+  },
+  "exit_code": 0,
+  "finished_at": "2026-07-12T19:40:36Z",
+  "inputs": [
+    {
+      "description": "20 standard-library unit and attack tests",
+      "path": "tests/"
+    },
+    {
+      "description": "operator implementation",
+      "path": "system/nexus_lab/"
+    }
+  ],
+  "non_claims": [
+    "No remote GitHub operation was performed.",
+    "No external Claude audit was performed.",
+    "Passing tests do not establish complete security, privacy, semantic correctness or production readiness."
+  ],
+  "operation": "prebaseline-local-verification",
+  "outputs": [
+    {
+      "path": "operations/receipts/R001_PREBASELINE/doctor.json"
+    },
+    {
+      "path": "operations/receipts/R001_PREBASELINE/unittest.stdout.txt"
+    },
+    {
+      "path": "operations/receipts/R001_PREBASELINE/unittest.stderr.txt"
+    }
+  ],
+  "receipt_id": "RCT-R001-PREBASELINE-LOCAL-VERIFICATION",
+  "schema": "nexus.receipt/v1",
+  "started_at": "2026-07-12T00:00:00Z"
+}

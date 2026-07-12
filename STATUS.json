@@ -1,0 +1,18 @@
+{
+  "active_tasks": [
+    "TSK-R001-CLAUDE-BLIND-AUDIT"
+  ],
+  "assurance_blocks": [
+    "REMOTE_GITHUB_PUSH_NOT_YET_RECORDED",
+    "CLAUDE_EXTERNAL_AUDIT_NOT_YET_INGESTED"
+  ],
+  "canonical_target": null,
+  "current_mode": "BASELINE_CANDIDATE",
+  "current_round": "R001",
+  "lab_id": "NEXUS-LAB",
+  "last_completed_action": "IMPLEMENTATION_AND_LOCAL_ATTACK_TESTS_PASSED",
+  "next_action_id": "ACT-R001-FREEZE-BASELINE",
+  "open_assurance_blocks": 2,
+  "open_defect_blocks": 0,
+  "schema": "nexus.status/v1"
+}

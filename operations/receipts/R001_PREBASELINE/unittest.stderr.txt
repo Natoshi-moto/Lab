@@ -1,0 +1,25 @@
+test_chain_tampering_is_detected (test_audit.AuditTests.test_chain_tampering_is_detected) ... ok
+test_self_promoting_observation_is_rejected (test_audit.AuditTests.test_self_promoting_observation_is_rejected) ... ok
+test_target_substitution_is_rejected (test_audit.AuditTests.test_target_substitution_is_rejected) ... ok
+test_valid_observation_appends_and_chain_verifies (test_audit.AuditTests.test_valid_observation_appends_and_chain_verifies) ... ok
+test_current_repository_doctor_has_no_errors (test_doctor.DoctorTests.test_current_repository_doctor_has_no_errors) ... ok
+test_secret_pattern_finds_constructed_github_token (test_doctor.DoctorTests.test_secret_pattern_finds_constructed_github_token) ... ok
+test_malformed_response_is_rejected (test_github.GitHubGuardTests.test_malformed_response_is_rejected) ... ok
+test_private_visibility_parses (test_github.GitHubGuardTests.test_private_visibility_parses) ... ok
+test_public_visibility_is_refused (test_github.GitHubGuardTests.test_public_visibility_is_refused) ... ok
+test_route_declares_exact_context_and_exclusions (test_route.RouteTests.test_route_declares_exact_context_and_exclusions) ... ok
+test_route_refuses_secret_data_class (test_route.RouteTests.test_route_refuses_secret_data_class) ... ok
+test_route_rejects_path_traversal (test_route.RouteTests.test_route_rejects_path_traversal) ... ok
+test_external_digest_mismatch_fails (test_snapshot.SnapshotTests.test_external_digest_mismatch_fails) ... ok
+test_same_commit_produces_byte_identical_snapshot (test_snapshot.SnapshotTests.test_same_commit_produces_byte_identical_snapshot) ... ok
+test_tampered_member_fails_internal_manifest (test_snapshot.SnapshotTests.test_tampered_member_fails_internal_manifest) ... ok
+test_tracked_symlink_is_refused (test_snapshot.SnapshotTests.test_tracked_symlink_is_refused) ... ok
+test_status_render_names_source_and_next_action (test_status.StatusTests.test_status_render_names_source_and_next_action) ... ok
+test_canonical_json_is_order_independent (test_util.UtilTests.test_canonical_json_is_order_independent) ... ok
+test_manifest_rejects_duplicate_paths (test_util.UtilTests.test_manifest_rejects_duplicate_paths) ... ok
+test_path_traversal_is_rejected (test_util.UtilTests.test_path_traversal_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 2.577s
+
+OK

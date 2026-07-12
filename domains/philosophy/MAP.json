@@ -1,0 +1,12 @@
+{
+  "domain": "philosophy",
+  "note": "References only; objects are not duplicated here.",
+  "object_refs": [
+    "SRC-2026-000001",
+    "DEC-2026-000001",
+    "CLM-2026-000001",
+    "Q-2026-000001",
+    "FAIL-2026-000001"
+  ],
+  "schema": "nexus.domain-map/v1"
+}

@@ -1,0 +1,21 @@
+{
+  "canonical_status": "NON_CANONICAL",
+  "created_at": "2026-07-12T00:00:00Z",
+  "created_by": {
+    "method": "uploaded_handoff",
+    "seat": "operator"
+  },
+  "data_class": "LAB_PRIVATE",
+  "id": "SRC-2026-000001",
+  "kind": "source",
+  "non_claims": [
+    "The handoff is not implementation authority.",
+    "Preservation does not make every historical mechanism current."
+  ],
+  "path": "corpus/raw/handoffs/NEXUS_WHOLE_SYSTEM_IDEATION_HANDOFF_R001.md",
+  "schema": "nexus.object/v1",
+  "sha256": "fde49fd829eb2caef2a98e21f980f3830a1e7b1760ca88c5b1ba632bac79849e",
+  "source_role": "CANDIDATE_IDEATION_HANDOFF",
+  "status": "PRESERVED",
+  "title": "Nexus Whole-System Ideation Handoff R001"
+}

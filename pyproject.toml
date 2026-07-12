@@ -1,0 +1,13 @@
+[build-system]
+requires = []
+build-backend = ""
+
+[project]
+name = "nexus-research-lab"
+version = "0.1.0"
+description = "Private, one-repository multi-model research laboratory operator tools"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.nexus]
+standard_library_only = true

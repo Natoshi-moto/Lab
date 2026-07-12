@@ -1,0 +1,57 @@
+name: Claude blind audit observation
+description: Record or route a hash-bound R001 audit observation
+title: "[AUD-R001] "
+labels: ["audit", "claude", "observation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read `AUDIT_START_HERE.md`. This issue is an observation carrier, not authority to mutate the target.
+  - type: input
+    id: observation
+    attributes:
+      label: Observation ID
+      placeholder: AUDOBS-R001-CLAUDE-0001
+    validations:
+      required: true
+  - type: dropdown
+    id: classification
+    attributes:
+      label: Classification
+      options:
+        - OBSERVATION
+        - SUSPECTED_DEFECT
+        - ASSURANCE_GAP
+        - PROCESS_CONTRADICTION
+        - PHILOSOPHICAL_TENSION
+        - ROUTING_FAILURE
+        - UNABLE_TO_VERIFY
+        - NO_FINDING_WITH_SCOPE
+        - NONCOMPLIANT_MUTATION
+        - RECLASSIFICATION_CANDIDATE
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: One exact claim
+    validations:
+      required: true
+  - type: textarea
+    id: locations
+    attributes:
+      label: Exact files and locations
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction, expected and actual results
+    validations:
+      required: true
+  - type: textarea
+    id: limits
+    attributes:
+      label: Files not seen and limitations
+    validations:
+      required: true

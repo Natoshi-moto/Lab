@@ -1,0 +1,30 @@
+{
+  "schema": "nexus.lab/v1",
+  "lab_id": "NEXUS-LAB",
+  "title": "Nexus Private Research Lab",
+  "visibility_requirement": "PRIVATE",
+  "authoritative_store": "one_git_repository",
+  "default_branch": "main",
+  "status_path": "STATUS.json",
+  "next_action_path": "NEXT_ACTION.md",
+  "corpus_root": "corpus",
+  "constitution_root": "constitution",
+  "operations_root": "operations",
+  "snapshots_root": "snapshots",
+  "data_classes": [
+    "LAB_PRIVATE",
+    "PROVIDER_BOUND",
+    "ROUTE_ONLY",
+    "LOCAL_ONLY",
+    "SECRET"
+  ],
+  "invariants": [
+    "proposal_is_not_action",
+    "action_is_not_truth",
+    "evidence_is_not_interpretation",
+    "computation_is_not_authority",
+    "one_object_one_identity_many_memberships",
+    "no_silent_mutation",
+    "audit_overlays_do_not_rewrite_targets"
+  ]
+}
