@@ -1,0 +1,43 @@
+{
+  "claims": [
+    "Doctor passed on the candidate working tree.",
+    "All 20 discovered unit and attack tests passed after pack-manifest verification was added."
+  ],
+  "environment": {
+    "git": "git version 2.47.3",
+    "python": "3.13.5"
+  },
+  "exit_code": 0,
+  "finished_at": "2026-07-12T19:44:05Z",
+  "inputs": [
+    {
+      "path": "system/nexus_lab/"
+    },
+    {
+      "path": "tests/"
+    }
+  ],
+  "non_claims": [
+    "The active Git commit and snapshot did not yet exist when this receipt was written.",
+    "No remote GitHub operation or external Claude audit was performed.",
+    "Passing tests do not establish complete security, privacy or semantic correctness."
+  ],
+  "operation": "baseline-candidate-local-verification",
+  "outputs": [
+    {
+      "path": "operations/receipts/R001_BASELINE_CANDIDATE/doctor.json",
+      "sha256": "da91f65ac8a770b8eba7cec7b10308fef32a362f0c333c0c2f3b408fd1d2149e"
+    },
+    {
+      "path": "operations/receipts/R001_BASELINE_CANDIDATE/unittest.stderr.txt",
+      "sha256": "9948cead11e477c67fe6bc88c8fd073fd9e9c1cb603196352a0cd18382357589"
+    },
+    {
+      "path": "operations/receipts/R001_BASELINE_CANDIDATE/unittest.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "receipt_id": "RCT-R001-BASELINE-CANDIDATE-002",
+  "schema": "nexus.receipt/v1",
+  "started_at": "2026-07-12T00:00:00Z"
+}

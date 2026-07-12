@@ -10,7 +10,7 @@
 | Canonical target | None |
 | Open defect blocks | `0` |
 | Open assurance blocks | `2` |
-| Last completed action | `IMPLEMENTATION_AND_LOCAL_ATTACK_TESTS_PASSED` |
+| Last completed action | `PACK_MANIFEST_VERIFICATION_ADDED_AND_PREAUDIT_COMMIT_PRESERVED` |
 | Next action | `ACT-R001-FREEZE-BASELINE` |
 
 ## Active tasks

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from system.nexus_lab.audit import build_audit_pack, check_audit, ingest_observation
 from system.nexus_lab.snapshot import build_snapshot
+from system.nexus_lab.route import verify_manifest_pack
 from system.nexus_lab.util import NexusError
 from tests.helpers import init_git_repo
 
@@ -21,6 +22,9 @@ class AuditTests(unittest.TestCase):
         snapshot = root / "snapshots" / "target.zip"
         result = build_snapshot(root, ref=commit, snapshot_id="AUDIT-TARGET", output=snapshot)
         target = build_audit_pack(root, audit_id="AUD-TEST", target_snapshot=snapshot)
+        verified_pack = verify_manifest_pack(root / target["audit_pack_path"])
+        if verified_pack["status"] != "PASS":
+            raise AssertionError("audit pack verification failed")
         return commit, target
 
     def observation(self, root: Path) -> dict:

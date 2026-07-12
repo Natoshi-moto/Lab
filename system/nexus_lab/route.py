@@ -143,3 +143,56 @@ def build_route(root: Path, task_path: Path, *, output_root: Path | None = None)
         "included_count": len(included),
         "baseline_commit": commit,
     }
+
+
+
+def verify_manifest_pack(path: Path) -> dict[str, Any]:
+    """Verify a deterministic route/audit ZIP whose MANIFEST covers every other member."""
+    import zipfile
+    from .util import parse_manifest, sha256_file
+
+    if not path.is_file():
+        raise NexusError(f"Pack is missing: {path}")
+    with zipfile.ZipFile(path, "r") as archive:
+        names = archive.namelist()
+        if len(names) != len(set(names)):
+            raise NexusError(f"Pack contains duplicate member names: {path}")
+        if names != sorted(names):
+            raise NexusError(f"Pack member order is not deterministic: {path}")
+        entries: dict[str, bytes] = {}
+        for info in archive.infolist():
+            validate_relative_path(info.filename)
+            if info.date_time != FIXED_ZIP_TIME:
+                raise NexusError(f"Pack member timestamp is not deterministic: {info.filename}")
+            mode = (info.external_attr >> 16) & 0xFFFF
+            if (mode & 0o170000) == 0o120000:
+                raise NexusError(f"Pack contains a symbolic link: {info.filename}")
+            entries[info.filename] = archive.read(info)
+    if "MANIFEST.sha256" not in entries:
+        raise NexusError(f"Pack has no MANIFEST.sha256: {path}")
+    manifest = parse_manifest(entries["MANIFEST.sha256"].decode("utf-8"))
+    subject = {name: data for name, data in entries.items() if name != "MANIFEST.sha256"}
+    if set(manifest) != set(subject):
+        missing = sorted(set(subject) - set(manifest))
+        extra = sorted(set(manifest) - set(subject))
+        raise NexusError(f"Pack manifest member mismatch; missing={missing}, extra={extra}")
+    for name, expected in manifest.items():
+        actual = sha256_bytes(subject[name])
+        if actual != expected:
+            raise NexusError(f"Pack manifest digest mismatch for {name}: expected {expected}, got {actual}")
+    result: dict[str, Any] = {
+        "path": str(path),
+        "archive_sha256": sha256_file(path),
+        "member_count": len(entries),
+        "status": "PASS",
+    }
+    if "ROUTE.json" in entries:
+        route = json.loads(entries["ROUTE.json"])
+        for item in route.get("included", []):
+            member = "context/" + item["path"]
+            if member not in subject or sha256_bytes(subject[member]) != item["sha256"]:
+                raise NexusError(f"Route included-context binding failed for {item['path']}")
+        result.update({"kind": "route", "route_id": route.get("route_id"), "baseline_commit": route.get("baseline_commit")})
+    else:
+        result["kind"] = "audit-or-generic"
+    return result

@@ -1,0 +1,10 @@
+{
+  "commit": "73b08604803dad884653f29bdc354543d137a200",
+  "external_distribution": false,
+  "nonclaim": "Superseded does not mean the earlier bytes disappeared or were retroactively altered.",
+  "reason": "A post-freeze review added deterministic manifest verification for route and audit ZIPs and corresponding tests. The earlier commit is preserved rather than rewritten.",
+  "record_id": "RELHIST-R001-PREAUDIT-001",
+  "schema": "nexus.release-history/v1",
+  "status": "SUPERSEDED_BEFORE_EXTERNAL_AUDIT",
+  "tag": "preaudit-001"
+}

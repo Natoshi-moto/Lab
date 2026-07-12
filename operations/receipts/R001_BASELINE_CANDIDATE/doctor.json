@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "check": "required_paths",
+      "count": 16,
+      "status": "PASS"
+    },
+    {
+      "check": "json_parse",
+      "json_files": 23,
+      "jsonl_files": 5,
+      "status": "PASS"
+    },
+    {
+      "check": "secret_patterns",
+      "findings": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "privacy_ignore_rules",
+      "status": "PASS"
+    },
+    {
+      "check": "seed_handoff_binding",
+      "status": "PASS"
+    },
+    {
+      "check": "git_repository",
+      "status": "PASS",
+      "worktree": "DIRTY"
+    }
+  ],
+  "claims": [
+    "Selected structural, parse, privacy-pattern and seed-source checks were executed."
+  ],
+  "errors": [],
+  "non_claims": [
+    "A PASS is not an exhaustive security, privacy or semantic audit."
+  ],
+  "schema": "nexus.doctor-report/v1",
+  "status": "PASS",
+  "warnings": [
+    "WORKTREE_DIRTY"
+  ]
+}

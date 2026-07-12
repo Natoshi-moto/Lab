@@ -6,7 +6,7 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from system.nexus_lab.route import build_route
+from system.nexus_lab.route import build_route, verify_manifest_pack
 from system.nexus_lab.util import NexusError
 from tests.helpers import init_git_repo
 
@@ -57,6 +57,8 @@ class RouteTests(unittest.TestCase):
                 self.assertIn("context/docs/a.md", archive.namelist())
                 self.assertIn("READ_SCOPE.md", archive.namelist())
                 self.assertIn("EXCLUSIONS.md", archive.namelist())
+            verified = verify_manifest_pack(out / "RTE-TEST-001.zip")
+            self.assertEqual(verified["kind"], "route")
 
     def test_route_rejects_path_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

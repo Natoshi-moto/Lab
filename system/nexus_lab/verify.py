@@ -7,6 +7,7 @@ from typing import Any
 from .audit import check_audit
 from .doctor import run_doctor
 from .snapshot import verify_snapshot
+from .route import verify_manifest_pack
 from .util import NexusError, load_json, sha256_file
 
 
@@ -28,11 +29,19 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
                 expected = first[0]
         snapshots.append(verify_snapshot(path, expected_sha256=expected))
 
+    packs: list[dict[str, Any]] = []
+    for pack in sorted((root / "operations" / "routes").glob("*.zip")):
+        packs.append(verify_manifest_pack(pack))
+
     audits: list[dict[str, Any]] = []
     audit_root = root / "operations" / "audits"
     if audit_root.exists():
         for target_json in sorted(audit_root.glob("*/TARGET.json")):
-            audits.append(check_audit(root, target_json.parent.name))
+            audit_id = target_json.parent.name
+            audits.append(check_audit(root, audit_id))
+            audit_pack = target_json.parent / f"{audit_id}.zip"
+            if audit_pack.is_file():
+                packs.append(verify_manifest_pack(audit_pack))
 
     # Index identity and referential checks.
     object_index = root / "corpus" / "indexes" / "objects.jsonl"
@@ -53,6 +62,7 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
         "doctor": doctor,
         "snapshots": snapshots,
         "audits": audits,
+        "packs": packs,
         "indexed_objects": object_count,
         "claims": ["All checks represented in this report passed."],
         "non_claims": ["This report does not establish semantic correctness, complete security or external audit."],
