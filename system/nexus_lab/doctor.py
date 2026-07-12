@@ -24,6 +24,7 @@ SECRET_PATTERNS = {
 TEXT_SUFFIXES = {".md", ".txt", ".json", ".jsonl", ".yaml", ".yml", ".py", ".toml", ".sh", ".csv", ".diff"}
 TEXT_FILENAMES = {"nexus", ".gitignore", ".gitattributes"}
 ENV_FILENAME = re.compile(r"^\.env(?:\..+)?$")
+MAX_SECRET_SCAN_BYTES = 5 * 1024 * 1024
 
 
 def is_secret_scan_candidate(path: Path) -> bool:
@@ -42,7 +43,11 @@ def is_secret_scan_candidate(path: Path) -> bool:
     )
 
 
-def scan_secrets(root: Path) -> list[dict[str, Any]]:
+def scan_secrets(
+    root: Path,
+    *,
+    skipped_files: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     for path in list_files(root, exclude_dirs={".git", "derived", "__pycache__"}):
         rel = path.relative_to(root).as_posix()
@@ -50,7 +55,15 @@ def scan_secrets(root: Path) -> list[dict[str, Any]]:
             continue
         if not is_secret_scan_candidate(path):
             continue
-        if path.stat().st_size > 5 * 1024 * 1024:
+        size_bytes = path.stat().st_size
+        if size_bytes > MAX_SECRET_SCAN_BYTES:
+            if skipped_files is not None:
+                skipped_files.append({
+                    "path": rel,
+                    "reason": "SIZE_LIMIT",
+                    "size_bytes": size_bytes,
+                    "limit_bytes": MAX_SECRET_SCAN_BYTES,
+                })
             continue
         try:
             text = path.read_text(encoding="utf-8")
@@ -99,10 +112,22 @@ def run_doctor(root: Path) -> dict[str, Any]:
                     errors.append(f"INVALID_JSONL {rel}:{number}: {exc}")
     checks.append({"check": "json_parse", "status": "PASS" if not any(e.startswith("INVALID_JSON") for e in errors) else "FAIL", "json_files": json_count, "jsonl_files": jsonl_count})
 
-    secrets = scan_secrets(root)
+    skipped_secret_scan_files: list[dict[str, Any]] = []
+    secrets = scan_secrets(root, skipped_files=skipped_secret_scan_files)
     if secrets:
         errors.extend(f"POTENTIAL_SECRET {item['kind']} {item['path']}:{item['line']}" for item in secrets)
-    checks.append({"check": "secret_patterns", "status": "PASS" if not secrets else "FAIL", "findings": len(secrets)})
+    if skipped_secret_scan_files:
+        warnings.extend(
+            f"SECRET_SCAN_SKIPPED_SIZE {item['path']} {item['size_bytes']}"
+            for item in skipped_secret_scan_files
+        )
+    secret_status = "FAIL" if secrets else "WARN" if skipped_secret_scan_files else "PASS"
+    checks.append({
+        "check": "secret_patterns",
+        "status": secret_status,
+        "findings": len(secrets),
+        "skipped_files": skipped_secret_scan_files,
+    })
 
     ignore = (root / ".gitignore").read_text(encoding="utf-8") if (root / ".gitignore").exists() else ""
     for required in ("corpus/local-only/*", ".env", "*.pem"):
@@ -136,5 +161,8 @@ def run_doctor(root: Path) -> dict[str, Any]:
         "errors": errors,
         "warnings": warnings,
         "claims": ["Selected structural, parse, privacy-pattern and seed-source checks were executed."],
-        "non_claims": ["A PASS is not an exhaustive security, privacy or semantic audit."],
+        "non_claims": [
+            "A PASS is not an exhaustive security, privacy or semantic audit.",
+            "Files excluded by the secret-scan size limit are reported as warnings and are not represented as scanned.",
+        ],
     }
