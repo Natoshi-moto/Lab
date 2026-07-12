@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .audit import check_audit
+from .audit_integrity import verify_audit_integrity
 from .doctor import run_doctor
 from .snapshot import verify_snapshot
 from .route import verify_manifest_pack
@@ -38,7 +38,7 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
     if audit_root.exists():
         for target_json in sorted(audit_root.glob("*/TARGET.json")):
             audit_id = target_json.parent.name
-            audits.append(check_audit(root, audit_id))
+            audits.append(verify_audit_integrity(root, audit_id))
             audit_pack = target_json.parent / f"{audit_id}.zip"
             if audit_pack.is_file():
                 packs.append(verify_manifest_pack(audit_pack))
