@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from system.nexus_lab.doctor import run_doctor, scan_secrets
+from system.nexus_lab.doctor import MAX_SECRET_SCAN_BYTES, run_doctor, scan_secrets
 
 
 class DoctorTests(unittest.TestCase):
@@ -35,6 +35,19 @@ class DoctorTests(unittest.TestCase):
 
     def test_secret_pattern_scans_extensionless_credentials_file(self) -> None:
         self._assert_github_token_found("credentials")
+
+    def test_secret_scan_reports_size_limit_exclusion(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / ".env"
+            path.write_bytes(b"x" * (MAX_SECRET_SCAN_BYTES + 1))
+            skipped: list[dict] = []
+            findings = scan_secrets(root, skipped_files=skipped)
+            self.assertEqual(findings, [])
+            self.assertEqual(len(skipped), 1)
+            self.assertEqual(skipped[0]["path"], ".env")
+            self.assertEqual(skipped[0]["reason"], "SIZE_LIMIT")
+            self.assertEqual(skipped[0]["limit_bytes"], MAX_SECRET_SCAN_BYTES)
 
     def test_doctor_reports_worktree_symlink(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
