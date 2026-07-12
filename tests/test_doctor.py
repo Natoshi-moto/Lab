@@ -8,14 +8,33 @@ from system.nexus_lab.doctor import run_doctor, scan_secrets
 
 
 class DoctorTests(unittest.TestCase):
-    def test_secret_pattern_finds_constructed_github_token(self) -> None:
+    @staticmethod
+    def _constructed_github_token() -> str:
+        return "gh" + "p_" + ("A" * 36)
+
+    def _assert_github_token_found(self, filename: str) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            token = "gh" + "p_" + ("A" * 36)
-            (root / "leak.txt").write_text("token=" + token, encoding="utf-8")
+            (root / filename).write_text(
+                "token=" + self._constructed_github_token(),
+                encoding="utf-8",
+            )
             findings = scan_secrets(root)
-            self.assertEqual(len(findings), 1)
+            self.assertEqual(len(findings), 1, findings)
             self.assertEqual(findings[0]["kind"], "GITHUB_CLASSIC_TOKEN")
+            self.assertEqual(findings[0]["path"], filename)
+
+    def test_secret_pattern_finds_constructed_github_token(self) -> None:
+        self._assert_github_token_found("leak.txt")
+
+    def test_secret_pattern_scans_dotenv(self) -> None:
+        self._assert_github_token_found(".env")
+
+    def test_secret_pattern_scans_dotenv_variant(self) -> None:
+        self._assert_github_token_found(".env.local")
+
+    def test_secret_pattern_scans_extensionless_credentials_file(self) -> None:
+        self._assert_github_token_found("credentials")
 
     def test_doctor_reports_worktree_symlink(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
