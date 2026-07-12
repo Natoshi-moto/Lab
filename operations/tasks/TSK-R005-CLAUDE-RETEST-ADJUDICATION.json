@@ -1,0 +1,63 @@
+{
+  "allowed_read": [
+    "README_START_HERE.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "constitution",
+    "docs",
+    "system/nexus_lab",
+    "tests",
+    ".github/workflows/nexus-audit.yml",
+    "operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account",
+    "operations/receipts/R003_R004_AUDIT_REMEDIATION"
+  ],
+  "allowed_write": [
+    "operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account-retest"
+  ],
+  "approval_required": true,
+  "authority": "OBSERVE_ONLY",
+  "baseline_ref": "main",
+  "data_classes": [
+    "LAB_PRIVATE",
+    "AUDIT_EVIDENCE"
+  ],
+  "exclude_paths": [
+    "corpus/local-only",
+    "snapshots/canonical",
+    "operations/audits/AUD-R001-CLAUDE-BLIND",
+    "operations/audits/AUD-R002-CLAUDE-BLIND/target",
+    "operations/audits/AUD-R002-CLAUDE-BLIND/ledger"
+  ],
+  "objective": "Retest the exact remediations for AUDOBS-0011, AUDOBS-0003 and AUDOBS-0012 on current main, then adjudicate only the still-open AUDOBS-0010, AUDOBS-0014, AUDOBS-0015 and AUDOBS-0016 without broadening into a new audit.",
+  "output_contract": {
+    "required_sections": [
+      "baseline_identity",
+      "commands_and_exit_codes",
+      "retest_0011",
+      "retest_0003",
+      "retest_0012",
+      "remaining_observation_adjudication",
+      "files_seen",
+      "files_not_seen",
+      "limitations",
+      "non_claims"
+    ],
+    "suffix": ".evidence",
+    "type": "bounded-retest-report"
+  },
+  "programme": "research-lab-bootstrap",
+  "required_checks": [
+    "./nexus doctor",
+    "python3 -m unittest discover -s tests -v",
+    "./nexus verify",
+    "./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND",
+    "./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND",
+    "repeat the original hostile filename-bypass attack for .env and .env.*",
+    "repeat self-consistent archive plus TARGET.json substitution in an isolated clone",
+    "repeat oversized candidate-file exclusion and confirm explicit warning/reporting"
+  ],
+  "schema": "nexus.task/v1",
+  "seat": "anthropic-claude-retester",
+  "status_authority": "NONE",
+  "task_id": "TSK-R005-CLAUDE-RETEST-ADJUDICATION"
+}
