@@ -22,6 +22,24 @@ SECRET_PATTERNS = {
     "PRIVATE_KEY_BLOCK": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 }
 TEXT_SUFFIXES = {".md", ".txt", ".json", ".jsonl", ".yaml", ".yml", ".py", ".toml", ".sh", ".csv", ".diff"}
+TEXT_FILENAMES = {"nexus", ".gitignore", ".gitattributes"}
+ENV_FILENAME = re.compile(r"^\.env(?:\..+)?$")
+
+
+def is_secret_scan_candidate(path: Path) -> bool:
+    """Return whether a small UTF-8 file should be inspected for secret patterns.
+
+    Extensionless files are included because common credential-bearing files such
+    as `.env`, `credentials`, and executable scripts otherwise have no suffix.
+    `.env.*` variants are included explicitly because pathlib treats the trailing
+    component as an unrelated suffix (for example, `.env.local` -> `.local`).
+    """
+    return (
+        path.suffix.lower() in TEXT_SUFFIXES
+        or path.suffix == ""
+        or path.name in TEXT_FILENAMES
+        or ENV_FILENAME.fullmatch(path.name) is not None
+    )
 
 
 def scan_secrets(root: Path) -> list[dict[str, Any]]:
@@ -30,7 +48,7 @@ def scan_secrets(root: Path) -> list[dict[str, Any]]:
         rel = path.relative_to(root).as_posix()
         if path.is_symlink():
             continue
-        if path.suffix.lower() not in TEXT_SUFFIXES and path.name not in {"nexus", ".gitignore", ".gitattributes"}:
+        if not is_secret_scan_candidate(path):
             continue
         if path.stat().st_size > 5 * 1024 * 1024:
             continue
