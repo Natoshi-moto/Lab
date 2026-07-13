@@ -1,0 +1,63 @@
+{
+  "acceptance": [
+    "AUDOBS-0010 is resolved by explicitly scoping outer-ZIP byte reproducibility to one declared Python zipfile/zlib toolchain while retaining Git-tree and payload-manifest identity as the cross-toolchain invariant.",
+    "AUDOBS-0014 is resolved by creating a new remote without --push, verifying GitHub reports PRIVATE, and only then pushing commits and tags.",
+    "AUDOBS-0015 is resolved by treating Actions-permission lockdown failure as fatal after writing a failed receipt, and by surfacing label or issue setup failures as PARTIAL warnings.",
+    "AUDOBS-0016 is resolved by implementing typed command-scoped assurance gates that can BLOCK, WARN or remain ADVISORY, and invoking them from the operator CLI.",
+    "Unit tests directly exercise GitHub bootstrap ordering, failure policy, snapshot scope metadata and assurance-gate decisions.",
+    "The full Nexus Audit workflow passes on the pull-request head before promotion to main."
+  ],
+  "allowed_read": [
+    "AGENTS.md",
+    "STATUS.json",
+    "STATUS.md",
+    "NEXT_ACTION.md",
+    "constitution",
+    "docs",
+    "system/nexus_lab",
+    "tests",
+    ".github/workflows/nexus-audit.yml",
+    "operations/audits/AUD-R002-CLAUDE-BLIND/results/r007-remaining-adjudication",
+    "operations/receipts"
+  ],
+  "allowed_write": [
+    "system/nexus_lab/github.py",
+    "system/nexus_lab/snapshot.py",
+    "system/nexus_lab/status.py",
+    "system/nexus_lab/cli.py",
+    "tests/test_github.py",
+    "tests/test_snapshot.py",
+    "tests/test_status.py",
+    "docs/DEMONSTRATION.md",
+    "docs/GITHUB_BOOTSTRAP.md",
+    "STATUS.json",
+    "STATUS.md",
+    "NEXT_ACTION.md",
+    "operations/tasks/TSK-R008-R010-FOUNDATION-CLOSEOUT.json",
+    "operations/receipts/R008_R010_FOUNDATION_CLOSEOUT"
+  ],
+  "approval_required": true,
+  "authority": "IMPLEMENT_ON_REVIEW_BRANCH",
+  "baseline_ref": "f79e9b650d10d3d9cf541114437ca54a56269b09",
+  "constraints": [
+    "Do not modify baseline-001, canonical snapshots, R001/R002 target bytes, audit ledgers or preserved evidence.",
+    "Do not create a real external repository while testing github_bootstrap; use mocks only.",
+    "Do not claim universal ZIP-byte determinism.",
+    "Do not treat a passing test or CI run as complete security or correctness.",
+    "Preserve reports with status_authority NONE as evidence rather than silently converting them into authoritative dispositions."
+  ],
+  "findings": [
+    "AUDOBS-0010",
+    "AUDOBS-0014",
+    "AUDOBS-0015",
+    "AUDOBS-0016"
+  ],
+  "objective": "Close the R001 foundation audit cycle by implementing and directly testing the four remaining bounded remediations, then record a separate promotion receipt after CI succeeds.",
+  "output_contract": {
+    "receipt_path": "operations/receipts/R008_R010_FOUNDATION_CLOSEOUT/RECEIPT.json",
+    "type": "foundation-closeout-remediation"
+  },
+  "schema": "nexus.task/v1",
+  "status_authority": "USER_AUTHORIZED_IMPLEMENTATION",
+  "task_id": "TSK-R008-R010-FOUNDATION-CLOSEOUT"
+}
