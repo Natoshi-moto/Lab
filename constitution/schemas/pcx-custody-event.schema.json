@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-custody-event/v0",
+  "title": "R016 synthetic custody event",
+  "oneOf": [
+    { "$ref": "#/$defs/transfer" },
+    { "$ref": "#/$defs/rotate" },
+    { "$ref": "#/$defs/recover" },
+    { "$ref": "#/$defs/revoke" }
+  ],
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonzeroHash": {
+      "allOf": [
+        { "$ref": "#/$defs/hash" },
+        { "not": { "const": "0000000000000000000000000000000000000000000000000000000000000000" } }
+      ]
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    },
+    "uint64Decimal": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$",
+      "maxLength": 20
+    },
+    "positiveAmount": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$",
+      "maxLength": 39
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "controller"],
+      "properties": {
+        "amount": { "$ref": "#/$defs/positiveAmount" },
+        "controller": { "$ref": "#/$defs/nonzeroHash" }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "signature"],
+      "properties": {
+        "key": { "$ref": "#/$defs/nonzeroHash" },
+        "signature": { "$ref": "#/$defs/signature" }
+      }
+    },
+    "transferProof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "outpoint", "signature"],
+      "properties": {
+        "key": { "$ref": "#/$defs/nonzeroHash" },
+        "outpoint": { "$ref": "#/$defs/hash" },
+        "signature": { "$ref": "#/$defs/signature" }
+      }
+    },
+    "transfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "controller",
+        "controller_epoch",
+        "controller_head",
+        "inputs",
+        "kind",
+        "network",
+        "object_id",
+        "outputs",
+        "predecessor",
+        "profile",
+        "proofs",
+        "status_authority",
+        "version"
+      ],
+      "properties": {
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "controller_epoch": { "$ref": "#/$defs/uint64Decimal" },
+        "controller_head": { "$ref": "#/$defs/hash" },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/hash" }
+        },
+        "kind": { "const": "TRANSFER" },
+        "network": { "const": "NEXUS-R016-SYNTHETIC" },
+        "object_id": { "$ref": "#/$defs/nonzeroHash" },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/output" }
+        },
+        "predecessor": { "$ref": "#/$defs/hash" },
+        "profile": { "const": "CUSTODY-KERNEL-V1" },
+        "proofs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/transferProof" }
+        },
+        "status_authority": { "const": "NONE" },
+        "version": { "const": "1" }
+      }
+    },
+    "rotate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "controller",
+        "controller_epoch",
+        "controller_head",
+        "kind",
+        "network",
+        "new_key",
+        "object_id",
+        "predecessor",
+        "profile",
+        "proofs",
+        "status_authority",
+        "version"
+      ],
+      "properties": {
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "controller_epoch": { "$ref": "#/$defs/uint64Decimal" },
+        "controller_head": { "$ref": "#/$defs/hash" },
+        "kind": { "const": "ROTATE" },
+        "network": { "const": "NEXUS-R016-SYNTHETIC" },
+        "new_key": { "$ref": "#/$defs/nonzeroHash" },
+        "object_id": { "$ref": "#/$defs/nonzeroHash" },
+        "predecessor": { "$ref": "#/$defs/hash" },
+        "profile": { "const": "CUSTODY-KERNEL-V1" },
+        "proofs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["active", "guardian", "new_key"],
+          "properties": {
+            "active": { "$ref": "#/$defs/proof" },
+            "guardian": { "$ref": "#/$defs/proof" },
+            "new_key": { "$ref": "#/$defs/proof" }
+          }
+        },
+        "status_authority": { "const": "NONE" },
+        "version": { "const": "1" }
+      }
+    },
+    "recover": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "controller",
+        "controller_epoch",
+        "controller_head",
+        "kind",
+        "network",
+        "new_key",
+        "object_id",
+        "predecessor",
+        "profile",
+        "proofs",
+        "status_authority",
+        "version"
+      ],
+      "properties": {
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "controller_epoch": { "$ref": "#/$defs/uint64Decimal" },
+        "controller_head": { "$ref": "#/$defs/hash" },
+        "kind": { "const": "RECOVER" },
+        "network": { "const": "NEXUS-R016-SYNTHETIC" },
+        "new_key": { "$ref": "#/$defs/nonzeroHash" },
+        "object_id": { "$ref": "#/$defs/nonzeroHash" },
+        "predecessor": { "$ref": "#/$defs/hash" },
+        "profile": { "const": "CUSTODY-KERNEL-V1" },
+        "proofs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["guardians", "new_key"],
+          "properties": {
+            "guardians": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/proof" }
+            },
+            "new_key": { "$ref": "#/$defs/proof" }
+          }
+        },
+        "status_authority": { "const": "NONE" },
+        "version": { "const": "1" }
+      }
+    },
+    "revoke": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "controller",
+        "controller_epoch",
+        "controller_head",
+        "kind",
+        "network",
+        "object_id",
+        "predecessor",
+        "profile",
+        "proofs",
+        "status_authority",
+        "version"
+      ],
+      "properties": {
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "controller_epoch": { "$ref": "#/$defs/uint64Decimal" },
+        "controller_head": { "$ref": "#/$defs/hash" },
+        "kind": { "const": "REVOKE" },
+        "network": { "const": "NEXUS-R016-SYNTHETIC" },
+        "object_id": { "$ref": "#/$defs/nonzeroHash" },
+        "predecessor": { "$ref": "#/$defs/hash" },
+        "profile": { "const": "CUSTODY-KERNEL-V1" },
+        "proofs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["guardians"],
+          "properties": {
+            "guardians": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/proof" }
+            }
+          }
+        },
+        "status_authority": { "const": "NONE" },
+        "version": { "const": "1" }
+      }
+    }
+  }
+}
