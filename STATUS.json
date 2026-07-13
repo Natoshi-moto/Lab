@@ -1,5 +1,7 @@
 {
-  "active_tasks": [],
+  "active_tasks": [
+    "TSK-R011-HARD-VERTICAL-SLICE"
+  ],
   "assurance_blocks": [],
   "canonical_target": {
     "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
@@ -9,12 +11,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R001_FOUNDATION_OPERATIONAL",
-  "current_round": "R010",
+  "current_mode": "R011_HARD_VERTICAL_SLICE_ACTIVE",
+  "current_round": "R011",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R008_R010_FOUNDATION_CLOSEOUT_IMPLEMENTED_AND_PREPROMOTION_VERIFIED",
-  "next_action_id": "ACT-R011_RUN_FIRST_REAL_VERTICAL_SLICE",
+  "last_completed_action": "R011_TASK_COMMISSIONED_AND_ROUTED",
+  "next_action_id": "ACT-R011_COLLECT_EXTERNAL_EVIDENCE_AND_BUILD_COMPETING_MODELS",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"
