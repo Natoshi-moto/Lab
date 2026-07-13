@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-custody-receipt/v0",
+  "title": "R016 applied synthetic custody-event receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "after_root",
+    "before_root",
+    "height",
+    "kind",
+    "object_id",
+    "receipt_hash",
+    "result",
+    "status_authority"
+  ],
+  "properties": {
+    "after_root": { "$ref": "#/$defs/hash" },
+    "before_root": { "$ref": "#/$defs/hash" },
+    "height": { "$ref": "#/$defs/positiveUint64Decimal" },
+    "kind": {
+      "enum": ["TRANSFER", "ROTATE", "RECOVER", "REVOKE"]
+    },
+    "object_id": { "$ref": "#/$defs/nonzeroHash" },
+    "receipt_hash": { "$ref": "#/$defs/hash" },
+    "result": { "const": "APPLIED" },
+    "status_authority": { "const": "NONE" }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonzeroHash": {
+      "allOf": [
+        { "$ref": "#/$defs/hash" },
+        { "not": { "const": "0000000000000000000000000000000000000000000000000000000000000000" } }
+      ]
+    },
+    "positiveUint64Decimal": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$",
+      "maxLength": 20
+    }
+  }
+}
