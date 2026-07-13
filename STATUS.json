@@ -1,6 +1,7 @@
 {
   "active_tasks": [
-    "TSK-R012-BOUNDED-WORK-EXCHANGE"
+    "TSK-R012-BOUNDED-WORK-EXCHANGE",
+    "TSK-R013-PCX-CONSERVED-CLAIM"
   ],
   "assurance_blocks": [],
   "canonical_target": {
@@ -11,12 +12,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R012_BOUNDED_WORK_EXCHANGE_REVIEW_READY",
-  "current_round": "R012",
+  "current_mode": "R013_PCX_CONSERVED_CLAIM_REVIEW_READY_STACKED",
+  "current_round": "R013",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R012_IMPLEMENTED_AND_DEMONSTRATED_PREPROMOTION",
-  "next_action_id": "ACT-R012_USER_REVIEW_AND_PROMOTION_DECISION",
+  "last_completed_action": "R013_CONVERGENCE_AND_BOUNDED_MODEL_DEMONSTRATED_PREPROMOTION",
+  "next_action_id": "ACT-R012_R013_SEPARATE_USER_REVIEW_AND_PROMOTION_DECISIONS",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"

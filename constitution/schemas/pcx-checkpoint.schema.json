@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-checkpoint/v0",
+  "title": "R013 candidate conserved-state checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "network_id",
+    "genesis_id",
+    "height",
+    "initial_state_root",
+    "state_root",
+    "receipt_head",
+    "accepted_transaction_ids",
+    "utxo_count",
+    "total_supply",
+    "candidate_status",
+    "status_authority",
+    "checkpoint_id"
+  ],
+  "properties": {
+    "schema": { "const": "nexus.pcx-checkpoint/v0" },
+    "network_id": { "const": "NEXUS-R013-SYNTHETIC" },
+    "genesis_id": { "$ref": "#/$defs/hash" },
+    "height": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" },
+    "initial_state_root": { "$ref": "#/$defs/hash" },
+    "state_root": { "$ref": "#/$defs/hash" },
+    "receipt_head": { "type": "string", "pattern": "^(?:|[0-9a-f]{64})$" },
+    "accepted_transaction_ids": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/hash" }
+    },
+    "utxo_count": {
+      "type": "string",
+      "pattern": "^(?:[1-9]|[1-5][0-9]|6[0-4])$"
+    },
+    "total_supply": { "const": "1000" },
+    "candidate_status": { "const": "CANDIDATE" },
+    "status_authority": { "const": "NONE" },
+    "checkpoint_id": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

@@ -1,9 +1,22 @@
 # NEXT ACTION
 
-Review the R012 bounded-work-exchange draft pull request and decide whether to promote it into `main`.
+Review R012 and the stacked R013 proposal separately, then decide whether either
+should be promoted into `main`.
 
-The proposal now contains one generated, task-bound route; a deterministic synthetic cognition workload; an accepted local exchange receipt; an exact-replay receipt check; 43 passing adversarial fixtures; and a passing cold-context decision brief labelled `CORRELATED`.
+R012 demonstrates one non-financial bounded work exchange. R013 depends on its
+proposal head but uses a separate value-conservation kernel: one frozen
+synthetic genesis, transfer-only Ed25519 authorization, creating-transaction
+outpoints, exact conservation, competing-spend rejection and byte-identical
+Python/OpenSSL versus JavaScript/Noble results. The normative verifier is
+path/hash pinned, evidence fails closed, and a bounded abstract model adds
+exhaustive conservation coverage without claiming general correctness.
 
-Promotion would accept the V0 protocol, implementation, frozen fixture, tests and evidence limits as working project history. It would not establish semantic truth, general Nexus utility, provider independence, identity, Sybil resistance, consensus, financial value, production readiness, either historical meaning of PCCE, or a new canonical snapshot.
+Promotion of R013 would accept only
+`DEMONSTRATED_CONSERVATION_KERNEL_ON_SYNTHETIC_HISTORY` as project history. It
+would not create money, economic value, backing, redemption, custody, network
+consensus, global double-spend prevention, production readiness or a new
+canonical snapshot.
 
-Do not merge or promote without explicit user approval. If review finds a kill-criterion breach, preserve the evidence and keep R012 unpromoted.
+Do not merge or promote either proposal without explicit user approval. If a
+kill criterion or implementation disagreement appears, preserve the evidence
+and keep the affected round unpromoted.

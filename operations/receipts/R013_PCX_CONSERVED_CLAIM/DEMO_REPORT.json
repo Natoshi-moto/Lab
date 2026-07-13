@@ -1,0 +1,58 @@
+{
+  "schema": "nexus.r013-pcx-conserved-claim-demo/v0",
+  "status": "DEMONSTRATED_CONSERVATION_KERNEL_ON_SYNTHETIC_HISTORY",
+  "status_authority": "NONE",
+  "dependency": {
+    "r012_branch_head": "f28dc07bf1433bb22e4d992a7f523503387ea445",
+    "canonical_status": "UNPROMOTED_PROPOSAL_DEPENDENCY"
+  },
+  "fixture": {
+    "suite_id": "R013-PCX-CONSERVED-CLAIM-FROZEN-001",
+    "suite_path": "experiments/R013_PCX_CONSERVED_CLAIM/fixtures/SUITE.json",
+    "suite_sha256": "a6ab4fde497b64395767edd1c8e652994e1bfeff0ca258fc661913918329c27b",
+    "genesis_id": "974cd4da89feb9f7ae8e14d7b4359f4b76d8697f55e5793219c52e38b627b7de",
+    "fixed_supply": "1000",
+    "unit_label": "R013-SYNTHETIC-CLAIM"
+  },
+  "convergence": {
+    "report_sha256": "77c97a72d6845341785ae8cf33dde8cfb319b12c9f083bf83ce654466f76fbd1",
+    "implementations": [
+      "PYTHON_ORCHESTRATION_WITH_OPENSSL_ED25519",
+      "JAVASCRIPT_STATE_MACHINE_WITH_NOBLE_ED25519"
+    ],
+    "vector_signer": "NODE_NATIVE_ED25519",
+    "independent_verifier_sha256": "fd547ec4e5aa4961ec8b238ad1cd3688bd02d47273a56a4d3cb5cabe1163c52c",
+    "byte_identical": true,
+    "histories": 6,
+    "accepted_transfers": 19,
+    "rejected_attacks": 49
+  },
+  "small_model": {
+    "report_path": "operations/receipts/R013_PCX_CONSERVED_CLAIM/MODEL_CHECK_REPORT.json",
+    "report_sha256": "44f344d671e30f76ef4643a08b4b8045ad2b967fc606bfca8ef858db78554326",
+    "supply": 4,
+    "max_depth": 4,
+    "unique_states": 5881,
+    "valid_transitions": 115266,
+    "replay_rejections": 115266,
+    "transition_digest": "751ba92a967e3ebe93d1f9197f9d2a906bf16186901e87b117899d447d5c16fb",
+    "claim_scope": "BOUNDED_ABSTRACT_MODEL_ONLY"
+  },
+  "demonstrated": [
+    "The frozen synthetic quantity remained exactly 1000 after every accepted prefix.",
+    "Split, merge, multi-owner and creating-transaction ancestry transitions were accepted under full-field Ed25519 authorization.",
+    "The exact same two signed sibling spends were replayed in both orders; only the first candidate in each local order was accepted.",
+    "Malformed, ambiguous, hostile-Unicode, oversized, stale, foreign, inflationary, forged-ancestry and signature-mutated candidates left state unchanged.",
+    "The candidate state reached 64 live outputs and rejected further growth without changing state.",
+    "Separate parsers and transition kernels emitted byte-identical decisions, receipt hashes and candidate checkpoint roots.",
+    "A bounded abstract model exhaustively checked 115266 conserved transitions through depth four."
+  ],
+  "non_claims": [
+    "The synthetic claim is not money, a token, legal property, a security, a currency, a redeemable promise or an economically valuable asset.",
+    "No work return, AI judgment, receipt, decision or checkpoint can mint quantity.",
+    "This does not establish safe custody, key recovery, privacy, network consensus, global double-spend prevention, liveness, decentralization, Sybil resistance, market demand, purchasing-power preservation or regulatory compliance.",
+    "Cross-implementation convergence on a frozen suite and a bounded abstract model are not an independent security audit or proof of general correctness.",
+    "Checkpoint import, durable persistence, crash recovery, atomic external settlement and concurrent writers are not implemented or demonstrated.",
+    "Every checkpoint remains CANDIDATE with status_authority NONE; only the user may promote canonical project state."
+  ]
+}

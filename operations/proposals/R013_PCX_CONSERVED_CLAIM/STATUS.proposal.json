@@ -1,0 +1,10 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "round": "R013",
+  "mode": "R013_PCX_CONSERVED_CLAIM_REVIEW_READY",
+  "disposition": "DEMONSTRATED_CONSERVATION_KERNEL_ON_SYNTHETIC_HISTORY",
+  "canonical_status": "UNPROMOTED_STACKED_PROPOSAL",
+  "base_head": "f28dc07bf1433bb22e4d992a7f523503387ea445",
+  "status_authority": "NONE",
+  "next_action": "USER_REVIEW_R012_AND_R013_WITH_SEPARATE_PROMOTION_DECISIONS"
+}

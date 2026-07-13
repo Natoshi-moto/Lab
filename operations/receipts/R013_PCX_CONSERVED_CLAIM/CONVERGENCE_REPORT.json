@@ -1,0 +1,22 @@
+{
+  "accepted_transfer_count": 19,
+  "byte_identical": true,
+  "claims": [
+    "The two frozen implementations emitted byte-identical decisions and candidate roots for the frozen suite."
+  ],
+  "crypto_implementations": [
+    "OPENSSL_ED25519",
+    "NOBLE_ED25519"
+  ],
+  "history_count": 6,
+  "independent_verifier_sha256": "fd547ec4e5aa4961ec8b238ad1cd3688bd02d47273a56a4d3cb5cabe1163c52c",
+  "non_claims": [
+    "This is synthetic local conformance, not money, economic value, custody, consensus, global finality, or an external security audit."
+  ],
+  "rejected_attack_count": 49,
+  "report_sha256": "77c97a72d6845341785ae8cf33dde8cfb319b12c9f083bf83ce654466f76fbd1",
+  "schema": "nexus.pcx-cross-implementation-check/v0",
+  "status": "PASS",
+  "status_authority": "NONE",
+  "suite_id": "R013-PCX-CONSERVED-CLAIM-FROZEN-001"
+}
