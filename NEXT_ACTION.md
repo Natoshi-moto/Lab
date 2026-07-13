@@ -1,15 +1,22 @@
 # NEXT ACTION
 
-Execute `TSK-R011-HARD-VERTICAL-SLICE` on the proposal branch.
+Review PR #10 and decide whether to promote the completed R011 vertical-slice package into `main`.
 
-Research the external scaling question without privileging a conclusion:
+The proposal now contains:
 
-1. collect and classify public external evidence;
-2. construct competing linear, sublinear, superlinear and regime-dependent models;
-3. define falsification criteria and unresolved empirical gaps;
-4. build a small inspectable computational artifact;
-5. run sensitivity and adversarial tests appropriate to the model;
-6. preserve independent or cross-provider criticism where available;
-7. prepare a plain-English decision brief and reconstructable receipt.
+1. a sourced evidence register;
+2. competing linear, sublinear, superlinear and regime-dependent models;
+3. an inspectable computational artifact;
+4. scenario, sensitivity and adversarial tests;
+5. a research synthesis;
+6. an adversarial review with `status_authority: NONE`;
+7. a plain-English decision brief;
+8. a reconstructable receipt.
 
-Continue with low user-turn friction. Escalate only a consequential preference, new contradictory evidence, a required local or credential dependency, or canonical promotion. Do not modify `baseline-001`, historical audit evidence or canonical snapshots. Do not begin another broad audit unless this real-use slice exposes contradictory evidence.
+The proposed research disposition is:
+
+- regime-dependent scaling: `CANDIDATE / INFERRED`;
+- universal exponent: `UNVERIFIED`;
+- empirical calibration: `REQUIRED`.
+
+Promotion would canonize the research record, bounded implementation and evidence limits. It would not canonize the regime-dependent hypothesis as empirical truth. Do not merge without explicit user approval.
