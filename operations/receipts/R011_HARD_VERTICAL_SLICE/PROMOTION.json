@@ -1,0 +1,28 @@
+{
+  "schema": "nexus.promotion/v1",
+  "task_id": "TSK-R011-HARD-VERTICAL-SLICE",
+  "authority": "USER_EXPLICIT_PROMOTION",
+  "promoted_pull_request": 10,
+  "promoted_head": "18478e8d608c9e195b5bd4b0fc50d0c8085860f7",
+  "merge_commit": "bb9947957c3eda2168a7afc54237196601cae749",
+  "decision": "PROMOTE_TO_MAIN",
+  "canonical_scope": [
+    "R011 task and provider-neutral route",
+    "external evidence register with stated limitations",
+    "competing model specification",
+    "inspectable computational artifact and tests",
+    "research synthesis and adversarial review",
+    "decision brief and reconstructable receipt"
+  ],
+  "not_promoted_as_empirical_truth": [
+    "one universal scaling exponent",
+    "regime-dependent scaling as demonstrated fact",
+    "scenario parameter values as empirical estimates",
+    "general Nexus effectiveness from one vertical slice"
+  ],
+  "research_disposition_after_promotion": {
+    "regime_dependent": "CANDIDATE_INFERRED",
+    "universal_exponent": "UNVERIFIED",
+    "empirical_calibration": "REQUIRED"
+  }
+}
