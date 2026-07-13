@@ -1,51 +1,43 @@
-# Claude retest start — R005
+# Remaining audit adjudication start — R007
 
 ## Mission
 
-The R002 blind audit of `baseline-001` is complete. Its 18 observations are preserved under `operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account/`. Three reproduced findings have since been remediated on `main`:
+The R002 blind audit of `baseline-001` is complete and preserved. The following remediations have been implemented and retested:
 
+- `AUDOBS-0003` — audit snapshot payload bound to immutable Git tree at `target_commit`;
 - `AUDOBS-0011` — secret-scan filename coverage;
-- `AUDOBS-0003` — self-consistent loose audit-target substitution;
-- `AUDOBS-0012` — silent secret-scan size exclusions.
+- `AUDOBS-0012` — explicit reporting of size-limit exclusions.
 
-Your mission is to retest those exact repairs, then adjudicate only the four remaining material observations named in the R005 task.
+The current mission is to resolve only the four remaining material observations:
 
-## From Claude Code
+- `AUDOBS-0010` — cross-toolchain snapshot byte determinism;
+- `AUDOBS-0014` — GitHub bootstrap visibility ordering;
+- `AUDOBS-0015` — GitHub bootstrap failure surfacing;
+- `AUDOBS-0016` — process-gate contradiction.
 
-1. Confirm the repository is on current `main` and `git status --short` is clean.
-2. Read `operations/tasks/TSK-R005-CLAUDE-RETEST-ADJUDICATION.json`.
-3. Read the preserved R002 report and `operations/receipts/R003_R004_AUDIT_REMEDIATION/RECEIPT.json`.
-4. Run every required command and repeat the three declared hostile attacks in isolated temporary copies where mutation is needed.
-5. Produce one bounded `.evidence` report under the task's declared result path or on a review branch.
+## Start
 
-Do not invoke `/nexus-audit`; that skill describes the already-completed broad R002 pass.
+1. Confirm current `main` and a clean worktree.
+2. Read `operations/tasks/TSK-R007-REMAINING-AUDIT-ADJUDICATION.json`.
+3. Read the original R002 evidence, the R005 retest report, the Codex documentary review, and the R006 original-auditor retest evidence.
+4. Run every required verification command.
+5. Resolve the four observations in the declared order without broadening into a new audit.
+6. Produce one bounded `.evidence` report under the task's declared path or on a review branch.
+
+Do not invoke `/nexus-audit`; that broad pass is complete.
 
 ## Constraints
 
-- Do not edit `baseline-001`, canonical snapshots, R001/R002 target bytes, audit ledgers, or original evidence.
-- Do not inherit the remediation claims; attack them.
-- A passing test establishes only the exercised property.
+- Do not edit `baseline-001`, canonical snapshots, R001/R002 target bytes, audit ledgers, or preserved evidence.
+- Do not reopen the three confirmed remediations without contradictory evidence.
+- Do not create real external repositories or push test data when testing GitHub bootstrap behaviour.
+- A passing test establishes only its exercised property.
 - Use `UNABLE_TO_VERIFY` where execution is unavailable.
 - Report files seen and files not seen.
-- The report has `status_authority: NONE`.
-
-## Required result scope
-
-### Retest
-
-- `AUDOBS-0011`
-- `AUDOBS-0003`
-- `AUDOBS-0012`
-
-### Adjudicate without broadening
-
-- `AUDOBS-0010`
-- `AUDOBS-0014`
-- `AUDOBS-0015`
-- `AUDOBS-0016`
+- Output has `status_authority: NONE`.
 
 ## Return path
 
 ```text
-operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account-retest/R005_RETEST_REPORT.evidence
+operations/audits/AUD-R002-CLAUDE-BLIND/results/r007-remaining-adjudication/R007_ADJUDICATION_REPORT.evidence
 ```
