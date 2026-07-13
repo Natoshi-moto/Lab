@@ -41,6 +41,9 @@ jobs:
       - name: Verify exact R015 durability evidence
         run: python3 experiments/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL/verify_evidence.py
 
+      - name: Verify exact R016 integrated custody evidence
+        run: python3 experiments/R016_PCX_INTEGRATED_CUSTODY_GATE/verify_evidence.py
+
       - name: Run Nexus doctor
         run: ./nexus doctor
 
@@ -78,6 +81,6 @@ jobs:
           {
             echo "## Nexus Audit"
             echo
-            echo "The workflow executes structural, deterministic, manifest, unit, and exact R015 evidence checks."
+            echo "The workflow executes structural, deterministic, manifest, unit, and exact R015/R016 evidence checks."
             echo "A green run does not prove semantic correctness, complete security, privacy, or external audit."
           } >> "$GITHUB_STEP_SUMMARY"
