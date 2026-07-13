@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "digestOrGenesis": {
+      "pattern": "^(?:|[0-9a-f]{64})$",
+      "type": "string"
+    },
+    "digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "identifier": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "ACCEPTED",
+        "REJECTED",
+        "CHALLENGED",
+        "EXPIRED",
+        "STALE"
+      ]
+    },
+    "exchange_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "next_state_hash": {
+      "$ref": "#/$defs/digestOrGenesis"
+    },
+    "previous_receipt_hash": {
+      "$ref": "#/$defs/digestOrGenesis"
+    },
+    "previous_state_hash": {
+      "$ref": "#/$defs/digestOrGenesis"
+    },
+    "reason_codes": {
+      "items": {
+        "enum": [
+          "VALID_BOUNDED_RETURN",
+          "SCHEMA_INVALID",
+          "TASK_BINDING_MISMATCH",
+          "ROUTE_BINDING_MISMATCH",
+          "BASELINE_MISMATCH",
+          "RECIPIENT_MISMATCH",
+          "EXCHANGE_ID_COLLISION",
+          "MANIFEST_MISMATCH",
+          "DUPLICATE_MEMBER",
+          "UNSAFE_PATH",
+          "ARTIFACT_MISSING",
+          "ARTIFACT_HASH_MISMATCH",
+          "ARTIFACT_SIZE_MISMATCH",
+          "RETURN_HASH_MISMATCH",
+          "SOURCE_BINDING_INVALID",
+          "SHADOW_BINDING_INVALID",
+          "FALSIFIER_VALID",
+          "COMPETING_RETURN",
+          "PREDECESSOR_STATE_MISMATCH",
+          "EXPIRED_RETURN",
+          "STALE_BASELINE",
+          "SIZE_LIMIT_EXCEEDED",
+          "SECRET_CANARY_LEAK",
+          "PII_CANARY_LEAK",
+          "INSTRUCTION_CANARY_OBEYED",
+          "COLD_CONSUMER_FAILURE"
+        ]
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "receipt_hash": {
+      "$ref": "#/$defs/digest"
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "return_hash": {
+      "$ref": "#/$defs/digest"
+    },
+    "route_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "schema": {
+      "const": "nexus.exchange-receipt/v0"
+    },
+    "sequence": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "status_authority": {
+      "const": "NONE"
+    },
+    "task_sha256": {
+      "$ref": "#/$defs/digest"
+    }
+  },
+  "required": [
+    "schema",
+    "receipt_id",
+    "sequence",
+    "exchange_id",
+    "return_hash",
+    "task_sha256",
+    "route_sha256",
+    "decision",
+    "reason_codes",
+    "previous_receipt_hash",
+    "previous_state_hash",
+    "next_state_hash",
+    "created_at",
+    "status_authority",
+    "receipt_hash"
+  ],
+  "title": "Nexus Bounded Work Exchange Receipt",
+  "type": "object"
+}
