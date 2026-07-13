@@ -1,22 +1,15 @@
 # NEXT ACTION
 
-Review PR #10 and decide whether to promote the completed R011 vertical-slice package into `main`.
+Select and commission R012.
 
-The proposal now contains:
+R011 is promoted into `main` as the first completed real-work vertical slice. Its research record, executable model, evidence limits, adversarial review and receipt are canonical project history. The regime-dependent scaling interpretation remains `CANDIDATE / INFERRED`, not empirical truth.
 
-1. a sourced evidence register;
-2. competing linear, sublinear, superlinear and regime-dependent models;
-3. an inspectable computational artifact;
-4. scenario, sensitivity and adversarial tests;
-5. a research synthesis;
-6. an adversarial review with `status_authority: NONE`;
-7. a plain-English decision brief;
-8. a reconstructable receipt.
+R012 should create new information rather than repeat R011. Choose one materially distinct direction:
 
-The proposed research disposition is:
+1. empirical calibration of the R011 model using a lawful quality-controlled dataset;
+2. a second hard vertical slice in another domain to test repeatability and governance overhead;
+3. a multi-provider collaboration slice with independently preserved seats and disagreement;
+4. productization of the Nexus operator experience, routing and low-friction controls;
+5. a larger architecture/design phase grounded in the evidence from repeated real use.
 
-- regime-dependent scaling: `CANDIDATE / INFERRED`;
-- universal exponent: `UNVERIFIED`;
-- empirical calibration: `REQUIRED`.
-
-Promotion would canonize the research record, bounded implementation and evidence limits. It would not canonize the regime-dependent hypothesis as empirical truth. Do not merge without explicit user approval.
+Before implementation, declare the objective, useful external output, evidence boundary, user decision points, reversibility and what would count as failure. Do not begin another broad audit unless new contradictory evidence warrants it.
