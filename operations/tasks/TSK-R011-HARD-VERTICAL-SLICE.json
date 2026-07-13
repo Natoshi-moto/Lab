@@ -1,0 +1,84 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-R011-HARD-VERTICAL-SLICE",
+  "status_authority": "USER_AUTHORIZED_IMPLEMENTATION",
+  "authority": "RESEARCH_AND_IMPLEMENT_ON_PROPOSAL_BRANCH",
+  "approval_required": true,
+  "objective": "Test Nexus under a difficult real research-and-engineering workload by determining whether the cost of creating and maintaining many independent, aged, credible online identities is linear, superlinear or regime-dependent, and by producing a falsifiable model plus a small inspectable artifact.",
+  "research_question": "Under realistic adversarial conditions, how does the marginal cost of fabricating and maintaining N mutually independent, aged and credible online identities scale with N, and which mechanisms or empirical observations distinguish linear, superlinear and regime-dependent cost models?",
+  "operating_posture": {
+    "low_turn_default": true,
+    "user_device_requirement": "NONE_FOR_CLOUD_ONLY_WORK",
+    "continue_without_interruption_unless": [
+      "a consequential product or research preference cannot be inferred safely",
+      "new evidence contradicts the declared task boundary",
+      "credentials, local-only files or machine-specific execution become necessary",
+      "canonical promotion is requested"
+    ]
+  },
+  "allowed_read": [
+    "AGENTS.md",
+    "STATUS.json",
+    "STATUS.md",
+    "NEXT_ACTION.md",
+    "AUDIT_START_HERE.md",
+    "constitution",
+    "docs",
+    "corpus",
+    "domains",
+    "operations/tasks",
+    "operations/receipts",
+    "operations/routes",
+    "system/nexus_lab",
+    "tests"
+  ],
+  "allowed_write": [
+    "operations/tasks/TSK-R011-HARD-VERTICAL-SLICE.json",
+    "operations/routes/R011_HARD_VERTICAL_SLICE",
+    "operations/research/R011_IDENTITY_COST_SCALING",
+    "operations/receipts/R011_HARD_VERTICAL_SLICE",
+    "experiments/R011_IDENTITY_COST_SCALING",
+    "STATUS.json",
+    "STATUS.md",
+    "NEXT_ACTION.md"
+  ],
+  "constraints": [
+    "Do not modify baseline-001, canonical snapshots, historical audit targets, audit ledgers or preserved evidence.",
+    "Do not treat model agreement as external validation.",
+    "Separate sourced evidence, implementation, inference, hypothesis, falsification and user-authorized disposition.",
+    "Do not collect, purchase, operate or facilitate real fraudulent identities, accounts, credentials or evasion activity.",
+    "Use public literature, lawful datasets, defensive research and synthetic modelling only.",
+    "Do not promote any output into main without explicit user approval.",
+    "A passing test proves only the property exercised.",
+    "Minimize user turns and avoid requiring a local PC unless a material task dependency emerges."
+  ],
+  "required_outputs": [
+    "evidence register with source provenance and confidence labels",
+    "competing linear, superlinear and regime-dependent mechanism models",
+    "falsification criteria for each model",
+    "small inspectable executable or computational artifact",
+    "sensitivity and adversarial tests",
+    "plain-English decision brief",
+    "cross-provider or independent-review handoff where available",
+    "reconstructable receipt recording context loss, coordination friction and unresolved questions"
+  ],
+  "success_criteria": [
+    "The work produces a useful external research result independent of Nexus.",
+    "Important claims are traceable to evidence or explicitly labelled as inference or hypothesis.",
+    "The proposal can be reconstructed from repository artifacts without relying on chat memory.",
+    "The user is asked only for consequential preferences or canonical promotion.",
+    "The workflow reveals whether Nexus reduces context loss and coordination ambiguity during hard work."
+  ],
+  "non_claims": [
+    "One completed vertical slice does not establish general Nexus effectiveness.",
+    "A computational model does not establish the real-world scaling law without empirical support.",
+    "Public evidence may be incomplete or selection-biased.",
+    "This task does not validate live GitHub bootstrap behaviour, complete privacy, complete security or scientific validity."
+  ],
+  "output_contract": {
+    "research_root": "operations/research/R011_IDENTITY_COST_SCALING",
+    "artifact_root": "experiments/R011_IDENTITY_COST_SCALING",
+    "receipt_path": "operations/receipts/R011_HARD_VERTICAL_SLICE/RECEIPT.json",
+    "type": "hard-real-work-vertical-slice"
+  }
+}

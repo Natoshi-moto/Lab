@@ -1,0 +1,63 @@
+{
+  "schema": "nexus.vertical-slice-receipt/v1",
+  "task_id": "TSK-R011-HARD-VERTICAL-SLICE",
+  "authority": "USER_AUTHORIZED_PROPOSAL_BRANCH_EXECUTION",
+  "status": "IMPLEMENTED_AND_PREPROMOTION_VERIFIED",
+  "pull_request": 10,
+  "implementation_branch": "chatgpt/r011-hard-vertical-slice",
+  "content_head_verified": "5f42da9dde6bab8ad66d5bea29ee56d413483e39",
+  "research_disposition": {
+    "universal_linear": "UNVERIFIED",
+    "universal_sublinear": "UNVERIFIED",
+    "universal_superlinear": "UNVERIFIED",
+    "regime_dependent": "CANDIDATE_INFERRED",
+    "exact_exponent": "CANNOT_YET_BE_DECIDED",
+    "decisive_next_evidence": "quality-controlled multi-scale measurements with declared cost boundary, operator hours, spend, behavioural similarity, graph independence, survival, correlated loss, replacement and achieved effect"
+  },
+  "outputs": [
+    "operations/research/R011_IDENTITY_COST_SCALING/EVIDENCE_REGISTER.jsonl",
+    "operations/research/R011_IDENTITY_COST_SCALING/MODEL_SPEC.md",
+    "operations/research/R011_IDENTITY_COST_SCALING/RESEARCH_SYNTHESIS.md",
+    "operations/research/R011_IDENTITY_COST_SCALING/ADVERSARIAL_REVIEW.md",
+    "operations/research/R011_IDENTITY_COST_SCALING/DECISION_BRIEF.md",
+    "experiments/R011_IDENTITY_COST_SCALING/model.py",
+    "tests/test_r011_identity_cost_model.py"
+  ],
+  "verification": {
+    "workflow": "Nexus Audit",
+    "workflow_run_id": 29227350564,
+    "workflow_run_number": 46,
+    "job_id": 86744172574,
+    "conclusion": "success",
+    "properties_exercised": [
+      "Nexus doctor",
+      "unit and attack tests including R011 scenario, sensitivity and adversarial assumptions",
+      "snapshot, manifest and audit-ledger verification",
+      "R001 audit-target integrity",
+      "R002 audit-target integrity"
+    ]
+  },
+  "nexus_workflow_observations": {
+    "routine_user_interventions_after_authorization": 0,
+    "local_pc_required": false,
+    "context_reconstruction_source": "repository task, route, evidence, model, tests and receipts",
+    "minority_or_adversarial_position_preserved": true,
+    "canonical_promotion_withheld": true,
+    "administrative_cost_observation": "The workflow produced useful external research artifacts, but a single slice cannot yet establish whether the governance overhead is proportionate across repeated tasks."
+  },
+  "demonstrated": [
+    "The repository can carry a bounded real research question from task contract through evidence register, competing model, executable artifact, tests, adversarial review and decision brief on a proposal branch.",
+    "The implementation represents and tests linear, sublinear, superlinear and threshold/correlation-driven regime scenarios.",
+    "The evidence boundary survived synthesis: the leading regime-dependent interpretation remains labelled INFERRED rather than promoted to empirical fact.",
+    "The branch can be reconstructed without relying on chat memory for its task, evidence, assumptions, outputs and unresolved questions."
+  ],
+  "limitations": [
+    "The public literature does not provide a quality-controlled dataset from which to estimate a universal scaling exponent.",
+    "The scenario parameters are assumptions, not fitted empirical estimates.",
+    "Detection datasets are selection-biased toward observed or disrupted operations.",
+    "One completed vertical slice does not establish general Nexus effectiveness.",
+    "A successful workflow proves only the exercised repository properties and does not establish complete correctness, security, privacy or scientific validity.",
+    "Canonical promotion requires explicit user approval and a final green pull-request head."
+  ],
+  "status_authority": "USER_AUTHORIZED_IMPLEMENTATION_NO_CANONICAL_PROMOTION"
+}
