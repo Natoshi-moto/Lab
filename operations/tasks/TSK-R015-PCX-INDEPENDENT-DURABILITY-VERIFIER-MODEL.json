@@ -1,0 +1,78 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-R015-PCX-INDEPENDENT-DURABILITY-VERIFIER-MODEL",
+  "objective": "Reproduce a closed R014 synthetic durable transcript in a separately implemented Node verifier and exhaustively check an explicitly bounded abstract crash, acknowledgement, retry, conflict and anchor lifecycle.",
+  "baseline_ref": "5d765a3f01e718778a7195415430e7cffae42b57",
+  "authority": "PROPOSE_ONLY",
+  "allowed_read": [
+    ".github/workflows/nexus-audit.yml",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "constitution/schemas",
+    "experiments/R013_PCX_CONSERVED_CLAIM/fixtures/SUITE.json",
+    "operations/proposals/R013_PCX_CONSERVED_CLAIM/PROTOCOL.md",
+    "operations/receipts/R014_PCX_DURABLE_REPLAY",
+    "experiments/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL",
+    "operations/proposals/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL",
+    "operations/receipts/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL",
+    "operations/tasks/TSK-R014-PCX-DURABLE-REPLAY.json",
+    "node_modules/@noble/ed25519",
+    "package.json",
+    "package-lock.json",
+    "system/nexus_lab",
+    "tests"
+  ],
+  "allowed_write": [
+    ".github/workflows/nexus-audit.yml",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "constitution/schemas/pcx-closed-durable-transcript.schema.json",
+    "experiments/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL",
+    "operations/proposals/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL",
+    "operations/receipts/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL",
+    "tests/test_r015_independent_durability_verifier.py",
+    "tests/test_r015_crash_lifecycle_model.py",
+    "tests/R015_TEST_NOTES.md"
+  ],
+  "data_classes": [
+    "LOCAL_ONLY",
+    "ROUTE_ONLY"
+  ],
+  "output_contract": {
+    "claim": "DEMONSTRATED_CROSS_IMPLEMENTATION_DURABILITY_TRANSCRIPT_VERIFICATION_AND_BOUNDED_CRASH_LIFECYCLE_CONSISTENCY",
+    "required_invariants": [
+      "R014_HASH_BOUND_FILES_UNCHANGED",
+      "CLOSED_CANONICAL_TRANSCRIPT_MAX_256_RECORDS",
+      "COLD_VERIFIER_NO_PYTHON_SQLITE_OR_NEXUS_IMPLEMENTATION_IMPORT",
+      "INDEPENDENT_GENESIS_TRANSFER_RECEIPT_RECORD_AND_ANCHOR_REPLAY",
+      "EXACT_EMBEDDED_PREFIX_ANCHOR_CONVERGENCE",
+      "SEPARATE_EXTERNAL_ANCHOR_CLASSIFICATION",
+      "UNANCHORED_ROLLBACK_LIMITATION_EXPLICIT",
+      "PRECOMMIT_OLD_POSTCOMMIT_NEW_NO_HYBRID",
+      "ACK_ONLY_AFTER_COMMIT",
+      "LOST_ACK_EXACT_RETRY_AT_MOST_ONCE",
+      "INTERVENING_SIBLING_CONFLICT_HONESTY",
+      "FRESH_AT_CAP_REJECT_EXACT_RETRY_AVAILABLE",
+      "BOUNDED_MODEL_DETERMINISTIC_AND_MUTATION_SENSITIVE",
+      "SYNTHETIC_SUPPLY_1000",
+      "STATUS_AUTHORITY_NONE"
+    ],
+    "kill_on": [
+      "R014_FROZEN_EVIDENCE_REWRITE",
+      "COLD_VERIFIER_IMPORTS_OR_INVOKES_PYTHON_OR_R014_IMPLEMENTATION",
+      "TRANSCRIPT_OR_REPLAY_DISAGREEMENT_ACCEPTED",
+      "DUPLICATE_RETRY_APPEND",
+      "ACKNOWLEDGED_UNCOMMITTED_RECORD",
+      "HYBRID_STATE_ACCEPTED",
+      "BOTH_SIBLING_SPENDS_COMMITTED",
+      "INVALID_OR_COLLIDING_REQUEST_MUTATES_HISTORY",
+      "ANCHOR_MISMATCH_DOWNGRADED_OR_REPAIRED",
+      "OLDER_UNANCHORED_PREFIX_FALSELY_CLAIMED_FRESH",
+      "MODEL_MUTANT_SURVIVES",
+      "SUPPLY_OR_AUTHORITY_DIVERGENCE",
+      "KEY_FUND_CUSTODY_NETWORK_BACKING_REDEMPTION_OR_PROMOTION_ADDED"
+    ]
+  }
+}
