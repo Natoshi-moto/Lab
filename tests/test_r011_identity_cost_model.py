@@ -43,6 +43,30 @@ def test_correlated_loss_increases_total_cost() -> None:
     assert total_cost(200, correlated) > total_cost(200, baseline)
 
 
+def test_regime_change_disappears_when_threshold_and_correlation_are_removed() -> None:
+    candidate = scenario("regime")
+    no_regime_mechanisms = CostParameters(
+        fixed_cost=candidate.fixed_cost,
+        creation_weight=candidate.creation_weight,
+        maintenance_weight=candidate.maintenance_weight,
+        behaviour_weight=candidate.behaviour_weight,
+        graph_weight=candidate.graph_weight,
+        quality_weight=candidate.quality_weight,
+        alpha_creation=candidate.alpha_creation,
+        alpha_maintenance=candidate.alpha_maintenance,
+        alpha_behaviour=candidate.alpha_behaviour,
+        alpha_graph=candidate.alpha_graph,
+        alpha_quality=candidate.alpha_quality,
+    )
+    assert marginal_cost(150, candidate) > marginal_cost(150, no_regime_mechanisms)
+
+
+def test_higher_graph_independence_exponent_raises_large_scale_marginal_cost() -> None:
+    lower = CostParameters(alpha_graph=1.0)
+    higher = CostParameters(alpha_graph=1.4)
+    assert marginal_cost(500, higher) > marginal_cost(500, lower)
+
+
 def test_negative_population_is_rejected() -> None:
     try:
         total_cost(-1, scenario("linear"))
