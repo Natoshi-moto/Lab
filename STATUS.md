@@ -6,16 +6,16 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R014` |
-| Mode | `R014_PCX_DURABLE_REPLAY_REVIEW_READY` |
+| Mode | `R014_PCX_DURABLE_REPLAY_PROMOTED` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `R014_CRASH_CONSISTENT_SYNTHETIC_REPLAY_DEMONSTRATED_PREPROMOTION` |
-| Next action | `ACT-R014_USER_REVIEW_AND_PROMOTION_DECISION` |
+| Last completed action | `R014_USER_AUTHORIZED_PROMOTION_MERGED` |
+| Next action | `ACT-R015_COMMISSION_INDEPENDENT_DURABILITY_VERIFIER_MODEL` |
 
 ## Active tasks
 
-- `TSK-R014-PCX-DURABLE-REPLAY`
+- None
 
 ## Assurance blocks
 

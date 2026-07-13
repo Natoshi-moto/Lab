@@ -1,0 +1,43 @@
+{
+  "authority": "USER_EXPLICIT_PROMOTION",
+  "canonical_scope": [
+    "single-host-synthetic-durable-replay",
+    "sqlite-delete-extra-storage-profile",
+    "full-replay-from-frozen-r013-genesis",
+    "post-commit-acknowledgement",
+    "exact-idempotent-retry",
+    "caller-held-prefix-anchor-check",
+    "fail-closed-corruption-and-schema-detection",
+    "bounded-adversarial-test-evidence"
+  ],
+  "canonical_snapshot_unchanged": true,
+  "decision": "PROMOTE_TO_MAIN",
+  "exact_head_audit": {
+    "conclusion": "success",
+    "name": "Nexus Audit",
+    "run_id": 29256109907,
+    "run_number": 62
+  },
+  "merge_commit": "94127249d29ab3407cdb6337075f3f10a78aaed3",
+  "not_promoted_as_empirical_truth": [
+    "money-or-economic-value",
+    "safe-store-of-value",
+    "backing-or-redemption",
+    "custody-wallet-or-key-safety",
+    "network-consensus-or-global-finality",
+    "malicious-rollback-resistance-without-external-anchor",
+    "physical-power-loss-durability",
+    "production-availability-or-security",
+    "independent-durability-implementation",
+    "exhaustive-crash-or-concurrency-proof"
+  ],
+  "promoted_head": "4c82ca8a5aea683fbe500fa0f73108e21bcf67e6",
+  "promoted_pull_request": 16,
+  "research_disposition_after_promotion": {
+    "claim": "DEMONSTRATED_CRASH_CONSISTENT_LOCAL_RECOVERY_OF_SYNTHETIC_CONSERVED_STATE",
+    "proposal_evidence": "IMMUTABLE_PREPROMOTION_HISTORY",
+    "status": "PROMOTED_BOUNDED_DEMONSTRATION"
+  },
+  "schema": "nexus.promotion/v1",
+  "task_id": "TSK-R014-PCX-DURABLE-REPLAY"
+}
