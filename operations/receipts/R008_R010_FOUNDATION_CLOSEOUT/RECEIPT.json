@@ -1,0 +1,81 @@
+{
+  "authority": "USER_AUTHORIZED_CLOSEOUT",
+  "baseline_commit": "f79e9b650d10d3d9cf541114437ca54a56269b09",
+  "evidence_intake": {
+    "r007_merge_commit": "f79e9b650d10d3d9cf541114437ca54a56269b09",
+    "r007_report_commit": "b870d97c6403cf3d434006567f22fc88086c3d68",
+    "r007_report_git_blob": "e2746724ec1b6ae87579523f1942f8f547fc3193"
+  },
+  "findings": {
+    "AUDOBS-0010": {
+      "demonstrated": [
+        "Same-toolchain builds remain byte-identical in the unit test.",
+        "New snapshot metadata records Python zipfile/zlib scope and runtime versions.",
+        "Documentation now identifies Git-tree and payload-manifest identity as the cross-toolchain invariant."
+      ],
+      "disposition": "REMEDIATED_CANDIDATE",
+      "implemented": "Universal outer-ZIP byte identity is no longer claimed; exact frozen artifact hashes remain preserved and rebuild payload identity remains bound to the immutable Git tree.",
+      "limitations": "No second compression toolchain was executed by this change. Cross-toolchain compressed-byte equality is explicitly a non-claim."
+    },
+    "AUDOBS-0014": {
+      "demonstrated": [
+        "A mocked execution test asserts repository creation omits --push.",
+        "The test asserts visibility verification and the mandatory permission request occur before git push.",
+        "A PUBLIC response stops before permission configuration or push."
+      ],
+      "disposition": "REMEDIATED_CANDIDATE",
+      "implemented": "github_bootstrap creates an empty private remote, verifies GitHub reports PRIVATE, configures mandatory Actions permissions, and only then pushes content.",
+      "limitations": "Tests use an isolated in-process mock and do not prove live GitHub provider semantics."
+    },
+    "AUDOBS-0015": {
+      "demonstrated": [
+        "A simulated Actions-permission failure writes a FAILED receipt, raises NexusError and performs no content push.",
+        "Simulated label and issue failures return PARTIAL with explicit warning objects."
+      ],
+      "disposition": "REMEDIATED_CANDIDATE",
+      "implemented": "Mandatory and optional bootstrap failures now have different explicit policies instead of being silently absorbed as raw exit codes.",
+      "limitations": "A successful CLI exit code is not independent provider-state attestation."
+    },
+    "AUDOBS-0016": {
+      "demonstrated": [
+        "Unit tests exercise BLOCK, WARN, ADVISORY and legacy-untyped behavior.",
+        "The CLI invokes assurance evaluation before dispatch.",
+        "Status and diagnostic commands remain available under a wildcard block."
+      ],
+      "disposition": "REMEDIATED_CANDIDATE",
+      "implemented": "STATUS.json supports typed command-scoped assurance gates enforced by the Nexus CLI.",
+      "limitations": "Direct shell commands, manual file edits and external tools can bypass the Nexus CLI gate."
+    }
+  },
+  "implementation_branch": "chatgpt/r008-r010-foundation-closeout",
+  "implementation_head_verified": "7af5c719efba79b2badb8443efa0384580a79471",
+  "non_claims": [
+    "A passing workflow does not establish complete correctness, security, privacy or scientific validity.",
+    "Mocked GitHub bootstrap tests do not create a real repository or prove provider-side confidentiality.",
+    "This receipt does not alter baseline-001, canonical snapshots, R001/R002 targets, audit ledgers or preserved evidence.",
+    "Final promotion still requires the pull-request head, including this receipt and final status files, to pass the Nexus Audit workflow."
+  ],
+  "preserved_without_retroactive_ledger_mutation": {
+    "decision": "ACCEPT_AS_PRESERVED_EVIDENCE",
+    "item": "R002 observations",
+    "reason": "The observations and bounded adjudication reports are preserved with status_authority NONE. The closeout records user-authorized remediation and does not rewrite history or convert reports into self-authorizing ledger entries."
+  },
+  "pull_request": 9,
+  "schema": "nexus.foundation-closeout-receipt/v1",
+  "status": "IMPLEMENTED_AND_PREPROMOTION_VERIFIED",
+  "task_id": "TSK-R008-R010-FOUNDATION-CLOSEOUT",
+  "verification": {
+    "conclusion": "success",
+    "job_id": 86714138566,
+    "properties_exercised": [
+      "Nexus doctor",
+      "full unit and attack test suite",
+      "snapshot, manifest and audit-ledger verification",
+      "R001 audit-target integrity",
+      "R002 audit-target integrity"
+    ],
+    "workflow": "Nexus Audit",
+    "workflow_run_id": 29216787952,
+    "workflow_run_number": 31
+  }
+}

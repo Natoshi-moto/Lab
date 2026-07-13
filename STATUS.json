@@ -1,13 +1,6 @@
 {
-  "active_tasks": [
-    "TSK-R007-REMAINING-AUDIT-ADJUDICATION"
-  ],
-  "assurance_blocks": [
-    "R002_OBSERVATIONS_PRESERVED_NOT_LEDGER_APPENDED",
-    "AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING",
-    "AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING",
-    "AUDOBS_0016_PROCESS_CONTRADICTION_PENDING"
-  ],
+  "active_tasks": [],
+  "assurance_blocks": [],
   "canonical_target": {
     "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
     "payload_manifest_sha256": "34e4337b94685c725e316db95b1c8caa3aac4e6cf1595a6bb8005728f16bfb24",
@@ -16,12 +9,13 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R007_REMAINING_ADJUDICATION_READY",
-  "current_round": "R007",
+  "current_mode": "R001_FOUNDATION_OPERATIONAL",
+  "current_round": "R010",
+  "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R006_AUDOBS_0003_REMEDIATION_CONFIRMED",
-  "next_action_id": "ACT-R007_RESOLVE_0010_0014_0015_0016",
-  "open_assurance_blocks": 4,
+  "last_completed_action": "R008_R010_FOUNDATION_CLOSEOUT_IMPLEMENTED_AND_PREPROMOTION_VERIFIED",
+  "next_action_id": "ACT-R011_RUN_FIRST_REAL_VERTICAL_SLICE",
+  "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
-  "schema": "nexus.status/v1"
+  "schema": "nexus.status/v2"
 }

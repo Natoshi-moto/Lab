@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 import zipfile
+import zlib
 from pathlib import Path
 
 from system.nexus_lab.snapshot import build_snapshot, verify_snapshot
@@ -20,7 +21,7 @@ class SnapshotTests(unittest.TestCase):
         script.chmod(0o755)
         return init_git_repo(root)
 
-    def test_same_commit_produces_byte_identical_snapshot(self) -> None:
+    def test_same_toolchain_commit_produces_byte_identical_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             commit = self.make_repo(root)
@@ -30,9 +31,35 @@ class SnapshotTests(unittest.TestCase):
             second = build_snapshot(root, ref=commit, snapshot_id="TEST-001", output=two)
             self.assertEqual(one.read_bytes(), two.read_bytes())
             self.assertEqual(first["archive_sha256"], second["archive_sha256"])
+            self.assertEqual(
+                first["determinism"]["outer_archive_scope"],
+                "SAME_PYTHON_ZIPFILE_AND_ZLIB_RUNTIME",
+            )
+            self.assertEqual(
+                first["determinism"]["cross_toolchain_identity"],
+                "GIT_TREE_AND_PAYLOAD_MANIFEST",
+            )
+            self.assertEqual(first["toolchain"]["zlib_runtime_version"], zlib.ZLIB_RUNTIME_VERSION)
             verified = verify_snapshot(one, expected_sha256=first["archive_sha256"])
             self.assertEqual(verified["source_commit"], commit)
             self.assertEqual(verified["status"], "CANONICAL_AS_IS")
+            self.assertEqual(verified["payload_manifest_sha256"], first["payload_manifest_sha256"])
+            self.assertEqual(verified["toolchain"], first["toolchain"])
+
+    def test_snapshot_metadata_contains_toolchain_scope(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            commit = self.make_repo(root)
+            snapshot = root / "snapshot.zip"
+            build_snapshot(root, ref=commit, snapshot_id="TEST-SCOPE", output=snapshot)
+            with zipfile.ZipFile(snapshot, "r") as archive:
+                metadata = json.loads(archive.read("_nexus/SNAPSHOT_METADATA.json"))
+            self.assertEqual(
+                metadata["determinism"]["outer_archive_scope"],
+                "SAME_PYTHON_ZIPFILE_AND_ZLIB_RUNTIME",
+            )
+            self.assertEqual(metadata["toolchain"]["zlib_compile_version"], zlib.ZLIB_VERSION)
+            self.assertEqual(metadata["toolchain"]["zlib_runtime_version"], zlib.ZLIB_RUNTIME_VERSION)
 
     def test_tampered_member_fails_internal_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

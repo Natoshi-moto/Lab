@@ -1,10 +1,14 @@
 # NEXT ACTION
 
-Read `operations/tasks/TSK-R007-REMAINING-AUDIT-ADJUDICATION.json` and resolve only the four remaining material findings in the declared order:
+Run the first real bounded Nexus vertical slice.
 
-1. `AUDOBS-0010` — cross-toolchain snapshot determinism;
-2. `AUDOBS-0014` — GitHub bootstrap visibility ordering;
-3. `AUDOBS-0015` — GitHub bootstrap failure surfacing;
-4. `AUDOBS-0016` — process-gate contradiction.
+Use the operational R001 foundation to take one genuine research or engineering task through:
 
-Do not reopen `AUDOBS-0003`, `AUDOBS-0011`, or `AUDOBS-0012` unless new contradictory evidence appears. Do not modify `baseline-001`, canonical snapshots, R001/R002 target bytes, audit ledgers, or preserved evidence. Return one bounded `.evidence` report under the task's declared path with `status_authority: NONE`.
+1. a declared task and authority boundary;
+2. provider-neutral context routing;
+3. work on a proposal branch;
+4. tests or bounded evidence appropriate to the task;
+5. review and explicit promotion into `main`;
+6. a reconstructable receipt or handoff.
+
+The purpose of R011 is to test whether Nexus reduces context loss and coordination ambiguity during useful work. Do not begin another broad audit of the audit machinery unless the vertical slice produces new contradictory evidence. `baseline-001` and all historical audit evidence remain immutable.
