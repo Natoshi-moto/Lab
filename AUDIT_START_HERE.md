@@ -1,43 +1,38 @@
-# Remaining audit adjudication start — R007
+# Audit entrypoint — foundation cycle closed
 
-## Mission
+There is no active broad audit task.
 
-The R002 blind audit of `baseline-001` is complete and preserved. The following remediations have been implemented and retested:
+The R001 foundation was frozen at `baseline-001`. R002 produced preserved, non-authoritative observations against that immutable target. Follow-up rounds implemented and boundedly retested the material remediations:
 
-- `AUDOBS-0003` — audit snapshot payload bound to immutable Git tree at `target_commit`;
-- `AUDOBS-0011` — secret-scan filename coverage;
-- `AUDOBS-0012` — explicit reporting of size-limit exclusions.
+- `AUDOBS-0003` — audit snapshot payload bound to the immutable Git tree at `target_commit`;
+- `AUDOBS-0011` — secret-scan filename coverage includes `.env`, `.env.*` and extensionless candidates;
+- `AUDOBS-0012` — size-limit exclusions are explicitly reported;
+- `AUDOBS-0010` — snapshot claims now distinguish exact frozen artifact bytes, same-toolchain ZIP reproducibility, and cross-toolchain Git-tree/payload identity;
+- `AUDOBS-0014` — GitHub bootstrap verifies private visibility and mandatory permission configuration before pushing content;
+- `AUDOBS-0015` — mandatory bootstrap failure is fatal and optional failures are explicit `PARTIAL` warnings;
+- `AUDOBS-0016` — typed command-scoped assurance gates are enforced by the Nexus CLI.
 
-The current mission is to resolve only the four remaining material observations:
-
-- `AUDOBS-0010` — cross-toolchain snapshot byte determinism;
-- `AUDOBS-0014` — GitHub bootstrap visibility ordering;
-- `AUDOBS-0015` — GitHub bootstrap failure surfacing;
-- `AUDOBS-0016` — process-gate contradiction.
-
-## Start
-
-1. Confirm current `main` and a clean worktree.
-2. Read `operations/tasks/TSK-R007-REMAINING-AUDIT-ADJUDICATION.json`.
-3. Read the original R002 evidence, the R005 retest report, the Codex documentary review, and the R006 original-auditor retest evidence.
-4. Run every required verification command.
-5. Resolve the four observations in the declared order without broadening into a new audit.
-6. Produce one bounded `.evidence` report under the task's declared path or on a review branch.
-
-Do not invoke `/nexus-audit`; that broad pass is complete.
-
-## Constraints
-
-- Do not edit `baseline-001`, canonical snapshots, R001/R002 target bytes, audit ledgers, or preserved evidence.
-- Do not reopen the three confirmed remediations without contradictory evidence.
-- Do not create real external repositories or push test data when testing GitHub bootstrap behaviour.
-- A passing test establishes only its exercised property.
-- Use `UNABLE_TO_VERIFY` where execution is unavailable.
-- Report files seen and files not seen.
-- Output has `status_authority: NONE`.
-
-## Return path
+The closeout implementation and evidence are recorded under:
 
 ```text
-operations/audits/AUD-R002-CLAUDE-BLIND/results/r007-remaining-adjudication/R007_ADJUDICATION_REPORT.evidence
+operations/tasks/TSK-R008-R010-FOUNDATION-CLOSEOUT.json
+operations/receipts/R008_R010_FOUNDATION_CLOSEOUT/RECEIPT.json
+operations/audits/AUD-R002-CLAUDE-BLIND/results/r007-remaining-adjudication/
 ```
+
+## Current operating direction
+
+Read `STATUS.md` and `NEXT_ACTION.md`. The next phase is a real bounded vertical slice, not another automatic re-audit of the same machinery.
+
+## Starting a future audit
+
+A future audit must be separately commissioned. Before invoking `/nexus-audit` or another audit seat:
+
+1. create a new task with explicit authority and write scope;
+2. identify an immutable target commit and snapshot or Git-tree binding;
+3. state whether the work is broad audit, bounded retest or documentary review;
+4. preserve `status_authority: NONE` for auditor reports;
+5. do not modify historical targets, ledgers or evidence;
+6. treat passing tests as evidence only for the exercised property.
+
+New contradictory evidence may reopen a disposition. The absence of an active audit is not a claim of complete correctness, security, privacy or scientific validity.
