@@ -1,0 +1,85 @@
+# AUDOBS-0003 R006 remediation retest
+
+- Reviewer: original Claude session that performed `AUD-R002-CLAUDE-BLIND`
+- Review class: `SAME_FAMILY_PROCEDURAL_RETEST`
+- Status authority: `NONE`
+- Original checkout: `/home/anon/Downloads/Lab`
+- Original checkout HEAD: `084b3b9ee6a1434e38a5bf23eee8266c43b3522d`
+- Current tested main: `b348df52956f647216927599bae5637647e73f39`
+- R006 implementation commit: `0509f4cf416be2c16b20d0d8f863c5adccaa615e`
+- Observation: `AUDOBS-R002-CLAUDE-0003`
+
+## Original checkout integrity
+
+The original checkout remained at `084b3b9ee6a1434e38a5bf23eee8266c43b3522d` throughout. `git status --short` was clean at start, after `git fetch origin`, and at the end. A transient untracked `.claude/settings.local.json.tmp.*` harness artifact appeared momentarily and disappeared on the next check; it was not tracked repository content.
+
+## Disposable test environment
+
+A disposable clone was checked out at `b348df52956f647216927599bae5637647e73f39`, confirmed as the then-current `origin/main`, and clean before the test.
+
+Files inspected:
+
+- `system/nexus_lab/snapshot.py`
+- `system/nexus_lab/audit_integrity.py`
+- `tests/test_audit_git_tree_binding.py`
+- `operations/audits/AUD-R002-CLAUDE-BLIND/results/codex-documentary-review/R005_FIDELITY_REVIEW.evidence`
+
+## Baseline checks
+
+| Command | Result |
+|---|---|
+| `./nexus doctor` | PASS, exit 0 |
+| `python3 -m unittest discover -s tests -v` | 37/37 PASS, exit 0 |
+| `./nexus verify` | PASS, exit 0 |
+| `./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND` | PASS before attack, exit 0 |
+
+## Independent stronger replacement test
+
+The reviewer independently modified the real R002 target snapshot in the disposable clone by replacing `AGENTS.md` payload bytes, then regenerated:
+
+- `_nexus/PAYLOAD_MANIFEST.sha256`;
+- `_nexus/PACKAGE_MANIFEST.sha256`;
+- `_nexus/SNAPSHOT_METADATA.json`;
+- `TARGET.json.target_archive_sha256`;
+- target archive sidecar;
+- loose `MANIFEST.sha256`;
+- audit pack and its sidecar.
+
+The first attempt reproduced the same self-referential `MANIFEST.sha256` harness bug identified during R005. The disposable clone was reverted and the harness corrected by excluding `MANIFEST.sha256` and the audit-pack sidecar from the rebuild walk.
+
+The corrected replacement then passed all internal consistency checks:
+
+- `verify_snapshot()` returned PASS;
+- `verify_manifest_pack()` returned PASS;
+- loose and packed `MANIFEST.sha256` were byte-identical.
+
+The complete replacement was committed only inside the disposable clone as commit `a860ad2`; `git status --short` was clean afterward.
+
+## Decisive result
+
+Running:
+
+```text
+./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND
+```
+
+returned exit 2 with:
+
+```text
+NEXUS ERROR: Snapshot payload manifest does not match the immutable Git tree at target_commit.
+```
+
+The replacement was valid, internally self-consistent, and committed with a clean Git worktree. The decisive rejection was therefore the R006 `verify_snapshot_against_git_tree` binding, not a digest, manifest, pack-validity, or dirty-worktree check.
+
+## Verdict
+
+`AUDOBS_0003_REMEDIATION_CONFIRMED`
+
+R006 closes the broader condition identified by the Codex documentary review: a coherently committed replacement of the snapshot and all adjacent audit declarations is rejected when its payload does not equal the immutable Git tree at `target_commit`.
+
+## Limitations
+
+- The pass did not inspect the R005 retest report or the full preserved original Claude evidence set.
+- The critical-path Git-status branch was not separately attacked in this pass; the payload-to-Git-tree branch was isolated and exercised.
+- The test covered the declared target commit with altered payload, not substitution of a different declared commit tree.
+- No real branch, tag, target, snapshot, ledger, or remote state was modified or pushed.
