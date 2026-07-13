@@ -1,0 +1,233 @@
+{
+  "claims": [
+    "One route-bound synthetic cognition return settled exactly once in one local ledger and exact replay appended nothing."
+  ],
+  "cold_consumer": {
+    "check": "operations/receipts/R012_BOUNDED_WORK_EXCHANGE/COLD_CONSUMER_CHECK.json",
+    "independence": "CORRELATED",
+    "report": "operations/receipts/R012_BOUNDED_WORK_EXCHANGE/COLD_CONSUMER_REPORT.json",
+    "status": "PASS"
+  },
+  "exact_replay": {
+    "idempotent": true,
+    "ledger": "operations/receipts/R012_BOUNDED_WORK_EXCHANGE/SETTLEMENTS.jsonl",
+    "ledger_unchanged": true,
+    "receipt": {
+      "created_at": "2026-07-13T12:00:00Z",
+      "decision": "ACCEPTED",
+      "exchange_id": "276931f654a2d3ed7ed7395c8e988e6e2377bc3d771587e69e0be12d7d616261",
+      "next_state_hash": "c039658b6d9ec687dba0690513ef9a5178f593ed34fb6d8f51e96a0d8ea2fd94",
+      "previous_receipt_hash": "",
+      "previous_state_hash": "",
+      "reason_codes": [
+        "VALID_BOUNDED_RETURN"
+      ],
+      "receipt_hash": "5a6491a2625521dcd39b221800a5606f4a4a5972a8c2055640f119cb4531c009",
+      "receipt_id": "BWX-RCPT-000001",
+      "return_hash": "2fca3934016835a91451a6ef66427594f79d6a4cc8ef2ac4a991b967b93fc702",
+      "route_sha256": "466e469418c19d68c586a5c7a6035124ab0e4efd97da38565165f32666610fd8",
+      "schema": "nexus.exchange-receipt/v0",
+      "sequence": 1,
+      "status_authority": "NONE",
+      "task_sha256": "05a96aa3094c0f28c540ae666f7d65e9d381f24f2183fe63b2143ca04e23ee22"
+    },
+    "utility": {
+      "recomputed_falsifier_count": 0,
+      "shadow": {
+        "atom_count": 7,
+        "claims": [
+          "Source bytes, exact line spans, references, roots and declared task invariants were mechanically checked."
+        ],
+        "invariant_results": {
+          "INV-PLANTED-CONTRADICTION": true
+        },
+        "non_claims": [
+          "No semantic truth, source authority, provider independence, consensus or canonical status is established."
+        ],
+        "reason_codes": [
+          "COGNITION_SHADOW_BOUND"
+        ],
+        "reference_count": 3,
+        "shadow_root": "2039cbfbdd1e99b07197e1ed35422f073b2864ec92e29187352c9e2acda9020a",
+        "source_count": 3,
+        "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+        "status": "PASS"
+      },
+      "valid_falsifier_ids": []
+    }
+  },
+  "ledger_verification": {
+    "accepted_count": 1,
+    "accepted_state_hash": "c039658b6d9ec687dba0690513ef9a5178f593ed34fb6d8f51e96a0d8ea2fd94",
+    "ledger_head": "5a6491a2625521dcd39b221800a5606f4a4a5972a8c2055640f119cb4531c009",
+    "non_claims": [
+      "Replay handling is local to this ledger and does not establish global double-spend prevention."
+    ],
+    "receipt_count": 1,
+    "schema": "nexus.exchange-ledger-verification/v0",
+    "status": "PASS"
+  },
+  "non_claims": [
+    "This does not prove semantic truth, general utility, identity, independence, Sybil resistance, consensus, financial value, production readiness, PCCE, canonical status or promotion."
+  ],
+  "pack_build": {
+    "artifact_count": 1,
+    "exchange_id": "276931f654a2d3ed7ed7395c8e988e6e2377bc3d771587e69e0be12d7d616261",
+    "pack_path": "operations/receipts/R012_BOUNDED_WORK_EXCHANGE/R012-RETURN.zip",
+    "pack_sha256": "b4227b9f953cdb01251905e9a16b76eb90aaaeed1149881545d44f8bd742527e",
+    "return_hash": "2fca3934016835a91451a6ef66427594f79d6a4cc8ef2ac4a991b967b93fc702",
+    "schema": "nexus.exchange-pack-build/v0",
+    "status": "PASS",
+    "utility": {
+      "recomputed_falsifier_count": 0,
+      "shadow": {
+        "atom_count": 7,
+        "claims": [
+          "Source bytes, exact line spans, references, roots and declared task invariants were mechanically checked."
+        ],
+        "invariant_results": {
+          "INV-PLANTED-CONTRADICTION": true
+        },
+        "non_claims": [
+          "No semantic truth, source authority, provider independence, consensus or canonical status is established."
+        ],
+        "reason_codes": [
+          "COGNITION_SHADOW_BOUND"
+        ],
+        "reference_count": 3,
+        "shadow_root": "2039cbfbdd1e99b07197e1ed35422f073b2864ec92e29187352c9e2acda9020a",
+        "source_count": 3,
+        "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+        "status": "PASS"
+      },
+      "valid_falsifier_ids": []
+    }
+  },
+  "pack_verification": {
+    "artifact_count": 1,
+    "baseline_commit": "b0190148d791a3e9f6f9f1731759bdf1a18260e2",
+    "claims": [
+      "The declared route, baseline, return envelope and artifact bytes are hash-bound."
+    ],
+    "exchange_id": "276931f654a2d3ed7ed7395c8e988e6e2377bc3d771587e69e0be12d7d616261",
+    "non_claims": [
+      "This does not establish semantic truth, producer authorship, provider independence, financial value, Sybil resistance or global uniqueness."
+    ],
+    "return_hash": "2fca3934016835a91451a6ef66427594f79d6a4cc8ef2ac4a991b967b93fc702",
+    "route_sha256": "466e469418c19d68c586a5c7a6035124ab0e4efd97da38565165f32666610fd8",
+    "schema": "nexus.exchange-pack-verification/v0",
+    "status": "PASS",
+    "task_sha256": "05a96aa3094c0f28c540ae666f7d65e9d381f24f2183fe63b2143ca04e23ee22",
+    "utility": {
+      "recomputed_falsifier_count": 0,
+      "shadow": {
+        "atom_count": 7,
+        "claims": [
+          "Source bytes, exact line spans, references, roots and declared task invariants were mechanically checked."
+        ],
+        "invariant_results": {
+          "INV-PLANTED-CONTRADICTION": true
+        },
+        "non_claims": [
+          "No semantic truth, source authority, provider independence, consensus or canonical status is established."
+        ],
+        "reason_codes": [
+          "COGNITION_SHADOW_BOUND"
+        ],
+        "reference_count": 3,
+        "shadow_root": "2039cbfbdd1e99b07197e1ed35422f073b2864ec92e29187352c9e2acda9020a",
+        "source_count": 3,
+        "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+        "status": "PASS"
+      },
+      "valid_falsifier_ids": []
+    }
+  },
+  "route": "operations/routes/RTE-R012-BOUNDED-WORK-EXCHANGE.zip",
+  "schema": "nexus.r012-bwx-demo/v0",
+  "settlement": {
+    "idempotent": false,
+    "ledger": "operations/receipts/R012_BOUNDED_WORK_EXCHANGE/SETTLEMENTS.jsonl",
+    "receipt": {
+      "created_at": "2026-07-13T12:00:00Z",
+      "decision": "ACCEPTED",
+      "exchange_id": "276931f654a2d3ed7ed7395c8e988e6e2377bc3d771587e69e0be12d7d616261",
+      "next_state_hash": "c039658b6d9ec687dba0690513ef9a5178f593ed34fb6d8f51e96a0d8ea2fd94",
+      "previous_receipt_hash": "",
+      "previous_state_hash": "",
+      "reason_codes": [
+        "VALID_BOUNDED_RETURN"
+      ],
+      "receipt_hash": "5a6491a2625521dcd39b221800a5606f4a4a5972a8c2055640f119cb4531c009",
+      "receipt_id": "BWX-RCPT-000001",
+      "return_hash": "2fca3934016835a91451a6ef66427594f79d6a4cc8ef2ac4a991b967b93fc702",
+      "route_sha256": "466e469418c19d68c586a5c7a6035124ab0e4efd97da38565165f32666610fd8",
+      "schema": "nexus.exchange-receipt/v0",
+      "sequence": 1,
+      "status_authority": "NONE",
+      "task_sha256": "05a96aa3094c0f28c540ae666f7d65e9d381f24f2183fe63b2143ca04e23ee22"
+    },
+    "utility": {
+      "recomputed_falsifier_count": 0,
+      "shadow": {
+        "atom_count": 7,
+        "claims": [
+          "Source bytes, exact line spans, references, roots and declared task invariants were mechanically checked."
+        ],
+        "invariant_results": {
+          "INV-PLANTED-CONTRADICTION": true
+        },
+        "non_claims": [
+          "No semantic truth, source authority, provider independence, consensus or canonical status is established."
+        ],
+        "reason_codes": [
+          "COGNITION_SHADOW_BOUND"
+        ],
+        "reference_count": 3,
+        "shadow_root": "2039cbfbdd1e99b07197e1ed35422f073b2864ec92e29187352c9e2acda9020a",
+        "source_count": 3,
+        "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+        "status": "PASS"
+      },
+      "valid_falsifier_ids": []
+    }
+  },
+  "shadow_build": {
+    "atom_count": 7,
+    "path": "operations/receipts/R012_BOUNDED_WORK_EXCHANGE/artifacts/SHADOW.json",
+    "schema": "nexus.cognition-shadow-build/v0",
+    "shadow_root": "2039cbfbdd1e99b07197e1ed35422f073b2864ec92e29187352c9e2acda9020a",
+    "source_count": 3,
+    "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+    "status": "PASS"
+  },
+  "shadow_verification": {
+    "atom_count": 7,
+    "claims": [
+      "Source bytes, exact line spans, references, roots and declared task invariants were mechanically checked."
+    ],
+    "invariant_results": {
+      "INV-PLANTED-CONTRADICTION": true
+    },
+    "non_claims": [
+      "No semantic truth, source authority, provider independence, consensus or canonical status is established."
+    ],
+    "reason_codes": [
+      "COGNITION_SHADOW_BOUND"
+    ],
+    "reference_count": 3,
+    "shadow_root": "2039cbfbdd1e99b07197e1ed35422f073b2864ec92e29187352c9e2acda9020a",
+    "source_count": 3,
+    "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+    "status": "PASS"
+  },
+  "status": "PASS",
+  "status_authority": "NONE",
+  "template": {
+    "exchange_id": "276931f654a2d3ed7ed7395c8e988e6e2377bc3d771587e69e0be12d7d616261",
+    "path": "operations/receipts/R012_BOUNDED_WORK_EXCHANGE/RETURN_DRAFT.json",
+    "route_bound": true,
+    "schema": "nexus.exchange-template-build/v0",
+    "status": "PASS"
+  }
+}

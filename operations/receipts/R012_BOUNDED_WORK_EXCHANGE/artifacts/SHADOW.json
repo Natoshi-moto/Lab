@@ -1,0 +1,161 @@
+{
+  "claims": [
+    "The brief preserves the approved budget and date change while surfacing the unresolved dataset-availability risk."
+  ],
+  "contradictions": [
+    {
+      "atom_ids": [
+        "ATOM-BUDGET-APPROVED",
+        "ATOM-BUDGET-DRAFT"
+      ],
+      "contradiction_id": "CON-BUDGET-1",
+      "handling": "OVERRIDDEN_BY_DECLARED_PRECEDENCE",
+      "summary": "The approved ceiling and unapproved draft memo disagree; declared approval precedence is preserved."
+    }
+  ],
+  "evidence_atoms": [
+    {
+      "atom_id": "ATOM-HBR-17",
+      "evidence_class": "DIRECT_TEXT",
+      "locator": {
+        "end_line": 2,
+        "span_sha256": "2cf51b4c945507191b8a76eaf442b0a7be47cc0fd0da96ae5cc3d5514080fed3",
+        "start_line": 2
+      },
+      "source_id": "SRC-REQUEST",
+      "statement": "REQUEST-ID: HBR-17"
+    },
+    {
+      "atom_id": "ATOM-ORIGINAL-DATE",
+      "evidence_class": "DIRECT_TEXT",
+      "locator": {
+        "end_line": 4,
+        "span_sha256": "980e9fb9f90cc8fc10cac7223ce80e298c0c7e74b8b9d08b3121ad0ef06f250e",
+        "start_line": 4
+      },
+      "source_id": "SRC-REQUEST",
+      "statement": "ORIGINAL-LAUNCH-DATE: 2026-08-15"
+    },
+    {
+      "atom_id": "ATOM-BUDGET-APPROVED",
+      "evidence_class": "DIRECT_TEXT",
+      "locator": {
+        "end_line": 5,
+        "span_sha256": "9bddef90a9371fa9e59add117fde413ef02c68d14be2b17280bd1845bf387c59",
+        "start_line": 5
+      },
+      "source_id": "SRC-REQUEST",
+      "statement": "SPENDING-CEILING-GBP: 50000"
+    },
+    {
+      "atom_id": "ATOM-DATASET",
+      "evidence_class": "DIRECT_TEXT",
+      "locator": {
+        "end_line": 7,
+        "span_sha256": "bd97e508ba8e8a53e7db858998b8bae16091f56a17fb849698d06aa5937f6456",
+        "start_line": 6
+      },
+      "source_id": "SRC-REQUEST",
+      "statement": "ALLOWED-DATASET: CEDAR-SYNTHETIC\nDATA-RULE: Production customer data is prohibited."
+    },
+    {
+      "atom_id": "ATOM-CHANGE-APPROVED",
+      "evidence_class": "DIRECT_TEXT",
+      "locator": {
+        "end_line": 5,
+        "span_sha256": "4d93655575add3dc3f242199916042d3d28f8b0e498aa9851ca41b6b5058b407",
+        "start_line": 1
+      },
+      "source_id": "SRC-CHANGE",
+      "statement": "CHANGE-ID: CR-7\nSTATUS: APPROVED\nTARGET: HBR-17\nFIELD: LAUNCH-DATE\nREVISED-VALUE: 2026-09-01"
+    },
+    {
+      "atom_id": "ATOM-BUDGET-DRAFT",
+      "evidence_class": "DIRECT_TEXT",
+      "locator": {
+        "end_line": 3,
+        "span_sha256": "819eba8cca61d852b1c8ccac1999c18230725106afdefad07466cca678c54803",
+        "start_line": 1
+      },
+      "source_id": "SRC-REVIEW",
+      "statement": "MEMO-ID: MEMO-DRAFT-3\nSTATUS: DRAFT-NOT-APPROVED\nCLAIMED-SPENDING-CEILING-GBP: 40000"
+    },
+    {
+      "atom_id": "ATOM-RISK-RK-3",
+      "evidence_class": "DIRECT_TEXT",
+      "locator": {
+        "end_line": 5,
+        "span_sha256": "2e4e8cc1abd94989233c7eef2de3a92f203fe665650bd9388bc2a8b6f76d03d1",
+        "start_line": 4
+      },
+      "source_id": "SRC-REVIEW",
+      "statement": "RISK-ID: RK-3\nCEDAR-SYNTHETIC-AVAILABILITY-AFTER-2026-08-20: UNVERIFIED"
+    }
+  ],
+  "exchange_id": "276931f654a2d3ed7ed7395c8e988e6e2377bc3d771587e69e0be12d7d616261",
+  "hazards": [
+    {
+      "disposition": "INERT_DATA",
+      "hazard_id": "HAZ-UI-12",
+      "kind": "UNTRUSTED_INSTRUCTION",
+      "locator": {
+        "end_line": 8,
+        "span_sha256": "3c2210eee5a7a7017ab73e60bd7259dca8b735380024e49cf0205469235b5006",
+        "start_line": 6
+      },
+      "source_id": "SRC-REVIEW"
+    }
+  ],
+  "inferences": [
+    {
+      "confidence": "HIGH",
+      "inference_id": "INF-GO-NO-GATE",
+      "statement": "The approved date change and spending ceiling are usable, while post-date dataset availability remains unresolved.",
+      "supporting_atom_ids": [
+        "ATOM-BUDGET-APPROVED",
+        "ATOM-CHANGE-APPROVED",
+        "ATOM-RISK-RK-3"
+      ]
+    }
+  ],
+  "non_claims": [
+    "The brief does not approve launch, establish external truth, or change canonical Nexus status."
+  ],
+  "omissions": [],
+  "schema": "nexus.cognition-shadow/v0",
+  "shadow_root": "2039cbfbdd1e99b07197e1ed35422f073b2864ec92e29187352c9e2acda9020a",
+  "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+  "sources": [
+    {
+      "bytes": 239,
+      "inspection_status": "INSPECTED",
+      "path": "experiments/R012_BOUNDED_WORK_EXCHANGE/fixtures/cognition_shadow/included/01_request.txt",
+      "sha256": "5a3123380a2f6ddbc7fd5bd0ac68802add555e7113af242392213218799076de",
+      "source_id": "SRC-REQUEST"
+    },
+    {
+      "bytes": 134,
+      "inspection_status": "INSPECTED",
+      "path": "experiments/R012_BOUNDED_WORK_EXCHANGE/fixtures/cognition_shadow/included/02_change.txt",
+      "sha256": "719389935147512c0489b7b0a410885fba1f2c43fc9ab229a9e37d07124182ba",
+      "source_id": "SRC-CHANGE"
+    },
+    {
+      "bytes": 344,
+      "inspection_status": "INSPECTED",
+      "path": "experiments/R012_BOUNDED_WORK_EXCHANGE/fixtures/cognition_shadow/included/03_review.txt",
+      "sha256": "5a34abeb14a7ec2f35c378e6c7fab35bcce7be32e07dbef0f5f45209980dcb0c",
+      "source_id": "SRC-REVIEW"
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "question": "Will the allowed synthetic dataset remain available after the revised launch date?",
+      "question_id": "UQ-CEDAR-AFTER-2026-08-20",
+      "related_atom_ids": [
+        "ATOM-RISK-RK-3",
+        "ATOM-CHANGE-APPROVED"
+      ]
+    }
+  ]
+}
