@@ -1,22 +1,20 @@
 # NEXT ACTION
 
-Review R012 and the stacked R013 proposal separately, then decide whether either
-should be promoted into `main`.
+Commission R014 `PCX_DURABLE_REPLAY` from the post-promotion `main` head.
 
-R012 demonstrates one non-financial bounded work exchange. R013 depends on its
-proposal head but uses a separate value-conservation kernel: one frozen
-synthetic genesis, transfer-only Ed25519 authorization, creating-transaction
-outpoints, exact conservation, competing-spend rejection and byte-identical
-Python/OpenSSL versus JavaScript/Noble results. The normative verifier is
-path/hash pinned, evidence fails closed, and a bounded abstract model adds
-exhaustive conservation coverage without claiming general correctness.
+R012 and R013 are now bounded demonstrated project history under separate
+user-authorized promotion receipts. Their frozen proposal-time status and
+reports remain immutable evidence; the root status and promotion receipts are
+the live disposition. The R001 canonical snapshot remains unchanged.
 
-Promotion of R013 would accept only
-`DEMONSTRATED_CONSERVATION_KERNEL_ON_SYNTHETIC_HISTORY` as project history. It
-would not create money, economic value, backing, redemption, custody, network
-consensus, global double-spend prevention, production readiness or a new
-canonical snapshot.
+R014 must test whether the R013 synthetic conserved state can survive process
+failure and restart without loss, duplication, inflation, hybrid state or
+silent repair. Use an append-only local rollback-journal database, rebuild state
+by exact replay from the frozen genesis, acknowledge only after durable commit,
+and expose caller-held anchors so rollback detection is testable when an
+independent anchor is supplied.
 
-Do not merge or promote either proposal without explicit user approval. If a
-kill criterion or implementation disagreement appears, preserve the evidence
-and keep the affected round unpromoted.
+Keep the experiment synthetic and local. Do not add real funds, real custody,
+key generation, issuance, backing, redemption, networking or consensus. A pass
+may support only a bounded crash-consistent local-recovery claim under the
+declared runtime, filesystem and fault model.
