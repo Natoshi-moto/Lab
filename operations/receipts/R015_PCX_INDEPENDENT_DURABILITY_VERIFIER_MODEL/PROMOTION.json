@@ -1,0 +1,45 @@
+{
+  "authority": "USER_EXPLICIT_PROMOTION",
+  "canonical_scope": [
+    "frozen-r014-closed-durable-transcript",
+    "separate-node-noble-closed-transcript-replay",
+    "exact-genesis-transfer-receipt-record-anchor-recomputation",
+    "explicit-unauthenticated-caller-anchor-classification",
+    "fail-closed-hostile-transcript-and-anchor-mutation-evidence",
+    "finite-crash-acknowledgement-retry-conflict-anchor-lifecycle-model",
+    "deterministic-exact-byte-evidence-gate",
+    "bounded-mutant-kill-evidence"
+  ],
+  "canonical_snapshot_unchanged": true,
+  "decision": "PROMOTE_TO_MAIN",
+  "exact_head_audit": {
+    "conclusion": "success",
+    "name": "Nexus Audit",
+    "run_id": 29262394436,
+    "run_number": 66
+  },
+  "merge_commit": "67d038f82869433d781c82994e0679b4dc55d592",
+  "not_promoted_as_empirical_truth": [
+    "money-economic-value-or-legal-property",
+    "safe-store-of-value-purchasing-power-or-liquidity",
+    "backing-redemption-or-real-funds",
+    "custody-wallet-signing-key-recovery-or-secret-safety",
+    "authenticated-external-anchor-retention-or-freshness",
+    "operational-rollback-fork-tampering-or-independent-custody-proof",
+    "network-consensus-or-global-finality",
+    "physical-power-loss-filesystem-hardware-or-storage-proof",
+    "production-availability-or-security",
+    "cryptographic-independence-or-external-audit",
+    "unbounded-formal-verification-or-concrete-implementation-equivalence",
+    "regulatory-approval-or-live-pilot-authorization"
+  ],
+  "promoted_head": "8558bfb5d74299f6be33b0a785eb16c9b6fa097b",
+  "promoted_pull_request": 18,
+  "research_disposition_after_promotion": {
+    "claim": "DEMONSTRATED_CROSS_IMPLEMENTATION_DURABILITY_TRANSCRIPT_VERIFICATION_AND_BOUNDED_CRASH_LIFECYCLE_CONSISTENCY",
+    "proposal_evidence": "IMMUTABLE_PREPROMOTION_HISTORY",
+    "status": "PROMOTED_BOUNDED_DEMONSTRATION"
+  },
+  "schema": "nexus.promotion/v1",
+  "task_id": "TSK-R015-PCX-INDEPENDENT-DURABILITY-VERIFIER-MODEL"
+}
