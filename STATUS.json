@@ -9,12 +9,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R011_VERTICAL_SLICE_REVIEW_READY",
+  "current_mode": "R011_VERTICAL_SLICE_PROMOTED",
   "current_round": "R011",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R011_IMPLEMENTED_AND_PREPROMOTION_VERIFIED",
-  "next_action_id": "ACT-R011_USER_REVIEW_AND_PROMOTION_DECISION",
+  "last_completed_action": "R011_USER_AUTHORIZED_PROMOTION_MERGED",
+  "next_action_id": "ACT-R012_SELECT_AND_COMMISSION_NEXT_PHASE",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"
