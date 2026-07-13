@@ -1,0 +1,34 @@
+{
+  "authority": "USER_EXPLICIT_PROMOTION",
+  "canonical_scope": [
+    "synthetic-conservation-kernel",
+    "frozen-synthetic-genesis",
+    "transfer-only-authorization",
+    "competing-spend-rejection",
+    "two-verifier-byte-convergence",
+    "adversarial-conformance-suite",
+    "bounded-model-check"
+  ],
+  "canonical_snapshot_unchanged": true,
+  "decision": "PROMOTE_TO_MAIN",
+  "merge_commit": "b954083bc35bdd1ee7fef6374d2313a3c77d7a45",
+  "not_promoted_as_empirical_truth": [
+    "money-or-economic-value",
+    "backing-or-redemption",
+    "custody-or-key-safety",
+    "durable-persistence",
+    "network-consensus-or-global-finality",
+    "purchasing-power",
+    "production-security"
+  ],
+  "promoted_head": "616f41ff8fb5b3b217e2287107e9718a8a0ea3bb",
+  "promoted_pull_request": 13,
+  "research_disposition_after_promotion": {
+    "claim": "DEMONSTRATED_CONSERVATION_KERNEL_ON_SYNTHETIC_HISTORY",
+    "proposal_evidence": "IMMUTABLE_PREPROMOTION_HISTORY",
+    "status": "PROMOTED_BOUNDED_DEMONSTRATION"
+  },
+  "schema": "nexus.promotion/v1",
+  "substantive_head": "33da36ae22457986c69d3aacdcdecd1a71335793",
+  "task_id": "TSK-R013-PCX-CONSERVED-CLAIM"
+}
