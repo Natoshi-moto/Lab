@@ -12,7 +12,7 @@ from .doctor import run_doctor
 from .github import github_bootstrap
 from .route import build_route
 from .snapshot import build_snapshot, verify_snapshot
-from .status import render_status_file
+from .status import enforce_assurance_blocks, render_status_file
 from .util import NexusError, find_repo_root, load_json, pretty_json
 from .verify import verify_repository
 
@@ -78,7 +78,14 @@ def _task_path(root: Path, value: str) -> Path:
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
-        root = (args.root.resolve() if args.root else find_repo_root())
+        root = args.root.resolve() if args.root else find_repo_root()
+        gate = enforce_assurance_blocks(root, args.command)
+        for warning in gate["warnings"]:
+            print(
+                f"NEXUS WARN: assurance gate {warning['id']} for `{args.command}`: {warning['reason']}",
+                file=sys.stderr,
+            )
+
         if args.command == "status":
             status = load_json(root / "STATUS.json")
             print(pretty_json(status), end="")
