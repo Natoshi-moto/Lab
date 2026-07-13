@@ -5,17 +5,17 @@
 | Field | Value |
 |---|---|
 | Lab | `NEXUS-LAB` |
-| Round | `R014` |
-| Mode | `R014_PCX_DURABLE_REPLAY_PROMOTED` |
+| Round | `R015` |
+| Mode | `R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL_REVIEW_READY` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `R014_USER_AUTHORIZED_PROMOTION_MERGED` |
-| Next action | `ACT-R015_COMMISSION_INDEPENDENT_DURABILITY_VERIFIER_MODEL` |
+| Last completed action | `R015_CROSS_IMPLEMENTATION_DURABILITY_AND_BOUNDED_LIFECYCLE_EVIDENCE_VERIFIED` |
+| Next action | `ACT-R015_USER_REVIEW_AND_SEPARATE_PROMOTION_DECISION` |
 
 ## Active tasks
 
-- None
+- `TSK-R015-PCX-INDEPENDENT-DURABILITY-VERIFIER-MODEL`
 
 ## Assurance blocks
 

@@ -38,6 +38,9 @@ jobs:
           npm --version
           npm ci --ignore-scripts --no-audit --no-fund
 
+      - name: Verify exact R015 durability evidence
+        run: python3 experiments/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL/verify_evidence.py
+
       - name: Run Nexus doctor
         run: ./nexus doctor
 
@@ -65,6 +68,9 @@ jobs:
             echo "R002 audit overlay is not present on this historical revision."
           fi
 
+      - name: Ensure verification did not rewrite tracked evidence
+        run: git diff --exit-code -- .
+
       - name: Record evidence limits
         if: always()
         shell: bash
@@ -72,6 +78,6 @@ jobs:
           {
             echo "## Nexus Audit"
             echo
-            echo "The workflow executes structural, deterministic, manifest and unit checks."
+            echo "The workflow executes structural, deterministic, manifest, unit, and exact R015 evidence checks."
             echo "A green run does not prove semantic correctness, complete security, privacy, or external audit."
           } >> "$GITHUB_STEP_SUMMARY"
