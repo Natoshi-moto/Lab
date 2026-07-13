@@ -6,6 +6,7 @@ from typing import Any
 
 from .audit import check_audit
 from .route import verify_manifest_pack
+from .snapshot import verify_snapshot_against_git_tree
 from .util import NexusError, git, load_json, parse_manifest, safe_join, sha256_file
 
 _MUTABLE_AUDIT_PREFIXES = ("accepted/", "inbox/", "ledger/", "results/")
@@ -39,17 +40,11 @@ def _critical_repo_paths(root: Path, audit_dir: Path, audit_id: str, target: dic
 
 
 def verify_audit_integrity(root: Path, audit_id: str) -> dict[str, Any]:
-    """Verify an audit plus independent immutable-file bindings.
-
-    `check_audit()` validates the declared target semantics and ledger. This layer
-    additionally proves that immutable loose audit files match the manifest stored
-    inside the frozen audit pack and that critical target-binding files have no
-    staged, unstaged, or untracked divergence from Git.
-    """
     audit_dir = root / "operations" / "audits" / audit_id
     target = load_json(audit_dir / "TARGET.json")
     manifest_path = audit_dir / "MANIFEST.sha256"
     pack_path = audit_dir / f"{audit_id}.zip"
+    snapshot_path = safe_join(audit_dir, target["target_snapshot_path"])
 
     if not manifest_path.is_file():
         raise NexusError(f"Audit manifest is missing: {manifest_path.relative_to(root)}")
@@ -84,6 +79,13 @@ def verify_audit_integrity(root: Path, audit_id: str) -> dict[str, Any]:
             )
         checked_manifest_files += 1
 
+    snapshot_verification = verify_snapshot_against_git_tree(
+        root,
+        snapshot_path,
+        expected_commit=target["target_commit"],
+        expected_sha256=target["target_archive_sha256"],
+    )
+
     critical_paths = _critical_repo_paths(root, audit_dir, audit_id, target)
     git_status = git(root, "status", "--porcelain=v1", "--", *critical_paths, check=False)
     if git_status:
@@ -99,5 +101,6 @@ def verify_audit_integrity(root: Path, audit_id: str) -> dict[str, Any]:
         "manifest_files_checked": checked_manifest_files,
         "critical_git_paths_checked": len(critical_paths),
         "mutable_prefixes_excluded": list(_MUTABLE_AUDIT_PREFIXES),
+        "snapshot_payload_git_tree": snapshot_verification["git_tree_binding"],
     }
     return report

@@ -62,6 +62,14 @@ def git_blob(root: Path, object_id: str) -> bytes:
     return result.stdout
 
 
+def git_tree_payload_manifest(root: Path, ref: str) -> tuple[str, bytes]:
+    """Return the exact payload manifest for an immutable Git tree."""
+    commit = resolve_commit(root, ref)
+    tree = _git_tree_entries(root, commit)
+    payload_bytes = {path: data for path, (data, _) in tree.items()}
+    return commit, render_manifest(payload_bytes).encode("utf-8")
+
+
 def _write_zip(path: Path, entries: dict[str, tuple[bytes, bool]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
@@ -200,4 +208,34 @@ def verify_snapshot(path: Path, *, expected_sha256: str | None = None) -> dict[s
         "snapshot_id": metadata.get("snapshot_id"),
         "source_commit": metadata.get("source_commit"),
         "status": metadata.get("status"),
+    }
+
+
+def verify_snapshot_against_git_tree(
+    root: Path,
+    path: Path,
+    *,
+    expected_commit: str,
+    expected_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Bind a valid snapshot payload to the immutable tree of expected_commit."""
+    verification = verify_snapshot(path, expected_sha256=expected_sha256)
+    resolved_commit, expected_manifest = git_tree_payload_manifest(root, expected_commit)
+    if verification["source_commit"] != resolved_commit:
+        raise NexusError(
+            "Snapshot source_commit does not match the immutable Git commit selected for payload verification."
+        )
+    with zipfile.ZipFile(path, "r") as archive:
+        actual_manifest = archive.read("_nexus/PAYLOAD_MANIFEST.sha256")
+    if actual_manifest != expected_manifest:
+        raise NexusError(
+            "Snapshot payload manifest does not match the immutable Git tree at target_commit."
+        )
+    return {
+        **verification,
+        "git_tree_binding": {
+            "status": "PASS",
+            "commit": resolved_commit,
+            "payload_manifest_sha256": sha256_bytes(expected_manifest),
+        },
     }

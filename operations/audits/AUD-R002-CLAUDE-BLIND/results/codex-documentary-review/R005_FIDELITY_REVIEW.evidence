@@ -1,0 +1,40 @@
+# R005 cross-family documentary fidelity review
+
+- Review class: `CROSS_FAMILY_DOCUMENTARY_REVIEW`
+- Reviewer: Codex / OpenAI
+- Source supplied through the human operator
+- Reviewed R005 commit: `69ce3c120cfc1c11f45d711a573e184f92675798`
+- Reviewed report SHA-256: `b449518dafcfd813e0a028303ba19aa7b64f0618394d2c09d80b8c031be2f85a`
+- Original audit checkout observed by reviewer: `084b3b9ee6a1434e38a5bf23eee8266c43b3522d`, clean
+- Status authority: `NONE`
+
+## Conclusion
+
+`MATERIAL_FIDELITY_GAP`
+
+The R005 report correctly established that the exact original uncommitted-worktree reproduction for `AUDOBS-0003` was rejected after R004. It did not establish closure of the broader clean, committed, internally self-consistent replacement condition described in the original evidence.
+
+The stronger R005 replacement harness created a duplicate `MANIFEST.sha256`, so verification failed before the Git-status binding was isolated. A clean committed replacement of the snapshot, `TARGET.json`, loose manifest, audit pack and sidecars was not successfully constructed and tested.
+
+## Disposition by observation
+
+- `AUDOBS-0011`: remediation remains supported for the tested `.env`, `.env.*` and extensionless-file classes. The phrase “exactly reproduces” in R005 is narrower than the actual setup because a standalone temporary directory was used instead of the original full repository copy. This is a wording/scope qualification, not evidence that the repair failed.
+- `AUDOBS-0012`: remediation remains supported; the original oversized-file reporting condition was faithfully retested.
+- `AUDOBS-0003`: interpret the R005 verdict as `PARTIAL_REMEDIATION_CONFIRMED`. The dirty-worktree variant is closed. The coherently committed whole-overlay replacement remained open at the time of R005.
+- `AUDOBS-0010`, `AUDOBS-0014`, `AUDOBS-0015`, `AUDOBS-0016`: R005 preserved their original open status, limitations and non-claims.
+
+## Required next test
+
+Construct a valid replacement snapshot whose internal manifests and metadata are self-consistent, update `TARGET.json`, all loose manifests, the audit pack and sidecars, commit the complete replacement so `git status` is clean, and require `audit-check` to reject it by comparing the snapshot payload to the immutable Git tree named by `target_commit`.
+
+## R006 response
+
+R006 adds an independent payload-to-Git-tree binding and a regression that performs the required clean committed replacement test. Until R006 passes review and an external retest, `AUDOBS-0003` remains partially remediated rather than closed.
+
+## Non-claims and limitations
+
+- This record does not rewrite or invalidate the frozen R005 report.
+- This was documentary review of committed evidence, not a rerun of the original R002 audit.
+- Codex did not possess the original Claude session's private procedural memory; this is not an original-auditor memory review.
+- The review did not inspect all repository files or all 18 observations.
+- This record cannot promote an observation or implementation change by itself.
