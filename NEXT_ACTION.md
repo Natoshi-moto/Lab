@@ -1,13 +1,14 @@
 # NEXT ACTION
 
-Review and verify `TSK-R008-R010-FOUNDATION-CLOSEOUT` on branch `chatgpt/r008-r010-foundation-closeout`.
+Run the first real bounded Nexus vertical slice.
 
-Acceptance sequence:
+Use the operational R001 foundation to take one genuine research or engineering task through:
 
-1. inspect the source and test diff for `AUDOBS-0010`, `AUDOBS-0014`, `AUDOBS-0015` and `AUDOBS-0016`;
-2. run the full Nexus Audit workflow on the pull-request head;
-3. if it passes, add the bounded closeout receipt and clear only the corresponding typed assurance blocks;
-4. rerun the workflow against the final closeout state;
-5. merge only after the final workflow succeeds.
+1. a declared task and authority boundary;
+2. provider-neutral context routing;
+3. work on a proposal branch;
+4. tests or bounded evidence appropriate to the task;
+5. review and explicit promotion into `main`;
+6. a reconstructable receipt or handoff.
 
-Until that acceptance occurs, the Nexus CLI programmatically blocks `freeze` and `github-bootstrap` through `STATUS.json`. Diagnostic commands remain available. Do not modify `baseline-001`, canonical snapshots, R001/R002 target bytes, audit ledgers or preserved evidence.
+The purpose of R011 is to test whether Nexus reduces context loss and coordination ambiguity during useful work. Do not begin another broad audit of the audit machinery unless the vertical slice produces new contradictory evidence. `baseline-001` and all historical audit evidence remain immutable.
