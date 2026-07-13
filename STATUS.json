@@ -1,5 +1,7 @@
 {
-  "active_tasks": [],
+  "active_tasks": [
+    "TSK-R016-PCX-INTEGRATED-CUSTODY-GATE"
+  ],
   "assurance_blocks": [],
   "canonical_target": {
     "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
@@ -9,12 +11,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL_PROMOTED",
-  "current_round": "R015",
+  "current_mode": "R016_PCX_INTEGRATED_CUSTODY_GATE_REVIEW_READY",
+  "current_round": "R016",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R015_USER_AUTHORIZED_PROMOTION_MERGED",
-  "next_action_id": "ACT-R016_COMMISSION_SYNTHETIC_KEY_LIFECYCLE_RECOVERY_AND_CUSTODY_LOSS_GATE",
+  "last_completed_action": "R016_INTEGRATED_CUSTODY_GATE_EVIDENCE_VERIFIED",
+  "next_action_id": "ACT-R016_USER_REVIEW_AND_SEPARATE_PROMOTION_DECISION",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"
