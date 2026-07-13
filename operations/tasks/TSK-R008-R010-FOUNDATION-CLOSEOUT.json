@@ -12,6 +12,7 @@
     "STATUS.json",
     "STATUS.md",
     "NEXT_ACTION.md",
+    "AUDIT_START_HERE.md",
     "constitution",
     "docs",
     "system/nexus_lab",
@@ -33,6 +34,7 @@
     "STATUS.json",
     "STATUS.md",
     "NEXT_ACTION.md",
+    "AUDIT_START_HERE.md",
     "operations/tasks/TSK-R008-R010-FOUNDATION-CLOSEOUT.json",
     "operations/receipts/R008_R010_FOUNDATION_CLOSEOUT"
   ],
