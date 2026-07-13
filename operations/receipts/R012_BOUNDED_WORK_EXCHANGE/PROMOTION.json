@@ -1,0 +1,32 @@
+{
+  "authority": "USER_EXPLICIT_PROMOTION",
+  "canonical_scope": [
+    "bounded-work-exchange-protocol",
+    "reference-implementation",
+    "frozen-synthetic-fixture",
+    "adversarial-tests",
+    "one-nonfinancial-exchange-receipt",
+    "exact-replay-evidence",
+    "cold-consumer-check"
+  ],
+  "canonical_snapshot_unchanged": true,
+  "decision": "PROMOTE_TO_MAIN",
+  "merge_commit": "d870d904cec5f40cc128c9180914bf141b973a24",
+  "not_promoted_as_empirical_truth": [
+    "money-or-economic-value",
+    "identity-or-personhood",
+    "network-consensus-or-finality",
+    "general-utility",
+    "provider-independence",
+    "production-readiness"
+  ],
+  "promoted_head": "f28dc07bf1433bb22e4d992a7f523503387ea445",
+  "promoted_pull_request": 12,
+  "research_disposition_after_promotion": {
+    "claim": "DEMONSTRATED_ONE_BOUNDED_NONFINANCIAL_WORK_EXCHANGE",
+    "proposal_evidence": "IMMUTABLE_PREPROMOTION_HISTORY",
+    "status": "PROMOTED_BOUNDED_DEMONSTRATION"
+  },
+  "schema": "nexus.promotion/v1",
+  "task_id": "TSK-R012-BOUNDED-WORK-EXCHANGE"
+}

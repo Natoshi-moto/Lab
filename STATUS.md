@@ -6,17 +6,16 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R013` |
-| Mode | `R013_PCX_CONSERVED_CLAIM_REVIEW_READY_STACKED` |
+| Mode | `R013_PCX_CONSERVED_CLAIM_PROMOTED` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `R013_CONVERGENCE_AND_BOUNDED_MODEL_DEMONSTRATED_PREPROMOTION` |
-| Next action | `ACT-R012_R013_SEPARATE_USER_REVIEW_AND_PROMOTION_DECISIONS` |
+| Last completed action | `R012_R013_USER_AUTHORIZED_PROMOTION_MERGED` |
+| Next action | `ACT-R014_COMMISSION_PCX_DURABLE_REPLAY` |
 
 ## Active tasks
 
-- `TSK-R012-BOUNDED-WORK-EXCHANGE`
-- `TSK-R013-PCX-CONSERVED-CLAIM`
+- None
 
 ## Assurance blocks
 
