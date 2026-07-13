@@ -9,6 +9,7 @@ from typing import Any
 from .audit import build_audit_pack, ingest_observation
 from .audit_integrity import verify_audit_integrity
 from .doctor import run_doctor
+from .durable_store import apply_transfer, audit_store, export_anchor, init_store, load_anchor
 from .exchange import (
     accept_exchange,
     build_exchange_pack,
@@ -22,7 +23,7 @@ from .shadow import build_cognition_shadow, verify_cognition_shadow, verify_cold
 from .snapshot import build_snapshot, verify_snapshot
 from .status import enforce_assurance_blocks, render_status_file
 from .util import NexusError, find_repo_root, load_json, pretty_json
-from .value_kernel import verify_cross_implementation, verify_suite
+from .value_kernel import MAX_RAW_BYTES, verify_cross_implementation, verify_suite
 from .verify import verify_repository
 
 
@@ -155,6 +156,47 @@ def parser() -> argparse.ArgumentParser:
     )
     pcx_convergence_check.add_argument("suite", type=Path, help="R013 conformance SUITE.json")
 
+    pcx_store_init = sub.add_parser(
+        "pcx-store-init",
+        help="Create an empty crash-consistent local store for synthetic R013 transfers",
+    )
+    pcx_store_init.add_argument("db", type=Path, help="New local SQLite database path")
+
+    pcx_store_apply = sub.add_parser(
+        "pcx-store-apply",
+        help="Replay, validate and durably append one already-signed synthetic transfer",
+    )
+    pcx_store_apply.add_argument("db", type=Path, help="Existing local SQLite database")
+    pcx_store_apply.add_argument("transfer", type=Path, help="Exact canonical R013 transfer bytes")
+    pcx_store_apply.add_argument(
+        "--expected-anchor",
+        type=Path,
+        help="Optional independently held prefix anchor",
+    )
+
+    pcx_store_audit = sub.add_parser(
+        "pcx-store-audit",
+        help="Integrity-check and replay a synthetic durable store without repairing it",
+    )
+    pcx_store_audit.add_argument("db", type=Path, help="Existing local SQLite database")
+    pcx_store_audit.add_argument(
+        "--expected-anchor",
+        type=Path,
+        help="Optional independently held prefix anchor",
+    )
+
+    pcx_store_export = sub.add_parser(
+        "pcx-store-export-anchor",
+        help="Export a caller-held prefix anchor for later rollback/fork detection",
+    )
+    pcx_store_export.add_argument("db", type=Path, help="Existing local SQLite database")
+    pcx_store_export.add_argument("--output", required=True, type=Path, help="New anchor JSON path")
+    pcx_store_export.add_argument(
+        "--expected-anchor",
+        type=Path,
+        help="Optional independently held prefix anchor",
+    )
+
     github = sub.add_parser("github-bootstrap", help="Create or verify a private GitHub repository and push")
     github.add_argument("--repo-name", default="nexus-research-lab")
     return p
@@ -173,6 +215,17 @@ def _task_path(root: Path, value: str) -> Path:
 def _repo_path(root: Path, value: Path) -> Path:
     """Resolve operator paths consistently relative to the selected repository."""
     return value.resolve() if value.is_absolute() else root / value
+
+
+def _required_bytes(path: Path, *, label: str, max_bytes: int | None = None) -> bytes:
+    try:
+        with path.open("rb") as handle:
+            value = handle.read(max_bytes + 1 if max_bytes is not None else -1)
+    except OSError as exc:
+        raise NexusError(f"Unable to read {label}: {path}: {exc}") from exc
+    if max_bytes is not None and len(value) > max_bytes:
+        raise NexusError(f"{label.capitalize()} exceeds the {max_bytes}-byte input limit: {path}")
+    return value
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -301,6 +354,47 @@ def main(argv: list[str] | None = None) -> int:
                         / "independent_verifier.mjs"
                     ),
                     repo_root=root,
+                )
+            )
+        elif args.command == "pcx-store-init":
+            emit(init_store(root, _repo_path(root, args.db)))
+        elif args.command == "pcx-store-apply":
+            expected = (
+                load_anchor(_repo_path(root, args.expected_anchor))
+                if args.expected_anchor
+                else None
+            )
+            emit(
+                apply_transfer(
+                    root,
+                    _repo_path(root, args.db),
+                    _required_bytes(
+                        _repo_path(root, args.transfer),
+                        label="synthetic transfer",
+                        max_bytes=MAX_RAW_BYTES,
+                    ),
+                    expected_anchor=expected,
+                )
+            )
+        elif args.command == "pcx-store-audit":
+            expected = (
+                load_anchor(_repo_path(root, args.expected_anchor))
+                if args.expected_anchor
+                else None
+            )
+            emit(audit_store(root, _repo_path(root, args.db), expected_anchor=expected))
+        elif args.command == "pcx-store-export-anchor":
+            expected = (
+                load_anchor(_repo_path(root, args.expected_anchor))
+                if args.expected_anchor
+                else None
+            )
+            emit(
+                export_anchor(
+                    root,
+                    _repo_path(root, args.db),
+                    _repo_path(root, args.output),
+                    expected_anchor=expected,
                 )
             )
         elif args.command == "github-bootstrap":

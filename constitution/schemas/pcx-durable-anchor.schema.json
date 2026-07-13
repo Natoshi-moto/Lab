@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-durable-anchor/v0",
+  "title": "R014 caller-held synthetic durable-history anchor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "network_id",
+    "genesis_id",
+    "sequence",
+    "record_hash",
+    "state_root",
+    "receipt_head",
+    "status_authority",
+    "anchor_id"
+  ],
+  "properties": {
+    "schema": { "const": "nexus.pcx-durable-anchor/v0" },
+    "network_id": { "const": "NEXUS-R013-SYNTHETIC" },
+    "genesis_id": {
+      "const": "974cd4da89feb9f7ae8e14d7b4359f4b76d8697f55e5793219c52e38b627b7de"
+    },
+    "sequence": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-6])$"
+    },
+    "record_hash": { "type": "string" },
+    "state_root": { "$ref": "#/$defs/hash" },
+    "receipt_head": { "type": "string" },
+    "status_authority": { "const": "NONE" },
+    "anchor_id": { "$ref": "#/$defs/hash" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "sequence": { "const": "0" } },
+        "required": ["sequence"]
+      },
+      "then": {
+        "properties": {
+          "record_hash": { "const": "" },
+          "receipt_head": { "const": "" }
+        }
+      },
+      "else": {
+        "properties": {
+          "record_hash": { "$ref": "#/$defs/hash" },
+          "receipt_head": { "$ref": "#/$defs/hash" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

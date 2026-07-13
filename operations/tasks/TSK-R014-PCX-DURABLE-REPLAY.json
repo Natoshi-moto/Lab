@@ -1,0 +1,73 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-R014-PCX-DURABLE-REPLAY",
+  "objective": "Demonstrate bounded crash-consistent local recovery of the promoted R013 synthetic conserved state by replaying an append-only SQLite record chain from the frozen genesis.",
+  "baseline_ref": "69bbe07843e0d400d53e696b7516d8f3bcf55e3e",
+  "authority": "PROPOSE_ONLY",
+  "allowed_read": [
+    ".github/workflows/nexus-audit.yml",
+    ".gitignore",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "constitution",
+    "experiments/R013_PCX_CONSERVED_CLAIM",
+    "experiments/R014_PCX_DURABLE_REPLAY",
+    "operations/proposals/R013_PCX_CONSERVED_CLAIM",
+    "operations/proposals/R014_PCX_DURABLE_REPLAY",
+    "operations/receipts/R013_PCX_CONSERVED_CLAIM",
+    "system/nexus_lab",
+    "tests"
+  ],
+  "allowed_write": [
+    ".github/workflows/nexus-audit.yml",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "constitution/schemas",
+    "experiments/R014_PCX_DURABLE_REPLAY",
+    "operations/proposals/R014_PCX_DURABLE_REPLAY",
+    "operations/receipts/R014_PCX_DURABLE_REPLAY",
+    "system/nexus_lab",
+    "tests"
+  ],
+  "data_classes": [
+    "LOCAL_ONLY",
+    "ROUTE_ONLY"
+  ],
+  "output_contract": {
+    "type": "object",
+    "required_invariants": [
+      "SQLITE_ROLLBACK_JOURNAL_DELETE",
+      "SQLITE_SYNCHRONOUS_EXTRA",
+      "SQLITE_TRUSTED_SCHEMA_OFF",
+      "BEGIN_IMMEDIATE_SINGLE_WRITER",
+      "APPEND_ONLY_MAX_256_RECORDS",
+      "EXACT_CANONICAL_R013_RETURN_BYTES",
+      "FULL_REPLAY_FROM_FROZEN_GENESIS",
+      "ACK_ONLY_AFTER_COMMIT",
+      "EXACT_IDEMPOTENT_RETRY",
+      "CALLER_HELD_PREFIX_ANCHOR_CHECK",
+      "NO_SILENT_REPAIR_OR_FORK_SELECTION",
+      "CANDIDATE_ONLY_STATUS_AUTHORITY_NONE"
+    ],
+    "kill_on": [
+      "LOST_ACKNOWLEDGED_TRANSFER",
+      "ACKNOWLEDGED_UNCOMMITTED_TRANSFER",
+      "HYBRID_RECOVERED_STATE",
+      "SUPPLY_DIVERGENCE",
+      "DUPLICATE_RETRY_APPEND",
+      "EXACT_RETRY_RESULT_DIVERGENCE",
+      "ACCEPTED_COMPETING_SPENDS",
+      "INVALID_OR_NONCANONICAL_TRANSFER_PERSISTED",
+      "TRUSTED_DERIVED_STATE",
+      "CHAIN_OR_SCHEMA_DIVERGENCE_TOLERATED",
+      "UNDETECTED_SUPPLIED_ANCHOR_MISMATCH",
+      "SILENT_REPAIR_OR_HISTORY_REWRITE",
+      "UNSUPPORTED_SQLITE_MODE_ACCEPTED",
+      "RECORD_LIMIT_EXCEEDED",
+      "REAL_VALUE_SECRET_OR_EXTERNAL_SETTLEMENT_ADMITTED",
+      "AUTHORITY_ESCALATION"
+    ]
+  }
+}

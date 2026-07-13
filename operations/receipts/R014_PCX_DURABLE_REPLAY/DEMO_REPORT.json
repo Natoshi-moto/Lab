@@ -1,0 +1,97 @@
+{
+  "baseline_ref": "69bbe07843e0d400d53e696b7516d8f3bcf55e3e",
+  "demonstrated": [
+    "Every open and apply integrity-checked the exact SQLite schema and replayed exact stored R013 transfers from the frozen synthetic genesis.",
+    "Six pre-commit hard-exit boundaries recovered the complete prior prefix without a durable record.",
+    "A hard exit after commit but before acknowledgement recovered the complete new prefix, and exact retry returned the existing result without another record.",
+    "Eight fresh two-process races over the same signed sibling pair committed exactly one sibling per local history.",
+    "Matching caller-held anchors proved exact prefixes; shorter and same-height divergent database copies failed closed.",
+    "Concurrent initialization and anchor-export path races each produced one winner without deleting or replacing the winning artifact.",
+    "Five malformed, non-canonical, unknown-field, foreign-genesis or authority-escalating transfers appended nothing; altered stored derived state also failed closed.",
+    "Schema changes, row mutation, truncation, header corruption and WAL mode failed without silent repair or conversion.",
+    "The four-transfer frozen valid chain recovered the byte-converged R013 state root and receipt head with synthetic supply exactly 1000."
+  ],
+  "evidence": {
+    "anchor_schema_path": "constitution/schemas/pcx-durable-anchor.schema.json",
+    "anchor_schema_sha256": "3a5605890cbd24ef029ef6e4953d5130e534b276c245180639127ab32c1ac264",
+    "cli_path": "system/nexus_lab/cli.py",
+    "cli_sha256": "ba8e963a4f29330e565bbc4633ea710019ed878bd402392f03245dbade6a1a4f",
+    "implementation_path": "system/nexus_lab/durable_store.py",
+    "implementation_sha256": "738d8e0222d77741946db66d884689ec90223b28864816cea19e8d5c04c60113",
+    "r013_suite_path": "experiments/R013_PCX_CONSERVED_CLAIM/fixtures/SUITE.json",
+    "r013_suite_sha256": "a6ab4fde497b64395767edd1c8e652994e1bfeff0ca258fc661913918329c27b",
+    "task_path": "operations/tasks/TSK-R014-PCX-DURABLE-REPLAY.json",
+    "task_sha256": "28638c1950620593655209135d10b831f4d329d6f1ea8a826dd4ce01b12242d1",
+    "test_path": "tests/test_r014_durable_replay.py",
+    "test_sha256": "7297ad30a5da1cf14f275cf9b289e302f0847aa20e23e02a18abe712cae8eb99",
+    "status_module_path": "system/nexus_lab/status.py",
+    "status_module_sha256": "2ef1778234a7b03a47043087a097e362a9c9228f8944871c62274e05bbb01c55",
+    "verifier_path": "system/nexus_lab/verify.py",
+    "verifier_sha256": "c37430ae89933633aa50ac6925a02358e240c0a688aa5fbf56d7a8e86002dbfc"
+  },
+  "fault_model": {
+    "filesystem": "UNVERIFIED_REQUIRED_ASSUMPTION_HONEST_LOCAL_FILESYSTEM",
+    "injected_process_hard_exit_stages": [
+      "BEFORE_BEGIN",
+      "AFTER_BEGIN",
+      "AFTER_REPLAY",
+      "BEFORE_INSERT",
+      "AFTER_INSERT",
+      "BEFORE_COMMIT",
+      "AFTER_COMMIT_BEFORE_ACK"
+    ],
+    "not_injected": [
+      "physical-power-loss",
+      "dishonest-fsync-or-storage-controller",
+      "kernel-or-filesystem-bug",
+      "malicious-host-replacement-without-external-anchor"
+    ]
+  },
+  "non_claims": [
+    "The synthetic quantity is not money, economic value, legal property, backing, redemption, purchasing power or a safe store of value.",
+    "No private key, signing, wallet, custody, recovery secret or real fund enters the store.",
+    "Single-host SQLite serialization is not network consensus, global double-spend prevention or finality.",
+    "Injected process exits do not prove physical power-loss durability, honest fsync behavior, availability or production security.",
+    "A local hash chain cannot detect replacement by an older valid whole-database snapshot unless an independently retained anchor is supplied.",
+    "The R014 durability wrapper has one implementation and no independent storage-envelope verifier or exhaustive crash-lifecycle model.",
+    "Eight sibling-spend races are bounded scheduling evidence, not an exhaustive concurrency proof.",
+    "This bounded test campaign is not a formal proof, external security audit, regulatory determination or authorization for a live pilot."
+  ],
+  "observed": {
+    "accepted_valid_chain_transfers": 4,
+    "concurrent_sibling_race_rounds": 8,
+    "fixed_max_records": 256,
+    "initialization_path_races": 1,
+    "postcommit_preack_hard_exits": 1,
+    "precommit_hard_exit_boundaries": 6,
+    "anchor_export_path_races": 1,
+    "rejected_transfer_classes": 5,
+    "stored_derived_metadata_tamper": 1,
+    "recovered_receipt_head": "fedc92b971f0ea59586678297a981c950d2ac8646e8cf30f79bffc7537893ffc",
+    "recovered_state_root": "1b28ac32d6067a7b1bd2ec8b7097b341d891a2793a63c606da0c9eecf221598f",
+    "synthetic_supply": "1000",
+    "unit_tests": 24
+  },
+  "runtime_model": {
+    "database_version_binding": "SQLITE_VERSION_AT_INIT_MUST_EQUAL_SQLITE_VERSION_ON_REOPEN",
+    "evidence_creation_observation": {
+      "kernel": "Linux 6.12.47 x86_64",
+      "node": "24.14.0",
+      "openssl": "3.0.13",
+      "python": "3.12.13",
+      "sqlite": "3.50.4"
+    },
+    "observation_scope": "FROZEN_LOCAL_RUN_ONLY_CURRENT_VERIFICATION_RUNTIME_IS_REPORTED_SEPARATELY"
+  },
+  "schema": "nexus.r014-pcx-durable-replay-demo/v0",
+  "status": "DEMONSTRATED_CRASH_CONSISTENT_LOCAL_RECOVERY_OF_SYNTHETIC_CONSERVED_STATE",
+  "status_authority": "NONE",
+  "storage_profile": {
+    "journal_mode": "DELETE",
+    "max_records": 256,
+    "transaction": "BEGIN IMMEDIATE",
+    "synchronous": "EXTRA",
+    "trusted_schema": "OFF"
+  },
+  "test_command": "python3 -m unittest -q tests.test_r014_durable_replay"
+}
