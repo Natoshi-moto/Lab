@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import zipfile
+import zlib
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -111,6 +112,13 @@ def build_snapshot(
             "member_timestamp": "1980-01-01T00:00:00Z",
             "compression": "DEFLATE_LEVEL_9",
             "permissions": "GIT_EXECUTABLE_BIT_ONLY",
+            "outer_archive_scope": "SAME_PYTHON_ZIPFILE_AND_ZLIB_RUNTIME",
+            "cross_toolchain_identity": "GIT_TREE_AND_PAYLOAD_MANIFEST",
+        },
+        "toolchain": {
+            "python_zipfile": "stdlib",
+            "zlib_compile_version": zlib.ZLIB_VERSION,
+            "zlib_runtime_version": zlib.ZLIB_RUNTIME_VERSION,
         },
     }
     meta_bytes = canonical_json_bytes(metadata)
@@ -208,6 +216,9 @@ def verify_snapshot(path: Path, *, expected_sha256: str | None = None) -> dict[s
         "snapshot_id": metadata.get("snapshot_id"),
         "source_commit": metadata.get("source_commit"),
         "status": metadata.get("status"),
+        "payload_manifest_sha256": metadata.get("payload_manifest_sha256"),
+        "determinism": metadata.get("determinism"),
+        "toolchain": metadata.get("toolchain"),
     }
 
 
