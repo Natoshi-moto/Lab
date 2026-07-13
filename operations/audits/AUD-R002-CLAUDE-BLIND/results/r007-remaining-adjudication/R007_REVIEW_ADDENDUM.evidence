@@ -1,0 +1,30 @@
+# R007 review addendum
+
+- `status_authority`: `NONE`
+- Review role: post-execution repository-state clarification
+- Reviewed repository: `Natoshi-moto/Lab`
+- R007 execution base: `4950c11baac4b70467be009e45dfead5d780cc6f`
+- R007 report commit: `b870d97c6403cf3d434006567f22fc88086c3d68`
+- R007 report path: `operations/audits/AUD-R002-CLAUDE-BLIND/results/r007-remaining-adjudication/R007_ADJUDICATION_REPORT.evidence`
+- R007 report Git blob: `e2746724ec1b6ae87579523f1942f8f547fc3193`
+- R007 report SHA-256 supplied by the producing session: `ce44a78495e64780ddee2b2420ba42d7a25997228e7478abd9067569f85e9df4`
+
+## clarification
+
+The report's statement that HEAD remained `4950c11baac4b70467be009e45dfead5d780cc6f` describes the commit against which the reported commands, source readings and mock harness executions were performed. The report was then added in commit `b870d97c6403cf3d434006567f22fc88086c3d68`, which became the remote branch tip before this addendum.
+
+The original report is preserved without modification. This addendum does not promote, close, accept or remediate any observation. It records repository state only.
+
+## connector verification
+
+A live GitHub comparison confirmed before this addendum that:
+
+- `main` resolved to `4950c11baac4b70467be009e45dfead5d780cc6f`;
+- `claude/r007-remaining-adjudication` resolved to `b870d97c6403cf3d434006567f22fc88086c3d68`;
+- the R007 branch was exactly one commit ahead of `main`;
+- that commit added only the R007 report file;
+- `baseline-001` resolved exactly to `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8`.
+
+## limitations
+
+The Git blob identity was independently read from GitHub. The SHA-256 above is preserved from the producing session's handoff; this connector-only review did not independently stream the complete private blob into a local hashing process. The merge and subsequent remediation work must not treat that un-recomputed SHA-256 as stronger evidence than the Git blob and commit identities.
