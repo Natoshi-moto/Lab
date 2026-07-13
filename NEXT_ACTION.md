@@ -1,15 +1,9 @@
 # NEXT ACTION
 
-Select and commission R012.
+Review the R012 bounded-work-exchange draft pull request and decide whether to promote it into `main`.
 
-R011 is promoted into `main` as the first completed real-work vertical slice. Its research record, executable model, evidence limits, adversarial review and receipt are canonical project history. The regime-dependent scaling interpretation remains `CANDIDATE / INFERRED`, not empirical truth.
+The proposal now contains one generated, task-bound route; a deterministic synthetic cognition workload; an accepted local exchange receipt; an exact-replay receipt check; 43 passing adversarial fixtures; and a passing cold-context decision brief labelled `CORRELATED`.
 
-R012 should create new information rather than repeat R011. Choose one materially distinct direction:
+Promotion would accept the V0 protocol, implementation, frozen fixture, tests and evidence limits as working project history. It would not establish semantic truth, general Nexus utility, provider independence, identity, Sybil resistance, consensus, financial value, production readiness, either historical meaning of PCCE, or a new canonical snapshot.
 
-1. empirical calibration of the R011 model using a lawful quality-controlled dataset;
-2. a second hard vertical slice in another domain to test repeatability and governance overhead;
-3. a multi-provider collaboration slice with independently preserved seats and disagreement;
-4. productization of the Nexus operator experience, routing and low-friction controls;
-5. a larger architecture/design phase grounded in the evidence from repeated real use.
-
-Before implementation, declare the objective, useful external output, evidence boundary, user decision points, reversibility and what would count as failure. Do not begin another broad audit unless new contradictory evidence warrants it.
+Do not merge or promote without explicit user approval. If review finds a kill-criterion breach, preserve the evidence and keep R012 unpromoted.

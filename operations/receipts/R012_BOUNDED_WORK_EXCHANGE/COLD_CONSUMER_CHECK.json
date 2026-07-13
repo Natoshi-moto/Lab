@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "allowed_dataset": true,
+    "draft_conflict": true,
+    "instruction_inert": true,
+    "launch_date": true,
+    "no_launch_authority": true,
+    "request_id": true,
+    "spending_ceiling": true,
+    "unresolved_risk": true
+  },
+  "claim_count": 8,
+  "independence": "CORRELATED",
+  "non_claims": [
+    "This frozen-fixture check does not establish independent corroboration, general usefulness, semantic truth or canonical status."
+  ],
+  "schema": "nexus.r012-cold-consumer-verification/v0",
+  "status": "PASS"
+}

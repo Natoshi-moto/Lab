@@ -1,0 +1,38 @@
+{
+  "artifacts": [
+    {
+      "bytes": 0,
+      "media_type": "application/json",
+      "path": "artifacts/SHADOW.json",
+      "sha256": ""
+    }
+  ],
+  "baseline_commit": "b0190148d791a3e9f6f9f1731759bdf1a18260e2",
+  "claims": [],
+  "created_at": "2026-07-13T10:00:00Z",
+  "data_classes": [
+    "SYNTHETIC_FIXTURE"
+  ],
+  "dissent": [],
+  "epoch_id": "R012-E001",
+  "exchange_id": "276931f654a2d3ed7ed7395c8e988e6e2377bc3d771587e69e0be12d7d616261",
+  "expires_at": "2026-07-14T10:00:00Z",
+  "non_claims": [
+    "This return does not establish semantic truth, authorship, independence, financial value or canonical promotion."
+  ],
+  "nonce": "replace-with-unique-nonce",
+  "predecessor_state_hash": "",
+  "producer": {
+    "independence": "NOT_CLAIMED",
+    "provider_family": "DECLARED",
+    "seat_id": "R012-PRODUCER-A",
+    "session_label": "cold-context"
+  },
+  "recipient": "R012-CONSUMER-A",
+  "return_hash": "",
+  "route_sha256": "466e469418c19d68c586a5c7a6035124ab0e4efd97da38565165f32666610fd8",
+  "schema": "nexus.work-return/v0",
+  "source_root": "f8e8d9a36c162e234e958d5cc26d099ff859e33eb255a991cff1f8bfc0c18914",
+  "status_authority": "NONE",
+  "task_sha256": "05a96aa3094c0f28c540ae666f7d65e9d381f24f2183fe63b2143ca04e23ee22"
+}

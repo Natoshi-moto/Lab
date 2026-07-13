@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "identifier": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "path": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "maximum": 262144,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "media_type": {
+            "enum": [
+              "application/json",
+              "text/markdown",
+              "text/plain"
+            ]
+          },
+          "path": {
+            "$ref": "#/$defs/path"
+          },
+          "sha256": {
+            "$ref": "#/$defs/digest"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes",
+          "media_type"
+        ],
+        "type": "object"
+      },
+      "maxItems": 16,
+      "minItems": 1,
+      "type": "array"
+    },
+    "baseline_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "claims": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "claim_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "classification": {
+            "enum": [
+              "EVIDENCE",
+              "INFERENCE",
+              "HYPOTHESIS",
+              "UNVERIFIED",
+              "FALSIFIED"
+            ]
+          },
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "statement": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "statement",
+          "classification",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "data_classes": {
+      "items": {
+        "enum": [
+          "PUBLIC_FIXTURE",
+          "SYNTHETIC_FIXTURE",
+          "LAB_PRIVATE_MINIMIZED"
+        ]
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "dissent": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "claim_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "dissent_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "ANSWERED",
+              "FALSIFIER_VALID",
+              "REJECTED"
+            ]
+          }
+        },
+        "required": [
+          "dissent_id",
+          "claim_id",
+          "status",
+          "reason",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "epoch_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "exchange_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "non_claims": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "nonce": {
+      "$ref": "#/$defs/identifier"
+    },
+    "predecessor_state_hash": {
+      "pattern": "^(?:|[0-9a-f]{64})$",
+      "type": "string"
+    },
+    "producer": {
+      "additionalProperties": false,
+      "properties": {
+        "independence": {
+          "enum": [
+            "NOT_CLAIMED",
+            "CORRELATED",
+            "INDEPENDENT_UNVERIFIED"
+          ]
+        },
+        "provider_family": {
+          "$ref": "#/$defs/identifier"
+        },
+        "seat_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "session_label": {
+          "$ref": "#/$defs/identifier"
+        }
+      },
+      "required": [
+        "seat_id",
+        "provider_family",
+        "session_label",
+        "independence"
+      ],
+      "type": "object"
+    },
+    "recipient": {
+      "$ref": "#/$defs/identifier"
+    },
+    "return_hash": {
+      "$ref": "#/$defs/digest"
+    },
+    "route_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "schema": {
+      "const": "nexus.work-return/v0"
+    },
+    "source_root": {
+      "$ref": "#/$defs/digest"
+    },
+    "status_authority": {
+      "const": "NONE"
+    },
+    "task_sha256": {
+      "$ref": "#/$defs/digest"
+    }
+  },
+  "required": [
+    "schema",
+    "exchange_id",
+    "task_sha256",
+    "route_sha256",
+    "baseline_commit",
+    "producer",
+    "recipient",
+    "epoch_id",
+    "nonce",
+    "created_at",
+    "expires_at",
+    "source_root",
+    "data_classes",
+    "artifacts",
+    "claims",
+    "non_claims",
+    "dissent",
+    "predecessor_state_hash",
+    "status_authority",
+    "return_hash"
+  ],
+  "title": "Nexus Bounded Work Return",
+  "type": "object"
+}

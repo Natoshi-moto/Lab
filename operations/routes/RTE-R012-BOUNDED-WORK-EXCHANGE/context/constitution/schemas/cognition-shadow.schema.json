@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "identifier": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "locator": {
+      "additionalProperties": false,
+      "properties": {
+        "end_line": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "span_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "start_line": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_line",
+        "end_line",
+        "span_sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "claims": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "contradictions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "atom_ids": {
+            "items": {
+              "$ref": "#/$defs/identifier"
+            },
+            "minItems": 2,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "contradiction_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "handling": {
+            "enum": [
+              "UNRESOLVED",
+              "OVERRIDDEN_BY_DECLARED_PRECEDENCE",
+              "PRESERVED_WITHOUT_AVERAGING"
+            ]
+          },
+          "summary": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "contradiction_id",
+          "atom_ids",
+          "summary",
+          "handling"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "evidence_atoms": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "atom_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "evidence_class": {
+            "enum": [
+              "DIRECT_TEXT",
+              "PARAPHRASE"
+            ]
+          },
+          "locator": {
+            "$ref": "#/$defs/locator"
+          },
+          "source_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "statement": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "atom_id",
+          "statement",
+          "evidence_class",
+          "source_id",
+          "locator"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "exchange_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "hazards": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "disposition": {
+            "enum": [
+              "INERT_DATA",
+              "QUARANTINED",
+              "UNRESOLVED"
+            ]
+          },
+          "hazard_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "kind": {
+            "enum": [
+              "UNTRUSTED_INSTRUCTION",
+              "SECRET_CANARY",
+              "PII_CANARY"
+            ]
+          },
+          "locator": {
+            "$ref": "#/$defs/locator"
+          },
+          "source_id": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "required": [
+          "hazard_id",
+          "kind",
+          "source_id",
+          "locator",
+          "disposition"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "inferences": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ]
+          },
+          "inference_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "statement": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "supporting_atom_ids": {
+            "items": {
+              "$ref": "#/$defs/identifier"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "inference_id",
+          "statement",
+          "supporting_atom_ids",
+          "confidence"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "non_claims": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "omissions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "source_id": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "required": [
+          "source_id",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "schema": {
+      "const": "nexus.cognition-shadow/v0"
+    },
+    "shadow_root": {
+      "$ref": "#/$defs/digest"
+    },
+    "source_root": {
+      "$ref": "#/$defs/digest"
+    },
+    "sources": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "inspection_status": {
+            "enum": [
+              "INSPECTED",
+              "UNINSPECTED"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "source_id": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "required": [
+          "source_id",
+          "path",
+          "sha256",
+          "bytes",
+          "inspection_status"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "unresolved_questions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "question_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "related_atom_ids": {
+            "items": {
+              "$ref": "#/$defs/identifier"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "question_id",
+          "question",
+          "related_atom_ids"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "exchange_id",
+    "source_root",
+    "sources",
+    "evidence_atoms",
+    "inferences",
+    "contradictions",
+    "unresolved_questions",
+    "hazards",
+    "omissions",
+    "claims",
+    "non_claims",
+    "shadow_root"
+  ],
+  "title": "Nexus Source-bound Cognition Shadow",
+  "type": "object"
+}

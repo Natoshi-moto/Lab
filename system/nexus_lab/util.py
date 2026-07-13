@@ -21,7 +21,10 @@ IDENTIFIER_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 def validate_identifier(value: str, *, label: str = "identifier") -> str:
     if not isinstance(value, str) or not IDENTIFIER_PATTERN.fullmatch(value):
-        raise NexusError(f"Unsafe {label}: {value!r}. Use 1-128 ASCII letters, digits, dot, underscore or dash; start with a letter or digit.")
+        raise NexusError(
+            f"Unsafe {label}: {value!r}. Use 1-128 ASCII letters, digits, dot, underscore or dash; "
+            "start with a letter or digit."
+        )
     return value
 
 
@@ -38,11 +41,24 @@ def utc_now() -> str:
 
 
 def canonical_json_bytes(value: Any) -> bytes:
-    return (json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8")
+    try:
+        rendered = json.dumps(
+            value,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+    except (TypeError, ValueError) as exc:
+        raise NexusError(f"Value cannot be represented as canonical JSON: {exc}") from exc
+    return (rendered + "\n").encode("utf-8")
 
 
 def pretty_json(value: Any) -> str:
-    return json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    try:
+        return json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n"
+    except (TypeError, ValueError) as exc:
+        raise NexusError(f"Value cannot be represented as JSON: {exc}") from exc
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -61,8 +77,15 @@ def atomic_write_bytes(path: Path, data: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as handle:
         handle.write(data)
+        handle.flush()
+        os.fsync(handle.fileno())
         temp_name = handle.name
     os.replace(temp_name, path)
+    directory_fd = os.open(path.parent, os.O_RDONLY)
+    try:
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -118,10 +141,16 @@ def git_commit_time(root: Path, commit: str) -> str:
 
 
 def validate_relative_path(value: str) -> PurePosixPath:
-    if not value or "\\" in value or any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
-        raise NexusError(f"Unsafe or empty repository path: {value!r}")
+    if (
+        not value
+        or value.endswith("/")
+        or "//" in value
+        or "\\" in value
+        or any(ord(ch) < 32 or ord(ch) == 127 for ch in value)
+    ):
+        raise NexusError(f"Unsafe or non-canonical repository path: {value!r}")
     path = PurePosixPath(value)
-    if path.is_absolute() or any(part in ("", ".", "..") for part in path.parts):
+    if path.is_absolute() or path.as_posix() != value or any(part in ("", ".", "..") for part in path.parts):
         raise NexusError(f"Unsafe repository path: {value!r}")
     if path.parts and path.parts[0] == ".git":
         raise NexusError("The .git directory cannot be routed or packaged.")
