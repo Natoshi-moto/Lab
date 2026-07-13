@@ -1,0 +1,160 @@
+# TSK-R007-REMAINING-AUDIT-ADJUDICATION — bounded adjudication report
+
+- Task ID: `TSK-R007-REMAINING-AUDIT-ADJUDICATION`
+- `status_authority`: `NONE` — this report cannot promote itself or any observation. Disposition remains a separate, human-authorized step.
+- Authority: `OBSERVE_ONLY`
+- Seat: `adversarial-research-engineer`
+- Auditor: Claude (Anthropic), `claude-sonnet-5`, fresh-context session, continuing the same-family lineage that produced R002/R005.
+- Scope: adjudicate, without broadening into a new audit, exactly `AUDOBS-0010`, `AUDOBS-0014`, `AUDOBS-0015`, `AUDOBS-0016`, in that order. `AUDOBS-0003`, `AUDOBS-0011`, `AUDOBS-0012` were **not** reopened — no new contradictory evidence was found for any of them during this pass. `/nexus-audit` was not invoked. No real external GitHub repository was created and no test data was pushed anywhere.
+
+## baseline_identity
+
+- Branch at start and end: `claude/r007-remaining-adjudication`
+- HEAD at start and end: `4950c11baac4b70467be009e45dfead5d780cc6f` (unchanged; only this report file was added, under the task's declared write scope)
+- `git status --porcelain` at start: empty (clean). Confirmed clean again after all work aside from this new report file.
+- Canonical target (`STATUS.json.canonical_target`): tag `baseline-001` -> commit `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8`, snapshot `snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip`, `snapshot_sha256` `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603`, `payload_manifest_sha256` `34e4337b94685c725e316db95b1c8caa3aac4e6cf1595a6bb8005728f16bfb24`. Neither `baseline-001` nor the frozen ZIP was read-written or modified by this session.
+- Prior lineage read: `operations/receipts/R003_R004_AUDIT_REMEDIATION/RECEIPT.json`, `operations/receipts/R006_AUDOBS_0003_REMEDIATION/RECEIPT.json`, `operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account-retest/R005_RETEST_REPORT.evidence`, `operations/audits/AUD-R002-CLAUDE-BLIND/results/codex-documentary-review/R005_FIDELITY_REVIEW.evidence`.
+- `git diff 42de45561bbe6ec759042d67603eea09e25b10b5 HEAD --stat` on `tests/`, `system/nexus_lab/github.py`, `system/nexus_lab/snapshot.py`, `system/nexus_lab/status.py`, `docs/DEMONSTRATION.md`, `.github/workflows/nexus-audit.yml` (R005's HEAD -> current HEAD) shows only two changed files: `system/nexus_lab/snapshot.py` (+38 lines) and the new `tests/test_audit_git_tree_binding.py` (+105 lines) — both from R006's AUDOBS-0003 git-tree-binding work (commits `ba62d5a`, `5c5abd2`, `0509f4c`). `github.py`, `status.py`, and `docs/DEMONSTRATION.md` are byte-identical to their R005-era state.
+
+## commands_and_exit_codes
+
+All run from the repository root against the live source repository (read-only except for the declared report write), current HEAD `4950c11`:
+
+| Command | Exit code | Result |
+|---|---|---|
+| `./nexus doctor` | 0 | PASS, 7/7 checks |
+| `python3 -m unittest discover -s tests -v` | 0 | 37/37 tests passed (36 at R005 + `tests/test_audit_git_tree_binding.py` added by R006) |
+| `./nexus verify` | 0 | PASS (audits, packs, snapshot, doctor sub-report) |
+| `./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND` | 0 | PASS, `observation_count: 0` |
+| `./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND` | 0 | PASS, `observation_count: 0` |
+
+Additional read-only commands run for this adjudication, output written only to the session scratchpad (never to the source repository):
+
+```
+$ ./nexus freeze --ref baseline-001 --snapshot-id NEXUS-LAB-R001-BASELINE-001 \
+    --output <scratchpad>/rebuild.zip --profile full-private-git
+exit code: 0
+```
+```
+$ python3 <scratchpad>/gh_harness/harness.py   # fully mocked github_bootstrap() call
+exit code: 0
+```
+
+## audobs_0010
+
+**Classification / severity (original):** `SUSPECTED_DEFECT`, `MEDIUM`. **Status: STILL OPEN.**
+
+**Original claim:** `./nexus freeze` against `baseline-001` is self-consistent within one environment's zlib build but does not reproduce the exact checked-in canonical archive bytes when the zlib implementation differs, despite identical decompressed content.
+
+**Current code read:** `docs/DEMONSTRATION.md` DEMO-002 row is byte-identical to the R002/R005 text: "Same committed tree and profile produce byte-identical ZIPs", still with no toolchain scoping. `.github/workflows/nexus-audit.yml` pins `python-version: "3.12"` (line 32) but declares no zlib implementation/version. `tests/test_snapshot.py::test_same_commit_produces_byte_identical_snapshot` still only compares two same-process builds, not a rebuild against the checked-in canonical archive.
+
+**Fresh re-execution this session** (read-only, output to scratchpad only, source repository untouched):
+```
+$ python3 -c "import zlib; print(zlib.ZLIB_RUNTIME_VERSION)"
+1.3.1.zlib-ng
+$ ./nexus freeze --ref baseline-001 --snapshot-id NEXUS-LAB-R001-BASELINE-001 \
+    --output <scratchpad>/rebuild.zip --profile full-private-git
+archive_sha256: 3c673e6c883d08b3b45f6182268331c030788d5ea822b473d797d51842bb68d1
+payload_manifest_sha256: 34e4337b94685c725e316db95b1c8caa3aac4e6cf1595a6bb8005728f16bfb24
+```
+- Checked-in canonical archive: `snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip` sha256 `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` — **does not match** the rebuild's outer-archive digest.
+- `STATUS.json.canonical_target.payload_manifest_sha256` = `34e4337b94685c725e316db95b1c8caa3aac4e6cf1595a6bb8005728f16bfb24` — **matches** the rebuild's payload manifest hash exactly.
+- This is the same environment (zlib-ng 1.3.1) and the same result as R005's re-run: content-level determinism holds; outer-ZIP-byte determinism against the specific checked-in artifact does not.
+
+**New context found this session (not previously highlighted, does not close the observation):** R006's `verify_snapshot_against_git_tree()` (`system/nexus_lab/snapshot.py`, added after R005) is the mechanism `./nexus audit-check` now relies on for target-binding integrity, and it compares `_nexus/PAYLOAD_MANIFEST.sha256` content and `source_commit`, never the outer ZIP's compressed bytes. This means the security-relevant verification path in this repository does not depend on the byte-identity property that AUDOBS-0010 questions. This narrows the *practical* blast radius of the gap (the audit-integrity guarantee does not rely on cross-toolchain byte identity) but does not address the original claim: DEMO-002's prose is still unscoped, and no test or CI step asserts `./nexus freeze` reproduces the actual checked-in canonical/target archive byte-for-byte in any environment.
+
+**Verdict:** Unaddressed. Original condition reproduces exactly as before. `UNABLE_TO_VERIFY` for the cross-environment root-cause claim (only one zlib-ng environment was available in this sandbox, as in R002/R005); the toolchain-dependence explanation remains inferred from indirect evidence (matching payload content + differing compressed bytes + non-default zlib build present), not directly demonstrated against a second, stock-zlib environment.
+
+## audobs_0014
+
+**Classification / severity (original):** `SUSPECTED_DEFECT`, `MEDIUM`. **Status: STILL OPEN.**
+
+**Original claim:** In `github_bootstrap()` (`system/nexus_lab/github.py`), for the no-`origin`-yet branch, `gh repo create --private --source=. --remote=origin --push` both creates the repository and pushes local content before the subsequent `gh repo view` / `require_private_visibility()` check runs.
+
+**Current code read:** `system/nexus_lab/github.py` is byte-identical to the version described in R002/R005. Lines 44–50: when `origin` is empty, `_gh(root, "repo", "create", repo_name, "--private", "--source=.", "--remote=origin", "--push")` (create+push in one call) runs, and only afterward does `view = _gh(root, "repo", "view", ...)` followed by `require_private_visibility(full_name, visibility)` run. `tests/test_github.py` still contains exactly three tests (`test_private_visibility_parses`, `test_public_visibility_is_refused`, `test_malformed_response_is_rejected`), all exercising `parse_visibility()`/`require_private_visibility()` as pure functions against synthetic JSON strings; none invokes `github_bootstrap()` or asserts call ordering.
+
+**Fresh evidence this session — isolated mock harness (no real `gh` binary invoked, no network, no repository created or pushed to anywhere):** `shutil.which`, `github._gh`, `github.git`, `ensure_clean_worktree`, and `verify_repository` were monkeypatched in-process to synthetic fakes that only append to an in-memory call log and return canned results; `github_bootstrap()` was then called against a disposable scratch directory (not the source repository). Recorded call order (indices 0–12):
+
+```
+0 gh  ('auth', 'status')                                                          check=False
+1 ensure_clean_worktree
+2 verify_repository
+3 git ('remote', 'get-url', 'origin')                                             check=False
+4 gh  ('repo', 'create', 'fake-repo', '--private', '--source=.', '--remote=origin', '--push')   check=True
+5 gh  ('repo', 'view', '--json', 'nameWithOwner,visibility,url')                  check=True
+6 git ('push', 'origin', 'main', '--follow-tags')                                 check=True
+7 gh  ('api', '--method', 'PUT', 'repos/.../actions/permissions/workflow', ...)   check=False
+8-10 gh ('label', 'create', ...)                                                  check=False
+11 gh ('issue', 'create', ...)                                                    check=False
+12 git ('remote', 'get-url', 'origin')                                            check=True
+```
+
+`create_idx=4 < view_idx=5` — the create+push call is confirmed, by direct execution against the actual `github_bootstrap()` function body (not just static reading), to run strictly before the visibility check, exactly as the original observation claims. Exit code of the harness script: 0.
+
+**Verdict:** Unaddressed. The ordering defect described in AUDOBS-0014 reproduces under direct (mocked) execution of the unmodified function. `UNABLE_TO_VERIFY` remains correct for real-`gh` end-to-end behavior (e.g. whether GitHub's API can ever return a non-private repository transiently after `--private` is requested); that remains untested in any session in this lineage, per the task's constraint against creating real external repositories.
+
+## audobs_0015
+
+**Classification / severity (original):** `ASSURANCE_GAP`, `LOW`. **Status: STILL OPEN.**
+
+**Original claim:** The Actions-permission-lockdown PUT, each label-creation call, and the issue-creation call in `github_bootstrap()` all pass `check=False`; failures are recorded only as exit codes in the final receipt JSON, with no raised error or emitted warning.
+
+**Current code read:** Unchanged (lines 54–80 of `system/nexus_lab/github.py`, byte-identical to R002/R005): `permission = _gh(..., check=False)`, each label `result = _gh(..., check=False)`, and `issue_result = _gh(..., check=False)`. Only `permission.returncode`, each label's `exit_code`, and `issue_result.returncode` are written into `receipt`; no exception, log line, or `print` occurs on nonzero exit anywhere in this function.
+
+**Fresh evidence this session — same isolated mock harness as AUDOBS-0014:** the fake `gh` responder was configured to return `returncode=7` for the Actions-permission PUT and `returncode=9` for the issue-create call (both simulated failures), with all three label-create calls returning `0`. `github_bootstrap()` completed and returned a receipt without raising, with the receipt showing:
+```
+"actions_read_only_request_exit_code": 7,
+"audit_issue_exit_code": 9,
+```
+No warning, log line, or exception was observed at any point during execution — confirming by direct execution (not just source reading) that both simulated failures are silently absorbed into the receipt exactly as the original observation describes.
+
+**Verdict:** Unaddressed. `UNABLE_TO_VERIFY` for whether a real `gh` failure in this exact code path would look identical in a live environment; the mock only demonstrates the code's own control flow (no raise, no warning) given those return codes, which is what the original observation's claim is actually about.
+
+## audobs_0016
+
+**Classification / severity (original):** `PROCESS_CONTRADICTION`, `LOW`. **Status: STILL OPEN (structurally); no new instance occurred in this session.**
+
+**Original claim:** R002's own `STATUS.json`/`NEXT_ACTION.md` said not to start the audit before a push/tag verification receipt existed, yet the audit proceeded anyway; the underlying gap is that `assurance_blocks` in `STATUS.json` are never programmatically enforced anywhere.
+
+**Historical instance:** Not re-litigated; it is a closed past event, per task scope and R005's prior adjudication.
+
+**Systemic gap, re-checked this session:**
+```
+$ grep -rn "assurance_blocks" system/ .claude/ operations/routes/*/context tests/ 2>/dev/null
+```
+returns only:
+- `system/nexus_lab/status.py:15` (`render_status_markdown`, reads `assurance_blocks` purely to render it into `STATUS.md`) and its route-context mirror,
+- `tests/test_status.py:23,25` (asserts the rendering includes the block text — a rendering test, not a gating test) and its route-context mirror.
+
+No CLI subcommand (`system/nexus_lab/cli.py`), no `.claude/skills/*/SKILL.md` (checked `nexus-audit/SKILL.md`, the only skill file present), and no test anywhere reads `assurance_blocks` or `open_assurance_blocks` to refuse, warn, or gate proceeding with any command. This matches R005's finding exactly; the gap is unchanged.
+
+**This session's own preconditions:** `STATUS.json.current_mode` = `R007_REMAINING_ADJUDICATION_READY`; `NEXT_ACTION.md` and `AUDIT_START_HERE.md` contain no "do not start" language gating this task, and this session's four open `assurance_blocks` (`R002_OBSERVATIONS_PRESERVED_NOT_LEDGER_APPENDED`, `AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING`, `AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING`, `AUDOBS_0016_PROCESS_CONTRADICTION_PENDING`) are exactly the four things this task exists to adjudicate — i.e. they describe pending adjudication, not an unmet precondition to entering adjudication. Proceeding was therefore consistent with the repository's own self-declared state, and no new instance of the original contradiction occurred in this session.
+
+**Verdict:** Unaddressed structurally. The recommended fix (a programmatic gate reading `assurance_blocks` before a skill/command proceeds) has not been implemented in any commit since R002.
+
+## files_seen
+
+`AGENTS.md`, `STATUS.json`, `NEXT_ACTION.md`, `AUDIT_START_HERE.md`, `CLAUDE.md`, `operations/tasks/TSK-R007-REMAINING-AUDIT-ADJUDICATION.json`, `operations/receipts/R003_R004_AUDIT_REMEDIATION/RECEIPT.json`, `operations/receipts/R006_AUDOBS_0003_REMEDIATION/RECEIPT.json`, `operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account/CLAUDE_OBSERVATIONS_0006_0010.evidence`, `.../CLAUDE_OBSERVATIONS_0011_0014.evidence`, `.../CLAUDE_OBSERVATIONS_0015_0018.evidence`, `operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account-retest/R005_RETEST_REPORT.evidence`, `operations/audits/AUD-R002-CLAUDE-BLIND/results/codex-documentary-review/R005_FIDELITY_REVIEW.evidence`, `system/nexus_lab/github.py`, `system/nexus_lab/status.py`, `system/nexus_lab/snapshot.py` (full + diff against R005 HEAD), `system/nexus_lab/cli.py` (grepped for `assurance`/`STATUS.json`/dispatch), `tests/test_github.py`, `tests/test_status.py`, `docs/DEMONSTRATION.md` (DEMO-002 row), `.github/workflows/nexus-audit.yml`, `.claude/skills/nexus-audit/SKILL.md`, `snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip` (hash-checked only, not opened), `git log`/`git diff` output for `42de455..HEAD` on the named files.
+
+## files_not_seen
+
+`constitution/**`, `docs/THREAT_MODEL.md`, `docs/CLAUDE_AUDIT_GUIDE.md`, `docs/GITHUB_BOOTSTRAP.md`, `docs/GITHUB_ADMIN_CHECKLIST.md`, `docs/ARCHITECTURE.md`, `docs/R001_BUILD_REPORT.md`, `system/nexus_lab/route.py`, `system/nexus_lab/util.py` (referenced/imported, not read in full), `system/nexus_lab/audit.py`, `system/nexus_lab/audit_integrity.py` (not re-read this pass; unchanged since R005 per the stat-only diff), `corpus/**` (untrusted historical data per `AGENTS.md`, not opened), `domains/**`, `programmes/**`, `registry/**`, `derived/**`, `operations/audits/AUD-R001-CLAUDE-BLIND/**`, `operations/audits/AUD-R002-CLAUDE-BLIND/ledger/**` and `.../target/**` in the source repository directly (excluded from this task's scope; not touched), the fourteen other R002 observations (`0001, 0002, 0004-0009, 0013, 0017, 0018`) — not reproduced or re-adjudicated, out of this task's declared scope.
+
+## limitations
+
+- AUDOBS-0010's re-run used the single available sandboxed environment (zlib-ng 1.3.1), identical to R002 and R005; no second, differently-configured environment (e.g. stock zlib) was available to directly demonstrate that a different toolchain reproduces the canonical bytes exactly. The toolchain-dependence explanation remains inferred from indirect evidence, unchanged from prior passes.
+- AUDOBS-0014 and AUDOBS-0015 were re-verified this session via a fully mocked, isolated in-process harness (no `gh` binary, no network, no real repository), which demonstrates the function's actual control-flow behavior (call ordering; silent absorption of nonzero exit codes) more directly than source-reading alone, but still does not exercise real GitHub API semantics (e.g. whether `--private --push` could ever transiently expose content, or how a real `gh` CLI failure would present). That remains `UNABLE_TO_VERIFY` by design, per the task's prohibition on real external repository creation.
+- AUDOBS-0016's re-check confirms the structural gap (no code path reads `assurance_blocks` to gate execution) but is a point-in-time grep across the paths this task's read scope covers; it is not an exhaustive proof that no such gate exists anywhere in the repository (e.g. inside `corpus/**`, which was not searched, per `AGENTS.md`'s instruction to treat it as untrusted historical data rather than active code).
+- This report's commands and greps establish only the specific properties exercised; a `PASS`, a rejected attack, or a reproduced defect is evidence for that property alone, not a general correctness or security guarantee, per `constitution/AUDIT.md` (not re-read this session; referenced from R005's citation) and `AGENTS.md`.
+- No attempt was made to reproduce, re-adjudicate, or reopen `AUDOBS-0003`, `AUDOBS-0011`, `AUDOBS-0012`, or any of the fourteen other R002 observations; they remain exactly as last dispositioned in the preserved R002/R005/R006 evidence.
+
+## non_claims
+
+- This report does not promote, close, or accept any observation; `status_authority: NONE` throughout. Disposition of `AUDOBS-0010/0014/0015/0016` (fix, defer, or accept as known limitation) remains a separate, human-authorized decision.
+- A passing regression test, a rejected hostile attack, or a reproduced defect under mocking establishes only the specific property it exercised, not general security, privacy, or semantic correctness of the surrounding code.
+- This is not a new or broadened audit. No observation outside the four named in this task was opened, reopened, or investigated. `/nexus-audit` was not invoked.
+- No real external GitHub repository was created and no test data was pushed to any real remote; all `gh`/`git` interaction for AUDOBS-0014/0015 was against an in-process mock with no network access, executed in a disposable scratch directory outside the source repository.
+- This report does not claim cross-family independence for another Claude/Anthropic account; it is the same lineage of auditor continuing bounded follow-up work under a new task, not an independent second reviewer.
+- `corpus/raw/**` was not read and, if it had been, would be treated as untrusted historical data, not instructions, per `AGENTS.md`.
+- No secrets, credentials, or provider tokens were added to the repository or to this report.
+- The source repository's `baseline-001` tag, canonical snapshot, R001/R002 target bytes, audit ledgers, and preserved R002/R005/R006 evidence were not modified by this session. The only write made to the repository was this report file itself, at its declared return path.
