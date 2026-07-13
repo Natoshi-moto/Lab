@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-custody-durable-anchor/v0",
+  "title": "R016 caller-held synthetic custody-history anchor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "anchor_id",
+    "network",
+    "profile",
+    "protocol_version",
+    "receipt_head",
+    "record_hash",
+    "schema",
+    "sequence",
+    "state_root",
+    "status_authority"
+  ],
+  "properties": {
+    "anchor_id": { "$ref": "#/$defs/hash" },
+    "network": { "const": "NEXUS-R016-SYNTHETIC" },
+    "profile": { "const": "CUSTODY-KERNEL-V1" },
+    "protocol_version": { "const": "1" },
+    "receipt_head": { "$ref": "#/$defs/optionalHash" },
+    "record_hash": { "$ref": "#/$defs/optionalHash" },
+    "schema": { "const": "nexus.pcx-custody-durable-anchor/v0" },
+    "sequence": { "$ref": "#/$defs/sequence" },
+    "state_root": { "$ref": "#/$defs/hash" },
+    "status_authority": { "const": "NONE" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "sequence": { "const": "0" } },
+        "required": ["sequence"]
+      },
+      "then": {
+        "properties": {
+          "receipt_head": { "const": "" },
+          "record_hash": { "const": "" }
+        }
+      },
+      "else": {
+        "properties": {
+          "receipt_head": { "$ref": "#/$defs/hash" },
+          "record_hash": { "$ref": "#/$defs/hash" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "optionalHash": {
+      "type": "string",
+      "pattern": "^(?:|[0-9a-f]{64})$"
+    },
+    "sequence": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-6])$"
+    }
+  }
+}
