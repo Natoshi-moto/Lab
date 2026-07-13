@@ -22,6 +22,7 @@ from .shadow import build_cognition_shadow, verify_cognition_shadow, verify_cold
 from .snapshot import build_snapshot, verify_snapshot
 from .status import enforce_assurance_blocks, render_status_file
 from .util import NexusError, find_repo_root, load_json, pretty_json
+from .value_kernel import verify_cross_implementation, verify_suite
 from .verify import verify_repository
 
 
@@ -141,6 +142,18 @@ def parser() -> argparse.ArgumentParser:
     )
     cold_check.add_argument("report", type=Path, help="Cold-consumer report JSON")
     cold_check.add_argument("--corpus-root", required=True, type=Path, help="Frozen fixture corpus root")
+
+    pcx_value_check = sub.add_parser(
+        "pcx-value-check",
+        help="Replay the frozen synthetic PCX conservation suite with the Python/OpenSSL kernel",
+    )
+    pcx_value_check.add_argument("suite", type=Path, help="R013 conformance SUITE.json")
+
+    pcx_convergence_check = sub.add_parser(
+        "pcx-convergence-check",
+        help="Require the pinned JavaScript/Noble verifier to match Python/OpenSSL exactly",
+    )
+    pcx_convergence_check.add_argument("suite", type=Path, help="R013 conformance SUITE.json")
 
     github = sub.add_parser("github-bootstrap", help="Create or verify a private GitHub repository and push")
     github.add_argument("--repo-name", default="nexus-research-lab")
@@ -273,6 +286,21 @@ def main(argv: list[str] | None = None) -> int:
                 verify_cold_consumer_report(
                     _repo_path(root, args.corpus_root),
                     _repo_path(root, args.report),
+                )
+            )
+        elif args.command == "pcx-value-check":
+            emit(verify_suite(_repo_path(root, args.suite)))
+        elif args.command == "pcx-convergence-check":
+            emit(
+                verify_cross_implementation(
+                    _repo_path(root, args.suite),
+                    node_verifier=(
+                        root
+                        / "experiments"
+                        / "R013_PCX_CONSERVED_CLAIM"
+                        / "independent_verifier.mjs"
+                    ),
+                    repo_root=root,
                 )
             )
         elif args.command == "github-bootstrap":

@@ -1,0 +1,65 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-R013-PCX-CONSERVED-CLAIM",
+  "objective": "Demonstrate fixed-supply signed synthetic transfers with creating-transaction ancestry and byte-identical decisions from two separate implementations.",
+  "baseline_ref": "f28dc07bf1433bb22e4d992a7f523503387ea445",
+  "authority": "PROPOSE_ONLY",
+  "allowed_read": [
+    ".github/workflows/nexus-audit.yml",
+    ".gitignore",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "constitution",
+    "experiments/R013_PCX_CONSERVED_CLAIM",
+    "operations/proposals/R012_BOUNDED_WORK_EXCHANGE",
+    "operations/proposals/R013_PCX_CONSERVED_CLAIM",
+    "system/nexus_lab",
+    "tests",
+    "package.json",
+    "package-lock.json"
+  ],
+  "allowed_write": [
+    ".github/workflows/nexus-audit.yml",
+    ".gitignore",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "constitution/schemas",
+    "experiments/R013_PCX_CONSERVED_CLAIM",
+    "operations/proposals/R013_PCX_CONSERVED_CLAIM",
+    "operations/receipts/R013_PCX_CONSERVED_CLAIM",
+    "system/nexus_lab",
+    "tests",
+    "package.json",
+    "package-lock.json"
+  ],
+  "data_classes": [
+    "LOCAL_ONLY",
+    "ROUTE_ONLY"
+  ],
+  "output_contract": {
+    "type": "object",
+    "schema_path": "constitution/schemas/pcx-transfer.schema.json",
+    "required_invariants": [
+      "FIXED_GENESIS_SUPPLY_1000",
+      "NO_MINT_BURN_FEE_OR_REWARD",
+      "CREATING_TRANSACTION_ANCESTRY",
+      "FULL_FIELD_ED25519_AUTHORIZATION",
+      "REJECTION_PRESERVES_STATE",
+      "BYTE_IDENTICAL_CROSS_IMPLEMENTATION_REPORT",
+      "BOUNDED_EXHAUSTIVE_CONSERVATION_MODEL",
+      "PINNED_FAIL_CLOSED_EVIDENCE_GATE",
+      "CANDIDATE_ONLY_STATUS_AUTHORITY_NONE"
+    ],
+    "kill_on": [
+      "SUPPLY_DIVERGENCE",
+      "ACCEPTED_DOUBLE_SPEND",
+      "FORGED_ANCESTRY",
+      "SIGNATURE_DOMAIN_ESCAPE",
+      "PARSER_AMBIGUITY",
+      "IMPLEMENTATION_DISAGREEMENT",
+      "AUTHORITY_ESCALATION"
+    ]
+  }
+}

@@ -6,7 +6,19 @@ from typing import Any
 from .util import NexusError, atomic_write_text, load_json
 
 ASSURANCE_MODES = {"BLOCK", "WARN", "ADVISORY"}
-ALWAYS_AVAILABLE_COMMANDS = {"status", "next", "doctor", "verify", "audit-check", "exchange-verify", "exchange-ledger-check", "shadow-verify", "cold-consumer-check"}
+ALWAYS_AVAILABLE_COMMANDS = {
+    "status",
+    "next",
+    "doctor",
+    "verify",
+    "audit-check",
+    "exchange-verify",
+    "exchange-ledger-check",
+    "shadow-verify",
+    "cold-consumer-check",
+    "pcx-value-check",
+    "pcx-convergence-check",
+}
 
 
 def _normalise_assurance_block(raw: Any) -> dict[str, Any]:

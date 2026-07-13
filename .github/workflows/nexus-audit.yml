@@ -31,6 +31,13 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install pinned R013 verifier dependency
+        shell: bash
+        run: |
+          node --version
+          npm --version
+          npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Run Nexus doctor
         run: ./nexus doctor
 

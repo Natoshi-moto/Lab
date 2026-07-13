@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-value-receipt/v0",
+  "title": "R013 candidate value-transition receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "sequence",
+    "network_id",
+    "genesis_id",
+    "tx_id",
+    "tx_hash",
+    "decision",
+    "reason_code",
+    "spent_output_ids",
+    "created_output_ids",
+    "previous_state_root",
+    "next_state_root",
+    "previous_receipt_hash",
+    "status_authority",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schema": { "const": "nexus.pcx-value-receipt/v0" },
+    "sequence": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "network_id": { "const": "NEXUS-R013-SYNTHETIC" },
+    "genesis_id": { "$ref": "#/$defs/hash" },
+    "tx_id": { "$ref": "#/$defs/hash" },
+    "tx_hash": { "$ref": "#/$defs/hash" },
+    "decision": { "const": "CANDIDATE_ACCEPTED" },
+    "reason_code": { "const": "VALID_CONSERVED_TRANSFER" },
+    "spent_output_ids": { "$ref": "#/$defs/hashes" },
+    "created_output_ids": { "$ref": "#/$defs/hashes" },
+    "previous_state_root": { "$ref": "#/$defs/hash" },
+    "next_state_root": { "$ref": "#/$defs/hash" },
+    "previous_receipt_hash": { "type": "string", "pattern": "^(?:|[0-9a-f]{64})$" },
+    "status_authority": { "const": "NONE" },
+    "receipt_hash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "hashes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/hash" }
+    }
+  }
+}

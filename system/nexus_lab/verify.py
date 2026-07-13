@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +14,12 @@ from .shadow import verify_cold_consumer_report
 from .snapshot import verify_snapshot
 from .route import verify_manifest_pack
 from .util import NexusError, load_json
+from .value_kernel import (
+    require_r013_evidence_files,
+    validate_r013_claim_bindings,
+    validate_r013_saved_evidence,
+    verify_cross_implementation,
+)
 
 
 def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, Any]:
@@ -80,6 +89,56 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
                 }
             )
 
+    value_convergence: list[dict[str, Any]] = []
+    value_models: list[dict[str, Any]] = []
+    status = load_json(root / "STATUS.json")
+    if not isinstance(status, dict):
+        raise NexusError("STATUS.json must contain an object.")
+    active_tasks = status.get("active_tasks", []) if isinstance(status, dict) else []
+    r013_declared = (
+        "TSK-R013-PCX-CONSERVED-CLAIM" in active_tasks
+        or status.get("current_round") == "R013"
+        or (root / "operations" / "tasks" / "TSK-R013-PCX-CONSERVED-CLAIM.json").exists()
+        or (root / "operations" / "proposals" / "R013_PCX_CONSERVED_CLAIM" / "STATUS.proposal.json").exists()
+    )
+    if r013_declared:
+        paths = require_r013_evidence_files(root)
+        model_result = subprocess.run(
+            [sys.executable, str(paths["small_model"])],
+            cwd=root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=60,
+        )
+        if model_result.returncode != 0:
+            detail = model_result.stderr.decode("utf-8", errors="replace").strip()
+            raise NexusError(f"R013 bounded exhaustive model failed: {detail}")
+        model_bytes = paths["model_report"].read_bytes()
+        if model_result.stdout != model_bytes:
+            raise NexusError("R013 bounded-model report does not reproduce exactly.")
+        model_report = load_json(paths["model_report"])
+        check = verify_cross_implementation(
+            paths["suite"],
+            node_verifier=paths["node_verifier"],
+            repo_root=root,
+        )
+        validate_r013_saved_evidence(
+            expected_bytes=paths["expected_report"].read_bytes(),
+            saved_convergence=load_json(paths["convergence_report"]),
+            check=check,
+        )
+        validate_r013_claim_bindings(
+            demo=load_json(paths["demo_report"]),
+            proposal_status=load_json(paths["proposal_status"]),
+            check=check,
+            suite_sha256=hashlib.sha256(paths["suite"].read_bytes()).hexdigest(),
+            model_report=model_report,
+            model_report_sha256=hashlib.sha256(model_bytes).hexdigest(),
+        )
+        value_convergence.append(check)
+        value_models.append(model_report)
+
     # Index identity and referential checks.
     object_index = root / "corpus" / "indexes" / "objects.jsonl"
     object_count = 0
@@ -101,6 +160,8 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
         "audits": audits,
         "packs": packs,
         "exchanges": exchanges,
+        "value_convergence": value_convergence,
+        "value_models": value_models,
         "indexed_objects": object_count,
         "claims": ["All checks represented in this report passed."],
         "non_claims": ["This report does not establish semantic correctness, complete security or external audit."],
