@@ -1,7 +1,10 @@
 # NEXT ACTION
 
-From the existing Claude Code session in this repository, first fast-forward to current `main`, then read `operations/tasks/TSK-R005-CLAUDE-RETEST-ADJUDICATION.json` and execute only that bounded retest/adjudication task.
+Read `operations/tasks/TSK-R007-REMAINING-AUDIT-ADJUDICATION.json` and resolve only the four remaining material findings in the declared order:
 
-The three required remediation retests are `AUDOBS-0011`, `AUDOBS-0003`, and `AUDOBS-0012`. Adjudicate only the still-open `AUDOBS-0010`, `AUDOBS-0014`, `AUDOBS-0015`, and `AUDOBS-0016`; do not broaden this into a new audit.
+1. `AUDOBS-0010` — cross-toolchain snapshot determinism;
+2. `AUDOBS-0014` — GitHub bootstrap visibility ordering;
+3. `AUDOBS-0015` — GitHub bootstrap failure surfacing;
+4. `AUDOBS-0016` — process-gate contradiction.
 
-Do not modify `baseline-001`, canonical snapshots, R001/R002 target bytes, audit ledgers, or the original preserved evidence. Return one `.evidence` report under the task's declared write path or on a review branch. The report has `status_authority: NONE`.
+Do not reopen `AUDOBS-0003`, `AUDOBS-0011`, or `AUDOBS-0012` unless new contradictory evidence appears. Do not modify `baseline-001`, canonical snapshots, R001/R002 target bytes, audit ledgers, or preserved evidence. Return one bounded `.evidence` report under the task's declared path with `status_authority: NONE`.
