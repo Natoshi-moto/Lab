@@ -1,0 +1,153 @@
+# TSK-R005-CLAUDE-RETEST-ADJUDICATION — bounded retest and adjudication report
+
+- Task ID: `TSK-R005-CLAUDE-RETEST-ADJUDICATION`
+- `status_authority`: `NONE` — this report cannot promote itself or any observation. Disposition remains a separate, human-authorized step.
+- Authority: `OBSERVE_ONLY`
+- Auditor: Claude (Anthropic), `claude-sonnet-5`, this session is a fresh-context continuation of the `second-account` R002 lineage, retesting under task `TSK-R005-CLAUDE-RETEST-ADJUDICATION`.
+- Scope: retest `AUDOBS-0011`, `AUDOBS-0003`, `AUDOBS-0012`; adjudicate (without new broad testing) `AUDOBS-0010`, `AUDOBS-0014`, `AUDOBS-0015`, `AUDOBS-0016`. No other observation was reopened. `/nexus-audit` was not invoked.
+
+## baseline_identity
+
+- Branch at start and end: `claude/r005-retest-20260713`
+- HEAD at start and end: `42de45561bbe6ec759042d67603eea09e25b10b5` (unchanged; only the new file at this report's own path was added under the declared write scope)
+- `git status --short` at start: empty (clean). Confirmed clean again after all work, aside from the new report file itself.
+- Canonical target (`STATUS.json.canonical_target`): tag `baseline-001` -> commit `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8`, snapshot `snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip`, `snapshot_sha256` `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603`, `payload_manifest_sha256` `34e4337b94685c725e316db95b1c8caa3aac4e6cf1595a6bb8005728f16bfb24`. Neither `baseline-001` nor the frozen ZIP was read-written or modified by this session; the source repository copies used for `audit-check` were read-only inputs.
+- Remediation receipt read: `operations/receipts/R003_R004_AUDIT_REMEDIATION/RECEIPT.json`, commits `4ef36f1` (evidence ingestion), `ceb1c1e` (R003 secret-scan filename coverage), `57a9a52` (R004 audit integrity + scan transparency), all listed as ancestors of current HEAD.
+
+## commands_and_exit_codes
+
+All run from repository root on the source repository (read-only except where noted), current HEAD `42de455`:
+
+| Command | Exit code | Result |
+|---|---|---|
+| `./nexus doctor` | 0 | PASS, 7/7 checks |
+| `python3 -m unittest discover -s tests -v` | 0 | 36/36 tests passed |
+| `./nexus verify` | 0 | PASS (all audits, packs, snapshot, doctor sub-report) |
+| `./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND` | 0 | PASS |
+| `./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND` | 0 | PASS |
+
+The three hostile-attack required checks were executed only in disposable clones/temp directories, never against the source repository; their commands and exit codes are given inline under each retest section below.
+
+## retest_0011
+
+**Original claim:** `scan_secrets()` in `system/nexus_lab/doctor.py` silently skipped any file with an empty `pathlib` suffix, so `.env` files (explicitly called out as sensitive in `.gitignore`) were never scanned; a synthetic AWS/Anthropic-style key in a `.env` produced zero findings.
+
+**Current code (read):** `system/nexus_lab/doctor.py` now defines `is_secret_scan_candidate()`, which scans a file if its suffix is in `TEXT_SUFFIXES`, **or its suffix is empty**, or its name is in `TEXT_FILENAMES`, or it matches `ENV_FILENAME = re.compile(r"^\.env(?:\..+)?$")` (covering `.env.local`, `.env.production`, etc., which pathlib treats as a nonempty-but-irrelevant suffix).
+
+**Retest performed** (disposable temp directory outside the repository, not the source repository):
+```
+$ printf 'AKIAABCDEFGHIJKLMNOP\nANTHROPIC_API_KEY=sk-ant-api03-XXXX...\n' > .env
+$ printf 'AKIAABCDEFGHIJKLMNOP\n' > .env.local
+$ printf 'AKIAABCDEFGHIJKLMNOP\n' > credentials
+$ python3 -c "...scan_secrets(Path('.'), skipped_files=[])..."
+FINDINGS: [
+  {'kind': 'OPENAI_STYLE_KEY', 'path': '.env', 'line': 2},
+  {'kind': 'ANTHROPIC_STYLE_KEY', 'path': '.env', 'line': 2},
+  {'kind': 'AWS_ACCESS_KEY', 'path': '.env', 'line': 1},
+  {'kind': 'AWS_ACCESS_KEY', 'path': '.env.local', 'line': 1},
+  {'kind': 'AWS_ACCESS_KEY', 'path': 'credentials', 'line': 1}
+]
+SKIPPED: []
+```
+Exit code: 0 (Python call, no exception). This exactly reproduces the original bypass reproduction steps; the previous result (zero findings) no longer occurs. `.env`, the `.env.local` variant, and an extensionless `credentials` file are all now scanned and all three synthetic secrets are detected.
+
+Also confirmed via the standard checks: `tests/test_doctor.py::test_secret_pattern_scans_dotenv`, `::test_secret_pattern_scans_dotenv_variant`, and `::test_secret_pattern_scans_extensionless_credentials_file` all pass in the full suite run above.
+
+**Verdict:** Remediation confirmed. The originally reproduced bypass does not reproduce against current `main`. No claim is made about secret-pattern coverage completeness beyond the specific classes tested (`.env`, `.env.*`, extensionless files); other dotfile classes noted as untested in the original observation (e.g. `.npmrc`, `.netrc`) were not separately retested here since they fall under the same empty-suffix branch already fixed and covered by regression tests, but were not independently exercised by this session.
+
+## retest_0003
+
+**Original claim:** `./nexus audit-check` trusted `TARGET.json`'s own declared archive digest with no independent anchor; substituting the archive bytes and self-consistently rewriting `TARGET.json.target_archive_sha256` to match, in the same uncommitted working tree, produced a false `PASS`.
+
+**Current code (read):** `./nexus audit-check` now runs `verify_audit_integrity()` (`system/nexus_lab/audit_integrity.py`), which layers two independent checks on top of the original `check_audit()`: (1) it compares the loose `MANIFEST.sha256` on disk against the `MANIFEST.sha256` **frozen inside the already-built audit `.zip` pack**, and checks every immutable manifest entry's live digest against the frozen manifest; (2) it runs `git status --porcelain=v1` against a declared list of critical target-binding paths (`TARGET.json`, `MANIFEST.sha256`, the audit pack and its sidecar, the target snapshot and its sidecar, and any route pack) and raises `NexusError` if any of them diverge from the Git index.
+
+**Retest performed** (two separate disposable `git clone` copies of the source repository, in the session scratchpad, never the source repository itself):
+
+Clone 1 — exact original reproduction:
+```
+$ ./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND        # baseline: PASS, exit 0
+$ printf 'X' >> operations/audits/AUD-R002-CLAUDE-BLIND/target/NEXUS_LAB_R001_BASELINE_001.zip
+$ # patch TARGET.json.target_archive_sha256 to the new (self-consistent) sha256
+$ ./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND
+NEXUS ERROR: Audit immutable file differs from frozen manifest: TARGET.json
+  (expected e6412dbf..., got 115ca08b...).
+exit code: 2
+```
+
+Clone 2 — stronger variant: forge the archive, patch `TARGET.json`, **and** regenerate `MANIFEST.sha256` plus rebuild the audit `.zip` pack itself to be internally self-consistent with the forged archive:
+```
+$ ./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND
+NEXUS ERROR: Pack manifest member mismatch; missing=[], extra=['MANIFEST.sha256']
+exit code: 2
+$ git status --short operations/audits/AUD-R002-CLAUDE-BLIND
+ M .../AUD-R002-CLAUDE-BLIND.zip
+ M .../AUD-R002-CLAUDE-BLIND.zip.sha256
+ M .../MANIFEST.sha256
+ M .../TARGET.json
+ M .../target/NEXUS_LAB_R001_BASELINE_001.zip
+ M .../target/NEXUS_LAB_R001_BASELINE_001.zip.sha256
+```
+This clone-2 attack was rejected, but by a different error than the primary mechanism (a bug in this session's own pack-rebuild harness produced a duplicate `MANIFEST.sha256` member, not a clean forged pack). That specific error is not being reported as evidence of the fix's mechanism. What *is* solid evidence: `git status --short` shows all six touched files as diverged from the Git index at the time of the attack, which is exactly the second, independent binding `verify_audit_integrity()` checks (`git status --porcelain=v1` on critical paths) and would have raised `NexusError` on its own even had the pack rebuild been flawless.
+
+**Verdict:** Remediation confirmed. The exact original reproduction (self-consistent `TARGET.json` digest patch, without touching the frozen pack) is cleanly rejected via the frozen-manifest-inside-pack comparison. This session did not produce a clean, fully self-consistent whole-pack forgery (own harness limitation, disclosed above), so the git-status binding was not tested in complete isolation from the manifest-freeze binding in clone 2 — but the manifest-freeze binding alone already closes the exact attack in the original observation, and the git-status divergence observed independently supports that a second, structurally different binding is also in place.
+
+## retest_0012
+
+**Original claim:** `scan_secrets()` unconditionally skipped any file over 5MB with no warning recorded anywhere in the doctor report.
+
+**Current code (read):** `scan_secrets()` now accepts an optional `skipped_files` list and appends `{"path", "reason": "SIZE_LIMIT", "size_bytes", "limit_bytes"}` for every file excluded by the size guard. `run_doctor()` passes this list through, turns it into `SECRET_SCAN_SKIPPED_SIZE <path> <size>` warnings, sets the `secret_patterns` check's `status` to `WARN` (not `PASS`) whenever anything was skipped, and includes the skipped-file list plus an explicit non-claim ("Files excluded by the secret-scan size limit are reported as warnings and are not represented as scanned") in the doctor report.
+
+**Retest performed** (disposable temp directory, not the source repository):
+```
+$ python3 -c "open('big_secret.txt','wb').write(b'AKIAABCDEFGHIJKLMNOP\n' + b'x'*(6*1024*1024))"
+$ python3 -c "...scan_secrets(Path('.'), skipped_files=[])..."
+FINDINGS: []
+SKIPPED: [{'path': 'big_secret.txt', 'reason': 'SIZE_LIMIT', 'size_bytes': 6291477, 'limit_bytes': 5242880}]
+```
+Exit code: 0. The secret is still not found inside the oversized file (the size guard itself was never the defect — silence was), but the exclusion is now explicit and inspectable.
+
+`./nexus verify` on the real repository (no oversized candidate files present there) shows `"skipped_files": []` and the same new non-claim text, confirming the reporting plumbing is wired into the live doctor report, not just the library function. `tests/test_doctor.py::test_secret_scan_reports_size_limit_exclusion` passes in the full suite run above.
+
+**Verdict:** Remediation confirmed. The size exclusion is now explicitly reported (warning + `skipped_files` list + report-level non-claim) rather than silent.
+
+## remaining_observation_adjudication
+
+No new hostile attacks or code changes were made for this section; each item was adjudicated by reading the current state of the named files/tests against the original claim, per task scope ("adjudicate ... without broadening into a new audit").
+
+### AUDOBS-0010 — cross-toolchain snapshot byte-identity (SUSPECTED_DEFECT, MEDIUM) — **STILL OPEN**
+Re-ran the original reproduction read-only against the real tagged `baseline-001` (`./nexus freeze --ref baseline-001 --snapshot-id NEXUS-LAB-R001-BASELINE-001 --profile full-private-git`, output written only to the session scratchpad, source repository untouched): this environment (`zlib.ZLIB_RUNTIME_VERSION` = `1.3.1.zlib-ng`, same as originally observed) produced `archive_sha256=3c673e6c88...`, which still does not match the checked-in canonical `33d3fb5549d4...`, while `payload_manifest_sha256=34e4337b9468...` matches `STATUS.json.canonical_target.payload_manifest_sha256` exactly — i.e. content-level determinism holds, outer-ZIP-byte determinism against the specific checked-in artifact still does not, exactly as originally reported. `docs/DEMONSTRATION.md`'s DEMO-002 row is unchanged and still states "Same committed tree and profile produce byte-identical ZIPs" without toolchain scoping. `.github/workflows/nexus-audit.yml` pins `python-version: "3.12"` but does not pin or declare a zlib implementation. `tests/test_snapshot.py::test_same_commit_produces_byte_identical_snapshot` still only compares two same-process builds, not a rebuild against the checked-in canonical archive. This observation's underlying condition and recommended fix are unaddressed by the R003/R004 remediation pass (which was scoped to 0011/0003/0012 only, per the receipt), and it remains outside this task's retest scope by design.
+
+### AUDOBS-0014 — GitHub bootstrap push before visibility check (SUSPECTED_DEFECT, MEDIUM) — **STILL OPEN**
+`system/nexus_lab/github.py:github_bootstrap()` is unchanged in the relevant respect: for the `origin` empty branch, `_gh(root, "repo", "create", repo_name, "--private", "--source=.", "--remote=origin", "--push")` still creates the repository and pushes content in the same call, before the subsequent `gh repo view` / `require_private_visibility()` check. `tests/test_github.py` still covers only `parse_visibility()` and `require_private_visibility()` as pure functions (confirmed in the full suite run above: `test_malformed_response_is_rejected`, `test_private_visibility_parses`, `test_public_visibility_is_refused`); it does not invoke `github_bootstrap()` or assert push ordering. Not independently re-executed here (same reason as the original observation: no authenticated `gh` in this sandbox, and executing it would create real external state outside this observe-only task's scope).
+
+### AUDOBS-0015 — GitHub bootstrap silent `check=False` failures (ASSURANCE_GAP, LOW) — **STILL OPEN**
+The Actions-permission-lockdown PUT, each label-creation call, and the issue-creation call in `github_bootstrap()` all still pass `check=False`; only `permission.returncode`, each label's `exit_code`, and `issue_result.returncode` are recorded into the final receipt JSON, with no raised error or emitted warning on failure. Unchanged from the original observation. Not independently re-executed here for the same reason as AUDOBS-0014.
+
+### AUDOBS-0016 — process contradiction: audit started without a declared precondition being checked (PROCESS_CONTRADICTION, LOW) — **STILL OPEN (structurally)**
+The specific historical instance (R002's own `STATUS.json`/`NEXT_ACTION.md` saying "do not start the audit" before a push/tag verification receipt existed, while the audit proceeded anyway) is a closed, past event and is not re-litigated here. The systemic gap that allowed it is unchanged: `assurance_blocks` in `STATUS.json` are only ever *rendered* for human/operator display (`system/nexus_lab/status.py:render_status`, confirmed by reading the current source) — no skill, CLI command, or test reads `assurance_blocks` to refuse or flag proceeding when a precondition is unmet. `grep -rn "assurance_blocks" system/ .claude/` returns only the `status.py` rendering code. This R005 session's own preconditions (`STATUS.json.current_mode: "R005_RETEST_AND_ADJUDICATION_READY"`, no matching "do not start" language in `NEXT_ACTION.md`/`AUDIT_START_HERE.md`) were consistent with proceeding, so no new instance of the contradiction occurred in this run — but the originally recommended structural fix (a programmatic gate reading `assurance_blocks` before a skill/command proceeds) has not been implemented.
+
+## files_seen
+
+`AGENTS.md`, `STATUS.json`, `NEXT_ACTION.md`, `AUDIT_START_HERE.md`, `CLAUDE.md`, `operations/tasks/TSK-R005-CLAUDE-RETEST-ADJUDICATION.json`, `operations/receipts/R003_R004_AUDIT_REMEDIATION/RECEIPT.json`, `operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account/CLAUDE_AUDIT_REPORT.evidence`, `.../CLAUDE_OBSERVATIONS_0001_0005.evidence`, `.../CLAUDE_OBSERVATIONS_0006_0010.evidence`, `.../CLAUDE_OBSERVATIONS_0011_0014.evidence`, `.../CLAUDE_OBSERVATIONS_0015_0018.evidence`, `.../INGESTION_NOTE.md`, `system/nexus_lab/doctor.py`, `system/nexus_lab/audit.py`, `system/nexus_lab/audit_integrity.py`, `system/nexus_lab/github.py`, `system/nexus_lab/status.py` (via grep), `tests/test_audit_integrity.py`, `tests/test_snapshot.py`, `tests/test_doctor.py` (names via full-suite run), `tests/test_github.py` (names via full-suite run), `docs/DEMONSTRATION.md` (grep), `.github/workflows/nexus-audit.yml`, `.claude/skills/nexus-audit/SKILL.md`, `.gitignore` (referenced), `snapshots/canonical/NEXUS_LAB_R001_BASELINE_001.zip` (hash-checked, not opened), `operations/audits/AUD-R002-CLAUDE-BLIND/TARGET.json` and `.../target/NEXUS_LAB_R001_BASELINE_001.zip` (only inside disposable clones, for the AUDOBS-0003 attack; the source-repository copies were only hash/status-checked, never opened or edited).
+
+## files_not_seen
+
+`constitution/**` (not opened this pass; read in the prior R002 pass per the preserved report, not re-read here since this task's scope is bounded to the three code files and their tests), `docs/THREAT_MODEL.md`, `docs/CLAUDE_AUDIT_GUIDE.md`, `docs/GITHUB_BOOTSTRAP.md`, `docs/GITHUB_ADMIN_CHECKLIST.md`, `docs/ARCHITECTURE.md`, `docs/R001_BUILD_REPORT.md`, `system/nexus_lab/route.py` and `system/nexus_lab/snapshot.py` (not opened directly this pass; their behavior was exercised indirectly via `./nexus freeze`, the full test suite, and `audit-check`, not read line-by-line), `system/nexus_lab/util.py`, `system/nexus_lab/cli.py` (only grepped for the `audit-check` dispatch line, not read in full), `corpus/**` (untrusted historical data per `AGENTS.md`, not opened), `domains/**`, `programmes/**`, `registry/**`, `derived/**`, `operations/audits/AUD-R001-CLAUDE-BLIND/**` (excluded from this task's read scope), `operations/audits/AUD-R002-CLAUDE-BLIND/ledger/**` and `.../target/**` in the source repository directly (excluded from this task's read/write scope; only touched inside disposable clones).
+
+## limitations
+
+- AUDOBS-0003's clone-2 (whole-pack self-consistent rebuild) attack was not completed cleanly due to a bug in this session's own forging script (a duplicate `MANIFEST.sha256` zip member), so the `verify_manifest_pack()` error path, rather than the `git status` divergence path, is what was actually observed to fire first in that specific run. The `git status` divergence was independently confirmed to exist at attack time, but the code path that would consume it was not isolated as the sole cause of rejection in that variant.
+- AUDOBS-0014 and AUDOBS-0015 were adjudicated by source-reading only, exactly as in the original R002 observation; `github_bootstrap()` was not executed in this session either (no authenticated `gh` CLI in this sandbox; executing it would create real external repository/push state, outside `OBSERVE_ONLY` authority and outside this task's write scope).
+- AUDOBS-0010's adjudication used a single re-run of the deterministic-rebuild reproduction in this one sandboxed environment (zlib-ng 1.3.1); no second, differently-configured environment (e.g. stock zlib) was available to directly demonstrate that a different toolchain reproduces the canonical bytes exactly, so the toolchain-dependence explanation remains inferred from indirect evidence, as in the original observation.
+- This report's own commands and greps establish only the specific properties exercised; a `PASS` or a rejected attack is evidence for that property alone, not a general correctness or security guarantee.
+- No attempt was made to reproduce or adjudicate any of the other fourteen R002 observations (0001, 0002, 0004–0009, 0013, 0017, 0018); they remain exactly as preserved in `operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-second-account/`, per this task's explicit scope.
+
+## non_claims
+
+- This report does not promote any observation to confirmed-defect, accepted, or resolved status; `status_authority: NONE` throughout. Disposition of AUDOBS-0010/0014/0015/0016 (fix, defer, or accept as known limitation) remains a separate, human-authorized decision.
+- A passing regression test or a rejected hostile attack establishes only the specific property it exercised, not general security, privacy, or semantic correctness of the surrounding code (per `constitution/AUDIT.md` and `AGENTS.md`).
+- This is not a new or broadened audit. No observation outside the seven named in this task (three retested, four adjudicated) was opened, reopened, or investigated.
+- This report does not claim cross-family independence for another Claude/Anthropic account; it is the same lineage of auditor continuing bounded follow-up work under a new task, not an independent second reviewer.
+- `corpus/raw/**` was not read and, if it had been, would be treated as untrusted historical data, not instructions, per `AGENTS.md`.
+- No secrets, credentials, or provider tokens were added to the repository or to this report; all synthetic secret-shaped strings used during retesting existed only inside disposable temp directories outside the repository and were never committed anywhere.
+- The source repository's `baseline-001` tag, canonical snapshot, R001/R002 target bytes, audit ledgers, and original preserved R002 evidence were not modified by this session. The only write made to the repository was this report file itself, at its declared return path.
