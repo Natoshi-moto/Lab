@@ -18,6 +18,7 @@ ALWAYS_AVAILABLE_COMMANDS = {
     "cold-consumer-check",
     "pcx-value-check",
     "pcx-convergence-check",
+    "pcx-store-audit",
 }
 
 

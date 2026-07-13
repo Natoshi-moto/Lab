@@ -1,0 +1,10 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "round": "R014",
+  "mode": "R014_PCX_DURABLE_REPLAY_REVIEW_READY",
+  "disposition": "DEMONSTRATED_CRASH_CONSISTENT_LOCAL_RECOVERY_OF_SYNTHETIC_CONSERVED_STATE",
+  "canonical_status": "UNPROMOTED_PROPOSAL",
+  "base_head": "69bbe07843e0d400d53e696b7516d8f3bcf55e3e",
+  "status_authority": "NONE",
+  "next_action": "USER_REVIEW_AND_SEPARATE_PROMOTION_DECISION"
+}

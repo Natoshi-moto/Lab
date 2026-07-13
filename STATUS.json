@@ -1,5 +1,7 @@
 {
-  "active_tasks": [],
+  "active_tasks": [
+    "TSK-R014-PCX-DURABLE-REPLAY"
+  ],
   "assurance_blocks": [],
   "canonical_target": {
     "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
@@ -9,12 +11,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R013_PCX_CONSERVED_CLAIM_PROMOTED",
-  "current_round": "R013",
+  "current_mode": "R014_PCX_DURABLE_REPLAY_REVIEW_READY",
+  "current_round": "R014",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R012_R013_USER_AUTHORIZED_PROMOTION_MERGED",
-  "next_action_id": "ACT-R014_COMMISSION_PCX_DURABLE_REPLAY",
+  "last_completed_action": "R014_CRASH_CONSISTENT_SYNTHETIC_REPLAY_DEMONSTRATED_PREPROMOTION",
+  "next_action_id": "ACT-R014_USER_REVIEW_AND_PROMOTION_DECISION",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"

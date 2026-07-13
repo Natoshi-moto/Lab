@@ -1,20 +1,25 @@
 # NEXT ACTION
 
-Commission R014 `PCX_DURABLE_REPLAY` from the post-promotion `main` head.
+Review the R014 `PCX_DURABLE_REPLAY` proposal and its exact-head audit, then
+decide whether to record a user-authorized promotion disposition for the
+bounded demonstration as project history.
 
-R012 and R013 are now bounded demonstrated project history under separate
-user-authorized promotion receipts. Their frozen proposal-time status and
-reports remain immutable evidence; the root status and promotion receipts are
-the live disposition. The R001 canonical snapshot remains unchanged.
+R014 stores only exact, already-signed R013 synthetic transfers in a local
+SQLite rollback journal. It rebuilds state from the frozen genesis on every
+open, obtains the writer lock before validation, acknowledges only after
+commit, makes retry idempotent, rejects WAL and corruption without repair, and
+can prove a retained caller anchor as an exact prefix.
 
-R014 must test whether the R013 synthetic conserved state can survive process
-failure and restart without loss, duplication, inflation, hybrid state or
-silent repair. Use an append-only local rollback-journal database, rebuild state
-by exact replay from the frozen genesis, acknowledge only after durable commit,
-and expose caller-held anchors so rollback detection is testable when an
-independent anchor is supplied.
+The injected-failure campaign covers six pre-commit hard exits, one
+post-commit/pre-ack exit, eight fresh two-process sibling-spend races, rollback
+and same-height fork copies, schema and record mutation, truncation, header
+corruption, and WAL-profile rejection. All recovered accepted prefixes retain
+the frozen synthetic supply of 1000.
 
-Keep the experiment synthetic and local. Do not add real funds, real custody,
-key generation, issuance, backing, redemption, networking or consensus. A pass
-may support only a bounded crash-consistent local-recovery claim under the
-declared runtime, filesystem and fault model.
+Promotion may accept only
+`DEMONSTRATED_CRASH_CONSISTENT_LOCAL_RECOVERY_OF_SYNTHETIC_CONSERVED_STATE`
+under the declared process, runtime and honest-local-filesystem model. It does
+not establish money, economic value, backing, redemption, custody, wallet or
+key safety, network consensus, global finality, physical power-loss safety,
+malicious rollback resistance without an external anchor, or production
+security. The R001 canonical snapshot remains unchanged.
