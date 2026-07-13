@@ -1,12 +1,41 @@
 {
   "active_tasks": [
-    "TSK-R007-REMAINING-AUDIT-ADJUDICATION"
+    "TSK-R008-R010-FOUNDATION-CLOSEOUT"
   ],
   "assurance_blocks": [
-    "R002_OBSERVATIONS_PRESERVED_NOT_LEDGER_APPENDED",
-    "AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING",
-    "AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING",
-    "AUDOBS_0016_PROCESS_CONTRADICTION_PENDING"
+    {
+      "commands": [],
+      "id": "R002_OBSERVATIONS_PRESERVED_NOT_LEDGER_APPENDED",
+      "mode": "ADVISORY",
+      "reason": "R002 observations remain preserved non-authoritative evidence; closeout disposition is recorded through bounded remediation receipts rather than retroactive ledger mutation."
+    },
+    {
+      "commands": [
+        "freeze"
+      ],
+      "id": "AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING",
+      "mode": "BLOCK",
+      "reason": "Do not create a new canonical snapshot until the scoped identity claim and toolchain metadata pass review and CI."
+    },
+    {
+      "commands": [
+        "github-bootstrap"
+      ],
+      "id": "AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING",
+      "mode": "BLOCK",
+      "reason": "Do not run bootstrap until the privacy-before-push ordering and failure policy pass review and CI."
+    },
+    {
+      "commands": [
+        "route",
+        "audit-pack",
+        "audit-ingest",
+        "render-status"
+      ],
+      "id": "AUDOBS_0016_PROCESS_CONTRADICTION_PENDING",
+      "mode": "WARN",
+      "reason": "Typed gate enforcement is under review; mutation-capable operator commands require explicit attention until closeout acceptance."
+    }
   ],
   "canonical_target": {
     "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
@@ -16,12 +45,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R007_REMAINING_ADJUDICATION_READY",
-  "current_round": "R007",
+  "current_mode": "R008_R010_FOUNDATION_CLOSEOUT_IN_REVIEW",
+  "current_round": "R010",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R006_AUDOBS_0003_REMEDIATION_CONFIRMED",
-  "next_action_id": "ACT-R007_RESOLVE_0010_0014_0015_0016",
+  "last_completed_action": "R007_ADJUDICATION_EVIDENCE_MERGED",
+  "next_action_id": "ACT-R008_R010_REVIEW_AND_VERIFY_CLOSEOUT",
   "open_assurance_blocks": 4,
   "open_defect_blocks": 0,
-  "schema": "nexus.status/v1"
+  "schema": "nexus.status/v2"
 }
