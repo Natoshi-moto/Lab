@@ -1,0 +1,22 @@
+{
+  "claims": [
+    "R006 independently rejects a valid, internally self-consistent and cleanly committed replacement audit snapshot when its payload differs from the immutable Git tree at target_commit.",
+    "The decisive rejection mechanism was verify_snapshot_against_git_tree rather than digest mismatch, pack invalidity or dirty-worktree detection.",
+    "AUDOBS-R002-CLAUDE-0003 remediation is confirmed for the scoped altered-payload/same-target-commit condition."
+  ],
+  "evidence_path": "operations/audits/AUD-R002-CLAUDE-BLIND/results/claude-original-r006/AUDOBS-0003_R006_RETEST.evidence",
+  "implementation_commit": "0509f4cf416be2c16b20d0d8f863c5adccaa615e",
+  "non_claims": [
+    "This does not establish complete audit-system security.",
+    "The retest did not exercise substitution of a different declared target commit.",
+    "The result is same-family procedural retesting, not cross-provider independent corroboration."
+  ],
+  "observation": "AUDOBS-R002-CLAUDE-0003",
+  "operation": "confirm-r006-git-tree-binding-remediation",
+  "original_auditor_checkout": "084b3b9ee6a1434e38a5bf23eee8266c43b3522d",
+  "receipt_id": "RCT-R006-AUDOBS-0003-REMEDIATION",
+  "result": "AUDOBS_0003_REMEDIATION_CONFIRMED",
+  "schema": "nexus.receipt/v1",
+  "tested_main": "b348df52956f647216927599bae5637647e73f39",
+  "test_scope": "valid internally self-consistent committed replacement snapshot with changed payload and unchanged declared target_commit"
+}
