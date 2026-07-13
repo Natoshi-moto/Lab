@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-durable-record/v0",
+  "title": "R014 single-host durable synthetic settlement record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "sequence",
+    "previous_record_hash",
+    "transaction_raw_b64",
+    "transaction_sha256",
+    "tx_id",
+    "previous_state_root",
+    "next_state_root",
+    "receipt",
+    "checkpoint",
+    "status_authority",
+    "record_hash"
+  ],
+  "properties": {
+    "schema": { "const": "nexus.pcx-durable-record/v0" },
+    "sequence": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "previous_record_hash": { "type": "string", "pattern": "^(?:|[0-9a-f]{64})$" },
+    "transaction_raw_b64": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 87384,
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+    },
+    "transaction_sha256": { "$ref": "#/$defs/hash" },
+    "tx_id": { "$ref": "#/$defs/hash" },
+    "previous_state_root": { "$ref": "#/$defs/hash" },
+    "next_state_root": { "$ref": "#/$defs/hash" },
+    "receipt": { "$ref": "pcx-value-receipt.schema.json" },
+    "checkpoint": { "$ref": "pcx-checkpoint.schema.json" },
+    "status_authority": { "const": "NONE" },
+    "record_hash": { "$ref": "#/$defs/hash" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

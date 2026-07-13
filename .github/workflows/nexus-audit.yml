@@ -44,6 +44,15 @@ jobs:
       - name: Run unit and attack tests
         run: python3 -m unittest discover -s tests -v
 
+      - name: Reproduce R014 durable-settlement evidence when present
+        shell: bash
+        run: |
+          if [[ -f experiments/R014_PCX_DURABLE_SETTLEMENT/build_demo.py ]]; then
+            python3 -m experiments.R014_PCX_DURABLE_SETTLEMENT.build_demo --check
+          else
+            echo "R014 durable-settlement proposal is not present on this revision."
+          fi
+
       - name: Verify snapshots, manifests and audit ledgers
         run: ./nexus verify
 
