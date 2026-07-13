@@ -5,17 +5,17 @@
 | Field | Value |
 |---|---|
 | Lab | `NEXUS-LAB` |
-| Round | `R005` |
-| Mode | `R005_RETEST_AND_ADJUDICATION_READY` |
+| Round | `R007` |
+| Mode | `R007_REMAINING_ADJUDICATION_READY` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
-| Open assurance blocks | `5` |
-| Last completed action | `R002_EVIDENCE_PRESERVED_AND_AUDOBS_0011_0003_0012_REMEDIATED` |
-| Next action | `ACT-R005-CLAUDE-RETEST_AND_REMAINING_ADJUDICATION` |
+| Open assurance blocks | `4` |
+| Last completed action | `R006_AUDOBS_0003_REMEDIATION_CONFIRMED` |
+| Next action | `ACT-R007_RESOLVE_0010_0014_0015_0016` |
 
 ## Active tasks
 
-- `TSK-R005-CLAUDE-RETEST-ADJUDICATION`
+- `TSK-R007-REMAINING-AUDIT-ADJUDICATION`
 
 ## Assurance blocks
 
@@ -23,4 +23,3 @@
 - `AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING`
 - `AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING`
 - `AUDOBS_0016_PROCESS_CONTRADICTION_PENDING`
-- `CLAUDE_RETEST_R003_R004_PENDING`
