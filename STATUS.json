@@ -1,42 +1,6 @@
 {
-  "active_tasks": [
-    "TSK-R008-R010-FOUNDATION-CLOSEOUT"
-  ],
-  "assurance_blocks": [
-    {
-      "commands": [],
-      "id": "R002_OBSERVATIONS_PRESERVED_NOT_LEDGER_APPENDED",
-      "mode": "ADVISORY",
-      "reason": "R002 observations remain preserved non-authoritative evidence; closeout disposition is recorded through bounded remediation receipts rather than retroactive ledger mutation."
-    },
-    {
-      "commands": [
-        "freeze"
-      ],
-      "id": "AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING",
-      "mode": "BLOCK",
-      "reason": "Do not create a new canonical snapshot until the scoped identity claim and toolchain metadata pass review and CI."
-    },
-    {
-      "commands": [
-        "github-bootstrap"
-      ],
-      "id": "AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING",
-      "mode": "BLOCK",
-      "reason": "Do not run bootstrap until the privacy-before-push ordering and failure policy pass review and CI."
-    },
-    {
-      "commands": [
-        "route",
-        "audit-pack",
-        "audit-ingest",
-        "render-status"
-      ],
-      "id": "AUDOBS_0016_PROCESS_CONTRADICTION_PENDING",
-      "mode": "WARN",
-      "reason": "Typed gate enforcement is under review; mutation-capable operator commands require explicit attention until closeout acceptance."
-    }
-  ],
+  "active_tasks": [],
+  "assurance_blocks": [],
   "canonical_target": {
     "commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
     "payload_manifest_sha256": "34e4337b94685c725e316db95b1c8caa3aac4e6cf1595a6bb8005728f16bfb24",
@@ -45,12 +9,13 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "R008_R010_FOUNDATION_CLOSEOUT_IN_REVIEW",
+  "current_mode": "R001_FOUNDATION_OPERATIONAL",
   "current_round": "R010",
+  "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "R007_ADJUDICATION_EVIDENCE_MERGED",
-  "next_action_id": "ACT-R008_R010_REVIEW_AND_VERIFY_CLOSEOUT",
-  "open_assurance_blocks": 4,
+  "last_completed_action": "R008_R010_FOUNDATION_CLOSEOUT_IMPLEMENTED_AND_PREPROMOTION_VERIFIED",
+  "next_action_id": "ACT-R011_RUN_FIRST_REAL_VERTICAL_SLICE",
+  "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"
 }
