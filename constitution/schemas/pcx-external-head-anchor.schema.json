@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-external-head-anchor/v0",
+  "title": "R014 out-of-ledger rollback-detection anchor specimen",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "genesis_id",
+    "record_head",
+    "checkpoint_id",
+    "state_root",
+    "receipt_head",
+    "status_authority",
+    "instructions",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": { "const": "nexus.pcx-external-head-anchor/v0" },
+    "genesis_id": { "$ref": "#/$defs/hash" },
+    "record_head": { "$ref": "#/$defs/hash" },
+    "checkpoint_id": { "$ref": "#/$defs/hash" },
+    "state_root": { "$ref": "#/$defs/hash" },
+    "receipt_head": { "$ref": "#/$defs/hash" },
+    "status_authority": { "const": "NONE" },
+    "instructions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "non_claims": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

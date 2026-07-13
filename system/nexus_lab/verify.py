@@ -10,6 +10,7 @@ from typing import Any
 from .audit_integrity import verify_audit_integrity
 from .doctor import run_doctor
 from .exchange import verify_exchange_ledger, verify_exchange_pack
+from .durable_value import validate_r014_saved_evidence
 from .shadow import verify_cold_consumer_report
 from .snapshot import verify_snapshot
 from .route import verify_manifest_pack
@@ -91,6 +92,7 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
 
     value_convergence: list[dict[str, Any]] = []
     value_models: list[dict[str, Any]] = []
+    durable_settlements: list[dict[str, Any]] = []
     status = load_json(root / "STATUS.json")
     if not isinstance(status, dict):
         raise NexusError("STATUS.json must contain an object.")
@@ -139,6 +141,38 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
         value_convergence.append(check)
         value_models.append(model_report)
 
+    r014_declared = (
+        "TSK-R014-PCX-DURABLE-SETTLEMENT" in active_tasks
+        or status.get("current_round") == "R014"
+        or (root / "operations" / "tasks" / "TSK-R014-PCX-DURABLE-SETTLEMENT.json").exists()
+        or (
+            root
+            / "operations"
+            / "proposals"
+            / "R014_PCX_DURABLE_SETTLEMENT"
+            / "STATUS.proposal.json"
+        ).exists()
+    )
+    if r014_declared:
+        durable_check = validate_r014_saved_evidence(root)
+        reproduction = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "experiments.R014_PCX_DURABLE_SETTLEMENT.build_demo",
+                "--check",
+            ],
+            cwd=root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=60,
+        )
+        if reproduction.returncode != 0:
+            detail = reproduction.stderr.decode("utf-8", errors="replace").strip()
+            raise NexusError(f"R014 durable-settlement evidence did not reproduce exactly: {detail}")
+        durable_settlements.append(durable_check)
+
     # Index identity and referential checks.
     object_index = root / "corpus" / "indexes" / "objects.jsonl"
     object_count = 0
@@ -162,6 +196,7 @@ def verify_repository(root: Path, *, snapshot: Path | None = None) -> dict[str, 
         "exchanges": exchanges,
         "value_convergence": value_convergence,
         "value_models": value_models,
+        "durable_settlements": durable_settlements,
         "indexed_objects": object_count,
         "claims": ["All checks represented in this report passed."],
         "non_claims": ["This report does not establish semantic correctness, complete security or external audit."],

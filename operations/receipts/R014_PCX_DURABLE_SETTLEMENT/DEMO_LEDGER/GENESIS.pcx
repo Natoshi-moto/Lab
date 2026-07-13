@@ -1,0 +1,1 @@
+{"genesis_id":"974cd4da89feb9f7ae8e14d7b4359f4b76d8697f55e5793219c52e38b627b7de","network_id":"NEXUS-R013-SYNTHETIC","outputs":[{"amount":"1000","owner_public_key":"bd31dcf54d9b3255ab917685de56afd9a593c503086c9a02bc692bc40a28cdaa"}],"schema":"nexus.pcx-genesis/v0","status_authority":"NONE","unit_label":"R013-SYNTHETIC-CLAIM"}

@@ -1,0 +1,10 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "round": "R014",
+  "mode": "R014_PCX_DURABLE_SETTLEMENT_REVIEW_READY",
+  "disposition": "DEMONSTRATED_DURABLE_SINGLE_HOST_SYNTHETIC_SETTLEMENT",
+  "canonical_status": "UNPROMOTED_STACKED_PROPOSAL",
+  "base_head": "33da36ae22457986c69d3aacdcdecd1a71335793",
+  "status_authority": "NONE",
+  "next_action": "USER_REVIEW_R012_R013_R014_WITH_SEPARATE_PROMOTION_DECISIONS"
+}

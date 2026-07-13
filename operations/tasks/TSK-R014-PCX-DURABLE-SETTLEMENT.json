@@ -1,0 +1,56 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-R014-PCX-DURABLE-SETTLEMENT",
+  "objective": "Demonstrate crash-atomic, exactly-once, single-host persistence and deterministic restart for already-signed R013 conserved transfers.",
+  "baseline_ref": "33da36ae22457986c69d3aacdcdecd1a71335793",
+  "authority": "PROPOSE_ONLY",
+  "allowed_read": [
+    "STATUS.json",
+    "NEXT_ACTION.md",
+    "constitution",
+    "experiments/R013_PCX_CONSERVED_CLAIM",
+    "experiments/R014_PCX_DURABLE_SETTLEMENT",
+    "operations/proposals/R013_PCX_CONSERVED_CLAIM",
+    "system/nexus_lab",
+    "tests"
+  ],
+  "allowed_write": [
+    ".github/workflows/nexus-audit.yml",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "constitution/schemas",
+    "experiments/R014_PCX_DURABLE_SETTLEMENT",
+    "operations/proposals/R014_PCX_DURABLE_SETTLEMENT",
+    "operations/receipts/R014_PCX_DURABLE_SETTLEMENT",
+    "system/nexus_lab",
+    "tests"
+  ],
+  "data_classes": ["LOCAL_ONLY", "ROUTE_ONLY"],
+  "output_contract": {
+    "type": "object",
+    "schema_path": "constitution/schemas/pcx-durable-record.schema.json",
+    "required_invariants": [
+      "ACK_ONLY_AFTER_FILE_AND_DIRECTORY_FSYNC",
+      "ATOMIC_RECORD_RENAME",
+      "FULL_REPLAY_FROM_PINNED_GENESIS",
+      "EXACT_RETRY_APPENDS_NOTHING",
+      "REJECTION_PRESERVES_COMMITTED_PREFIX",
+      "COMPETING_WRITERS_SERIALIZED",
+      "EVERY_PREFIX_CONSERVES_SUPPLY_1000",
+      "INDEPENDENT_JOURNAL_AND_STATE_REPLAY",
+      "OPTIONAL_OUT_OF_BAND_HEAD_ROLLBACK_GATE",
+      "STATUS_AUTHORITY_NONE"
+    ],
+    "kill_on": [
+      "ACKNOWLEDGED_PARTIAL_COMMIT",
+      "DUPLICATE_DURABLE_DEBIT",
+      "POST_RESTART_STATE_DIVERGENCE",
+      "TWO_COMPETING_SPENDS_COMMITTED",
+      "CORRUPTION_ACCEPTED",
+      "IMPLEMENTATION_DISAGREEMENT",
+      "FALSE_ROLLBACK_PROTECTION_CLAIM",
+      "AUTHORITY_ESCALATION"
+    ]
+  }
+}

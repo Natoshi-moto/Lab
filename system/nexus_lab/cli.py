@@ -17,6 +17,13 @@ from .exchange import (
     write_exchange_template,
 )
 from .github import github_bootstrap
+from .durable_value import (
+    commit_durable_transfer,
+    genesis_from_suite,
+    read_transfer_file,
+    verify_durable_ledger,
+    verify_independent_durable_ledger,
+)
 from .route import build_route
 from .shadow import build_cognition_shadow, verify_cognition_shadow, verify_cold_consumer_report
 from .snapshot import build_snapshot, verify_snapshot
@@ -154,6 +161,30 @@ def parser() -> argparse.ArgumentParser:
         help="Require the pinned JavaScript/Noble verifier to match Python/OpenSSL exactly",
     )
     pcx_convergence_check.add_argument("suite", type=Path, help="R013 conformance SUITE.json")
+
+    pcx_durable_commit = sub.add_parser(
+        "pcx-durable-commit",
+        help="Commit one exact signed R013 transfer to the crash-recoverable local R014 journal",
+    )
+    pcx_durable_commit.add_argument("transfer", type=Path, help="Exact canonical signed transfer bytes")
+    pcx_durable_commit.add_argument("--suite", required=True, type=Path, help="Pinned R013 suite supplying genesis")
+    pcx_durable_commit.add_argument("--ledger", required=True, type=Path, help="Local durable ledger directory")
+    pcx_durable_commit.add_argument(
+        "--expected-record-head",
+        help="Previously retained record head; fail if it is absent from the local chain",
+    )
+
+    pcx_durable_check = sub.add_parser(
+        "pcx-durable-check",
+        help="Replay a local R014 journal from genesis and optionally require the independent verifier",
+    )
+    pcx_durable_check.add_argument("--suite", required=True, type=Path, help="Pinned R013 suite supplying genesis")
+    pcx_durable_check.add_argument("--ledger", required=True, type=Path, help="Local durable ledger directory")
+    pcx_durable_check.add_argument(
+        "--expected-record-head",
+        help="Independently retained record head that must occur in the local chain",
+    )
+    pcx_durable_check.add_argument("--independent", action="store_true", help="Also require JavaScript replay")
 
     github = sub.add_parser("github-bootstrap", help="Create or verify a private GitHub repository and push")
     github.add_argument("--repo-name", default="nexus-research-lab")
@@ -303,6 +334,51 @@ def main(argv: list[str] | None = None) -> int:
                     repo_root=root,
                 )
             )
+        elif args.command == "pcx-durable-commit":
+            suite_path = _repo_path(root, args.suite)
+            transfer_path = _repo_path(root, args.transfer)
+            emit(
+                commit_durable_transfer(
+                    _repo_path(root, args.ledger),
+                    genesis_from_suite(suite_path),
+                    read_transfer_file(transfer_path),
+                    expected_record_head=args.expected_record_head,
+                )
+            )
+        elif args.command == "pcx-durable-check":
+            suite_path = _repo_path(root, args.suite)
+            ledger_path = _repo_path(root, args.ledger)
+            genesis = genesis_from_suite(suite_path)
+            local_report = verify_durable_ledger(
+                ledger_path,
+                genesis,
+                expected_record_head=args.expected_record_head,
+            )
+            if args.independent:
+                emit(
+                    {
+                        "local": local_report,
+                        "independent": verify_independent_durable_ledger(
+                            ledger_path,
+                            genesis,
+                            node_verifier=(
+                                root
+                                / "experiments"
+                                / "R014_PCX_DURABLE_SETTLEMENT"
+                                / "independent_journal_verifier.mjs"
+                            ),
+                            r013_verifier=(
+                                root
+                                / "experiments"
+                                / "R013_PCX_CONSERVED_CLAIM"
+                                / "independent_verifier.mjs"
+                            ),
+                            repo_root=root,
+                        ),
+                    }
+                )
+            else:
+                emit(local_report)
         elif args.command == "github-bootstrap":
             emit(github_bootstrap(root, repo_name=args.repo_name))
         else:
