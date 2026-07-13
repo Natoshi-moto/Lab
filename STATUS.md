@@ -6,16 +6,16 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R011` |
-| Mode | `R011_HARD_VERTICAL_SLICE_ACTIVE` |
+| Mode | `R011_VERTICAL_SLICE_REVIEW_READY` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `R011_TASK_COMMISSIONED_AND_ROUTED` |
-| Next action | `ACT-R011_COLLECT_EXTERNAL_EVIDENCE_AND_BUILD_COMPETING_MODELS` |
+| Last completed action | `R011_IMPLEMENTED_AND_PREPROMOTION_VERIFIED` |
+| Next action | `ACT-R011_USER_REVIEW_AND_PROMOTION_DECISION` |
 
 ## Active tasks
 
-- `TSK-R011-HARD-VERTICAL-SLICE`
+- None
 
 ## Assurance blocks
 
