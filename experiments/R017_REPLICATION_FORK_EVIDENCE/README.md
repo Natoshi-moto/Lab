@@ -1,67 +1,74 @@
-# R017 — Replication and explicit fork evidence
+# R017 — Replica-independent history attestations and explicit fork evidence
 
 ## Purpose
 
-R017 is a bounded proposal layered over the canonically promoted R016 custody kernel. It asks whether independent hosts can exchange exact authenticated checkpoint statements and preserve objective evidence when their observed histories disagree.
+R017 is a bounded proposal layered over the canonically promoted R016 custody kernel. It asks whether independent processes can authenticate exact local histories, distinguish multiple witnesses to one history from incompatible histories, and preserve objective fork evidence without selecting a branch.
 
 It deliberately does **not** choose a branch, declare finality, or call the result consensus.
 
-## Implemented slice
+## Implemented
 
-`system/nexus_lab/replication_evidence.py` provides:
+- replica-independent `history_id` values committing genesis, height, parent history, R016 state root, durable record head, and receipt head;
+- replica-specific signed checkpoint attestations with separate `checkpoint_id` values;
+- pinned replica ID to raw Ed25519 public-key registries;
+- OpenSSL Ed25519 verification with no production signing or private-key storage path;
+- exact validation and adaptation of complete R016 durable anchors;
+- agreement, duplicate-attestation, gap, known-history extension, sibling fork, invalid-parent, and equivocation classification;
+- deterministic arrival-order-independent fork proofs;
+- a process-separated partition/healing demonstration using two real R016 SQLite stores.
 
-- exact canonical ASCII JSON checkpoint statements;
-- domain-separated checkpoint identifiers;
-- a caller-supplied authentication verifier, keeping transport identity separate from protocol evidence;
-- fixed genesis binding;
-- bounded replica and observation counts;
-- classifications for genesis, duplicate, known-prefix extension, missing-parent gap, invalid parent height, sibling fork, and same-replica equivocation;
-- order-independent fork proof identifiers containing both exact checkpoint byte hashes;
-- append-only observation identifiers;
-- no winner, canonical-branch, score, weight, quorum, or finality field.
+## Process-separated demonstration
 
-## Threats exercised by focused tests
+`run_partition_demo.py` performs the following deterministic sequence:
 
-- duplicate delivery;
-- delayed or reordered delivery;
-- missing predecessor delivery;
-- two replicas extending one parent differently;
-- one replica signing two checkpoints at the same height;
-- checkpoint-id corruption;
-- signature corruption;
-- noncanonical wire encoding;
-- wrong-genesis import;
-- malformed height-zero statements;
-- accidental fork-choice introduction.
+1. creates one exact R016 genesis using public test-vector derivations;
+2. initializes two SQLite custody stores through separate `custody_cli` process invocations;
+3. audits both height-zero stores and confirms they produce one shared history ID;
+4. isolates the stores;
+5. constructs two different valid Ed25519-signed spends of the same Alice genesis outpoint;
+6. applies one spend to each isolated store through separate processes;
+7. audits each store and produces pinned-key signed R017 attestations;
+8. gives the attestations to two observers in opposite orders;
+9. requires both observers to derive one byte-identical `CONFLICTING_SIBLING_HISTORIES` proof;
+10. reopens both stores and confirms evidence exchange rewrote neither history.
 
-## Security boundary
+The complete report is required to be identical across two independent full runs.
 
-Authentication is supplied as a verifier callback. The test verifier is deterministic synthetic evidence and is not an operational signature system. A later R017 increment must bind this interface to pinned public keys using the repository's reviewed Ed25519/OpenSSL profile and add exact cross-implementation vectors.
+## Verification
 
-A checkpoint is an observation statement, not authority. A fork proof demonstrates incompatible signed statements under one genesis; it does not identify the honest party, reverse a transfer, prevent double spending, ensure availability, or resolve the fork.
+```bash
+python3 -m unittest \
+  tests.test_r017_replication_evidence \
+  tests.test_r017_replication_auth \
+  tests.test_r017_partition_demo -v
+
+python3 experiments/R017_REPLICATION_FORK_EVIDENCE/run_partition_demo.py
+```
+
+Nexus Audit run 83 passed on exact implementation head `d2e447a25a034e09e0045b000ac5304736b98fb7`. The proposal-task recording commit passed Nexus Audit run 84.
+
+## Demonstrated boundary
+
+The evidence demonstrates process-separated valid sibling histories and deterministic authenticated fork evidence. It also demonstrates that multiple replica attestations of one history are agreement rather than a fork.
 
 ## Nonclaims
 
-This experiment does not establish:
+This is not:
 
-- network consensus or fork choice;
+- network transport or peer discovery;
+- consensus or fork choice;
 - global double-spend prevention;
-- global finality;
+- finality;
 - Byzantine fault tolerance;
-- Sybil resistance;
-- economic security;
 - availability or liveness;
-- secure networking or peer discovery;
-- operational identity-key security;
-- money, backing, redemption, liquidity, or stable value;
+- Sybil resistance;
+- operational key security;
+- economic security;
+- money or stable value;
 - production readiness or authorization for live funds.
 
-## Focused verification
+The fork is detected and preserved but not resolved.
 
-```bash
-python3 -m unittest tests.test_r017_replication_evidence -v
-```
+## Next research boundary
 
-## Proposed next increment
-
-Bind authenticated checkpoints to pinned Ed25519 replica identities, export exact R016 durable-store anchors, construct deterministic multi-process fixtures, and test omission, duplication, reordering, corruption, partition, healing, and competing sibling histories across independently reconstructed stores.
+The next round should compare explicit consensus/deployment options before selecting one. The primary alternatives are sovereign fixed-validator BFT, proof-of-stake, proof-of-work, externally anchored settlement, or using an existing base layer. The decision must be based on safety, liveness, state-sync, economic-security, and operational assumptions rather than implementation momentum.
