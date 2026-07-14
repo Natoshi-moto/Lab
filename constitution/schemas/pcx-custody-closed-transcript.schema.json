@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.r016-custody-closed-transcript/v0",
+  "title": "R016 closed exact synthetic custody-event prefix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "closure",
+    "event_count",
+    "final_height",
+    "final_state",
+    "final_state_root",
+    "genesis_b64",
+    "genesis_sha256",
+    "initial_state_root",
+    "network",
+    "profile",
+    "records",
+    "schema",
+    "status_authority",
+    "synthetic_supply",
+    "transcript_id",
+    "vector_provenance",
+    "version"
+  ],
+  "properties": {
+    "closure": { "const": "CLOSED_EXACT_PREFIX" },
+    "event_count": { "$ref": "#/$defs/positiveSequence" },
+    "final_height": { "$ref": "#/$defs/positiveSequence" },
+    "final_state": { "$ref": "#/$defs/state" },
+    "final_state_root": { "$ref": "#/$defs/hash" },
+    "genesis_b64": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 349528,
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+      "contentEncoding": "base64",
+      "contentMediaType": "application/json"
+    },
+    "genesis_sha256": { "$ref": "#/$defs/hash" },
+    "initial_state_root": { "$ref": "#/$defs/hash" },
+    "network": { "const": "NEXUS-R016-SYNTHETIC" },
+    "profile": { "const": "CUSTODY-KERNEL-V1" },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/record" }
+    },
+    "schema": { "const": "nexus.r016-custody-closed-transcript/v0" },
+    "status_authority": { "const": "NONE" },
+    "synthetic_supply": { "$ref": "#/$defs/positiveDecimal" },
+    "transcript_id": { "$ref": "#/$defs/hash" },
+    "vector_provenance": { "$ref": "#/$defs/vectorProvenance" },
+    "version": { "const": "1" }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonzeroHash": {
+      "allOf": [
+        { "$ref": "#/$defs/hash" },
+        { "not": { "const": "0000000000000000000000000000000000000000000000000000000000000000" } }
+      ]
+    },
+    "positiveDecimal": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "positiveSequence": {
+      "type": "string",
+      "pattern": "^(?:[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-6])$"
+    },
+    "base64Event": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 87384,
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+      "contentEncoding": "base64",
+      "contentMediaType": "application/json"
+    },
+    "uint64Decimal": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$",
+      "maxLength": 20
+    },
+    "positiveAmount": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$",
+      "maxLength": 39
+    },
+    "stateController": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "active_key",
+        "controller",
+        "epoch",
+        "head",
+        "recovery_keys",
+        "recovery_policy_hash",
+        "recovery_threshold",
+        "retired_keys",
+        "status"
+      ],
+      "properties": {
+        "active_key": { "$ref": "#/$defs/hash" },
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "epoch": { "$ref": "#/$defs/uint64Decimal" },
+        "head": { "$ref": "#/$defs/hash" },
+        "recovery_keys": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonzeroHash" }
+        },
+        "recovery_policy_hash": { "$ref": "#/$defs/hash" },
+        "recovery_threshold": { "const": "2" },
+        "retired_keys": {
+          "type": "array",
+          "maxItems": 4096,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonzeroHash" }
+        },
+        "status": { "enum": ["ACTIVE", "LOCKED"] }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "ACTIVE" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "active_key": { "$ref": "#/$defs/nonzeroHash" }
+            }
+          },
+          "else": {
+            "properties": {
+              "active_key": { "const": "0000000000000000000000000000000000000000000000000000000000000000" }
+            }
+          }
+        }
+      ]
+    },
+    "stateUtxo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "controller", "outpoint"],
+      "properties": {
+        "amount": { "$ref": "#/$defs/positiveAmount" },
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "outpoint": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "controllers",
+        "height",
+        "last_object_id",
+        "network",
+        "profile",
+        "status_authority",
+        "utxos",
+        "version"
+      ],
+      "properties": {
+        "controllers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stateController" }
+        },
+        "height": { "$ref": "#/$defs/positiveSequence" },
+        "last_object_id": { "$ref": "#/$defs/nonzeroHash" },
+        "network": { "const": "NEXUS-R016-SYNTHETIC" },
+        "profile": { "const": "CUSTODY-KERNEL-V1" },
+        "status_authority": { "const": "NONE" },
+        "utxos": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stateUtxo" }
+        },
+        "version": { "const": "1" }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "after_root",
+        "before_root",
+        "height",
+        "kind",
+        "object_id",
+        "receipt_hash",
+        "result",
+        "status_authority"
+      ],
+      "properties": {
+        "after_root": { "$ref": "#/$defs/hash" },
+        "before_root": { "$ref": "#/$defs/hash" },
+        "height": { "$ref": "#/$defs/positiveSequence" },
+        "kind": {
+          "enum": ["TRANSFER", "ROTATE", "RECOVER", "REVOKE"]
+        },
+        "object_id": { "$ref": "#/$defs/nonzeroHash" },
+        "receipt_hash": { "$ref": "#/$defs/hash" },
+        "result": { "const": "APPLIED" },
+        "status_authority": { "const": "NONE" }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_b64",
+        "event_sha256",
+        "kind",
+        "object_id",
+        "receipt",
+        "sequence"
+      ],
+      "properties": {
+        "event_b64": { "$ref": "#/$defs/base64Event" },
+        "event_sha256": { "$ref": "#/$defs/hash" },
+        "kind": {
+          "enum": ["TRANSFER", "ROTATE", "RECOVER", "REVOKE"]
+        },
+        "object_id": { "$ref": "#/$defs/nonzeroHash" },
+        "receipt": { "$ref": "#/$defs/receipt" },
+        "sequence": { "$ref": "#/$defs/positiveSequence" }
+      }
+    },
+    "vectorProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "derivation",
+        "operational_secrecy",
+        "retained_private_material",
+        "signer"
+      ],
+      "properties": {
+        "derivation": { "const": "PUBLIC_LABEL_SHA256_TO_EPHEMERAL_ED25519_PKCS8_TEMPFILES" },
+        "operational_secrecy": { "const": "NONE" },
+        "retained_private_material": { "const": "FALSE" },
+        "signer": { "const": "OPENSSL_ED25519" }
+      }
+    }
+  }
+}

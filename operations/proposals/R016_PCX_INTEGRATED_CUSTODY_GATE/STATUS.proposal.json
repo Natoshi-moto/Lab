@@ -1,0 +1,10 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "round": "R016",
+  "mode": "R016_PCX_INTEGRATED_CUSTODY_GATE_REVIEW_READY",
+  "disposition": "DEMONSTRATED_SYNTHETIC_CONTROLLER_BOUND_KEY_ROTATION_REVOCATION_AND_QUORUM_RECOVERY_UNDER_ONE_CRASH_CONSISTENT_LOCAL_ORDER",
+  "canonical_status": "UNPROMOTED_PROPOSAL",
+  "base_head": "8e23e76ea2808131f1683a50abccb48078afff35",
+  "status_authority": "NONE",
+  "next_action": "USER_REVIEW_AND_SEPARATE_PROMOTION_DECISION"
+}

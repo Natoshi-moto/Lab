@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.pcx-custody-genesis/v0",
+  "title": "R016 synthetic custody genesis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "controllers",
+    "kind",
+    "network",
+    "profile",
+    "status_authority",
+    "utxos",
+    "version"
+  ],
+  "properties": {
+    "controllers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/controller" }
+    },
+    "kind": { "const": "GENESIS" },
+    "network": { "const": "NEXUS-R016-SYNTHETIC" },
+    "profile": { "const": "CUSTODY-KERNEL-V1" },
+    "status_authority": { "const": "NONE" },
+    "utxos": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/utxo" }
+    },
+    "version": { "const": "1" }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonzeroHash": {
+      "allOf": [
+        { "$ref": "#/$defs/hash" },
+        { "not": { "const": "0000000000000000000000000000000000000000000000000000000000000000" } }
+      ]
+    },
+    "positiveDecimal": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$",
+      "maxLength": 39
+    },
+    "controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active_key", "controller", "recovery_keys"],
+      "properties": {
+        "active_key": { "$ref": "#/$defs/nonzeroHash" },
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "recovery_keys": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonzeroHash" }
+        }
+      }
+    },
+    "utxo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "controller", "outpoint"],
+      "properties": {
+        "amount": { "$ref": "#/$defs/positiveDecimal" },
+        "controller": { "$ref": "#/$defs/nonzeroHash" },
+        "outpoint": { "$ref": "#/$defs/hash" }
+      }
+    }
+  }
+}
