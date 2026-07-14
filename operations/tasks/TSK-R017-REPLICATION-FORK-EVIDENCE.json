@@ -2,10 +2,18 @@
   "authority": "PROPOSE_ONLY",
   "base_commit": "6ad3b470d190eafdde97143c7df0c8334a754764",
   "claims": [
-    "Exact authenticated checkpoint statements can be classified without branch selection.",
-    "Conflicting sibling checkpoints produce deterministic order-independent fork evidence.",
-    "Same-replica same-height conflicting statements are preserved as equivocation evidence before rejection."
+    "Replica-independent history identifiers distinguish multiple attestations of one history from incompatible histories.",
+    "Pinned Ed25519 replica identities authenticate exact R016-anchor attestations.",
+    "Two separately invoked R016 stores can accept different valid sibling spends during isolation.",
+    "Independent observers receiving the sibling attestations in opposite orders derive one identical fork proof.",
+    "Evidence exchange rewrites, merges, rolls back, and selects neither local history."
   ],
+  "evidence_head": "d2e447a25a034e09e0045b000ac5304736b98fb7",
+  "evidence_workflow": {
+    "conclusion": "success",
+    "name": "Nexus Audit",
+    "run_number": 83
+  },
   "nonclaims": [
     "network_consensus",
     "fork_choice",
@@ -21,7 +29,7 @@
   ],
   "round": "R017",
   "schema": "nexus.task/v1",
-  "status": "PROPOSAL_IMPLEMENTED_AWAITING_CI",
+  "status": "PROCESS_SEPARATED_VALID_SIBLING_HISTORY_EVIDENCE_VERIFIED",
   "status_authority": "NONE",
   "task_id": "TSK-R017-REPLICATION-FORK-EVIDENCE"
 }
