@@ -11,14 +11,18 @@ import hashlib
 import re
 import subprocess
 import tempfile
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Mapping
 
+from .custody_kernel import NETWORK, PROFILE, PROTOCOL_VERSION, canonical_json
 from .replication_evidence import AuthenticationError, SchemaError, checkpoint_payload
 
 _PUBLIC_KEY = re.compile(r"^[0-9a-f]{64}$")
 _SIGNATURE = re.compile(r"^[0-9a-f]{128}$")
+_HASH = re.compile(r"^[0-9a-f]{64}$")
 _REPLICA = re.compile(r"^[a-z0-9][a-z0-9._-]{0,62}$")
+ANCHOR_SCHEMA = "nexus.pcx-custody-durable-anchor/v0"
 
 
 class ReplicaKeyRegistry:
@@ -79,6 +83,43 @@ class ReplicaKeyRegistry:
         return completed.returncode == 0
 
 
+def _validate_r016_anchor(anchor: Any) -> tuple[int, dict[str, Any]]:
+    expected = {
+        "anchor_id", "network", "profile", "protocol_version", "receipt_head",
+        "record_hash", "schema", "sequence", "state_root", "status_authority",
+    }
+    if type(anchor) is not dict or set(anchor) != expected:
+        raise SchemaError("R016 anchor fields are not exact")
+    if (
+        anchor["schema"] != ANCHOR_SCHEMA
+        or anchor["network"] != NETWORK
+        or anchor["profile"] != PROFILE
+        or anchor["protocol_version"] != PROTOCOL_VERSION
+        or anchor["status_authority"] != "NONE"
+    ):
+        raise SchemaError("R016 anchor domain or authority is invalid")
+    sequence = anchor["sequence"]
+    if type(sequence) is not str or not sequence.isdigit() or (sequence != "0" and sequence.startswith("0")):
+        raise SchemaError("R016 anchor sequence is not canonical")
+    height = int(sequence)
+    for field in ("anchor_id", "state_root"):
+        if type(anchor[field]) is not str or _HASH.fullmatch(anchor[field]) is None:
+            raise SchemaError(f"R016 anchor {field} is invalid")
+    for field in ("record_hash", "receipt_head"):
+        value = anchor[field]
+        if height == 0 and value == "":
+            continue
+        if type(value) is not str or _HASH.fullmatch(value) is None:
+            raise SchemaError(f"R016 anchor {field} is invalid")
+    subject = deepcopy(anchor)
+    subject["anchor_id"] = ""
+    tag_hash = hashlib.sha256(b"NEXUS/PCX/CUSTODY-DURABLE-ANCHOR/V0").digest()
+    expected_id = hashlib.sha256(tag_hash + tag_hash + canonical_json(subject)).hexdigest()
+    if anchor["anchor_id"] != expected_id:
+        raise SchemaError("R016 anchor_id does not bind the exact anchor")
+    return height, anchor
+
+
 def checkpoint_payload_from_r016_audit(
     *,
     replica_id: str,
@@ -95,29 +136,15 @@ def checkpoint_payload_from_r016_audit(
     report = dict(audit_report)
     if report.get("status") != "PASS" or report.get("status_authority") != "NONE":
         raise SchemaError("R016 audit report is not a passing authority-free report")
-    anchor = report.get("anchor")
-    if type(anchor) is not dict:
-        raise SchemaError("R016 audit report is missing its exact anchor")
-    expected_anchor_fields = {
-        "record_hash", "receipt_head", "schema", "sequence",
-        "state_root", "status_authority",
-    }
-    if set(anchor) != expected_anchor_fields:
-        raise SchemaError("R016 anchor fields are not exact")
-    if anchor.get("status_authority") != "NONE":
-        raise SchemaError("R016 anchor attempts authority escalation")
-    sequence = anchor.get("sequence")
-    if type(sequence) is not str or not sequence.isdigit() or (sequence != "0" and sequence.startswith("0")):
-        raise SchemaError("R016 anchor sequence is not canonical")
-    height = int(sequence)
-    if report.get("height") != height or report.get("state_root") != anchor.get("state_root"):
+    height, anchor = _validate_r016_anchor(report.get("anchor"))
+    if report.get("height") != height or report.get("state_root") != anchor["state_root"]:
         raise SchemaError("R016 audit summary differs from its anchor")
     return checkpoint_payload(
         replica_id=replica_id,
         height=height,
-        state_root=anchor.get("state_root"),
-        record_hash=anchor.get("record_hash"),
-        receipt_head=anchor.get("receipt_head"),
+        state_root=anchor["state_root"],
+        record_hash=anchor["record_hash"],
+        receipt_head=anchor["receipt_head"],
         parent_checkpoint=parent_checkpoint,
         genesis_sha256=hashlib.sha256(genesis_raw).hexdigest(),
     )
