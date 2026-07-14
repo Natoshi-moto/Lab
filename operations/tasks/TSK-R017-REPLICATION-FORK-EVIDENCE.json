@@ -1,0 +1,27 @@
+{
+  "authority": "PROPOSE_ONLY",
+  "base_commit": "6ad3b470d190eafdde97143c7df0c8334a754764",
+  "claims": [
+    "Exact authenticated checkpoint statements can be classified without branch selection.",
+    "Conflicting sibling checkpoints produce deterministic order-independent fork evidence.",
+    "Same-replica same-height conflicting statements are preserved as equivocation evidence before rejection."
+  ],
+  "nonclaims": [
+    "network_consensus",
+    "fork_choice",
+    "global_double_spend_prevention",
+    "global_finality",
+    "byzantine_fault_tolerance",
+    "availability",
+    "economic_security",
+    "money",
+    "stable_value",
+    "production_readiness",
+    "live_fund_authorization"
+  ],
+  "round": "R017",
+  "schema": "nexus.task/v1",
+  "status": "PROPOSAL_IMPLEMENTED_AWAITING_CI",
+  "status_authority": "NONE",
+  "task_id": "TSK-R017-REPLICATION-FORK-EVIDENCE"
+}
