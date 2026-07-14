@@ -1,22 +1,9 @@
 # NEXT ACTION
 
-Review R016 on the exact proposal head and decide separately whether to promote
-its bounded synthetic custody disposition.
+Design R017 as a new reversible proposal round that tests multi-host replication and explicit fork evidence over the canonically promoted R016 synthetic custody kernel.
 
-The review must confirm that R016 uses a new controller-owned profile rather
-than a sidecar over R013 raw-key outputs; that transfer, rotation, recovery, and
-revocation share one combined predecessor root and crash-consistent local writer
-order; that the exact predecessor inventory remains frozen; and that the
-cross-implementation transcript, crash/race campaign, bounded model, killed
-mutants, public-vector provenance, and anchor limitations reproduce exactly.
+R017 should test deterministic replication, conflicting sibling histories, explicit fork detection, bounded reconciliation evidence, authenticated checkpoint exchange, replay from exact genesis, and fail-closed behavior under delay, duplication, reordering, omission, corruption, and competing writers.
 
-R016 remains an unpromoted proposal with `status_authority: NONE`. It does not
-establish money, economic value, purchasing-power storage, operational secret
-or backup safety, secure entropy or erase, guardian independence, hardware
-custody, guardian-policy rotation, checkpoint import, hostile-filesystem race
-resistance, network consensus, global finality, physical power-loss durability,
-production security, external audit, formal verification, regulatory approval,
-or authorization for a live pilot.
+R017 must not claim network consensus, fork choice, global double-spend prevention, global finality, Byzantine fault tolerance, availability, economic security, money, stable value, operational custody, deployment readiness, or authorization for live funds.
 
-Do not merge or promote this proposal without a separate user decision on the
-exact audited head. The stale draft PR #14 is not an R016 dependency.
+R016 is canonically promoted only at exact proposal head `75343b7f00d4ab38a11086180193b8fd26ccd435`, merged by commit `206cd013d5de59a5e12d861223278c0591f4758b`. Its bounded nonclaims remain controlling.

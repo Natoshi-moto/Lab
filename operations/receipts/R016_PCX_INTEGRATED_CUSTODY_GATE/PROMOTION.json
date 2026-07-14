@@ -1,0 +1,30 @@
+{
+  "authority": "USER_EXPLICIT_PROMOTION",
+  "base_commit_before_promotion": "8e23e76ea2808131f1683a50abccb48078afff35",
+  "bounded_disposition": "DEMONSTRATED_SYNTHETIC_CONTROLLER_BOUND_KEY_ROTATION_REVOCATION_AND_QUORUM_RECOVERY_UNDER_ONE_CRASH_CONSISTENT_LOCAL_ORDER",
+  "canonical_merge_commit": "206cd013d5de59a5e12d861223278c0591f4758b",
+  "canonical_ref": "refs/heads/main",
+  "evidence_workflow": {
+    "conclusion": "success",
+    "name": "Nexus Audit",
+    "run_number": 70
+  },
+  "nonclaims_preserved": [
+    "money",
+    "economic_value",
+    "value_stability",
+    "backing_or_redemption",
+    "legal_property",
+    "operational_key_or_backup_safety",
+    "network_consensus",
+    "global_finality",
+    "production_security",
+    "deployment_authorization",
+    "live_fund_authorization"
+  ],
+  "pr_number": 20,
+  "proposal_head": "75343b7f00d4ab38a11086180193b8fd26ccd435",
+  "receipt_schema": "nexus.promotion-receipt/v1",
+  "round": "R016",
+  "status_authority": "NONE"
+}
