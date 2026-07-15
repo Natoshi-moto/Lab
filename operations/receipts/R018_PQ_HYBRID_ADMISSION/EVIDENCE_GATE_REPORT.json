@@ -1,0 +1,24 @@
+{
+  "artifact_sha256": {
+    "authorization": "dfb16c850baac6bd5f23fc656e9e37b1f5e13e51687520ad6be6a27df3094d42",
+    "demo_report": "8d5c78c6ee410a527d4142615ccf3562829487b775cf1b0f742c87344770f143",
+    "event": "6c1c0315d8c1b056d5b9a8d15871844c9dacf52c6bf37a0845ecc7d8f0856a1e",
+    "interop_report": "f7f78d1234ac5ef8c8777807d41f353a2720d91188333a6718ae1a37cf8a4c94",
+    "policy": "12639f753d398f9237cbcaa36886f0f5e7b98a72abdd36fecf34d13a34d11154",
+    "pq_admission_report": "5f85482b5dfd39bedcadd92df10cd9d513a7b1da411f10a345a3a7089160450f"
+  },
+  "checks": {
+    "bidirectional_ml_dsa_implementation_interop": "PASS",
+    "deterministic_public_fixture_rebuild": "PASS",
+    "fixed_no_fallback_policy": "PASS",
+    "focused_attack_tests": "10_PASS",
+    "hybrid_r016_all_of_demo": "PASS",
+    "native_and_cold_report_equivalence": "PASS",
+    "verifier_only_primary_surface": "PASS"
+  },
+  "noble_post_quantum": "0.6.1",
+  "node": "24.14.0",
+  "schema": "nexus.r018-evidence-gate-report/v0",
+  "status": "PASS",
+  "status_authority": "NONE"
+}
