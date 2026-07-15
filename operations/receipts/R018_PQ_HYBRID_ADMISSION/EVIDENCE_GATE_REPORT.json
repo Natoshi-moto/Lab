@@ -5,18 +5,26 @@
     "event": "6c1c0315d8c1b056d5b9a8d15871844c9dacf52c6bf37a0845ecc7d8f0856a1e",
     "interop_report": "f7f78d1234ac5ef8c8777807d41f353a2720d91188333a6718ae1a37cf8a4c94",
     "policy": "12639f753d398f9237cbcaa36886f0f5e7b98a72abdd36fecf34d13a34d11154",
-    "pq_admission_report": "5f85482b5dfd39bedcadd92df10cd9d513a7b1da411f10a345a3a7089160450f"
+    "pq_admission_report": "5f85482b5dfd39bedcadd92df10cd9d513a7b1da411f10a345a3a7089160450f",
+    "predecessor_package_lock": "dfc3bcb3c0fa067e7f8af3701ac4791f7be1ba265fbbd3b667cdacb0908957c5",
+    "predecessor_package_manifest": "fd5e21f974f50045d0a2b8284c2907e725c839ab2697b5b2638412e9a7261565",
+    "r018_package_lock": "9469bcc1257d48441b572dfc4d3d94c3a6801c7bb78595a1f288b99e637374a0",
+    "r018_package_manifest": "c8d20b08824f7f20db0109e7a81d80c9a4774799e34871d8b819ce349b73e0fb"
   },
   "checks": {
     "bidirectional_ml_dsa_implementation_interop": "PASS",
     "deterministic_public_fixture_rebuild": "PASS",
+    "experiment_local_dependency_lock": "PASS",
     "fixed_no_fallback_policy": "PASS",
     "focused_attack_tests": "10_PASS",
     "hybrid_r016_all_of_demo": "PASS",
     "native_and_cold_report_equivalence": "PASS",
+    "predecessor_root_dependencies_byte_exact": "PASS",
     "verifier_only_primary_surface": "PASS"
   },
   "noble_post_quantum": "0.6.1",
+  "noble_post_quantum_entrypoint_sha256": "210a020b4933275edf89201e2a5168ee404190f2d5cfa676d0cb13b7a1072276",
+  "noble_post_quantum_integrity_sha512": "sha512-+pormrDZwjRw05U8ADK4JpHejo87+gBd+muRBB/ozztH5yhDLMDF4jHQWN3NQQAsu1zBNPWTG0ZwVI0CR29H0A==",
   "node": "24.14.0",
   "schema": "nexus.r018-evidence-gate-report/v0",
   "status": "PASS",
