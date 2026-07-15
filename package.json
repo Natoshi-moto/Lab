@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=24.14.0"
   },
   "dependencies": {
-    "@noble/ed25519": "3.1.0"
+    "@noble/ed25519": "3.1.0",
+    "@noble/post-quantum": "0.6.1"
   }
 }
