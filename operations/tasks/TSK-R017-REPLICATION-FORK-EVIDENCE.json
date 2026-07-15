@@ -1,0 +1,33 @@
+{
+  "allowed_read": [
+    "AGENTS.md",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "constitution",
+    "experiments/R016_PCX_INTEGRATED_CUSTODY_GATE",
+    "operations/proposals/R016_PCX_INTEGRATED_CUSTODY_GATE",
+    "system/nexus_lab/custody_kernel.py",
+    "tests"
+  ],
+  "allowed_write": [
+    "experiments/R017_REPLICATION_FORK_EVIDENCE",
+    "operations/proposals/R017_REPLICATION_FORK_EVIDENCE",
+    "operations/receipts/R017_REPLICATION_FORK_EVIDENCE",
+    "operations/tasks/TSK-R017-REPLICATION-FORK-EVIDENCE.json",
+    "system/nexus_lab/replication.py",
+    "tests/R017_TEST_NOTES.md",
+    "tests/test_r017_replication.py"
+  ],
+  "authority": "PROPOSE_ONLY",
+  "baseline_ref": "6ad3b470d190eafdde97143c7df0c8334a754764",
+  "data_classes": [
+    "LAB_PRIVATE"
+  ],
+  "objective": "Implement a bounded three-host synthetic campaign for deterministic R016 replay, authenticated checkpoint exchange, and explicit sibling-fork evidence without branch selection.",
+  "output_contract": {
+    "schema_path": "operations/proposals/R017_REPLICATION_FORK_EVIDENCE/ACCEPTANCE.md",
+    "type": "BOUNDED_TEST_CAMPAIGN"
+  },
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-R017-REPLICATION-FORK-EVIDENCE"
+}

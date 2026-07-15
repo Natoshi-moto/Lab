@@ -1,0 +1,10 @@
+{
+  "base_head": "6ad3b470d190eafdde97143c7df0c8334a754764",
+  "canonical_status": "UNPROMOTED_PROPOSAL",
+  "disposition": "DEMONSTRATED_BOUNDED_MULTI_HOST_REPLAY_AUTHENTICATED_CHECKPOINT_AND_EXPLICIT_SIBLING_FORK_EVIDENCE",
+  "mode": "R017_REPLICATION_FORK_EVIDENCE_REVIEW_READY",
+  "next_action": "USER_REVIEW_AND_SEPARATE_PROMOTION_DECISION",
+  "round": "R017",
+  "schema": "nexus.proposal-status/v1",
+  "status_authority": "NONE"
+}
