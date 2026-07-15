@@ -43,6 +43,7 @@ jobs:
           node --version
           npm --version
           npm ci --ignore-scripts --no-audit --no-fund
+          npm --prefix experiments/R018_PQ_HYBRID_ADMISSION ci --ignore-scripts --no-audit --no-fund
 
       - name: Verify exact R015 durability evidence
         run: python3 experiments/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL/verify_evidence.py
