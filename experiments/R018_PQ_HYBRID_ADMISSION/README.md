@@ -46,6 +46,10 @@ repository maintainer cannot publish different code or a new policy.
 2. `independent_verifier.mjs` independently implements the envelope and policy
    rules and uses pinned `@noble/post-quantum` 0.6.1 for ML-DSA-65.
 
+The Noble dependency has an experiment-local manifest and lockfile. The root
+manifest and lock remain byte-identical to the frozen R015/R016 predecessor
+evidence, so adding R018 cannot silently reinterpret those earlier proofs.
+
 `interop_self_test.mjs` signs and verifies in both directions between those
 implementations. This is implementation diversity, not proof that either
 implementation or ML-DSA is defect-free.
@@ -67,6 +71,7 @@ Requires exact Node `24.14.0`, Python 3.12, and the pinned lockfile.
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
+npm --prefix experiments/R018_PQ_HYBRID_ADMISSION ci --ignore-scripts --no-audit --no-fund
 python3 experiments/R018_PQ_HYBRID_ADMISSION/verify_evidence.py
 python3 experiments/R018_PQ_HYBRID_ADMISSION/run_hybrid_demo.py
 python3 -m unittest tests.test_r018_pq_hybrid_admission -v
