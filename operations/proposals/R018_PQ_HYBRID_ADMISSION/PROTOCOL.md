@@ -65,9 +65,11 @@ requiring other machines to use this wrapper.
 ## Cryptographic implementation boundary
 
 The native verifier uses the Node 24.14.0 ML-DSA-65 implementation. The cold
-verifier uses pinned Noble 0.6.1 and duplicates the policy/envelope logic rather
-than importing the native gate. Bidirectional generated-signature tests require
-each implementation to accept the other's exact ML-DSA-65 encoding.
+verifier uses Noble 0.6.1 from an R018-local exact lock and duplicates the
+policy/envelope logic rather than importing the native gate. The predecessor
+root package manifest and lock remain byte-identical to R015/R016. Bidirectional
+generated-signature tests require each implementation to accept the other's
+exact ML-DSA-65 encoding.
 
 This establishes conformance between two implementations for the tested
 vectors. It does not establish algorithmic security, implementation
