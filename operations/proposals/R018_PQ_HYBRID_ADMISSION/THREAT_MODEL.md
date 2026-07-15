@@ -22,6 +22,9 @@
   semantic revision requires a new explicit R018 successor policy.
 - Node 24.14.0 and Noble 0.6.1 correctly implement the tested algorithm and
   encodings.
+- npm installs the exact R018-local lock entries whose registry integrity
+  values and installed Noble manifest/entrypoint hashes are rechecked by the
+  evidence gate.
 - SHA-256 domain commitments and the canonical encoder behave as specified.
 - the exact policy is obtained through an authentic channel and is not silently
   replaced before verification.
@@ -56,6 +59,9 @@ The proposal fails if any of the following occurs:
   substitution;
 - the PQ gate emits state-transition acceptance or bypasses R016;
 - the two verifiers disagree on any frozen positive or attack vector;
+- R018 rewrites the frozen predecessor root dependency manifest or lock;
+- the experiment-local dependency manifest, lock, integrity, or installed
+  Noble entrypoint differs from the pinned evidence;
 - fixture regeneration is not byte-identical;
 - the primary gate gains a signing/private-key/policy-update path; or
 - any artifact claims unbreakability, complete post-quantum security, money,
