@@ -4,6 +4,14 @@
 
 ➡️ Begin with [`README_START_HERE.md`](README_START_HERE.md).
 
+## Public protocol bet
+
+**OPEN-GATE v0** — Open Post-Quantum Admitted Conserved Transitions.
+
+This Lab forges an **open** protocol claim that is narrowly **better than Bitcoin at properties Bitcoin cannot express in-protocol** (dual independent verification, fail-closed versioned admission policy, post-quantum hybrid precheck over a conserved custody gate). It does **not** claim better money, consensus, or live-fund safety.
+
+➡️ Read [`docs/PROTOCOL_V0.md`](docs/PROTOCOL_V0.md).
+
 ## Repository contract
 
 ```text

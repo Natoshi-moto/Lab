@@ -1,0 +1,64 @@
+{
+  "schema": "nexus.protocol_claim/v0",
+  "name": "OPEN-GATE",
+  "version": "v0",
+  "full_title": "Open Post-Quantum Admitted Conserved Transitions",
+  "status_authority": "NONE",
+  "maturity": "RESEARCH_DEMONSTRATION",
+  "license_intent": {
+    "code_and_fixtures": "Apache-2.0",
+    "specification_text": "CC-BY-4.0",
+    "repository_license_files": "PENDING"
+  },
+  "one_sentence_claim": "Open protocol for conserved state transitions with dual independent verification, fail-closed versioned admission policy, and a fixed post-quantum hybrid precheck in front of an unchanged custody transition gate — properties Bitcoin does not express in-protocol.",
+  "superiority_scope": "NARROW_PROPERTIES_ONLY",
+  "not_claimed": [
+    "money_or_currency",
+    "bitcoin_replacement_store_of_value",
+    "global_consensus",
+    "fork_choice",
+    "network_finality",
+    "availability",
+    "byzantine_fault_tolerance",
+    "global_double_spend_prevention",
+    "economic_security",
+    "live_fund_safety",
+    "quantum_proof_keys",
+    "production_readiness",
+    "regulatory_approval"
+  ],
+  "layers": {
+    "conservation_baseline": {
+      "path": "experiments/R013_PCX_CONSERVED_CLAIM/",
+      "promotion": "RESEARCH_BASELINE"
+    },
+    "custody_gate": {
+      "path": "experiments/R016_PCX_INTEGRATED_CUSTODY_GATE/",
+      "protocol_prose": "operations/proposals/R016_PCX_INTEGRATED_CUSTODY_GATE/PROTOCOL.md",
+      "claim_matrix": "operations/proposals/R016_PCX_INTEGRATED_CUSTODY_GATE/CLAIM_MATRIX.md",
+      "promotion": "USER_AUTHORIZED_MERGED_ON_MAIN"
+    },
+    "pq_hybrid_admission": {
+      "proposal": "R018_PQ_HYBRID_ADMISSION",
+      "pull_request": 23,
+      "promotion": "DRAFT_PROPOSAL",
+      "decision": "ALL_OF_R016_AND_ML_DSA_65",
+      "fallback": "NONE",
+      "missing_authorization": "REJECT",
+      "unknown_policy": "REJECT",
+      "algorithm": "ML-DSA-65",
+      "policy_id": "a17b46de0a98dd4462997350c7730006ba4eeb2024130de5cb6d0c0b76a4aa55",
+      "public_fixture_key_id": "e81fced8ea5b13397b50344ecc9ff0519edee40033c99616f10ec68c17c8fa02",
+      "precheck_success_code": "PQ_PRECHECK_PASS_R016_STILL_REQUIRED"
+    }
+  },
+  "spec_path": "docs/PROTOCOL_V0.md",
+  "commercial_capture": [
+    "certification_of_external_implementations",
+    "private_nexus_operator_deployments",
+    "security_design_review",
+    "hosted_non_custodial_dual_verifier"
+  ],
+  "token_required": false,
+  "effect": "DECLARATIVE_PUBLIC_BET_ONLY"
+}
