@@ -1,0 +1,70 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-R018-PQ-HYBRID-ADMISSION",
+  "objective": "Demonstrate on one exact R016 event that a fixed ML-DSA-65 authorization policy can make admission strictly harder without replacing the unchanged R016 transition gate, using two structurally separate verification implementations and a naive R016-only differential baseline.",
+  "baseline_ref": "b8dca0e9be40dedd4f1ba6930ad34caec0167076",
+  "authority": "PROPOSE_ONLY",
+  "allowed_read": [
+    ".github/workflows/nexus-audit.yml",
+    "AGENTS.md",
+    "NEXT_ACTION.md",
+    "STATUS.json",
+    "STATUS.md",
+    "experiments/R016_PCX_INTEGRATED_CUSTODY_GATE",
+    "experiments/R017_REPLICATION_FORK_EVIDENCE",
+    "operations/proposals/R016_PCX_INTEGRATED_CUSTODY_GATE",
+    "operations/proposals/R017_REPLICATION_FORK_EVIDENCE",
+    "operations/receipts/R016_PCX_INTEGRATED_CUSTODY_GATE",
+    "operations/tasks/TSK-R017-REPLICATION-FORK-EVIDENCE.json",
+    "package.json",
+    "package-lock.json",
+    "system/nexus_lab/custody_kernel.py",
+    "tests"
+  ],
+  "allowed_write": [
+    ".github/workflows/nexus-audit.yml",
+    "experiments/R018_PQ_HYBRID_ADMISSION",
+    "operations/proposals/R018_PQ_HYBRID_ADMISSION",
+    "operations/receipts/R018_PQ_HYBRID_ADMISSION",
+    "operations/tasks/TSK-R018-PQ-HYBRID-ADMISSION.json",
+    "system/nexus_lab/pq_admission.mjs",
+    "tests/test_r018_pq_hybrid_admission.py"
+  ],
+  "data_classes": [
+    "LOCAL_ONLY",
+    "ROUTE_ONLY"
+  ],
+  "output_contract": {
+    "claim": "DEMONSTRATED_FIXED_PQ_ADMISSION_AND_UNCHANGED_R016_ALL_OF_GATE",
+    "required_invariants": [
+      "R016_AND_R017_BASELINES_UNMODIFIED",
+      "R015_R016_ROOT_DEPENDENCIES_BYTE_EXACT",
+      "R018_DEPENDENCIES_ISOLATED_AND_EXACTLY_LOCKED",
+      "FIXED_ML_DSA_65_POLICY_ID",
+      "NO_CLASSICAL_ONLY_FALLBACK",
+      "MISSING_AND_UNKNOWN_POLICY_REJECT",
+      "EXACT_CONTROLLER_EPOCH_KEY_EVENT_AND_NETWORK_BINDING",
+      "NATIVE_AND_COLD_VERIFIERS_MATCH_EXACTLY",
+      "BIDIRECTIONAL_ML_DSA_IMPLEMENTATION_INTEROP",
+      "PQ_PASS_ONLY_ADMITS_TO_UNCHANGED_R016",
+      "R016_ONLY_BASELINE_ACCEPTS_WHERE_MISSING_PQ_HYBRID_REJECTS",
+      "TAMPER_DOWNGRADE_REPLAY_AND_KEY_SUBSTITUTION_REJECT",
+      "PUBLIC_FIXTURE_REBUILDS_BYTE_FOR_BYTE",
+      "PRIMARY_GATE_HAS_NO_SIGNING_OR_PRIVATE_KEY_SURFACE",
+      "STATUS_AUTHORITY_NONE"
+    ],
+    "kill_on": [
+      "R016_OR_R017_ACCEPTED_EVIDENCE_REWRITE",
+      "PREDECESSOR_ROOT_DEPENDENCY_MANIFEST_OR_LOCK_REWRITE",
+      "PQ_GATE_BYPASSES_OR_REPLACES_R016",
+      "MISSING_PQ_AUTHORIZATION_ACCEPTED",
+      "CLASSICAL_ONLY_TIMEOUT_UNKNOWN_POLICY_OR_MANUAL_FALLBACK",
+      "EVENT_POLICY_CONTROLLER_EPOCH_KEY_OR_SIGNATURE_SUBSTITUTION_ACCEPTED",
+      "VERIFIER_DISAGREEMENT_ACCEPTED",
+      "NONDETERMINISTIC_FIXTURE_OR_REPORT",
+      "SIGNING_PRIVATE_KEY_KEY_GENERATION_POLICY_UPDATE_OR_PROMOTION_SURFACE_ADDED_TO_PRIMARY_GATE",
+      "UNBREAKABLE_COMPLETE_POST_QUANTUM_MONEY_VALUE_CONSENSUS_FINALITY_PRODUCTION_OR_LIVE_FUND_CLAIM",
+      "STATUS_AUTHORITY_ESCALATION_OR_AUTOMATIC_PROMOTION"
+    ]
+  }
+}

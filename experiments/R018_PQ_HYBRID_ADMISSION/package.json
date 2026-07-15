@@ -1,0 +1,12 @@
+{
+  "name": "nexus-r018-pq-hybrid-admission",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.14.0"
+  },
+  "dependencies": {
+    "@noble/post-quantum": "0.6.1"
+  }
+}

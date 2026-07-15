@@ -1,0 +1,40 @@
+{
+  "attacks": {
+    "event_byte_tamper": "REJECTED_BY_BOTH",
+    "missing_pq_authorization": "REJECTED_BY_BOTH",
+    "policy_fallback_weakening": "REJECTED_BY_BOTH",
+    "signature_bit_flip": "REJECTED_BY_BOTH"
+  },
+  "baseline": {
+    "decision": "R016_ACCEPTED_WITHOUT_PQ_AUTHORIZATION",
+    "object_id": "333ac3cd4c696bbc11a3b570a141f212415cac3c35cf36713956e84a37fcfb20",
+    "state_root": "469eadaa44b8331a3bef935e12b4c9a79db771c46ff2bd479556ced31949be91"
+  },
+  "claims": [
+    "The exact R016-valid event is rejected when the fixed R018 policy lacks its required ML-DSA-65 authorization.",
+    "Node native and separately implemented Noble JavaScript ML-DSA-65 verifiers emit one byte-identical admission report.",
+    "The admitted event still passes the unchanged R016 gate; PQ admission alone never accepts a state transition.",
+    "Event tampering, signature tampering, and a self-consistent fallback-policy rewrite fail closed in both verifiers."
+  ],
+  "event_sha256": "6dfb7e271d8845a3a45ee47d45ff19b18bf4a73179b6b48591a8d4cf3f52d23f",
+  "hybrid": {
+    "pq_cold_verifier": "PASS",
+    "pq_native_verifier": "PASS",
+    "r016_after_pq": "PASS",
+    "r016_object_id": "333ac3cd4c696bbc11a3b570a141f212415cac3c35cf36713956e84a37fcfb20",
+    "r016_state_root": "469eadaa44b8331a3bef935e12b4c9a79db771c46ff2bd479556ced31949be91"
+  },
+  "non_claims": [
+    "This experiment does not prove ML-DSA-65 unbreakable or establish complete post-quantum security.",
+    "It does not implement authenticated PQ-key enrollment, PQ-key rotation or recovery, wallet custody, secure hardware, or operational entropy.",
+    "Nothing in this proposal makes the R018 wrapper mandatory; a caller can still invoke legacy R016 directly because no consensus or deployment policy selects R018.",
+    "A repository maintainer can publish different code, but it cannot retain this exact policy ID and frozen proof while changing the committed V0 policy bytes.",
+    "It does not establish consensus, fork choice, global finality, economic security, stable value, production readiness, or authorization for live funds.",
+    "The public deterministic fixture seed and generated signature are test material, never operational credentials."
+  ],
+  "policy_id": "a17b46de0a98dd4462997350c7730006ba4eeb2024130de5cb6d0c0b76a4aa55",
+  "proof_id": "d0bf18aa045b00f38b038cbdc65e9d8e5cf6de18d78376341a118609ba835197",
+  "schema": "nexus.r018-pq-hybrid-demo/v0",
+  "status": "DEMONSTRATED_FIXED_PQ_ADMISSION_AND_UNCHANGED_R016_ALL_OF_GATE",
+  "status_authority": "NONE"
+}

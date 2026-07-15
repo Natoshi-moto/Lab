@@ -31,18 +31,28 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install pinned R013 verifier dependency
+      - name: Set up exact Node runtime with native ML-DSA
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "24.14.0"
+          package-manager-cache: false
+
+      - name: Install pinned verifier dependencies
         shell: bash
         run: |
           node --version
           npm --version
           npm ci --ignore-scripts --no-audit --no-fund
+          npm --prefix experiments/R018_PQ_HYBRID_ADMISSION ci --ignore-scripts --no-audit --no-fund
 
       - name: Verify exact R015 durability evidence
         run: python3 experiments/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL/verify_evidence.py
 
       - name: Verify exact R016 integrated custody evidence
         run: python3 experiments/R016_PCX_INTEGRATED_CUSTODY_GATE/verify_evidence.py
+
+      - name: Verify exact R018 hybrid post-quantum admission evidence
+        run: python3 experiments/R018_PQ_HYBRID_ADMISSION/verify_evidence.py
 
       - name: Run Nexus doctor
         run: ./nexus doctor
@@ -81,6 +91,6 @@ jobs:
           {
             echo "## Nexus Audit"
             echo
-            echo "The workflow executes structural, deterministic, manifest, unit, and exact R015/R016 evidence checks."
+            echo "The workflow executes structural, deterministic, manifest, unit, exact R015/R016 evidence, and bounded R018 hybrid-admission checks."
             echo "A green run does not prove semantic correctness, complete security, privacy, or external audit."
           } >> "$GITHUB_STEP_SUMMARY"
