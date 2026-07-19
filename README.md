@@ -1,6 +1,6 @@
-# Nexus Private Research Lab
+# Nexus Public Research Lab
 
-**Private, one-repository research infrastructure for human-directed collaboration across ChatGPT, Claude, local tools, GitHub, terminal workflows, and future interfaces.**
+**Public, one-repository research infrastructure for human-directed collaboration across ChatGPT, Claude, local tools, GitHub, terminal workflows, and future interfaces.**
 
 ➡️ Begin with [`README_START_HERE.md`](README_START_HERE.md).
 
