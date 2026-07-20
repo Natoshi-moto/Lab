@@ -1,0 +1,5 @@
+{
+  "note": "Minimized F-001 retest vector: unknown pq_sig_domain_bytes must not crash",
+  "mutation": { "pq_sig_domain_bytes": "not-hex!!!" },
+  "expected_code": "UNKNOWN_FIELD"
+}
