@@ -15,7 +15,9 @@
   "prior_breaker_head": "54bca3f827ab062dda0a5888590ebda924a673f5",
   "stacked_base_branch": "codex/beneficial-genesis-diff-repair-002",
   "retest_commit": "b9de462ef42e232dc6012cc728f5fcfe8e29c2fd",
-  "draft_pr": null,
+  "branch_tip": "fee86dc",
+  "draft_pr": 32,
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/32",
   "authorized_paths": [
     "experiments/BENEFICIAL_GENESIS_RETEST_002/**",
     "operations/audits/BENEFICIAL_GENESIS_DIFF_RETEST_002/**",
