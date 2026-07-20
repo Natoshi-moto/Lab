@@ -18,9 +18,6 @@
   },
   "label": "SYNTHETIC_CLAIM_FIXTURE",
   "new_ledger_chain_id": "bgen-synth-ledger-v0",
-  "notes_expected": [
-    "Stolen-source-key scenario: crypto control may hold; legal ownership is a non-claim."
-  ],
   "nullifier_hex": "27d7c56acfb9099cbed4ddab821c5b5bb339238633c41e49fb2462211bb1b528",
   "pq_destination_public_key_hex": "1b7b72ea0fc2a7d2ff659b72d3dbf532c52ce50e36675ab23b581d37a5d6fc97",
   "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f763100db75893b477b011294467475753bbcdeef7edd9864f60604a2330bd9a8146e7c",

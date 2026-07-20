@@ -14,12 +14,32 @@ from .constants import (
     DEFAULT_MIN_CONFIRMATIONS,
     DEFAULT_SOURCE_CHAIN,
     PROTOCOL_VERSION,
+    SUPPORTED_COMMITMENT_VERSION,
     SYNTH_PQ_ALG,
 )
 from .crypto_synth import pq_message_for_claim, pq_verify, source_verify
 from .merkle import confirmations, header_hash, txid_from_tx, verify_merkle_proof
 from .nullifier import NullifierSet, compute_nullifier
 from .objects import donation_commitment_hex, validate_charity_set
+
+
+CLAIM_KEYS = {
+    "amount_sats", "charity_id", "commitment_nonce_hex", "commitment_version",
+    "declared_commitment_hex", "donation_txid_hex", "donation_vout", "epoch_id",
+    "inclusion_proof", "label", "new_ledger_chain_id", "nullifier_hex",
+    "pq_destination_public_key_hex", "pq_signature_hex", "schema", "source_authorization",
+    "source_chain", "transaction", "version",
+}
+PROOF_KEYS = {"block_header_hash_hex", "block_height", "merkle_branch_hex", "merkle_index", "schema"}
+AUTH_KEYS = {"alg", "control_label", "public_key_hex", "sighash_hex", "signature_hex"}
+TX_KEYS = {"inputs", "label", "locktime", "outputs", "version"}
+TX_INPUT_KEYS = {"prev_txid_hex", "prev_vout", "script_sig_hex", "sequence"}
+TX_OUTPUT_KEYS = {"script_pubkey_hex", "value_sats"}
+EPOCH_REQUIRED_KEYS = {
+    "accepted_source_tip_header_hash_hex", "accepted_source_tip_height", "closed", "epoch_id",
+    "last_eligible_inclusion_header_hash_hex", "last_eligible_inclusion_height",
+    "min_confirmations", "schema", "version",
+}
 
 
 @dataclass
@@ -50,7 +70,7 @@ class ClaimVerifier:
     charity_set : CharitySetCommitment object
     epoch : MigrationEpochClose object
     headers_by_hash : map header_hash_hex -> header objects forming ancestry
-    tip_height / tip_hash : accepted source tip under the bounded model
+    tip_height / tip_hash : accepted source tip (must equal the epoch binding)
     nullifiers : optional shared NullifierSet
     """
 
@@ -78,21 +98,34 @@ class ClaimVerifier:
 
     @staticmethod
     def _validate_epoch(epoch: object) -> dict[str, Any]:
-        if not isinstance(epoch, dict) or type(epoch.get("closed")) is not bool:
+        if not isinstance(epoch, dict):
             raise ValueError("MALFORMED_EPOCH")
-        for name in ("last_clean_source_height", "min_confirmations"):
-            if type(epoch.get(name)) is not int or epoch[name] < 0:
+        allowed = EPOCH_REQUIRED_KEYS | {"quantum_compromise_cutoff_height"}
+        if set(epoch) - allowed or not EPOCH_REQUIRED_KEYS <= set(epoch):
+            raise ValueError("MALFORMED_EPOCH")
+        if type(epoch.get("closed")) is not bool or epoch.get("schema") != "MigrationEpochClose" or epoch.get("version") != PROTOCOL_VERSION:
+            raise ValueError("MALFORMED_EPOCH")
+        for name in ("accepted_source_tip_height", "last_eligible_inclusion_height", "min_confirmations"):
+            if type(epoch.get(name)) is not int or not 0 <= epoch[name] <= 0xFFFFFFFF:
                 raise ValueError("MALFORMED_EPOCH")
+        if epoch["last_eligible_inclusion_height"] > epoch["accepted_source_tip_height"]:
+            raise ValueError("MALFORMED_EPOCH")
+        qcut = epoch.get("quantum_compromise_cutoff_height")
+        if qcut is not None and (type(qcut) is not int or not 0 <= qcut <= 0xFFFFFFFF):
+            raise ValueError("MALFORMED_EPOCH")
         if not isinstance(epoch.get("epoch_id"), str) or not epoch["epoch_id"]:
             raise ValueError("MALFORMED_EPOCH")
-        h = epoch.get("last_clean_source_header_hash_hex")
-        if not isinstance(h, str) or len(h) != 64 or h != h.lower():
-            raise ValueError("MALFORMED_EPOCH")
+        from .encoding import require_hex
+        try:
+            require_hex("accepted tip", epoch["accepted_source_tip_header_hash_hex"], expected_bytes=32)
+            require_hex("eligibility anchor", epoch["last_eligible_inclusion_header_hash_hex"], expected_bytes=32)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("MALFORMED_EPOCH") from exc
         return epoch
 
     def _validate_checkpoint(self, supplied_tip_height: int) -> int:
         if not isinstance(self.headers_by_hash, dict) or self.tip_hash_hex not in self.headers_by_hash:
-            raise ValueError("HEADER_ANCESTRY_INVALID")
+            raise ValueError("CHECKPOINT_MISMATCH")
         current = self.tip_hash_hex
         seen: set[str] = set()
         tip_height: int | None = None
@@ -116,10 +149,27 @@ class ClaimVerifier:
             current = prev
         if tip_height is None or type(supplied_tip_height) is not int or supplied_tip_height != tip_height:
             raise ValueError("CHECKPOINT_MISMATCH")
-        if (self.epoch["last_clean_source_height"] != tip_height or
-                self.epoch["last_clean_source_header_hash_hex"] != self.tip_hash_hex):
+        if (self.epoch["accepted_source_tip_height"] != tip_height or
+                self.epoch["accepted_source_tip_header_hash_hex"] != self.tip_hash_hex):
+            raise ValueError("CHECKPOINT_MISMATCH")
+        cutoff_hash = self.epoch["last_eligible_inclusion_header_hash_hex"]
+        cutoff_header = self.headers_by_hash.get(cutoff_hash)
+        if (cutoff_header is None or
+                cutoff_header.get("height") != self.epoch["last_eligible_inclusion_height"] or
+                not self._hash_is_ancestor(cutoff_hash, self.tip_hash_hex, self.headers_by_hash)):
             raise ValueError("CHECKPOINT_MISMATCH")
         return tip_height
+
+    @staticmethod
+    def _hash_is_ancestor(target: str, tip: str, headers: dict[str, dict[str, Any]]) -> bool:
+        current = tip
+        seen: set[str] = set()
+        while current in headers and current not in seen:
+            if current == target:
+                return True
+            seen.add(current)
+            current = headers[current].get("prev_hash_hex", "")
+        return False
 
     def _fail(self, code: str, detail: str = "", **kwargs: Any) -> VerificationResult:
         return VerificationResult(ok=False, code=code, detail=detail, **kwargs)
@@ -140,8 +190,13 @@ class ClaimVerifier:
         # --- structural ---
         if not isinstance(claim, dict):
             return self._fail("TYPE_ERROR", "claim not object")
+        if set(claim) != CLAIM_KEYS:
+            unexpected = sorted(set(claim) - CLAIM_KEYS)
+            missing = sorted(CLAIM_KEYS - set(claim))
+            return self._fail("UNKNOWN_FIELD" if unexpected else "MISSING_FIELD",
+                              ",".join(unexpected or missing))
         version = claim.get("version")
-        if version != PROTOCOL_VERSION:
+        if type(version) is not int or version != PROTOCOL_VERSION:
             return self._fail("UNSUPPORTED_CLAIM_VERSION", str(version))
 
         source_chain = claim.get("source_chain")
@@ -154,48 +209,40 @@ class ClaimVerifier:
         if claim.get("epoch_id") != self.epoch.get("epoch_id"):
             return self._fail("CROSS_EPOCH_REPLAY", "epoch_id mismatch")
 
-        # Required fields
-        required = [
-            "charity_id",
-            "donation_txid_hex",
-            "donation_vout",
-            "amount_sats",
-            "pq_destination_public_key_hex",
-            "pq_signature_hex",
-            "commitment_nonce_hex",
-            "commitment_version",
-            "inclusion_proof",
-            "source_authorization",
-            "transaction",
-        ]
-        for key in required:
-            if key not in claim:
-                return self._fail("MISSING_FIELD", key)
-
-        try:
-            charity_id = claim["charity_id"]
-            txid = claim["donation_txid_hex"]
-            vout = claim["donation_vout"]
-            amount = claim["amount_sats"]
-            if type(vout) is not int or vout < 0:
-                return self._fail("TYPE_ERROR", "donation_vout")
-            if type(amount) is not int:
-                return self._fail("TYPE_ERROR", "amount_sats")
-            if amount <= 0:
-                return self._fail("AMOUNT_NOT_POSITIVE")
-        except Exception as exc:  # noqa: BLE001
-            return self._fail("TYPE_ERROR", str(exc))
-
-        # Address-string path forbidden
-        if "charity_address_string" in claim:
-            return self._fail("ADDRESS_STRING_AMBIGUITY")
+        charity_id = claim["charity_id"]
+        txid = claim["donation_txid_hex"]
+        vout = claim["donation_vout"]
+        amount = claim["amount_sats"]
+        if not isinstance(charity_id, str) or not charity_id:
+            return self._fail("TYPE_ERROR", "charity_id")
+        if type(vout) is not int or not 0 <= vout <= 0xFFFFFFFF:
+            return self._fail("TYPE_ERROR", "donation_vout")
+        if type(amount) is not int:
+            return self._fail("TYPE_ERROR", "amount_sats")
+        if not 0 < amount <= 0xFFFFFFFFFFFFFFFF:
+            return self._fail("AMOUNT_NOT_POSITIVE" if amount <= 0 else "TYPE_ERROR", "amount_sats")
+        commitment_version = claim["commitment_version"]
+        if (type(commitment_version) is not int or not 0 <= commitment_version <= 0xFFFFFFFF or
+                commitment_version != SUPPORTED_COMMITMENT_VERSION):
+            return self._fail("COMMITMENT_VERSION_INVALID")
+        from .encoding import require_hex
+        for name, size in (("donation_txid_hex", 32), ("pq_destination_public_key_hex", 32),
+                           ("commitment_nonce_hex", 16), ("declared_commitment_hex", 32),
+                           ("nullifier_hex", 32)):
+            try:
+                require_hex(name, claim[name], expected_bytes=size)
+            except (TypeError, ValueError):
+                return self._fail("NULLIFIER_INVALID" if name == "nullifier_hex" else "TYPE_ERROR", name)
 
         # --- transaction identity / malleability ---
         tx = claim["transaction"]
         if not self._valid_transaction(tx):
             return self._fail("UNSUPPORTED_TX_FORM")
 
-        computed_txid = txid_from_tx(tx)
+        try:
+            computed_txid = txid_from_tx(tx)
+        except (TypeError, ValueError, OverflowError):
+            return self._fail("UNSUPPORTED_TX_FORM")
         if computed_txid != txid:
             return self._fail("TX_MALLEABILITY_REENCODING", f"{computed_txid} != {txid}")
 
@@ -228,10 +275,14 @@ class ClaimVerifier:
 
         # --- inclusion proof ---
         proof = claim["inclusion_proof"]
-        if not isinstance(proof, dict):
+        if not isinstance(proof, dict) or set(proof) != PROOF_KEYS or proof.get("schema") != "DonationInclusionProof":
             return self._fail("INCLUSION_PROOF_INVALID", "not object")
         block_hash = proof.get("block_header_hash_hex")
         block_height = proof.get("block_height")
+        if type(block_height) is not int or not 0 <= block_height <= 0xFFFFFFFF:
+            return self._fail("INCLUSION_PROOF_INVALID", "block_height")
+        if type(proof.get("merkle_index")) is not int:
+            return self._fail("INCLUSION_PROOF_INVALID", "merkle_index")
         if block_hash not in self.headers_by_hash:
             return self._fail("HEADER_ANCESTRY_INVALID", "unknown header")
         header = self.headers_by_hash[block_hash]
@@ -263,27 +314,29 @@ class ClaimVerifier:
             return self._fail("INCLUSION_PROOF_INVALID")
 
         # Confirmations & cutoff
-        min_conf = int(self.epoch.get("min_confirmations", DEFAULT_MIN_CONFIRMATIONS))
-        conf = confirmations(int(block_height), self.tip_height)
+        min_conf = self.epoch.get("min_confirmations", DEFAULT_MIN_CONFIRMATIONS)
+        conf = confirmations(block_height, self.tip_height)
         if conf < min_conf:
             return self._fail("INSUFFICIENT_CONFIRMATIONS", f"{conf}<{min_conf}")
 
-        last_clean_h = int(self.epoch["last_clean_source_height"])
-        if int(block_height) > last_clean_h:
+        cutoff_h = self.epoch["last_eligible_inclusion_height"]
+        if block_height > cutoff_h:
             return self._fail("INCLUSION_AFTER_CUTOFF")
 
         # Charity validity window
-        if not (entry["valid_from_height"] <= int(block_height) <= entry["valid_until_height"]):
+        if not (entry["valid_from_height"] <= block_height <= entry["valid_until_height"]):
             return self._fail("CHARITY_INACTIVE")
 
         # Quantum-compromise cutoff: classical source auth after cutoff rejected.
         qcut = self.epoch.get("quantum_compromise_cutoff_height")
-        if qcut is not None and int(block_height) > int(qcut):
-            if claim.get("source_authorization", {}).get("alg") == "SYNTHETIC_SOURCE_HMAC_v1":
-                return self._fail("QUANTUM_COMPROMISE_CUTOFF")
+        if qcut is not None and block_height > qcut:
+            return self._fail("QUANTUM_COMPROMISE_CUTOFF")
 
         # Source authorization (cryptographic control, not legal ownership)
-        auth_err = source_verify(claim["source_authorization"], txid)
+        auth = claim["source_authorization"]
+        if not isinstance(auth, dict) or set(auth) != AUTH_KEYS:
+            return self._fail("SOURCE_AUTH_INVALID")
+        auth_err = source_verify(auth, txid)
         if auth_err:
             return self._fail(auth_err)
         if claim.get("source_authorization", {}).get("control_label") == "CRYPTOGRAPHIC_CONTROL_SYNTHETIC":
@@ -293,59 +346,60 @@ class ClaimVerifier:
 
         # --- commitment binding ---
         # The commitment must be an exact OP_RETURN push32 output in this transaction.
-        commitment_hex = donation_commitment_hex(
-            new_ledger_chain_id=claim["new_ledger_chain_id"],
-            epoch_id=claim["epoch_id"],
-            charity_id=charity_id,
-            donation_vout=vout,
-            amount_sats=amount,
-            pq_destination_public_key_hex=claim["pq_destination_public_key_hex"],
-            nonce_hex=claim["commitment_nonce_hex"],
-            commitment_version=int(claim["commitment_version"]),
-        )
+        try:
+            commitment_hex = donation_commitment_hex(
+                new_ledger_chain_id=claim["new_ledger_chain_id"],
+                epoch_id=claim["epoch_id"],
+                charity_id=charity_id,
+                donation_vout=vout,
+                amount_sats=amount,
+                pq_destination_public_key_hex=claim["pq_destination_public_key_hex"],
+                nonce_hex=claim["commitment_nonce_hex"],
+                commitment_version=commitment_version,
+            )
+        except (TypeError, ValueError, OverflowError):
+            return self._fail("TYPE_ERROR", "commitment fields")
 
         # Commitment must appear in the same transaction as an OP_RETURN payload
         # or match claim.declared_commitment_hex when testing binding failures.
-        declared = claim.get("declared_commitment_hex", commitment_hex)
+        declared = claim["declared_commitment_hex"]
         if declared != commitment_hex:
             return self._fail("COMMITMENT_INVALID", "declared mismatch")
 
-        if not self._tx_contains_commitment(tx, commitment_hex):
-            return self._fail("COMMITMENT_INVALID", "commitment not in exact transaction carrier")
+        multiplicity = self._commitment_carrier_status(tx, commitment_hex)
+        if multiplicity != "OK":
+            return self._fail(multiplicity, "commitment carrier policy")
 
         # --- nullifier ---
-        nullifier = compute_nullifier(
-            source_chain=source_chain,
-            donation_txid_hex=txid,
-            donation_vout=vout,
-        )
-        if claim.get("presented_nullifier_hex") and claim["presented_nullifier_hex"] != nullifier:
-            return self._fail("NULLIFIER_COLLISION", "presented nullifier mismatch")
+        try:
+            nullifier = compute_nullifier(
+                source_chain=source_chain,
+                donation_txid_hex=txid,
+                donation_vout=vout,
+            )
+        except (TypeError, ValueError, OverflowError):
+            return self._fail("NULLIFIER_INVALID")
+        if claim["nullifier_hex"] != nullifier:
+            return self._fail("NULLIFIER_INVALID", "presented nullifier mismatch")
 
         # --- PQ destination control ---
-        if claim.get("pq_alg") and claim.get("pq_alg") != SYNTH_PQ_ALG:
-            return self._fail("PQ_ALGORITHM_UNSUPPORTED")
-
-        msg = pq_message_for_claim(
-            new_ledger_chain_id=claim["new_ledger_chain_id"],
-            epoch_id=claim["epoch_id"],
-            charity_id=charity_id,
-            donation_txid_hex=txid,
-            donation_vout=vout,
-            amount_sats=amount,
-            commitment_hex=commitment_hex,
-            nullifier_hex=nullifier,
-        )
-        domain = claim.get("pq_sig_domain_bytes")
-        from .constants import DOMAIN_PQ_SIG
-
-        use_domain = DOMAIN_PQ_SIG if domain is None else bytes.fromhex(domain)
+        try:
+            msg = pq_message_for_claim(
+                new_ledger_chain_id=claim["new_ledger_chain_id"],
+                epoch_id=claim["epoch_id"],
+                charity_id=charity_id,
+                donation_txid_hex=txid,
+                donation_vout=vout,
+                amount_sats=amount,
+                commitment_hex=commitment_hex,
+                nullifier_hex=nullifier,
+            )
+        except (TypeError, ValueError, OverflowError):
+            return self._fail("TYPE_ERROR", "PQ claim message")
         pq_err = pq_verify(
             claim["pq_destination_public_key_hex"],
             msg,
             claim["pq_signature_hex"],
-            domain=use_domain,
-            expected_public_key_hex=claim.get("expected_pq_key_hex"),
         )
         if pq_err:
             return self._fail(pq_err)
@@ -383,12 +437,21 @@ class ClaimVerifier:
 
     @staticmethod
     def _tx_contains_commitment(tx: dict[str, Any], commitment_hex: str) -> bool:
+        return ClaimVerifier._commitment_carrier_status(tx, commitment_hex) == "OK"
+
+    @staticmethod
+    def _commitment_carrier_status(tx: dict[str, Any], commitment_hex: str) -> str:
+        carriers = [o["script_pubkey_hex"] for o in tx["outputs"]
+                    if o["script_pubkey_hex"].startswith("6a20")]
         needle = "6a20" + commitment_hex
-        for out in tx.get("outputs", []):
-            spk = out.get("script_pubkey_hex", "")
-            if spk == needle:
-                return True
-        return False
+        if carriers.count(needle) == 0:
+            return "COMMITMENT_INVALID"
+        if carriers.count(needle) != 1 or len(carriers) != len(set(carriers)):
+            return "COMMITMENT_MULTIPLICITY_INVALID"
+        donation_outputs = [o for o in tx["outputs"] if not o["script_pubkey_hex"].startswith("6a20")]
+        if len(carriers) > len(donation_outputs):
+            return "COMMITMENT_MULTIPLICITY_INVALID"
+        return "OK"
 
     @staticmethod
     def _supported_script(script: object) -> bool:
@@ -404,17 +467,17 @@ class ClaimVerifier:
 
     @classmethod
     def _valid_transaction(cls, tx: object) -> bool:
-        if not isinstance(tx, dict) or set(tx) not in ({"version", "locktime", "inputs", "outputs", "label"},
-                                                      {"version", "locktime", "inputs", "outputs"}):
+        if not isinstance(tx, dict) or set(tx) != TX_KEYS:
             return False
         if type(tx["version"]) is not int or type(tx["locktime"]) is not int:
             return False
         if not isinstance(tx["inputs"], list) or not tx["inputs"] or not isinstance(tx["outputs"], list) or not tx["outputs"]:
             return False
         for i in tx["inputs"]:
-            if not isinstance(i, dict) or set(i) != {"prev_txid_hex", "prev_vout", "script_sig_hex", "sequence"}:
+            if not isinstance(i, dict) or set(i) != TX_INPUT_KEYS:
                 return False
-            if type(i["prev_vout"]) is not int or i["prev_vout"] < 0 or type(i["sequence"]) is not int:
+            if (type(i["prev_vout"]) is not int or not 0 <= i["prev_vout"] <= 0xFFFFFFFF or
+                    type(i["sequence"]) is not int or not 0 <= i["sequence"] <= 0xFFFFFFFF):
                 return False
             try:
                 if len(bytes.fromhex(i["prev_txid_hex"])) != 32 or not isinstance(i["script_sig_hex"], str):
@@ -423,9 +486,10 @@ class ClaimVerifier:
             except (TypeError, ValueError):
                 return False
         for out in tx["outputs"]:
-            if not isinstance(out, dict) or set(out) != {"script_pubkey_hex", "value_sats"}:
+            if not isinstance(out, dict) or set(out) != TX_OUTPUT_KEYS:
                 return False
-            if type(out["value_sats"]) is not int or out["value_sats"] < 0 or not cls._supported_script(out["script_pubkey_hex"]):
+            if (type(out["value_sats"]) is not int or not 0 <= out["value_sats"] <= 0xFFFFFFFFFFFFFFFF or
+                    not cls._supported_script(out["script_pubkey_hex"])):
                 return False
         return True
 
@@ -450,5 +514,24 @@ class ClaimVerifier:
             eligible_by_nullifier=rows,
             epoch_id=epoch_id,
         )
+        record["epoch_checkpoint_binding"] = {
+            "accepted_source_tip_header_hash_hex": self.epoch["accepted_source_tip_header_hash_hex"],
+            "accepted_source_tip_height": self.epoch["accepted_source_tip_height"],
+            "last_eligible_inclusion_header_hash_hex": self.epoch["last_eligible_inclusion_header_hash_hex"],
+            "last_eligible_inclusion_height": self.epoch["last_eligible_inclusion_height"],
+        }
         assert_supply_invariant(record)
         return record
+
+    def revalidate_admitted_claims(self, claims: list[dict[str, Any]]) -> list[VerificationResult]:
+        """Rebuild provisional nullifier state after an accepted-tip change.
+
+        Claims that no longer verify against this verifier's exact checkpoint
+        are rolled out of the state.  This is the bounded V1 post-admission
+        reorg rule; callers must construct this verifier from the replacement
+        trusted epoch/checkpoint before invoking it.
+        """
+        results = [self.verify_historical_claim(claim) for claim in claims]
+        survivors = [r.nullifier_hex for r in results if r.ok and r.nullifier_hex is not None]
+        self.nullifiers.replace(survivors)
+        return results

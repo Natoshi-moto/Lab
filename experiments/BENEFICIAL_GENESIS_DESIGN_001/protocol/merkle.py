@@ -103,6 +103,11 @@ def verify_merkle_proof(
 
 
 def header_hash(header: dict[str, Any]) -> str:
+    if (not isinstance(header, dict) or type(header.get("height")) is not int or
+            not 0 <= header["height"] <= 0xFFFFFFFF or
+            type(header.get("bits", 0)) is not int or not 0 <= header.get("bits", 0) <= 0xFFFFFFFF or
+            type(header.get("time", 0)) is not int or not 0 <= header.get("time", 0) <= 0xFFFFFFFF):
+        raise ValueError("malformed header integers")
     body = {
         "bits": header.get("bits", 0),
         "height": header["height"],

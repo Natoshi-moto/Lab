@@ -1,9 +1,11 @@
 {
   "epoch": {
+    "accepted_source_tip_header_hash_hex": "6a6d172abad9ee2a2539641e0936533867f4a10b529b7bfa70a38df27ae815b0",
+    "accepted_source_tip_height": 110,
     "closed": false,
     "epoch_id": "epoch-synth-0001",
-    "last_clean_source_header_hash_hex": "6a6d172abad9ee2a2539641e0936533867f4a10b529b7bfa70a38df27ae815b0",
-    "last_clean_source_height": 110,
+    "last_eligible_inclusion_header_hash_hex": "6a6d172abad9ee2a2539641e0936533867f4a10b529b7bfa70a38df27ae815b0",
+    "last_eligible_inclusion_height": 110,
     "min_confirmations": 6,
     "quantum_compromise_cutoff_height": 1000000,
     "schema": "MigrationEpochClose",

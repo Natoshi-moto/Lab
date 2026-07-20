@@ -26,6 +26,8 @@ DEFAULT_EPOCH_ID = "epoch-synth-0001"
 
 # Synthetic PQ algorithm tag. NOT a real post-quantum primitive.
 SYNTH_PQ_ALG = "SYNTHETIC_HMAC_SHA256_PQ_STANDIN_v1"
+SYNTH_SOURCE_AUTH_ALG = "SYNTHETIC_SOURCE_HMAC_v1"
+SUPPORTED_COMMITMENT_VERSION = 1
 
 # Confirmations required under the bounded verifier model.
 DEFAULT_MIN_CONFIRMATIONS = 6
@@ -68,6 +70,8 @@ REJECTION_CODES: dict[str, str] = {
     "WRONG_OUTPUT_INDEX": "Commitment or claim points at the wrong output index",
     "COMMITMENT_INVALID": "Donation commitment binding does not verify",
     "COMMITMENT_FIELD_MISMATCH": "Commitment fields disagree with claim body",
+    "COMMITMENT_VERSION_INVALID": "Commitment version is not the exact supported uint32 value",
+    "COMMITMENT_MULTIPLICITY_INVALID": "Commitment carrier multiplicity is ambiguous or duplicated",
     "PQ_SIGNATURE_INVALID": "Post-quantum destination signature is invalid",
     "PQ_KEY_WRONG": "Signature does not match bound PQ destination public key",
     "PQ_ALGORITHM_UNSUPPORTED": "PQ algorithm tag is not supported by this verifier",
@@ -86,6 +90,9 @@ REJECTION_CODES: dict[str, str] = {
     "SOURCE_AUTH_INVALID": "Source-chain authorization does not demonstrate control",
     "MISSING_FIELD": "Required protocol field is missing",
     "TYPE_ERROR": "Field has the wrong type or encoding",
+    "UNKNOWN_FIELD": "Consensus object contains an unexpected field",
+    "NULLIFIER_INVALID": "Presented nullifier is malformed or disagrees with the canonical nullifier",
+    "DUPLICATE_JSON_KEY": "Raw JSON contains a duplicate object key",
 }
 
 # Ordered list used by schemas and documentation.

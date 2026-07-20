@@ -1,0 +1,38 @@
+{
+  "schema": "bgen.retest-002.differential-decision-matrix/v1",
+  "subject_commit": "46a7de63fd800029a05793d7d8204a900690f68e",
+  "subject_pr": 30,
+  "cleanroom_fixture_matrix": {
+    "agreements": 43,
+    "disagreements": 0,
+    "crashes": 0,
+    "report": "experiments/BENEFICIAL_GENESIS_RETEST_002/results/FIXTURE_COMPATIBILITY_REPORT.json"
+  },
+  "node_tests": {
+    "command": "node --test experiments/BENEFICIAL_GENESIS_RETEST_002/tests/*.test.mjs",
+    "passed": 19,
+    "failed": 0
+  },
+  "python_subject_evidence": {
+    "command": "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py",
+    "result": "PASS",
+    "executable_invalid": 34,
+    "documentary_only": 1,
+    "unit_tests": 37
+  },
+  "prior_breaker_findings": {
+    "F-001": "REPAIRED",
+    "F-002": "REPAIRED",
+    "F-003": "REPAIRED",
+    "F-004_architecture_D005": "REPAIRED (tip vs eligibility split present in genesis epoch objects)",
+    "F-005_spec_constants": "MOSTLY_REPAIRED (domains/framing published; PUBLIC_TEST_SEEDS still implementation-only)",
+    "F-006_parser_policy": "REPAIRED (duplicate-key loader + exact key sets)"
+  },
+  "residual_non_blockers": [
+    "PUBLIC_TEST_SEEDS not duplicated into schemas/protocol_constants.json (public test material still required for synthetic HMAC verify)",
+    "source-auth sighash body derivation remains fixture-side; verifier binds presented sighash into MAC with txid",
+    "synthetic crypto non-claims unchanged"
+  ],
+  "gate_recommendation": "DIFF_RETEST_PASS",
+  "status_authority": "NONE"
+}

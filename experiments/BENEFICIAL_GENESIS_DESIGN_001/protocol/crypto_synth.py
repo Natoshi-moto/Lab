@@ -169,6 +169,8 @@ def source_authorize(secret_seed_hex: str, txid_hex: str, sighash_hex: str) -> d
 def source_verify(auth: dict, txid_hex: str) -> str | None:
     if not isinstance(auth, dict):
         return "SOURCE_AUTH_INVALID"
+    if set(auth) != {"alg", "public_key_hex", "signature_hex", "sighash_hex", "control_label"}:
+        return "SOURCE_AUTH_INVALID"
     if auth.get("alg") != "SYNTHETIC_SOURCE_HMAC_v1":
         return "SOURCE_AUTH_INVALID"
     try:

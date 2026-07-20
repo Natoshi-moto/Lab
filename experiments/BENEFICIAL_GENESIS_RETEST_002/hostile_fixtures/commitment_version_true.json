@@ -1,0 +1,5 @@
+{
+  "note": "Minimized F-002 retest vector: boolean commitment_version must typed-reject",
+  "mutation": { "commitment_version": true },
+  "expected_code": "COMMITMENT_VERSION_INVALID"
+}

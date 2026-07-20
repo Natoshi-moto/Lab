@@ -1,16 +1,8 @@
 {
+  "checkpoint_probe": "stale_tip",
   "claim": {
     "amount_sats": 100000,
     "charity_id": "CHARITY_ALPHA",
-    "claimed_checkpoint": {
-      "header_hash_hex": "b1a258b474913c9a695d6eb514185fd3438e129938b23594a0d4e868847c6974",
-      "height": 100,
-      "merkle_root_hex": "48252057aa98e792ddb2d10bba1c295d27f88427c5c08e6a00fea7327cd3688e",
-      "note": "stale",
-      "prev_hash_hex": "0000000000000000000000000000000000000000000000000000000000000000",
-      "schema": "SourceHeaderCheckpoint",
-      "time": 1700000100
-    },
     "commitment_nonce_hex": "a1000000000000000000000000000000",
     "commitment_version": 1,
     "declared_commitment_hex": "e220855b120e7f829592297c5e289c96966022f903636fb9ce20f456b5d8b833",
@@ -65,6 +57,5 @@
     },
     "version": 1
   },
-  "epoch_last_clean_height_override": 120,
-  "expected_code": "STALE_CHECKPOINT"
+  "expected_code": "CHECKPOINT_MISMATCH"
 }
