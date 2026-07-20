@@ -1,0 +1,294 @@
+{
+  "charity_set": {
+    "commitment_hex": "ab17b38bee106803e546f74ee355024c8688836b7a5cf74d59ee98653ce107c8",
+    "entries": [
+      {
+        "attestation_commitment_hex": "dcf03c26b216344b7d28d8da4e5d037440bc15455fc5e003dadb7135ab00f061",
+        "charity_id": "CHARITY_ALPHA",
+        "script_pubkey_hex": "00141111111111111111111111111111111111111111",
+        "valid_from_height": 0,
+        "valid_until_height": 1000000
+      },
+      {
+        "attestation_commitment_hex": "547c8db49df14c92222eb13294743e3f590749edb18473e1fc34c28d58509df5",
+        "charity_id": "CHARITY_BETA",
+        "script_pubkey_hex": "00142222222222222222222222222222222222222222",
+        "valid_from_height": 0,
+        "valid_until_height": 1000000
+      }
+    ],
+    "schema": "CharitySetCommitment",
+    "version": 1
+  },
+  "epoch_closed": {
+    "closed": true,
+    "epoch_id": "epoch-synth-0001",
+    "last_clean_source_header_hash_hex": "23d62bd29ca036edabbcee4a2daac90fa9d7ee27e6baf04f6bfe66206f442eb2",
+    "last_clean_source_height": 120,
+    "min_confirmations": 6,
+    "quantum_compromise_cutoff_height": 1000000,
+    "schema": "MigrationEpochClose",
+    "version": 1
+  },
+  "epoch_open": {
+    "closed": false,
+    "epoch_id": "epoch-synth-0001",
+    "last_clean_source_header_hash_hex": "23d62bd29ca036edabbcee4a2daac90fa9d7ee27e6baf04f6bfe66206f442eb2",
+    "last_clean_source_height": 120,
+    "min_confirmations": 6,
+    "quantum_compromise_cutoff_height": 1000000,
+    "schema": "MigrationEpochClose",
+    "version": 1
+  },
+  "fixed_bitcoin_genesis_pool": 1000000000,
+  "headers": [
+    {
+      "bits": 486604799,
+      "header_hash_hex": "b1a258b474913c9a695d6eb514185fd3438e129938b23594a0d4e868847c6974",
+      "height": 100,
+      "merkle_root_hex": "48252057aa98e792ddb2d10bba1c295d27f88427c5c08e6a00fea7327cd3688e",
+      "prev_hash_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "time": 1700000100,
+      "txids_hex": [
+        "ac3c1d41aba49d7207c47d8927ef25d01b05a3570ef51e0614ae8599c5a1cf24",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "6316f8015d707d35252665c545357b4271be9312d4ca6f8fbdfef97c8a29fbb3",
+      "height": 101,
+      "merkle_root_hex": "e649d4aa6ba120352bbc482a21d3c9f005fa6b97ad5e012adce0ca5aa3fe99c7",
+      "prev_hash_hex": "b1a258b474913c9a695d6eb514185fd3438e129938b23594a0d4e868847c6974",
+      "time": 1700000101,
+      "txids_hex": [
+        "363f01a4856761ef1d3fbb85295fe77db5d7f1e79d4f7cdd94bf00e10c8be622",
+        "14d2ce00058ba1d24caf2e35722eec1ca098ee93ae075397c853cba5595c33a4",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "2412cf5f9054bf33da92da9de768f6e6e3b2092fe2531fae839cf7888d0a77b3",
+      "height": 102,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "6316f8015d707d35252665c545357b4271be9312d4ca6f8fbdfef97c8a29fbb3",
+      "time": 1700000102,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "cd1eadbf87cdb6b675eccdc713d3fd59aad51b4a75e63242d120f5286f08977c",
+      "height": 103,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "2412cf5f9054bf33da92da9de768f6e6e3b2092fe2531fae839cf7888d0a77b3",
+      "time": 1700000103,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "87929066617cfb3ae41c9e44a237a40fa0066d97dbd0828c09c379212a184d2f",
+      "height": 104,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "cd1eadbf87cdb6b675eccdc713d3fd59aad51b4a75e63242d120f5286f08977c",
+      "time": 1700000104,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "ce7bbe582d62780b42db6132540234013caf1b13c9a4a55a66f9b148d1a6463f",
+      "height": 105,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "87929066617cfb3ae41c9e44a237a40fa0066d97dbd0828c09c379212a184d2f",
+      "time": 1700000105,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "082826ca8b2863ceb2eca3f615f9d849eb3fe50385b71d7a1c7dd13729e3b062",
+      "height": 106,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "ce7bbe582d62780b42db6132540234013caf1b13c9a4a55a66f9b148d1a6463f",
+      "time": 1700000106,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "63d4d2202013261fc2adbe0e22cb13e4ab08fcabcb6aa36264c7e7fe7b74217c",
+      "height": 107,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "082826ca8b2863ceb2eca3f615f9d849eb3fe50385b71d7a1c7dd13729e3b062",
+      "time": 1700000107,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "a896fc126d62afedcc57a630ba04a312b77788d8f280b250772bc9b56e7e29d9",
+      "height": 108,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "63d4d2202013261fc2adbe0e22cb13e4ab08fcabcb6aa36264c7e7fe7b74217c",
+      "time": 1700000108,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "28534929a1016292894d642a7904dde4557a112c355d793fc56ace32d83b4291",
+      "height": 109,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "a896fc126d62afedcc57a630ba04a312b77788d8f280b250772bc9b56e7e29d9",
+      "time": 1700000109,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "b08d7d19cfb7abd9a7bc0f0c09371f9c436749864c8210f1c7d7187d730c1650",
+      "height": 110,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "28534929a1016292894d642a7904dde4557a112c355d793fc56ace32d83b4291",
+      "time": 1700000110,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "ac35f84ac5d49ccae55f7d2538be31820a04af85ebc962a83d4141a0c2a0298a",
+      "height": 111,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "b08d7d19cfb7abd9a7bc0f0c09371f9c436749864c8210f1c7d7187d730c1650",
+      "time": 1700000111,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "bb05c1ebb8f3dfc6a4f9a6956d0b66746e2c67da2ab341bab0ccfa09e3380907",
+      "height": 112,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "ac35f84ac5d49ccae55f7d2538be31820a04af85ebc962a83d4141a0c2a0298a",
+      "time": 1700000112,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "bafdb224253fcbcd33edc91d6b0f86b5aa42d868efd19aebfad9c987834a2dc8",
+      "height": 113,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "bb05c1ebb8f3dfc6a4f9a6956d0b66746e2c67da2ab341bab0ccfa09e3380907",
+      "time": 1700000113,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "1548d7a7788fd3add25dd5b6690413ed155ccbed85b85df66bac1cc30cafa689",
+      "height": 114,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "bafdb224253fcbcd33edc91d6b0f86b5aa42d868efd19aebfad9c987834a2dc8",
+      "time": 1700000114,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "ee8623f65bf78cc28b49160aa5a60971418692458fa633856afa198121b40e57",
+      "height": 115,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "1548d7a7788fd3add25dd5b6690413ed155ccbed85b85df66bac1cc30cafa689",
+      "time": 1700000115,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "b84c7f2be569c8fabbc2f90a8992cf79e97a5ecf1150f317148b535a8a7cfc4a",
+      "height": 116,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "ee8623f65bf78cc28b49160aa5a60971418692458fa633856afa198121b40e57",
+      "time": 1700000116,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "eaba375dbeaf0e74f818b814b476f7027c48edae0e5e063e7b2baff0714c2b1c",
+      "height": 117,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "b84c7f2be569c8fabbc2f90a8992cf79e97a5ecf1150f317148b535a8a7cfc4a",
+      "time": 1700000117,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "256c1c9722dd1c8669fd93cbea84abbbc2247819f9d522a7cfaa9bc8e0651fed",
+      "height": 118,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "eaba375dbeaf0e74f818b814b476f7027c48edae0e5e063e7b2baff0714c2b1c",
+      "time": 1700000118,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "2570e796c99b3fba982a21a3cd6f77770c3f8590b588be045a0285bd052a3e43",
+      "height": 119,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "256c1c9722dd1c8669fd93cbea84abbbc2247819f9d522a7cfaa9bc8e0651fed",
+      "time": 1700000119,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "23d62bd29ca036edabbcee4a2daac90fa9d7ee27e6baf04f6bfe66206f442eb2",
+      "height": 120,
+      "merkle_root_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "prev_hash_hex": "2570e796c99b3fba982a21a3cd6f77770c3f8590b588be045a0285bd052a3e43",
+      "time": 1700000120,
+      "txids_hex": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    }
+  ],
+  "label": "SYNTHETIC_GENESIS_CONTEXT_NOT_MAINNET",
+  "new_ledger_chain_id": "bgen-synth-ledger-v0",
+  "public_test_seeds_are_not_secrets": true,
+  "seed_labels": [
+    "pq_alice",
+    "pq_attacker",
+    "pq_bob",
+    "source_donor_1",
+    "source_donor_2",
+    "source_stolen"
+  ],
+  "source_chain": "bitcoin-mainnet-semantics-synthetic",
+  "tip_hash_hex": "23d62bd29ca036edabbcee4a2daac90fa9d7ee27e6baf04f6bfe66206f442eb2",
+  "tip_height": 120
+}

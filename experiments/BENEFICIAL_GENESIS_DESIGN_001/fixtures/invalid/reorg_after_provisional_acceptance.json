@@ -1,0 +1,239 @@
+{
+  "claim": {
+    "amount_sats": 100000,
+    "charity_id": "CHARITY_ALPHA",
+    "commitment_nonce_hex": "a1000000000000000000000000000000",
+    "commitment_version": 1,
+    "declared_commitment_hex": "e220855b120e7f829592297c5e289c96966022f903636fb9ce20f456b5d8b833",
+    "donation_txid_hex": "ac3c1d41aba49d7207c47d8927ef25d01b05a3570ef51e0614ae8599c5a1cf24",
+    "donation_vout": 0,
+    "epoch_id": "epoch-synth-0001",
+    "inclusion_proof": {
+      "block_header_hash_hex": "b1a258b474913c9a695d6eb514185fd3438e129938b23594a0d4e868847c6974",
+      "block_height": 100,
+      "merkle_branch_hex": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "merkle_index": 0,
+      "schema": "DonationInclusionProof"
+    },
+    "label": "SYNTHETIC_CLAIM_FIXTURE",
+    "new_ledger_chain_id": "bgen-synth-ledger-v0",
+    "nullifier_hex": "7777272a103f4e724555d95dcded15a133b3aea33c07416596f926fb93556975",
+    "pq_destination_public_key_hex": "1b7b72ea0fc2a7d2ff659b72d3dbf532c52ce50e36675ab23b581d37a5d6fc97",
+    "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f763100301bb0238c160c90243a7f0c3dcbe7ba8f44e0ae58f3ce9ba82759f3aa08fcb2",
+    "schema": "BeneficialGenesisClaim",
+    "source_authorization": {
+      "alg": "SYNTHETIC_SOURCE_HMAC_v1",
+      "control_label": "CRYPTOGRAPHIC_CONTROL_SYNTHETIC",
+      "public_key_hex": "1261eeba7c39303935c2f12110784c3b75e0f4a8e84dd4f5f7f78b783df86351",
+      "sighash_hex": "3912ba61e76d7e7ac37868c02147ec97235088c9e9fa40be25e9477bee2a4b82",
+      "signature_hex": "5bf946f0d9ab7895b05679beaaf3f5d65a62eb3a0c1d54a3cadb5a4eb52ca593"
+    },
+    "source_chain": "bitcoin-mainnet-semantics-synthetic",
+    "transaction": {
+      "inputs": [
+        {
+          "prev_txid_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+          "prev_vout": 0,
+          "script_sig_hex": "00",
+          "sequence": 4294967295
+        }
+      ],
+      "label": "SYNTHETIC_BITCOIN_LIKE_TX_NOT_BROADCAST",
+      "locktime": 0,
+      "outputs": [
+        {
+          "script_pubkey_hex": "00141111111111111111111111111111111111111111",
+          "value_sats": 100000
+        },
+        {
+          "script_pubkey_hex": "6a20e220855b120e7f829592297c5e289c96966022f903636fb9ce20f456b5d8b833",
+          "value_sats": 0
+        }
+      ],
+      "version": 1
+    },
+    "version": 1
+  },
+  "expected_code": "HEADER_ANCESTRY_INVALID",
+  "new_tip_only_headers": [
+    {
+      "bits": 486604799,
+      "header_hash_hex": "eba981d2670399c1a10452a9a4314364d2f07c52db48c26c70bf742eb7b9312e",
+      "height": 100,
+      "merkle_root_hex": "9999999999999999999999999999999999999999999999999999999999999999",
+      "prev_hash_hex": "2222222222222222222222222222222222222222222222222222222222222222",
+      "time": 1700000100,
+      "txids_hex": [
+        "9999999999999999999999999999999999999999999999999999999999999999"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "3495dded19aa517e984fe4bef3b31e3fe74cc2da931e629fbd1b882adb9463d5",
+      "height": 101,
+      "merkle_root_hex": "3232323232323232323232323232323232323232323232323232323232323232",
+      "prev_hash_hex": "eba981d2670399c1a10452a9a4314364d2f07c52db48c26c70bf742eb7b9312e",
+      "time": 1700000101,
+      "txids_hex": [
+        "3232323232323232323232323232323232323232323232323232323232323232"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "abf0ee6f46fca2ee9c4c4ee20f8cf30bf912d3728f7b2ca4ac2adf2249a9a3e3",
+      "height": 102,
+      "merkle_root_hex": "3333333333333333333333333333333333333333333333333333333333333333",
+      "prev_hash_hex": "3495dded19aa517e984fe4bef3b31e3fe74cc2da931e629fbd1b882adb9463d5",
+      "time": 1700000102,
+      "txids_hex": [
+        "3333333333333333333333333333333333333333333333333333333333333333"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "4cac9df0e80349c880b1d885d22549abe797eb9058de8ac7b5fa26056b7ccdbc",
+      "height": 103,
+      "merkle_root_hex": "3434343434343434343434343434343434343434343434343434343434343434",
+      "prev_hash_hex": "abf0ee6f46fca2ee9c4c4ee20f8cf30bf912d3728f7b2ca4ac2adf2249a9a3e3",
+      "time": 1700000103,
+      "txids_hex": [
+        "3434343434343434343434343434343434343434343434343434343434343434"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "98fadee362af665f5a9bf838553fb2da2ba706ce1bb47cabc95c46678ed36aef",
+      "height": 104,
+      "merkle_root_hex": "3535353535353535353535353535353535353535353535353535353535353535",
+      "prev_hash_hex": "4cac9df0e80349c880b1d885d22549abe797eb9058de8ac7b5fa26056b7ccdbc",
+      "time": 1700000104,
+      "txids_hex": [
+        "3535353535353535353535353535353535353535353535353535353535353535"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "a557caac4fe713c334e07ac38965f1d90b9aac5e99383c5aa8c82c48bc7239d4",
+      "height": 105,
+      "merkle_root_hex": "3636363636363636363636363636363636363636363636363636363636363636",
+      "prev_hash_hex": "98fadee362af665f5a9bf838553fb2da2ba706ce1bb47cabc95c46678ed36aef",
+      "time": 1700000105,
+      "txids_hex": [
+        "3636363636363636363636363636363636363636363636363636363636363636"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "f271730756a8b43ca5d57452ab755be0d8c31ab4ea8f9f5ca47cc7e72a79c509",
+      "height": 106,
+      "merkle_root_hex": "3737373737373737373737373737373737373737373737373737373737373737",
+      "prev_hash_hex": "a557caac4fe713c334e07ac38965f1d90b9aac5e99383c5aa8c82c48bc7239d4",
+      "time": 1700000106,
+      "txids_hex": [
+        "3737373737373737373737373737373737373737373737373737373737373737"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "d20dd873f0eed70102359bf3207682bc6d5a29ae7ee83dcbab7507d46f63ecfe",
+      "height": 107,
+      "merkle_root_hex": "3838383838383838383838383838383838383838383838383838383838383838",
+      "prev_hash_hex": "f271730756a8b43ca5d57452ab755be0d8c31ab4ea8f9f5ca47cc7e72a79c509",
+      "time": 1700000107,
+      "txids_hex": [
+        "3838383838383838383838383838383838383838383838383838383838383838"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "487bca27de3d12948bb2c6c781f0717be0dc85704d89e86646de95ea1f5bed74",
+      "height": 108,
+      "merkle_root_hex": "3939393939393939393939393939393939393939393939393939393939393939",
+      "prev_hash_hex": "d20dd873f0eed70102359bf3207682bc6d5a29ae7ee83dcbab7507d46f63ecfe",
+      "time": 1700000108,
+      "txids_hex": [
+        "3939393939393939393939393939393939393939393939393939393939393939"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "ca9b821bd980cefd2177bf6e1f011d7a234f6ec97d6797c36075f1585de48713",
+      "height": 109,
+      "merkle_root_hex": "3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a",
+      "prev_hash_hex": "487bca27de3d12948bb2c6c781f0717be0dc85704d89e86646de95ea1f5bed74",
+      "time": 1700000109,
+      "txids_hex": [
+        "3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "4cfec63d1cbb793a57a541526c22270d59c758d973af6d56e16eb44f63b13ec7",
+      "height": 110,
+      "merkle_root_hex": "3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b",
+      "prev_hash_hex": "ca9b821bd980cefd2177bf6e1f011d7a234f6ec97d6797c36075f1585de48713",
+      "time": 1700000110,
+      "txids_hex": [
+        "3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "16223ba3323548c66b925c53435db138c8a5947bd8b7176e24bbadf9e13de106",
+      "height": 111,
+      "merkle_root_hex": "3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c",
+      "prev_hash_hex": "4cfec63d1cbb793a57a541526c22270d59c758d973af6d56e16eb44f63b13ec7",
+      "time": 1700000111,
+      "txids_hex": [
+        "3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "301429c393a57b9b7088137370d0b0f661852936f6461a5732c4196f566a1dd3",
+      "height": 112,
+      "merkle_root_hex": "3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d",
+      "prev_hash_hex": "16223ba3323548c66b925c53435db138c8a5947bd8b7176e24bbadf9e13de106",
+      "time": 1700000112,
+      "txids_hex": [
+        "3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "8645de87b3445c71cc59944cda04ed20c2bd1ce890038cbd4970982fa67b93e8",
+      "height": 113,
+      "merkle_root_hex": "3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e",
+      "prev_hash_hex": "301429c393a57b9b7088137370d0b0f661852936f6461a5732c4196f566a1dd3",
+      "time": 1700000113,
+      "txids_hex": [
+        "3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e3e"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "eb9b2e783e939d123cf26dce24644db22d01e8afed3cab14e8407eb2ee5ab116",
+      "height": 114,
+      "merkle_root_hex": "3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+      "prev_hash_hex": "8645de87b3445c71cc59944cda04ed20c2bd1ce890038cbd4970982fa67b93e8",
+      "time": 1700000114,
+      "txids_hex": [
+        "3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f"
+      ]
+    },
+    {
+      "bits": 486604799,
+      "header_hash_hex": "f36b6bdb7ec95a2b03296a6152260cf1bb01752c74ce81e66e92ca70bd630ca3",
+      "height": 115,
+      "merkle_root_hex": "4040404040404040404040404040404040404040404040404040404040404040",
+      "prev_hash_hex": "eb9b2e783e939d123cf26dce24644db22d01e8afed3cab14e8407eb2ee5ab116",
+      "time": 1700000115,
+      "txids_hex": [
+        "4040404040404040404040404040404040404040404040404040404040404040"
+      ]
+    }
+  ],
+  "note": "After provisional acceptance, if the accepted tip reorgs away from the inclusion header, re-verification against the new tip fails ancestry."
+}

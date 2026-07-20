@@ -1,0 +1,151 @@
+{
+  "task_id": "TSK-BENEFICIAL-GENESIS-DESIGN-001",
+  "github_issue": 26,
+  "seat": "Designer",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / DESIGN_AND_SYNTHETIC_EVIDENCE",
+  "round_assignment": null,
+  "independent_review_claimed": false,
+  "branch": "claude/beneficial-genesis-design-001",
+  "base_commit": "52bfb27cef4212a82226f9f9281e540e8abb7173",
+  "final_commit": "1ebc179706b8ca175ab0509fd93cfa8617d34e3a",
+  "draft_pr": null,
+  "observed_origin": "https://github.com/Natoshi-moto/Lab.git",
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_DESIGN_001/**"
+  ],
+  "scope_respected": true,
+  "paths_outside_scope_modified": [],
+  "synthetic_only": true,
+  "live_funds": false,
+  "live_transactions": false,
+  "real_keys_or_credentials": false,
+  "donor_data": false,
+  "dependency_manifests_changed": false,
+  "canonical_status_changed": false,
+  "constitutions_or_workflows_changed": false,
+  "command_results": {
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_DESIGN_001/tests -v": {
+      "exit_code": 0,
+      "summary": "Ran 20 tests \u2014 OK"
+    },
+    "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py": {
+      "exit_code": 0,
+      "summary": "PASS; 35 invalid cases; 42 rejection codes"
+    },
+    "git diff --check": {
+      "exit_code": 0,
+      "summary": "clean"
+    },
+    "git status --short": {
+      "exit_code": 0,
+      "summary": "only authorized untracked paths plus unrelated pre-existing handoff file not committed"
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS with WARN WORKTREE_DIRTY (expected before commit)"
+    },
+    "python3 -m unittest discover -s tests -v": {
+      "exit_code": 0,
+      "summary": "Ran 185 tests \u2014 OK"
+    },
+    "./nexus verify": {
+      "exit_code": 0,
+      "summary": "PASS (canonical verify including R013 model checks)"
+    }
+  },
+  "implemented_requirements": [
+    "TECHNICAL_DESIGN.md",
+    "THREAT_MODEL_AND_NONCLAIMS.md",
+    "README.md with reproduction commands",
+    "machine-readable schemas (protocol_objects + rejection_codes)",
+    "canonical protocol objects: CharityGenesisEntry, CharitySetCommitment, DonationCommitment, SourceHeaderCheckpoint, DonationInclusionProof, BeneficialGenesisClaim, DonationNullifier, GenesisAllocationRecord, MigrationEpochClose",
+    "deterministic valid fixtures (single, multi-output, boundary, allocation)",
+    "deterministic invalid/adversarial fixtures (35 catalogued cases)",
+    "reference claim verifier (protocol/verifier.py)",
+    "nullifier tests",
+    "allocation invariant tests with integer-only floor remainder unissued",
+    "deterministic rejection codes",
+    "verify_evidence.py fail-closed gate",
+    "sanitized task receipt",
+    "stdlib-only Python (no root dependency changes)",
+    "all mandatory adversarial cases from issue #26 represented as fixtures and/or explicit residual risks"
+  ],
+  "unimplemented_or_residual": [
+    "Second independent verifier implementation (planned Reproducer seat; not in this Designer deliverable)",
+    "Real post-quantum signature algorithms (synthetic HMAC stand-in only)",
+    "Real Bitcoin script evaluation / ECDSA-Schnorr / full consensus rules",
+    "Source-chain RPC or network service (explicitly out of scope)",
+    "Economics analysis of whale/Sybil concentration (Economics reviewer seat)",
+    "Production deployment, live charity addresses, or fund movement (forbidden)"
+  ],
+  "adversarial_fixture_catalog": [
+    "front_run_different_pq_key",
+    "front_run_rewritten_commitment",
+    "double_claim_same_output",
+    "wrong_output_index",
+    "amount_mismatch",
+    "amount_not_positive",
+    "address_string_ambiguity",
+    "wrong_charity_id_script_mismatch",
+    "script_substitution",
+    "script_substitution_identity_break",
+    "duplicate_charity_entries",
+    "malformed_charity_entry",
+    "charity_destination_key_compromise_assumption",
+    "insufficient_confirmations",
+    "claim_after_cutoff",
+    "inclusion_after_cutoff",
+    "inclusion_after_cutoff_epoch",
+    "stale_checkpoint",
+    "conflicting_checkpoint",
+    "invalid_merkle_branch",
+    "tx_malleability_reencoding",
+    "unsupported_tx_form",
+    "unsupported_script_form",
+    "unsupported_source_chain",
+    "nullifier_domain_omission",
+    "pq_signature_mutation",
+    "pq_wrong_algorithm",
+    "pq_wrong_key",
+    "pq_wrong_domain",
+    "cross_chain_replay",
+    "cross_epoch_replay",
+    "allocation_overflow_bool",
+    "quantum_compromise_cutoff",
+    "reorg_before_acceptance",
+    "reorg_after_provisional_acceptance"
+  ],
+  "valid_crypto_ok_with_explicit_nonclaims": [
+    "claim_stolen_source_key_crypto_ok",
+    "claim_charity_rebate_collusion_crypto_ok"
+  ],
+  "residual_risks": [
+    "Single reference verifier only; second implementation not provided",
+    "Synthetic PQ and source auth stand-ins are not production cryptography",
+    "Bitcoin consensus/reorg security outside bounded header model",
+    "Charity rebate/collusion out of protocol",
+    "Stolen-key crypto control is not legal ownership",
+    "Whale/Sybil economics not solved by proportional weights",
+    "Genesis operator honesty for charity set publication is social/governance",
+    "Quantum cutoff height is a policy input, not derived in-protocol"
+  ],
+  "recommended_breaker_task": "Attempt to craft a false Beneficial Genesis claim that the reference verifier accepts, focusing on commitment encoding tricks, cutoff off-by-ones, nullifier domain mix-ups under a divergent parser, and allocation over-issuance under a reimplementation that mishandles floor remainder.",
+  "nonclaims": [
+    "backing_or_redemption",
+    "legal_ownership",
+    "tax_treatment",
+    "regulatory_compliance",
+    "charity_honesty_or_rebate_absence",
+    "quantum_safety",
+    "network_consensus_or_finality",
+    "operational_key_safety",
+    "live_fund_authorization",
+    "independent_review",
+    "R_round_assignment"
+  ],
+  "receipt_schema": "nexus.task-receipt.beneficial-genesis-design/v0",
+  "label": "SANITIZED_TASK_RECEIPT_NO_SECRETS",
+  "receipt_final_commit_semantics": "Primary design-pack commit containing this receipt body at first authoring; branch tip after PR metadata update is reported in the Designer handoff and may differ by receipt-only commits."
+}

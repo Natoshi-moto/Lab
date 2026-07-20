@@ -1,0 +1,26 @@
+{
+  "entries": [
+    {
+      "attestation_commitment_hex": "dcf03c26b216344b7d28d8da4e5d037440bc15455fc5e003dadb7135ab00f061",
+      "charity_id": "CHARITY_ALPHA",
+      "script_pubkey_hex": "00141111111111111111111111111111111111111111",
+      "valid_from_height": 0,
+      "valid_until_height": 1000000
+    },
+    {
+      "attestation_commitment_hex": "547c8db49df14c92222eb13294743e3f590749edb18473e1fc34c28d58509df5",
+      "charity_id": "CHARITY_BETA",
+      "script_pubkey_hex": "00142222222222222222222222222222222222222222",
+      "valid_from_height": 0,
+      "valid_until_height": 1000000
+    },
+    {
+      "attestation_commitment_hex": "dcf03c26b216344b7d28d8da4e5d037440bc15455fc5e003dadb7135ab00f061",
+      "charity_id": "CHARITY_ALPHA",
+      "script_pubkey_hex": "00141111111111111111111111111111111111111111",
+      "valid_from_height": 0,
+      "valid_until_height": 1000000
+    }
+  ],
+  "expected_code": "DUPLICATE_CHARITY_ENTRY"
+}

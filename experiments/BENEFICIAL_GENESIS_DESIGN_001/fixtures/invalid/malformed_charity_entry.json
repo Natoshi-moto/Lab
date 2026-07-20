@@ -1,0 +1,7 @@
+{
+  "entry": {
+    "charity_id": "",
+    "script_pubkey_hex": "zz"
+  },
+  "expected_code": "MALFORMED_CHARITY_ENTRY"
+}
