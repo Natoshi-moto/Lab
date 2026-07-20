@@ -1,0 +1,192 @@
+{
+  "schema": "bgen.retest-002.cleanroom-freeze/v1",
+  "task": "TSK-BENEFICIAL-GENESIS-DIFF-RETEST-002",
+  "github_issue": 31,
+  "subject_pr": 30,
+  "subject_commit": "46a7de63fd800029a05793d7d8204a900690f68e",
+  "subject_branch": "codex/beneficial-genesis-diff-repair-002",
+  "retest_branch": "grok/beneficial-genesis-diff-retest-002",
+  "frozen_at_utc": "2026-07-20T19:35:16Z",
+  "seat": {
+    "provider": "xAI",
+    "model_label": "Grok interactive CLI (grok-4.5 class)",
+    "environment": "Linux fedora; Node v24.14.0; Python 3.14.6; gh authenticated",
+    "network": true,
+    "prior_beneficial_genesis_session_state": false,
+    "note": "Fresh session; not a resume of PR #29"
+  },
+  "cleanroom_sources_inspected": [
+    "TECHNICAL_DESIGN.md",
+    "THREAT_MODEL_AND_NONCLAIMS.md",
+    "README.md",
+    "schemas/*",
+    "fixtures/**",
+    "issues #26 #28 #31",
+    "PR #27 #29 #30 review summaries"
+  ],
+  "forbidden_paths_not_content_opened_before_freeze": [
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/generate_fixtures.py",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py",
+    "experiments/BENEFICIAL_GENESIS_REPRODUCER_001"
+  ],
+  "forbidden_path_inventory_sha256": [
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/__init__.py",
+      "sha256": "68d10ece67dbd10a71f542741c3607bcc2e579adce288aa48eb3cc7bcf478b4b",
+      "bytes": 448
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/allocation.py",
+      "sha256": "1f36c5d348e4b93100085720940b6774204e090109f87dd2b0fff740c6c044ff",
+      "bytes": 9561
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/constants.py",
+      "sha256": "3b6179ea076e3d0a25899aacca42edb6847a19578b461d1946cacbe5809416f2",
+      "bytes": 5885
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/crypto_synth.py",
+      "sha256": "05075e0572a464f3d11f77f8177c213e0202a66a5057923c8708f8be3fa31575",
+      "bytes": 7750
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/encoding.py",
+      "sha256": "8a2c72f15cdf22c332c414b3ac84d951af1f7037624f54dcd4d969415bda5515",
+      "bytes": 3565
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/merkle.py",
+      "sha256": "5086d6188a0de96d7de9a4201e70aeb9690bf336ab36e59bc53f68975c710cf2",
+      "bytes": 5137
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/nullifier.py",
+      "sha256": "d02933cc8a5eb0c8c4bf20cb97740cbda8be082bcae233ac902ec843d2f95aaa",
+      "bytes": 2487
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/objects.py",
+      "sha256": "92e3a913af5019b604671e3e6fbdee5b0ba559aa8c7ea31b897984adf94c227a",
+      "bytes": 8741
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/verifier.py",
+      "sha256": "d67d298613f6ec7cf4baa28ca07a33176b050f02438a1dd8b7f22f1a1dc054e4",
+      "bytes": 24772
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests/test_allocation.py",
+      "sha256": "961cd5e0d0701cef77ca6c99a4b12c9d9c7d990226339434c05b2c68f748ef4d",
+      "bytes": 4682
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests/test_diff_repair_002.py",
+      "sha256": "d565a6ec9b826c31d1bcc5a1ce5f871cf3d2b9d09140105be39df5481aab9282",
+      "bytes": 8080
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests/test_nullifier.py",
+      "sha256": "7de69afcbd080539a10e1814b9bafe925540906673fae5e8a0f140a864384382",
+      "bytes": 2021
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests/test_verifier_adversarial.py",
+      "sha256": "9d7f96e1b99071fd9703ecb14b4bc1049f0be5df6504aa5939acfc45267a8b1c",
+      "bytes": 10696
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/generate_fixtures.py",
+      "sha256": "df3d7113345f8a95c2f003baa7f6107cae98c4a618acca1bb86bdb89f45b60ec",
+      "bytes": 34246
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py",
+      "sha256": "d0cc0e403d82c71600e64cc78002e0d8e739dd7a0435e0f131603e1f39c142ea",
+      "bytes": 16079
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_REPRODUCER_001",
+      "status": "NOT_FOUND"
+    }
+  ],
+  "cleanroom_artifact_inventory": [
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/CLEANROOM_INTERPRETATION.md",
+      "sha256": "c3a95f479dc1e7c0257e3232dccdf4456b8876ad14e61254f032ebede912a448",
+      "bytes": 5216
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/README.md",
+      "sha256": "f9a91df971ba6d99e7665b6791cbf78d80709a95346315ffdf9b3865138bd498",
+      "bytes": 824
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/allocation.mjs",
+      "sha256": "6843f4155411c990ff157a94318e4035460f2d337ba0d87211ef7dc0d11c3209",
+      "bytes": 5439
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/constants.mjs",
+      "sha256": "403440ca8b7b3c563f06b7e49407b38cd16660b42d05a1343a1a8a6fc860993d",
+      "bytes": 6108
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/crypto.mjs",
+      "sha256": "e145a08941867a50fa697d4fee0740f40e5718a8fa1ef9f6f76656a7ed4d3589",
+      "bytes": 4869
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/encoding.mjs",
+      "sha256": "183a45c0cfed8d1f2fdf19b79423a77e0f281aebad352cde957485ad582efbb7",
+      "bytes": 6645
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/index.mjs",
+      "sha256": "73fd0bc0aa06687deef485a8632e97ac14470099524d21ee8efc50044339fce4",
+      "bytes": 258
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/merkle.mjs",
+      "sha256": "56ba65180abd4f6f9740f65591a72ccb7a8900fe25a6b67b4d4d2196772c818f",
+      "bytes": 1889
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/parser.mjs",
+      "sha256": "1e8da92783fd4ad06403f308390895853183b3b700fc11922486047673093aa9",
+      "bytes": 4660
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/src/verifier.mjs",
+      "sha256": "a7b665f3245dce1d943b48883a7fb073779737efcb349672e3eb875320df9101",
+      "bytes": 22205
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/tests/core.test.mjs",
+      "sha256": "41f01aec7dbc2624021c34b03465e8b9335b5a505f4095cd0a3c97d332e3e629",
+      "bytes": 5803
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/tests/hostile.test.mjs",
+      "sha256": "b35a1720b74715256b01d8aaebac99241355f2dbec1ceb2690657ee025366e74",
+      "bytes": 7597
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_RETEST_002/verify.mjs",
+      "sha256": "52bae53ec3bc704d5857f995337990086cdd9dfed331a0fd4f76024700d7916c",
+      "bytes": 10327
+    }
+  ],
+  "known_gaps_at_freeze": [
+    "PUBLIC_TEST_SEEDS not published in protocol_constants.json",
+    "source-auth HMAC framing may need post-freeze confirmation"
+  ],
+  "status_authority": "NONE"
+}

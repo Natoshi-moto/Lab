@@ -1,0 +1,57 @@
+{
+  "amount_sats": 10000,
+  "charity_id": "CHARITY_ALPHA",
+  "commitment_nonce_hex": "a5000000000000000000000000000000",
+  "commitment_version": 1,
+  "declared_commitment_hex": "9da612b2318c8c8c07775446f86953e2aa428c02d96e71f635ca7457ddf68980",
+  "donation_txid_hex": "2fa399a9071fa5edb963df39335cf37ffdff71a8606427c31dd0d68587591260",
+  "donation_vout": 0,
+  "epoch_id": "epoch-synth-0001",
+  "inclusion_proof": {
+    "block_header_hash_hex": "0845ad2241d01d440c79b7387646fc6fc9fc554394967cdfacade65113499233",
+    "block_height": 100,
+    "merkle_branch_hex": [
+      "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    ],
+    "merkle_index": 0,
+    "schema": "DonationInclusionProof"
+  },
+  "label": "SYNTHETIC_CLAIM_FIXTURE",
+  "new_ledger_chain_id": "bgen-synth-ledger-v0",
+  "nullifier_hex": "27d7c56acfb9099cbed4ddab821c5b5bb339238633c41e49fb2462211bb1b528",
+  "pq_destination_public_key_hex": "1b7b72ea0fc2a7d2ff659b72d3dbf532c52ce50e36675ab23b581d37a5d6fc97",
+  "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f763100db75893b477b011294467475753bbcdeef7edd9864f60604a2330bd9a8146e7c",
+  "schema": "BeneficialGenesisClaim",
+  "source_authorization": {
+    "alg": "SYNTHETIC_SOURCE_HMAC_v1",
+    "control_label": "CRYPTOGRAPHIC_CONTROL_SYNTHETIC",
+    "public_key_hex": "93c83686b454f8ea5dbc2ed5cb5ea5bfa672dc2e1ee44f3bc9bd56f705ab7913",
+    "sighash_hex": "7c7d6fa38423aff65b9d0f416557fa9792921a62ee53b57b265e62f5d9e37e91",
+    "signature_hex": "aee2322f657ba6f3e46e0fc0352dd5fb3a1abac9b788974ccd4255c668dd6dae"
+  },
+  "source_chain": "bitcoin-mainnet-semantics-synthetic",
+  "transaction": {
+    "inputs": [
+      {
+        "prev_txid_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+        "prev_vout": 0,
+        "script_sig_hex": "00",
+        "sequence": 4294967295
+      }
+    ],
+    "label": "SYNTHETIC_BITCOIN_LIKE_TX_NOT_BROADCAST",
+    "locktime": 0,
+    "outputs": [
+      {
+        "script_pubkey_hex": "00141111111111111111111111111111111111111111",
+        "value_sats": 10000
+      },
+      {
+        "script_pubkey_hex": "6a209da612b2318c8c8c07775446f86953e2aa428c02d96e71f635ca7457ddf68980",
+        "value_sats": 0
+      }
+    ],
+    "version": 1
+  },
+  "version": 1
+}

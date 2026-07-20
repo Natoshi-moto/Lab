@@ -1,0 +1,58 @@
+{
+  "schema": "bgen.retest-002.post-freeze-python-probes/v1",
+  "subject_commit": "46a7de63fd800029a05793d7d8204a900690f68e",
+  "probes": [
+    {
+      "id": "F-001",
+      "python": "UNKNOWN_FIELD",
+      "crash": false
+    },
+    {
+      "id": "F-002/True",
+      "python": "COMMITMENT_VERSION_INVALID",
+      "crash": false
+    },
+    {
+      "id": "F-002/'1'",
+      "python": "COMMITMENT_VERSION_INVALID",
+      "crash": false
+    },
+    {
+      "id": "F-002/-1",
+      "python": "COMMITMENT_VERSION_INVALID",
+      "crash": false
+    },
+    {
+      "id": "F-002/2",
+      "python": "COMMITMENT_VERSION_INVALID",
+      "crash": false
+    },
+    {
+      "id": "F-002/4294967296",
+      "python": "COMMITMENT_VERSION_INVALID",
+      "crash": false
+    },
+    {
+      "id": "F-003-disagree",
+      "python": "NULLIFIER_INVALID"
+    },
+    {
+      "id": "F-003-missing",
+      "python": "MISSING_FIELD"
+    },
+    {
+      "id": "F-004-unknown",
+      "python": "UNKNOWN_FIELD"
+    },
+    {
+      "id": "F-005-dup",
+      "python": "duplicate JSON object key: a",
+      "crash": false
+    },
+    {
+      "id": "D-005-tip-gt-elig",
+      "python": true
+    }
+  ],
+  "note": "Post-freeze only; explains Node/Python agreement on repaired subject"
+}

@@ -1,0 +1,61 @@
+{
+  "claim": {
+    "amount_sats": 100000,
+    "charity_id": "CHARITY_ALPHA",
+    "commitment_nonce_hex": "a1000000000000000000000000000000",
+    "commitment_version": 1,
+    "declared_commitment_hex": "e220855b120e7f829592297c5e289c96966022f903636fb9ce20f456b5d8b833",
+    "donation_txid_hex": "ac3c1d41aba49d7207c47d8927ef25d01b05a3570ef51e0614ae8599c5a1cf24",
+    "donation_vout": 0,
+    "epoch_id": "epoch-synth-0001",
+    "inclusion_proof": {
+      "block_header_hash_hex": "b1a258b474913c9a695d6eb514185fd3438e129938b23594a0d4e868847c6974",
+      "block_height": 100,
+      "merkle_branch_hex": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "merkle_index": 0,
+      "schema": "DonationInclusionProof"
+    },
+    "label": "SYNTHETIC_CLAIM_FIXTURE",
+    "new_ledger_chain_id": "bgen-synth-ledger-v0",
+    "nullifier_hex": "7777272a103f4e724555d95dcded15a133b3aea33c07416596f926fb93556975",
+    "pq_destination_public_key_hex": "1b7b72ea0fc2a7d2ff659b72d3dbf532c52ce50e36675ab23b581d37a5d6fc97",
+    "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f763100301bb0238c160c90243a7f0c3dcbe7ba8f44e0ae58f3ce9ba82759f3aa08fcb2",
+    "schema": "BeneficialGenesisClaim",
+    "source_authorization": {
+      "alg": "SYNTHETIC_SOURCE_HMAC_v1",
+      "control_label": "CRYPTOGRAPHIC_CONTROL_SYNTHETIC",
+      "public_key_hex": "1261eeba7c39303935c2f12110784c3b75e0f4a8e84dd4f5f7f78b783df86351",
+      "sighash_hex": "3912ba61e76d7e7ac37868c02147ec97235088c9e9fa40be25e9477bee2a4b82",
+      "signature_hex": "5bf946f0d9ab7895b05679beaaf3f5d65a62eb3a0c1d54a3cadb5a4eb52ca593"
+    },
+    "source_chain": "bitcoin-mainnet-semantics-synthetic",
+    "transaction": {
+      "inputs": [
+        {
+          "prev_txid_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+          "prev_vout": 0,
+          "script_sig_hex": "00",
+          "sequence": 4294967295
+        }
+      ],
+      "label": "SYNTHETIC_BITCOIN_LIKE_TX_NOT_BROADCAST",
+      "locktime": 0,
+      "outputs": [
+        {
+          "script_pubkey_hex": "00141111111111111111111111111111111111111111",
+          "value_sats": 100000
+        },
+        {
+          "script_pubkey_hex": "6a20e220855b120e7f829592297c5e289c96966022f903636fb9ce20f456b5d8b833",
+          "value_sats": 0
+        }
+      ],
+      "version": 1
+    },
+    "version": 1
+  },
+  "epoch": "closed",
+  "expected_code": "EPOCH_CLOSED"
+}

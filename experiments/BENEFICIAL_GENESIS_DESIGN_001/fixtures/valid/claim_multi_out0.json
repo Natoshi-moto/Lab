@@ -1,0 +1,66 @@
+{
+  "amount_sats": 50000,
+  "charity_id": "CHARITY_ALPHA",
+  "commitment_nonce_hex": "a3000000000000000000000000000000",
+  "commitment_version": 1,
+  "declared_commitment_hex": "c7a29eca1a13ad201a1346b3414f6ff36bac5c7c4643e5f310ef67d4825a2d44",
+  "donation_txid_hex": "14d2ce00058ba1d24caf2e35722eec1ca098ee93ae075397c853cba5595c33a4",
+  "donation_vout": 0,
+  "epoch_id": "epoch-synth-0001",
+  "inclusion_proof": {
+    "block_header_hash_hex": "6316f8015d707d35252665c545357b4271be9312d4ca6f8fbdfef97c8a29fbb3",
+    "block_height": 101,
+    "merkle_branch_hex": [
+      "363f01a4856761ef1d3fbb85295fe77db5d7f1e79d4f7cdd94bf00e10c8be622",
+      "497737d804030f3da62d8b1339c72d991051ca4800f6b5a24bf677b0f2d99a87"
+    ],
+    "merkle_index": 1,
+    "schema": "DonationInclusionProof"
+  },
+  "label": "SYNTHETIC_CLAIM_FIXTURE",
+  "new_ledger_chain_id": "bgen-synth-ledger-v0",
+  "nullifier_hex": "2dc1fee8b13fe536dc78f3e8460427eb38ea44646148bd31eb084403ffc0064f",
+  "pq_destination_public_key_hex": "1b7b72ea0fc2a7d2ff659b72d3dbf532c52ce50e36675ab23b581d37a5d6fc97",
+  "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f763100d951cb9c6a22183cf0f37973850ec38a3ac10c96ed53eaa748652e091c06255a",
+  "schema": "BeneficialGenesisClaim",
+  "source_authorization": {
+    "alg": "SYNTHETIC_SOURCE_HMAC_v1",
+    "control_label": "CRYPTOGRAPHIC_CONTROL_SYNTHETIC",
+    "public_key_hex": "1261eeba7c39303935c2f12110784c3b75e0f4a8e84dd4f5f7f78b783df86351",
+    "sighash_hex": "aedde0eae1db4e2952fd594b97b9a6cce1a3ee23e8a4f8bb57f9cb0eedb3bb1d",
+    "signature_hex": "e3e131c42766468a724bf6a70bdbacc88633d13d09eed85c36802af0e6a9bd67"
+  },
+  "source_chain": "bitcoin-mainnet-semantics-synthetic",
+  "transaction": {
+    "inputs": [
+      {
+        "prev_txid_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+        "prev_vout": 1,
+        "script_sig_hex": "00",
+        "sequence": 4294967295
+      }
+    ],
+    "label": "SYNTHETIC_MULTI_DONATION_TX",
+    "locktime": 0,
+    "outputs": [
+      {
+        "script_pubkey_hex": "00141111111111111111111111111111111111111111",
+        "value_sats": 50000
+      },
+      {
+        "script_pubkey_hex": "00142222222222222222222222222222222222222222",
+        "value_sats": 75000
+      },
+      {
+        "script_pubkey_hex": "6a20c7a29eca1a13ad201a1346b3414f6ff36bac5c7c4643e5f310ef67d4825a2d44",
+        "value_sats": 0
+      },
+      {
+        "script_pubkey_hex": "6a2096741660b77eaa7359696a1a266f28ebb902ec12c82f58bed93dedd5b74fec05",
+        "value_sats": 0
+      }
+    ],
+    "version": 1
+  },
+  "version": 1
+}

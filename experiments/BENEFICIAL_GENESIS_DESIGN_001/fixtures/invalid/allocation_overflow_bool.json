@@ -1,0 +1,10 @@
+{
+  "eligible": [
+    [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      true
+    ]
+  ],
+  "expected_code": "ARITHMETIC_OVERFLOW",
+  "pool": 100
+}

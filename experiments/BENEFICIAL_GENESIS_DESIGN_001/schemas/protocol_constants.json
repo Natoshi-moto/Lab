@@ -1,0 +1,30 @@
+{
+  "canonical_json": {
+    "allow_nan": false,
+    "duplicate_keys": "REJECT",
+    "encoding": "UTF-8",
+    "ensure_ascii": true,
+    "separators": [",", ":"],
+    "sort_keys": true
+  },
+  "commitment_multiplicity": "EXACTLY_ONE_MATCH; DISTINCT_CARRIERS_REQUIRE_DISTINCT_DONATION_OUTPUT_CAPACITY",
+  "commitment_version": 1,
+  "domain_hash_framing": "domain || 0x00 || u32be(len(part)) || part ...",
+  "domains_ascii": {
+    "charity_set": "BGEN-CHARITY-SET-v1",
+    "donation_commitment": "BGEN-DONATION-COMMIT-v1",
+    "header": "BGEN-SYNTH-HEADER-v1",
+    "merkle": "BGEN-SYNTH-MERKLE-v1",
+    "nullifier": "BGEN-NULLIFIER-v1",
+    "pq_public_key": "BGEN-SYNTH-PQ-PK-v1",
+    "pq_signature": "BGEN-SYNTH-PQ-SIG-v1",
+    "source_authorization": "BGEN-SYNTH-SOURCE-AUTH-v1",
+    "transaction_id": "BGEN-SYNTH-TXID-v1"
+  },
+  "pq_claim_message_prefix_ascii": "BGEN-PQ-CLAIM-MSG-v1",
+  "protocol_version": 1,
+  "schema": "nexus.beneficial-genesis.protocol-constants/v1",
+  "supported_pq_algorithm": "SYNTHETIC_HMAC_SHA256_PQ_STANDIN_v1",
+  "supported_source_authorization_algorithm": "SYNTHETIC_SOURCE_HMAC_v1",
+  "supported_scripts": ["0014 || program20", "6a20 || digest32"]
+}

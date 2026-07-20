@@ -1,0 +1,12 @@
+{
+  "accepted_source_tip_header_hash_hex": "23d62bd29ca036edabbcee4a2daac90fa9d7ee27e6baf04f6bfe66206f442eb2",
+  "accepted_source_tip_height": 120,
+  "closed": true,
+  "epoch_id": "epoch-synth-0001",
+  "last_eligible_inclusion_header_hash_hex": "b08d7d19cfb7abd9a7bc0f0c09371f9c436749864c8210f1c7d7187d730c1650",
+  "last_eligible_inclusion_height": 110,
+  "min_confirmations": 6,
+  "quantum_compromise_cutoff_height": 1000000,
+  "schema": "MigrationEpochClose",
+  "version": 1
+}

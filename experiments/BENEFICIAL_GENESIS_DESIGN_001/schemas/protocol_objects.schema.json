@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.beneficial-genesis.protocol-objects/v0",
+  "title": "Beneficial Genesis protocol objects (synthetic design pack)",
+  "description": "Machine-readable definitions for consensus objects. All fixtures are synthetic. Binary fields are lowercase hex. Integers are non-negative and within declared widths.",
+  "definitions": {
+    "hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$"
+    },
+    "hex32": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "hex16": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "u32": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "u64": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "CharityGenesisEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "charity_id",
+        "script_pubkey_hex",
+        "attestation_commitment_hex",
+        "valid_from_height",
+        "valid_until_height"
+      ],
+      "properties": {
+        "charity_id": { "type": "string", "minLength": 1 },
+        "script_pubkey_hex": { "$ref": "#/definitions/hex" },
+        "attestation_commitment_hex": { "$ref": "#/definitions/hex32" },
+        "valid_from_height": { "$ref": "#/definitions/u32" },
+        "valid_until_height": { "$ref": "#/definitions/u32" }
+      }
+    },
+    "CharitySetCommitment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "version", "entries", "commitment_hex"],
+      "properties": {
+        "schema": { "const": "CharitySetCommitment" },
+        "version": { "type": "integer", "const": 1 },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/CharityGenesisEntry" }
+        },
+        "commitment_hex": { "$ref": "#/definitions/hex32" }
+      }
+    },
+    "DonationCommitment": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Logical commitment fields hashed into OP_RETURN payload. txid is intentionally excluded to avoid circular identity.",
+      "required": [
+        "new_ledger_chain_id",
+        "epoch_id",
+        "charity_id",
+        "donation_vout",
+        "amount_sats",
+        "pq_destination_public_key_hex",
+        "nonce_hex",
+        "commitment_version",
+        "commitment_hex"
+      ],
+      "properties": {
+        "new_ledger_chain_id": { "type": "string" },
+        "epoch_id": { "type": "string" },
+        "charity_id": { "type": "string" },
+        "donation_vout": { "$ref": "#/definitions/u32" },
+        "amount_sats": { "$ref": "#/definitions/u64" },
+        "pq_destination_public_key_hex": { "$ref": "#/definitions/hex32" },
+        "nonce_hex": { "$ref": "#/definitions/hex16" },
+        "commitment_version": { "const": 1 },
+        "commitment_hex": { "$ref": "#/definitions/hex32" }
+      }
+    },
+    "SourceHeaderCheckpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "height",
+        "header_hash_hex",
+        "prev_hash_hex",
+        "merkle_root_hex"
+      ],
+      "properties": {
+        "schema": { "const": "SourceHeaderCheckpoint" },
+        "height": { "$ref": "#/definitions/u32" },
+        "header_hash_hex": { "$ref": "#/definitions/hex32" },
+        "prev_hash_hex": { "$ref": "#/definitions/hex32" },
+        "merkle_root_hex": { "$ref": "#/definitions/hex32" },
+        "time": { "type": "integer" },
+        "note": { "type": "string" }
+      }
+    },
+    "DonationInclusionProof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "block_header_hash_hex",
+        "block_height",
+        "merkle_branch_hex",
+        "merkle_index"
+      ],
+      "properties": {
+        "schema": { "const": "DonationInclusionProof" },
+        "block_header_hash_hex": { "$ref": "#/definitions/hex32" },
+        "block_height": { "$ref": "#/definitions/u32" },
+        "merkle_branch_hex": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/hex32" }
+        },
+        "merkle_index": { "$ref": "#/definitions/u32" }
+      }
+    },
+    "DonationNullifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_chain", "donation_txid_hex", "donation_vout", "nullifier_hex"],
+      "properties": {
+        "source_chain": { "type": "string" },
+        "donation_txid_hex": { "$ref": "#/definitions/hex32" },
+        "donation_vout": { "$ref": "#/definitions/u32" },
+        "nullifier_hex": { "$ref": "#/definitions/hex32" }
+      }
+    },
+    "BeneficialGenesisClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "source_chain",
+        "new_ledger_chain_id",
+        "epoch_id",
+        "charity_id",
+        "donation_txid_hex",
+        "donation_vout",
+        "amount_sats",
+        "pq_destination_public_key_hex",
+        "pq_signature_hex",
+        "commitment_nonce_hex",
+        "commitment_version",
+        "inclusion_proof",
+        "source_authorization",
+        "transaction"
+        ,"schema"
+        ,"label"
+        ,"declared_commitment_hex"
+        ,"nullifier_hex"
+      ],
+      "properties": {
+        "version": { "type": "integer" },
+        "schema": { "type": "string" },
+        "label": { "type": "string" },
+        "source_chain": { "type": "string" },
+        "new_ledger_chain_id": { "type": "string" },
+        "epoch_id": { "type": "string" },
+        "charity_id": { "type": "string" },
+        "donation_txid_hex": { "$ref": "#/definitions/hex32" },
+        "donation_vout": { "$ref": "#/definitions/u32" },
+        "amount_sats": { "$ref": "#/definitions/u64" },
+        "pq_destination_public_key_hex": { "$ref": "#/definitions/hex32" },
+        "pq_signature_hex": { "$ref": "#/definitions/hex" },
+        "commitment_nonce_hex": { "$ref": "#/definitions/hex16" },
+        "commitment_version": { "const": 1 },
+        "declared_commitment_hex": { "$ref": "#/definitions/hex32" },
+        "inclusion_proof": { "$ref": "#/definitions/DonationInclusionProof" },
+        "source_authorization": { "$ref": "#/definitions/SourceAuthorization" },
+        "transaction": { "$ref": "#/definitions/SyntheticTransaction" },
+        "nullifier_hex": { "$ref": "#/definitions/hex32" }
+      }
+    },
+    "GenesisAllocationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "version",
+        "epoch_id",
+        "fixed_bitcoin_genesis_pool",
+        "claims",
+        "total_eligible_sats",
+        "total_issued",
+        "remainder_unissued",
+        "remainder_handling"
+      ],
+      "properties": {
+        "schema": { "const": "GenesisAllocationRecord" },
+        "version": { "type": "integer" },
+        "epoch_id": { "type": "string" },
+        "fixed_bitcoin_genesis_pool": { "$ref": "#/definitions/u64" },
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["nullifier_hex", "eligible_sats", "allocation"],
+            "properties": {
+              "nullifier_hex": { "$ref": "#/definitions/hex32" },
+              "eligible_sats": { "$ref": "#/definitions/u64" },
+              "allocation": { "$ref": "#/definitions/u64" }
+            }
+          }
+        },
+        "total_eligible_sats": { "$ref": "#/definitions/u64" },
+        "total_issued": { "$ref": "#/definitions/u64" },
+        "remainder_unissued": { "$ref": "#/definitions/u64" },
+        "remainder_handling": { "const": "UNISSUED_FLOOR_REMAINDER" }
+        ,"epoch_checkpoint_binding": {
+          "type": "object", "additionalProperties": false,
+          "required": ["accepted_source_tip_header_hash_hex", "accepted_source_tip_height", "last_eligible_inclusion_header_hash_hex", "last_eligible_inclusion_height"],
+          "properties": {
+            "accepted_source_tip_header_hash_hex": { "$ref": "#/definitions/hex32" },
+            "accepted_source_tip_height": { "$ref": "#/definitions/u32" },
+            "last_eligible_inclusion_header_hash_hex": { "$ref": "#/definitions/hex32" },
+            "last_eligible_inclusion_height": { "$ref": "#/definitions/u32" }
+          }
+        }
+      }
+    },
+    "MigrationEpochClose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "version",
+        "epoch_id",
+        "accepted_source_tip_height",
+        "accepted_source_tip_header_hash_hex",
+        "last_eligible_inclusion_height",
+        "last_eligible_inclusion_header_hash_hex",
+        "min_confirmations",
+        "closed"
+      ],
+      "properties": {
+        "schema": { "const": "MigrationEpochClose" },
+        "version": { "type": "integer" },
+        "epoch_id": { "type": "string" },
+        "accepted_source_tip_height": { "$ref": "#/definitions/u32" },
+        "accepted_source_tip_header_hash_hex": { "$ref": "#/definitions/hex32" },
+        "last_eligible_inclusion_height": { "$ref": "#/definitions/u32" },
+        "last_eligible_inclusion_header_hash_hex": { "$ref": "#/definitions/hex32" },
+        "min_confirmations": { "type": "integer", "minimum": 1 },
+        "closed": { "type": "boolean" },
+        "quantum_compromise_cutoff_height": { "$ref": "#/definitions/u32" }
+      }
+    },
+    "SourceAuthorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alg", "control_label", "public_key_hex", "sighash_hex", "signature_hex"],
+      "properties": {
+        "alg": { "const": "SYNTHETIC_SOURCE_HMAC_v1" },
+        "control_label": { "const": "CRYPTOGRAPHIC_CONTROL_SYNTHETIC" },
+        "public_key_hex": { "$ref": "#/definitions/hex32" },
+        "sighash_hex": { "$ref": "#/definitions/hex32" },
+        "signature_hex": { "$ref": "#/definitions/hex32" }
+      }
+    },
+    "SyntheticTransaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "locktime", "inputs", "outputs", "label"],
+      "properties": {
+        "version": { "$ref": "#/definitions/u32" },
+        "locktime": { "$ref": "#/definitions/u32" },
+        "label": { "type": "string" },
+        "inputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/SyntheticTransactionInput" } },
+        "outputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/SyntheticTransactionOutput" } }
+      }
+    },
+    "SyntheticTransactionInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["prev_txid_hex", "prev_vout", "script_sig_hex", "sequence"],
+      "properties": {
+        "prev_txid_hex": { "$ref": "#/definitions/hex32" }, "prev_vout": { "$ref": "#/definitions/u32" },
+        "script_sig_hex": { "$ref": "#/definitions/hex" }, "sequence": { "$ref": "#/definitions/u32" }
+      }
+    },
+    "SyntheticTransactionOutput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["script_pubkey_hex", "value_sats"],
+      "properties": { "script_pubkey_hex": { "$ref": "#/definitions/hex" }, "value_sats": { "$ref": "#/definitions/u64" } }
+    }
+  }
+}

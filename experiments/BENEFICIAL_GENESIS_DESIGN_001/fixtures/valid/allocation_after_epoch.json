@@ -1,0 +1,38 @@
+{
+  "claims": [
+    {
+      "allocation": 526315789,
+      "eligible_sats": 250000,
+      "nullifier_hex": "1c3afb34fa7453395cd9a4b95ee19d7b4c0a09be045e2d0acab68e03a5432e73"
+    },
+    {
+      "allocation": 105263157,
+      "eligible_sats": 50000,
+      "nullifier_hex": "2dc1fee8b13fe536dc78f3e8460427eb38ea44646148bd31eb084403ffc0064f"
+    },
+    {
+      "allocation": 210526315,
+      "eligible_sats": 100000,
+      "nullifier_hex": "7777272a103f4e724555d95dcded15a133b3aea33c07416596f926fb93556975"
+    },
+    {
+      "allocation": 157894736,
+      "eligible_sats": 75000,
+      "nullifier_hex": "d23787d27f97a69774d253dc7b94e1be98eeb6ba4b71cc3b0ec620bce83a2322"
+    }
+  ],
+  "epoch_checkpoint_binding": {
+    "accepted_source_tip_header_hash_hex": "23d62bd29ca036edabbcee4a2daac90fa9d7ee27e6baf04f6bfe66206f442eb2",
+    "accepted_source_tip_height": 120,
+    "last_eligible_inclusion_header_hash_hex": "b08d7d19cfb7abd9a7bc0f0c09371f9c436749864c8210f1c7d7187d730c1650",
+    "last_eligible_inclusion_height": 110
+  },
+  "epoch_id": "epoch-synth-0001",
+  "fixed_bitcoin_genesis_pool": 1000000000,
+  "remainder_handling": "UNISSUED_FLOOR_REMAINDER",
+  "remainder_unissued": 3,
+  "schema": "GenesisAllocationRecord",
+  "total_eligible_sats": 475000,
+  "total_issued": 999999997,
+  "version": 1
+}

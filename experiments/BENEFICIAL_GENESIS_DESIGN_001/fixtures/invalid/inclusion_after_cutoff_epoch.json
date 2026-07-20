@@ -1,0 +1,62 @@
+{
+  "claim": {
+    "amount_sats": 250000,
+    "charity_id": "CHARITY_BETA",
+    "commitment_nonce_hex": "a2000000000000000000000000000000",
+    "commitment_version": 1,
+    "declared_commitment_hex": "6ca1c78f5dde4a39e0b5b27a9ed839bc8315194f42e680a08861b99cd3486095",
+    "donation_txid_hex": "363f01a4856761ef1d3fbb85295fe77db5d7f1e79d4f7cdd94bf00e10c8be622",
+    "donation_vout": 0,
+    "epoch_id": "epoch-synth-0001",
+    "inclusion_proof": {
+      "block_header_hash_hex": "6316f8015d707d35252665c545357b4271be9312d4ca6f8fbdfef97c8a29fbb3",
+      "block_height": 101,
+      "merkle_branch_hex": [
+        "14d2ce00058ba1d24caf2e35722eec1ca098ee93ae075397c853cba5595c33a4",
+        "497737d804030f3da62d8b1339c72d991051ca4800f6b5a24bf677b0f2d99a87"
+      ],
+      "merkle_index": 0,
+      "schema": "DonationInclusionProof"
+    },
+    "label": "SYNTHETIC_CLAIM_FIXTURE",
+    "new_ledger_chain_id": "bgen-synth-ledger-v0",
+    "nullifier_hex": "1c3afb34fa7453395cd9a4b95ee19d7b4c0a09be045e2d0acab68e03a5432e73",
+    "pq_destination_public_key_hex": "397ae269d07b798f9936c98b0d3c881a095022d0397933d660834e86c616f4ce",
+    "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f7631003e9134eeeb69fe28e986fa915dcb4b980cba1f919d38d96ee4692cfad698bbfb",
+    "schema": "BeneficialGenesisClaim",
+    "source_authorization": {
+      "alg": "SYNTHETIC_SOURCE_HMAC_v1",
+      "control_label": "CRYPTOGRAPHIC_CONTROL_SYNTHETIC",
+      "public_key_hex": "313dda5e30ac928cd2975c1d205e234126fdf3f99cfd98fbce7c625629309f12",
+      "sighash_hex": "b91a971f4e3383469a98f7adf9d0f21ce34fd5d6c8841a0e07bdffa7f498c38a",
+      "signature_hex": "b0d7b8397e9f47b15eb6f8227a68688ab2b044a925f10808ce831e67b5b240cf"
+    },
+    "source_chain": "bitcoin-mainnet-semantics-synthetic",
+    "transaction": {
+      "inputs": [
+        {
+          "prev_txid_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+          "prev_vout": 0,
+          "script_sig_hex": "00",
+          "sequence": 4294967295
+        }
+      ],
+      "label": "SYNTHETIC_BITCOIN_LIKE_TX_NOT_BROADCAST",
+      "locktime": 0,
+      "outputs": [
+        {
+          "script_pubkey_hex": "00142222222222222222222222222222222222222222",
+          "value_sats": 250000
+        },
+        {
+          "script_pubkey_hex": "6a206ca1c78f5dde4a39e0b5b27a9ed839bc8315194f42e680a08861b99cd3486095",
+          "value_sats": 0
+        }
+      ],
+      "version": 1
+    },
+    "version": 1
+  },
+  "epoch_last_clean_height_override": 100,
+  "expected_code": "INCLUSION_AFTER_CUTOFF"
+}
