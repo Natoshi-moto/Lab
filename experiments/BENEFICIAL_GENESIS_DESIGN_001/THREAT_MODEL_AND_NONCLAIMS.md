@@ -119,3 +119,8 @@ Recommended focus for an independent Breaker task:
 - `ok: true` means: admitted under the **synthetic** validation predicate.
 - It does not mean: economically fair, legally clean, quantum-safe, or mainnet-ready.
 - Invalid fixtures must fail with the **catalogued** rejection code in `fixtures/EXPECTED.json`.
+
+The repaired evidence catalog distinguishes executable invalid vectors from
+documentary scenarios. Documentary cases do not count as verifier passes.
+Residual risks are independently enumerated in `EXPECTED.json`; they remain
+limitations even when all executable vectors pass.

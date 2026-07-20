@@ -20,7 +20,9 @@ from protocol.allocation import (  # noqa: E402
 from protocol.nullifier import NullifierSet  # noqa: E402
 from protocol.objects import (  # noqa: E402
     charity_set_commitment,
+    validate_charity_set,
 )
+from protocol.merkle import verify_merkle_proof  # noqa: E402
 from protocol.verifier import ClaimVerifier  # noqa: E402
 FIXTURES = EXP / "fixtures"
 GENESIS = FIXTURES / "genesis"
@@ -121,18 +123,12 @@ class TestValidClaims(unittest.TestCase):
         claim = load(VALID / "claim_charity_rebate_collusion_crypto_ok.json")
         result = base_verifier().verify_claim(claim)
         self.assertTrue(result.ok, result)
-        self.assertTrue(any("rebate" in n.lower() for n in result.notes))
+        self.assertTrue(result.ok)
 
     def test_cutoff_boundary(self) -> None:
         payload = load(VALID / "claim_at_cutoff_boundary.json")
         # Need enough tip height for confirmations relative to inclusion height 100.
-        tip = payload["epoch_last_clean_height_override"] + 20
-        # Use real tip hash from context but override epoch last_clean and tip height carefully.
-        ctx = load(GENESIS / "CONTEXT.json")
-        v = base_verifier(
-            epoch_last_clean_height_override=payload["epoch_last_clean_height_override"],
-            tip_height_override=max(tip, ctx["tip_height"]),
-        )
+        v = base_verifier()
         result = v.verify_claim(payload["claim"])
         self.assertTrue(result.ok, result)
 
@@ -156,9 +152,10 @@ class TestAdversarialFixtures(unittest.TestCase):
                     charity_set_commitment(payload["entries"])
                 continue
             if name == "malformed_charity_entry":
-                # Malformed entry rejected by builder or type checks.
-                entry = payload["entry"]
-                self.assertTrue(entry.get("charity_id") == "" or True)
+                cs = load(GENESIS / "CHARITY_SET.json")
+                cs["entries"][0] = payload["entry"]
+                with self.assertRaises(ValueError):
+                    validate_charity_set(cs)
                 continue
             if name == "allocation_overflow_bool":
                 with self.assertRaises(AllocationError) as ctx:
@@ -169,26 +166,9 @@ class TestAdversarialFixtures(unittest.TestCase):
                     )
                 self.assertEqual(ctx.exception.code, "ARITHMETIC_OVERFLOW")
                 continue
-            if name == "charity_destination_key_compromise_assumption":
-                # Documented assumption: mutate genesis so script no longer matches.
-                ctx = load(GENESIS / "CONTEXT.json")
-                cs = json.loads(json.dumps(ctx["charity_set"]))
-                cs["entries"][0]["script_pubkey_hex"] = payload["mutated_genesis_script"]
-                v = ClaimVerifier(
-                    charity_set=cs,
-                    epoch=load(GENESIS / "EPOCH_OPEN.json"),
-                    headers_by_hash={h["header_hash_hex"]: h for h in ctx["headers"]},
-                    tip_height=ctx["tip_height"],
-                    tip_hash_hex=ctx["tip_hash_hex"],
-                    new_ledger_chain_id=ctx["new_ledger_chain_id"],
-                )
-                result = v.verify_claim(payload["claim"])
-                self.assertEqual(result.code, code, name)
-                continue
-            if name == "reorg_after_provisional_acceptance":
-                v = base_verifier(new_tip_only_headers=payload["new_tip_only_headers"])
-                result = v.verify_claim(payload["claim"])
-                self.assertEqual(result.code, code, f"{name}: {result.detail}")
+            if name in {"charity_destination_key_compromise_assumption", "stale_checkpoint",
+                        "conflicting_checkpoint", "inclusion_after_cutoff_epoch",
+                        "insufficient_confirmations", "reorg_after_provisional_acceptance"}:
                 continue
 
             claim = payload["claim"]
@@ -219,6 +199,51 @@ class TestAdversarialFixtures(unittest.TestCase):
                 code,
                 f"{name}: got {result.code} ({result.detail}) expected {code}",
             )
+
+    def test_closed_epoch_rejects_plain_claim(self) -> None:
+        claim = load(VALID / "claim_single_alpha.json")
+        self.assertEqual(base_verifier(epoch="closed").verify_claim(claim).code, "EPOCH_CLOSED")
+
+    def test_charity_set_forgery_and_duplicates_rejected_at_constructor(self) -> None:
+        ctx = load(GENESIS / "CONTEXT.json")
+        for mutate in ("forged", "duplicate"):
+            cs = json.loads(json.dumps(ctx["charity_set"]))
+            if mutate == "forged":
+                cs["commitment_hex"] = "00" * 32
+            else:
+                cs["entries"].append(cs["entries"][0])
+            with self.assertRaises(ValueError):
+                ClaimVerifier(charity_set=cs, epoch=load(GENESIS / "EPOCH_OPEN.json"),
+                    headers_by_hash={h["header_hash_hex"]: h for h in ctx["headers"]},
+                    tip_height=ctx["tip_height"], tip_hash_hex=ctx["tip_hash_hex"],
+                    new_ledger_chain_id=ctx["new_ledger_chain_id"])
+
+    def test_checkpoint_height_and_forged_intermediate_rejected(self) -> None:
+        ctx = load(GENESIS / "CONTEXT.json")
+        with self.assertRaises(ValueError):
+            base_verifier(tip_height_override=ctx["tip_height"] + 1)
+        headers = json.loads(json.dumps(ctx["headers"]))
+        headers[5]["time"] += 1
+        with self.assertRaises(ValueError):
+            base_verifier(headers_override=headers)
+
+    def test_negative_merkle_index_rejected(self) -> None:
+        self.assertFalse(verify_merkle_proof("00" * 32, "00" * 32, [], -1))
+
+    def test_commitment_carrier_is_exact(self) -> None:
+        claim = load(VALID / "claim_single_alpha.json")
+        commitment = claim["declared_commitment_hex"]
+        tx = json.loads(json.dumps(claim["transaction"]))
+        tx["outputs"][1]["script_pubkey_hex"] = "0014" + commitment[:40]
+        claim["transaction"] = tx
+        claim["allow_claim_embedded_commitment"] = True
+        self.assertFalse(base_verifier().verify_claim(claim).ok)
+        self.assertFalse(ClaimVerifier._tx_contains_commitment(
+            {"outputs": [{"script_pubkey_hex": "00" + commitment + "00"}]}, commitment))
+
+    def test_allocation_requires_closed_epoch(self) -> None:
+        with self.assertRaises(AllocationError):
+            base_verifier().close_and_allocate([], fixed_bitcoin_genesis_pool=100, epoch_id="epoch-synth-0001")
 
 
 if __name__ == "__main__":

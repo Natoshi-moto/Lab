@@ -8,9 +8,11 @@ allocation supply invariants, and scans for obviously operational material.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
@@ -139,6 +141,10 @@ def verify_invalid_catalog() -> None:
     codes = expected["invalid_expected_codes"]
     if len(codes) < 20:
         raise EvidenceError(f"too few adversarial cases: {len(codes)}")
+    documentary = set(expected.get("documentary_only", []))
+    if not documentary <= set(codes):
+        raise EvidenceError("documentary cases are not a subset of the invalid catalog")
+    executed = 0
     for name, code in codes.items():
         if code not in REJECTION_CODES and code != "OK":
             # All catalog codes should be known except documentation-only.
@@ -151,15 +157,37 @@ def verify_invalid_catalog() -> None:
         if payload.get("expected_code") != code:
             raise EvidenceError(f"EXPECTED mismatch for {name}")
 
-        # Spot-check a subset via verifier (same logic as unit tests).
-        if name in {
-            "duplicate_charity_entries",
-            "malformed_charity_entry",
-            "allocation_overflow_bool",
-            "charity_destination_key_compromise_assumption",
-            "reorg_after_provisional_acceptance",
-        }:
+        if name in documentary:
             continue
+        if name == "duplicate_charity_entries":
+            try:
+                charity_set_commitment(payload["entries"])
+            except ValueError:
+                executed += 1
+                continue
+            raise EvidenceError("duplicate charity set accepted")
+        if name == "malformed_charity_entry":
+            cs = load(GENESIS / "CHARITY_SET.json")
+            cs["entries"][0] = payload["entry"]
+            try:
+                ClaimVerifier(charity_set=cs, epoch=load(GENESIS / "EPOCH_OPEN.json"),
+                    headers_by_hash={h["header_hash_hex"]: h for h in load(GENESIS / "CONTEXT.json")["headers"]},
+                    tip_height=load(GENESIS / "CONTEXT.json")["tip_height"],
+                    tip_hash_hex=load(GENESIS / "CONTEXT.json")["tip_hash_hex"],
+                    new_ledger_chain_id=load(GENESIS / "CONTEXT.json")["new_ledger_chain_id"])
+            except ValueError:
+                executed += 1
+                continue
+            raise EvidenceError("malformed charity entry accepted")
+        if name == "allocation_overflow_bool":
+            from protocol.allocation import AllocationError, allocate_proportional
+            try:
+                allocate_proportional(fixed_bitcoin_genesis_pool=payload["pool"],
+                    eligible_by_nullifier=[tuple(x) for x in payload["eligible"]], epoch_id="e")
+            except AllocationError:
+                executed += 1
+                continue
+            raise EvidenceError("allocation bool accepted")
         claim = payload["claim"]
         kwargs: dict[str, Any] = {}
         if "pre_consume_nullifier" in payload:
@@ -180,6 +208,28 @@ def verify_invalid_catalog() -> None:
             raise EvidenceError(
                 f"{name}: expected {code}, got {result.code} ({result.detail})"
             )
+        executed += 1
+    return executed, len(documentary), len(expected.get("residual_risks", []))
+
+
+def verify_fixture_determinism() -> None:
+    with tempfile.TemporaryDirectory(prefix="bgen-determinism-") as tmp:
+        out = Path(tmp) / "experiment"
+        env = dict(os.environ)
+        env["BGEN_OUTPUT_ROOT"] = str(out)
+        proc = subprocess.run([sys.executable, str(EXP / "generate_fixtures.py")],
+                              cwd=ROOT, env=env, capture_output=True, text=True)
+        if proc.returncode:
+            raise EvidenceError("fixture regeneration failed: " + proc.stderr.strip())
+        committed = sorted(p.relative_to(EXP) for p in (EXP / "fixtures").rglob("*") if p.is_file())
+        generated = sorted(p.relative_to(out) for p in (out / "fixtures").rglob("*") if p.is_file())
+        if committed != generated:
+            raise EvidenceError("generated fixture path set differs")
+        for rel in committed:
+            if (EXP / rel).read_bytes() != (out / rel).read_bytes():
+                raise EvidenceError(f"fixture bytes differ: {rel}")
+        if (EXP / "schemas/rejection_codes.json").read_bytes() != (out / "schemas/rejection_codes.json").read_bytes():
+            raise EvidenceError("generated rejection-code bytes differ")
 
 
 def scan_for_operational_material() -> None:
@@ -197,14 +247,7 @@ def scan_for_operational_material() -> None:
         for pat in FORBIDDEN_PATTERNS:
             for match in pat.finditer(text):
                 s = match.group(0)
-                # Allow explicitly synthetic labels.
-                if "synth" in s.lower() or "SYNTHETIC" in text[max(0, match.start() - 40) : match.end() + 40]:
-                    continue
-                # Skip bech32-like if clearly documentation deny-list only.
-                if s.startswith("bc1q") and "lookalike" in text:
-                    continue
-                if "PRIVATE KEY" in s:
-                    raise EvidenceError(f"possible private key material in {path}")
+                raise EvidenceError(f"forbidden operational-looking material in {path}: {s[:12]}")
 
 
 def check_genesis_labels() -> None:
@@ -226,8 +269,10 @@ def main() -> int:
         print("  unittests: OK")
         verify_valid_and_allocation()
         print("  valid + allocation: OK")
-        verify_invalid_catalog()
-        print(f"  invalid catalog: OK ({len(load(EXPECTED_PATH)['invalid_expected_codes'])} cases)")
+        executed, documentary, residual = verify_invalid_catalog()
+        print(f"  invalid catalog: OK (executed={executed}, documentary={documentary}, residual={residual})")
+        verify_fixture_determinism()
+        print("  fixture byte determinism: OK")
         scan_for_operational_material()
         print("  operational-material scan: OK")
         # Schema rejection codes consistency
@@ -244,7 +289,9 @@ def main() -> int:
             {
                 "result": "PASS",
                 "experiment": "BENEFICIAL_GENESIS_DESIGN_001",
-                "invalid_cases": len(load(EXPECTED_PATH)["invalid_expected_codes"]),
+                "executable_invalid_cases": executed,
+                "documentary_only_cases": documentary,
+                "residual_risks": residual,
                 "rejection_code_count": len(REJECTION_CODES),
             },
             sort_keys=True,

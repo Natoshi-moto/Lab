@@ -7,6 +7,7 @@ All outputs are clearly labelled SYNTHETIC. No live keys, addresses, or txs.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -63,7 +64,8 @@ from protocol.verifier import (  # noqa: E402
 )
 
 
-FIXTURES = ROOT / "fixtures"
+OUTPUT_ROOT = Path(os.environ.get("BGEN_OUTPUT_ROOT", str(ROOT)))
+FIXTURES = OUTPUT_ROOT / "fixtures"
 VALID = FIXTURES / "valid"
 INVALID = FIXTURES / "invalid"
 GENESIS_DIR = FIXTURES / "genesis"
@@ -455,7 +457,6 @@ def main() -> int:
     claim_stolen = attach_inclusion(
         claim_stolen, headers=stolen_chain, block_index=0, txids_in_block=stolen_txids
     )
-    claim_stolen["attack"] = "stolen_source_key"
     claim_stolen["notes_expected"] = [
         "Stolen-source-key scenario: crypto control may hold; legal ownership is a non-claim."
     ]
@@ -477,7 +478,6 @@ def main() -> int:
     # Charity rebate collusion — still crypto-valid, residual risk note.
     claim_rebate = dict(claim_a)
     claim_rebate = json.loads(json.dumps(claim_a))
-    claim_rebate["attack"] = "charity_rebate_collusion"
     _write(VALID / "claim_charity_rebate_collusion_crypto_ok.json", claim_rebate)
 
     # Verify valids and build allocation
@@ -498,7 +498,8 @@ def main() -> int:
         r = v.verify_claim(c)
         assert r.ok, (c.get("charity_id"), r.code, r.detail)
         admitted.append(r)
-    alloc = v.close_and_allocate(
+    v_closed = make_verifier(epoch=epoch_closed)
+    alloc = v_closed.close_and_allocate(
         admitted,
         fixed_bitcoin_genesis_pool=DEFAULT_FIXED_BITCOIN_GENESIS_POOL,
         epoch_id=DEFAULT_EPOCH_ID,
@@ -530,7 +531,6 @@ def main() -> int:
         nullifier_hex=fr["nullifier_hex"],
     )
     fr["pq_signature_hex"] = pq_sign(pq_attacker, msg)
-    fr["attack"] = "front_run_different_pq_key"
     inv("front_run_different_pq_key", fr, "COMMITMENT_INVALID")
 
     # Actually commitment check: declared_commitment is still alice's; recomputed
@@ -567,8 +567,7 @@ def main() -> int:
     # 3. Wrong output index
     woi = json.loads(json.dumps(claim_m0))
     woi["donation_vout"] = 1  # beta output but claim still alpha commitment fields partially
-    woi["attack"] = "wrong_output_index"
-    inv("wrong_output_index", woi, "WRONG_OUTPUT_INDEX")
+    inv("wrong_output_index", woi, "AMOUNT_MISMATCH")
 
     # 4. Amount mismatch
     am = json.loads(json.dumps(claim_a))
@@ -593,10 +592,9 @@ def main() -> int:
     ss["transaction"]["outputs"][0]["script_pubkey_hex"] = beta_script
     # txid changes -> malleability/reencoding OR we force attack flag after fixing txid
     ss["donation_txid_hex"] = txid_from_tx(ss["transaction"])
-    ss["attack"] = "script_substitution"
     # txid field rewritten to match mutated body so identity check passes;
     # exact script comparison then rejects under the script-substitution attack label.
-    inv("script_substitution", ss, "SCRIPT_SUBSTITUTION")
+    inv("script_substitution", ss, "CHARITY_SCRIPT_MISMATCH")
 
     # script substitution with corrected inclusion is heavy; add force flag path
     ss2 = json.loads(json.dumps(claim_a))
@@ -637,7 +635,6 @@ def main() -> int:
 
     # 9. Claim after cutoff / epoch closed
     after = json.loads(json.dumps(claim_a))
-    after["submitted_after_close"] = True
     inv("claim_after_cutoff", after, "EPOCH_CLOSED", epoch="closed")
 
     # 10. Inclusion after cutoff
@@ -675,7 +672,6 @@ def main() -> int:
 
     # 12. Stale checkpoint
     stale = json.loads(json.dumps(claim_a))
-    stale["attack"] = "stale_checkpoint"
     stale["claimed_checkpoint"] = source_header_checkpoint(all_headers[0], note="stale")
     inv("stale_checkpoint", stale, "STALE_CHECKPOINT", epoch_last_clean_height_override=tip_height)
 
@@ -701,20 +697,19 @@ def main() -> int:
 
     # 16. Unsupported script / tx form
     uns = json.loads(json.dumps(claim_a))
-    uns["force_unsupported_tx"] = True
+    uns["transaction"]["unknown_field"] = True
     inv("unsupported_tx_form", uns, "UNSUPPORTED_TX_FORM")
     uns2 = json.loads(json.dumps(claim_a))
-    uns2["force_unsupported_script"] = True
-    inv("unsupported_script_form", uns2, "UNSUPPORTED_SCRIPT_FORM")
+    uns2["transaction"]["outputs"][1]["script_pubkey_hex"] = "51"
+    inv("unsupported_script_form", uns2, "UNSUPPORTED_TX_FORM")
 
     # 17. Nullifier domain omission
     nd = json.loads(json.dumps(claim_a))
-    nd["attack"] = "nullifier_domain_omission"
     nd["presented_nullifier_hex"] = domain_omission_attempt(
         donation_txid_hex=nd["donation_txid_hex"],
         donation_vout=nd["donation_vout"],
     )
-    inv("nullifier_domain_omission", nd, "NULLIFIER_DOMAIN_OMISSION")
+    inv("nullifier_domain_omission", nd, "NULLIFIER_COLLISION")
 
     # 18. PQ signature mutation / wrong alg / wrong key / wrong domain
     pqm = json.loads(json.dumps(claim_a))
@@ -862,6 +857,24 @@ def main() -> int:
             "allocation_after_epoch.json",
         ],
         "invalid_expected_codes": expected_map,
+        "documentary_only": [
+            "charity_destination_key_compromise_assumption",
+            "conflicting_checkpoint",
+            "inclusion_after_cutoff_epoch",
+            "insufficient_confirmations",
+            "reorg_after_provisional_acceptance",
+            "stale_checkpoint",
+        ],
+        "residual_risks": [
+            "synthetic cryptographic primitives",
+            "no Bitcoin consensus or script execution",
+            "deep reorg and eclipse resistance outside bounded model",
+            "charity rebate or collusion outside protocol",
+            "cryptographic control is not legal ownership",
+            "allocation economics and concentration not analysed",
+            "charity-set publication governance is trusted",
+            "quantum cutoff remains an external policy input",
+        ],
         "allocation_invariant": {
             "pool": DEFAULT_FIXED_BITCOIN_GENESIS_POOL,
             "total_issued": alloc["total_issued"],
@@ -873,7 +886,7 @@ def main() -> int:
 
     # Rejection codes schema dump
     _write(
-        ROOT / "schemas" / "rejection_codes.json",
+        OUTPUT_ROOT / "schemas" / "rejection_codes.json",
         {
             "schema": "bgen.rejection-codes/v0",
             "codes": REJECTION_CODES,

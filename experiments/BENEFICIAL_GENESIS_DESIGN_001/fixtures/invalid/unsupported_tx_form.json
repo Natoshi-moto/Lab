@@ -8,7 +8,6 @@
     "donation_txid_hex": "ac3c1d41aba49d7207c47d8927ef25d01b05a3570ef51e0614ae8599c5a1cf24",
     "donation_vout": 0,
     "epoch_id": "epoch-synth-0001",
-    "force_unsupported_tx": true,
     "inclusion_proof": {
       "block_header_hash_hex": "b1a258b474913c9a695d6eb514185fd3438e129938b23594a0d4e868847c6974",
       "block_height": 100,
@@ -53,6 +52,7 @@
           "value_sats": 0
         }
       ],
+      "unknown_field": true,
       "version": 1
     },
     "version": 1

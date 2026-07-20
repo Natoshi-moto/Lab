@@ -233,3 +233,19 @@ operations/receipts/BENEFICIAL_GENESIS_DESIGN_001/
 - Live charity addresses, donor data, credentials, real keys.
 - Changing `STATUS.json`, constitutions, workflows, lockfiles, or other experiments.
 - Assigning an R-round number or claiming independent review.
+
+---
+
+## 12. Trusted-context and lifecycle invariants
+
+- Constructor validation is fail-closed for the full canonical charity set,
+  its commitment, the epoch object, every traversed header hash, every link,
+  and the accepted tip height/hash.
+- `last_clean_source_height` and `last_clean_source_header_hash_hex` identify
+  that accepted tip; an independent mismatched height is rejected.
+- New admission is open-epoch-only. Closed-epoch replay uses the explicitly
+  non-consuming historical verifier path.
+- The only supported commitment carrier is the exact 34-byte script
+  `6a20 || commitment`; substring and claim-only carriers are invalid.
+- Allocation requires the validated epoch to be closed and validates the full
+  canonical record, widths, sums, ordering, uniqueness, floors, and remainder.

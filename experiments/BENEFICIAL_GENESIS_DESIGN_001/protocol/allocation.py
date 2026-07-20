@@ -17,7 +17,8 @@ from __future__ import annotations
 
 from typing import Iterable, Sequence
 
-from .constants import MAX_SATS
+from .constants import MAX_SATS, PROTOCOL_VERSION
+from .encoding import require_hex
 from .objects import genesis_allocation_record
 
 
@@ -67,7 +68,7 @@ def allocate_proportional(
     # Canonical order: nullifier ascending.
     cleaned.sort(key=lambda row: row[0])
     total_eligible = sum(e for _, e in cleaned)
-    if total_eligible <= 0:
+    if total_eligible <= 0 or total_eligible > MAX_SATS:
         raise AllocationError("AMOUNT_NOT_POSITIVE", "total_eligible")
 
     rows: list[dict] = []
@@ -105,18 +106,51 @@ def allocate_proportional(
 
 
 def assert_supply_invariant(record: dict) -> None:
-    pool = record["fixed_bitcoin_genesis_pool"]
-    issued = record["total_issued"]
-    rem = record["remainder_unissued"]
+    required = {"claims", "epoch_id", "fixed_bitcoin_genesis_pool", "remainder_handling",
+                "remainder_unissued", "schema", "total_eligible_sats", "total_issued", "version"}
+    if not isinstance(record, dict) or set(record) != required:
+        raise AllocationError("ALLOCATION_NONCANONICAL", "record shape")
+    if record["schema"] != "GenesisAllocationRecord" or record["version"] != PROTOCOL_VERSION:
+        raise AllocationError("ALLOCATION_NONCANONICAL", "schema/version")
+    if not isinstance(record["epoch_id"], str) or not record["epoch_id"]:
+        raise AllocationError("TYPE_ERROR", "epoch_id")
+    if record["remainder_handling"] != "UNISSUED_FLOOR_REMAINDER":
+        raise AllocationError("ALLOCATION_NONCANONICAL", "remainder handling")
+    pool = _as_nonneg_int("fixed_bitcoin_genesis_pool", record["fixed_bitcoin_genesis_pool"])
+    issued = _as_nonneg_int("total_issued", record["total_issued"])
+    rem = _as_nonneg_int("remainder_unissued", record["remainder_unissued"])
+    total_eligible = _as_nonneg_int("total_eligible_sats", record["total_eligible_sats"])
+    claims = record["claims"]
+    if not isinstance(claims, list) or not claims or total_eligible == 0:
+        raise AllocationError("ALLOCATION_NONCANONICAL", "claims/total")
+    nullifiers: list[str] = []
+    eligible_sum = 0
+    allocation_sum = 0
+    for row in claims:
+        if not isinstance(row, dict) or set(row) != {"allocation", "eligible_sats", "nullifier_hex"}:
+            raise AllocationError("ALLOCATION_NONCANONICAL", "row shape")
+        n = row["nullifier_hex"]
+        try:
+            require_hex("nullifier_hex", n, expected_bytes=32)
+        except (TypeError, ValueError) as exc:
+            raise AllocationError("TYPE_ERROR", "nullifier_hex") from exc
+        if n != n.lower():
+            raise AllocationError("TYPE_ERROR", "nullifier_hex lowercase")
+        nullifiers.append(n)
+        eligible_sum += _as_nonneg_int("eligible_sats", row["eligible_sats"])
+        allocation_sum += _as_nonneg_int("allocation", row["allocation"])
+    if len(nullifiers) != len(set(nullifiers)) or nullifiers != sorted(nullifiers):
+        raise AllocationError("ALLOCATION_NONCANONICAL", "nullifier order/uniqueness")
+    if eligible_sum != total_eligible:
+        raise AllocationError("ALLOCATION_NONCANONICAL", "eligible sum mismatch")
     if issued + rem != pool:
         raise AllocationError("ALLOCATION_EXCEEDS_POOL", "issued+remainder != pool")
     if issued > pool:
         raise AllocationError("ALLOCATION_EXCEEDS_POOL")
-    if sum(r["allocation"] for r in record["claims"]) != issued:
+    if allocation_sum != issued:
         raise AllocationError("ALLOCATION_NONCANONICAL", "sum mismatch")
     # Recompute each floor.
-    total_eligible = record["total_eligible_sats"]
-    for row in record["claims"]:
+    for row in claims:
         expected = (pool * row["eligible_sats"]) // total_eligible
         if row["allocation"] != expected:
             raise AllocationError("ALLOCATION_NONCANONICAL", row["nullifier_hex"])

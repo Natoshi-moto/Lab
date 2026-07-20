@@ -8,7 +8,8 @@
   "independent_review_claimed": false,
   "branch": "claude/beneficial-genesis-design-001",
   "base_commit": "52bfb27cef4212a82226f9f9281e540e8abb7173",
-  "final_commit": "e689b946956de141230de0150104c6b2ae34e7ca",
+  "previous_reviewed_head": "146d5ab8cde7a75760d6f58efe94c1854292ed9e",
+  "final_commit": "PENDING_REPAIR_COMMIT",
   "draft_pr": 27,
   "observed_origin": "https://github.com/Natoshi-moto/Lab.git",
   "authorized_paths": [
@@ -28,11 +29,11 @@
   "command_results": {
     "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_DESIGN_001/tests -v": {
       "exit_code": 0,
-      "summary": "Ran 20 tests \u2014 OK"
+      "summary": "Ran 27 tests \u2014 OK"
     },
     "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py": {
       "exit_code": 0,
-      "summary": "PASS; 35 invalid cases; 42 rejection codes"
+      "summary": "PASS; executable invalid=29; documentary-only=6; residual risks=8; 46 rejection codes; exact fixture byte determinism"
     },
     "git diff --check": {
       "exit_code": 0,
@@ -62,7 +63,7 @@
     "machine-readable schemas (protocol_objects + rejection_codes)",
     "canonical protocol objects: CharityGenesisEntry, CharitySetCommitment, DonationCommitment, SourceHeaderCheckpoint, DonationInclusionProof, BeneficialGenesisClaim, DonationNullifier, GenesisAllocationRecord, MigrationEpochClose",
     "deterministic valid fixtures (single, multi-output, boundary, allocation)",
-    "deterministic invalid/adversarial fixtures (35 catalogued cases)",
+    "deterministic invalid/adversarial fixtures (29 executed cases; 6 documentary-only cases)",
     "reference claim verifier (protocol/verifier.py)",
     "nullifier tests",
     "allocation invariant tests with integer-only floor remainder unissued",
@@ -130,6 +131,21 @@
     "Whale/Sybil economics not solved by proportional weights",
     "Genesis operator honesty for charity set publication is social/governance",
     "Quantum cutoff height is a policy input, not derived in-protocol"
+  ],
+  "evidence_counts": {
+    "executable_invalid": 29,
+    "documentary_only": 6,
+    "residual_risk": 8
+  },
+  "integration_blockers_repaired": [
+    "BGEN-REV-001",
+    "BGEN-REV-002",
+    "BGEN-REV-003",
+    "BGEN-REV-004",
+    "BGEN-REV-005",
+    "BGEN-REV-006",
+    "BGEN-REV-007",
+    "BGEN-REV-008"
   ],
   "recommended_breaker_task": "Attempt to craft a false Beneficial Genesis claim that the reference verifier accepts, focusing on commitment encoding tricks, cutoff off-by-ones, nullifier domain mix-ups under a divergent parser, and allocation over-issuance under a reimplementation that mishandles floor remainder.",
   "nonclaims": [

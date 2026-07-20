@@ -31,7 +31,6 @@
       "signature_hex": "5bf946f0d9ab7895b05679beaaf3f5d65a62eb3a0c1d54a3cadb5a4eb52ca593"
     },
     "source_chain": "bitcoin-mainnet-semantics-synthetic",
-    "submitted_after_close": true,
     "transaction": {
       "inputs": [
         {

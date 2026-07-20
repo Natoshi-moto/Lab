@@ -5,6 +5,14 @@
     "rule": "floor(pool * eligible_i / total_eligible); remainder unissued",
     "total_issued": 999999997
   },
+  "documentary_only": [
+    "charity_destination_key_compromise_assumption",
+    "conflicting_checkpoint",
+    "inclusion_after_cutoff_epoch",
+    "insufficient_confirmations",
+    "reorg_after_provisional_acceptance",
+    "stale_checkpoint"
+  ],
   "invalid_expected_codes": {
     "address_string_ambiguity": "ADDRESS_STRING_AMBIGUITY",
     "allocation_overflow_bool": "ARITHMETIC_OVERFLOW",
@@ -24,7 +32,7 @@
     "insufficient_confirmations": "INSUFFICIENT_CONFIRMATIONS",
     "invalid_merkle_branch": "INCLUSION_PROOF_INVALID",
     "malformed_charity_entry": "MALFORMED_CHARITY_ENTRY",
-    "nullifier_domain_omission": "NULLIFIER_DOMAIN_OMISSION",
+    "nullifier_domain_omission": "NULLIFIER_COLLISION",
     "pq_signature_mutation": "PQ_SIGNATURE_INVALID",
     "pq_wrong_algorithm": "PQ_ALGORITHM_UNSUPPORTED",
     "pq_wrong_domain": "PQ_DOMAIN_INVALID",
@@ -32,15 +40,15 @@
     "quantum_compromise_cutoff": "QUANTUM_COMPROMISE_CUTOFF",
     "reorg_after_provisional_acceptance": "HEADER_ANCESTRY_INVALID",
     "reorg_before_acceptance": "HEADER_ANCESTRY_INVALID",
-    "script_substitution": "SCRIPT_SUBSTITUTION",
+    "script_substitution": "CHARITY_SCRIPT_MISMATCH",
     "script_substitution_identity_break": "TX_MALLEABILITY_REENCODING",
     "stale_checkpoint": "STALE_CHECKPOINT",
     "tx_malleability_reencoding": "TX_MALLEABILITY_REENCODING",
-    "unsupported_script_form": "UNSUPPORTED_SCRIPT_FORM",
+    "unsupported_script_form": "UNSUPPORTED_TX_FORM",
     "unsupported_source_chain": "UNSUPPORTED_SOURCE_CHAIN",
     "unsupported_tx_form": "UNSUPPORTED_TX_FORM",
     "wrong_charity_id_script_mismatch": "CHARITY_SCRIPT_MISMATCH",
-    "wrong_output_index": "WRONG_OUTPUT_INDEX"
+    "wrong_output_index": "AMOUNT_MISMATCH"
   },
   "protocol_version": 1,
   "rejection_codes": {
@@ -53,6 +61,8 @@
     "CHARITY_ID_UNKNOWN": "Charity identifier is not in the genesis set",
     "CHARITY_INACTIVE": "Charity entry is outside its validity window",
     "CHARITY_SCRIPT_MISMATCH": "Output script bytes do not match genesis entry",
+    "CHARITY_SET_COMMITMENT_INVALID": "Genesis charity-set commitment does not match its entries",
+    "CHECKPOINT_MISMATCH": "Supplied checkpoint height/hash does not match the validated tip",
     "CLAIM_AFTER_CUTOFF": "Claim submitted after epoch close / last-clean checkpoint",
     "COMMITMENT_FIELD_MISMATCH": "Commitment fields disagree with claim body",
     "COMMITMENT_INVALID": "Donation commitment binding does not verify",
@@ -61,11 +71,13 @@
     "CROSS_EPOCH_REPLAY": "Claim attempts replay across migration epochs",
     "DUPLICATE_CHARITY_ENTRY": "Genesis charity set contains a duplicate identifier",
     "EPOCH_CLOSED": "Migration epoch is closed; no further claims admitted",
+    "EPOCH_NOT_CLOSED": "Allocation requires a validated closed epoch",
     "HEADER_ANCESTRY_INVALID": "Source header is not in accepted checkpoint ancestry",
     "INCLUSION_AFTER_CUTOFF": "Source inclusion height is after epoch cutoff",
     "INCLUSION_PROOF_INVALID": "Merkle inclusion proof does not verify",
     "INSUFFICIENT_CONFIRMATIONS": "Declared confirmations below required minimum",
     "MALFORMED_CHARITY_ENTRY": "Genesis charity entry is malformed",
+    "MALFORMED_EPOCH": "Trusted epoch object is malformed",
     "MISSING_FIELD": "Required protocol field is missing",
     "NULLIFIER_ALREADY_CONSUMED": "Donation nullifier has already been consumed",
     "NULLIFIER_COLLISION": "Nullifier collides under domain-omission or ambiguity attempt",
@@ -87,6 +99,16 @@
     "UNSUPPORTED_TX_FORM": "Transaction form is outside the synthetic model",
     "WRONG_OUTPUT_INDEX": "Commitment or claim points at the wrong output index"
   },
+  "residual_risks": [
+    "synthetic cryptographic primitives",
+    "no Bitcoin consensus or script execution",
+    "deep reorg and eclipse resistance outside bounded model",
+    "charity rebate or collusion outside protocol",
+    "cryptographic control is not legal ownership",
+    "allocation economics and concentration not analysed",
+    "charity-set publication governance is trusted",
+    "quantum cutoff remains an external policy input"
+  ],
   "schema": "bgen.fixture-expected/v0",
   "valid": [
     "claim_single_alpha.json",

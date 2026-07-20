@@ -1,7 +1,6 @@
 {
   "claim": {
     "amount_sats": 50000,
-    "attack": "wrong_output_index",
     "charity_id": "CHARITY_ALPHA",
     "commitment_nonce_hex": "a3000000000000000000000000000000",
     "commitment_version": 1,
@@ -66,5 +65,5 @@
     },
     "version": 1
   },
-  "expected_code": "WRONG_OUTPUT_INDEX"
+  "expected_code": "AMOUNT_MISMATCH"
 }

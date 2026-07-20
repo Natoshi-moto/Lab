@@ -64,3 +64,17 @@ remainder_unissued = pool - sum(allocation_i)   # never issued
 ## Related receipt
 
 `operations/receipts/BENEFICIAL_GENESIS_DESIGN_001/RECEIPT.json`
+
+## Integration-adjudication repair
+
+The PR #27 repair makes admission distinct from historical replay: new admission
+always rejects a trusted closed epoch, while `verify_historical_claim` is a
+non-consuming replay check. The verifier validates the entire charity set and
+the accepted header checkpoint at construction, accepts only structurally
+defined transactions/scripts and exact `6a20 || 32-byte commitment` carriers,
+and permits allocation only from a validated closed epoch.
+
+`EXPECTED.json` reports 29 executable invalid vectors, 6 documentary-only
+scenarios, and 8 residual risks separately. The evidence gate executes every
+executable vector and regenerates fixtures in a temporary directory for an
+exact byte comparison.

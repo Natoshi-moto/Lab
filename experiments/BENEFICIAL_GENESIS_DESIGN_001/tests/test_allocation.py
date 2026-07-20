@@ -92,13 +92,12 @@ class TestAllocation(unittest.TestCase):
         self.assertEqual(ctx.exception.code, "NULLIFIER_ALREADY_CONSUMED")
 
     def test_large_product_still_bounded(self) -> None:
-        rec = allocate_proportional(
-            fixed_bitcoin_genesis_pool=MAX_SATS,
-            eligible_by_nullifier=[("aa" * 32, MAX_SATS), ("bb" * 32, 1)],
-            epoch_id="e",
-        )
-        assert_supply_invariant(rec)
-        self.assertLessEqual(rec["total_issued"], MAX_SATS)
+        with self.assertRaises(AllocationError):
+            allocate_proportional(
+                fixed_bitcoin_genesis_pool=MAX_SATS,
+                eligible_by_nullifier=[("aa" * 32, MAX_SATS), ("bb" * 32, 1)],
+                epoch_id="e",
+            )
 
     def test_overflow_attack_vectors_report(self) -> None:
         results = try_overflow_attack_vectors()
@@ -117,6 +116,16 @@ class TestAllocation(unittest.TestCase):
         )
         keys = [r["nullifier_hex"] for r in rec["claims"]]
         self.assertEqual(keys, sorted(keys))
+
+    def test_rejects_manipulated_total_eligible(self) -> None:
+        rec = allocate_proportional(
+            fixed_bitcoin_genesis_pool=100,
+            eligible_by_nullifier=[("aa" * 32, 10), ("bb" * 32, 20)],
+            epoch_id="e",
+        )
+        rec["total_eligible_sats"] += 1
+        with self.assertRaises(AllocationError):
+            assert_supply_invariant(rec)
 
 
 if __name__ == "__main__":

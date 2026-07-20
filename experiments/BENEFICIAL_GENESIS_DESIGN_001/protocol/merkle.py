@@ -81,6 +81,12 @@ def verify_merkle_proof(
     index: int,
 ) -> bool:
     try:
+        if type(index) is not int or index < 0:
+            return False
+        if not isinstance(branch_hex, (list, tuple)) or len(branch_hex) > 64:
+            return False
+        if index >= (1 << len(branch_hex)):
+            return False
         h = require_hex("txid", txid_hex, expected_bytes=32)
         root = require_hex("merkle_root", merkle_root_hex, expected_bytes=32)
         idx = index

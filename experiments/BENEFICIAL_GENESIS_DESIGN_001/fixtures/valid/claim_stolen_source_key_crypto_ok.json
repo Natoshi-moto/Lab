@@ -1,6 +1,5 @@
 {
   "amount_sats": 10000,
-  "attack": "stolen_source_key",
   "charity_id": "CHARITY_ALPHA",
   "commitment_nonce_hex": "a5000000000000000000000000000000",
   "commitment_version": 1,

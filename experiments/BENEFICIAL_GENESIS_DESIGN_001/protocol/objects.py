@@ -62,6 +62,42 @@ def charity_set_commitment(entries: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def validate_charity_set(obj: object) -> dict[str, Any]:
+    """Fail-closed validation of the complete committed charity set."""
+
+    if not isinstance(obj, dict) or set(obj) != {"commitment_hex", "entries", "schema", "version"}:
+        raise ValueError("MALFORMED_CHARITY_ENTRY")
+    if obj.get("schema") != "CharitySetCommitment" or obj.get("version") != PROTOCOL_VERSION:
+        raise ValueError("MALFORMED_CHARITY_ENTRY")
+    try:
+        require_hex("commitment_hex", obj["commitment_hex"], expected_bytes=32)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("MALFORMED_CHARITY_ENTRY") from exc
+    entries = obj.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise ValueError("MALFORMED_CHARITY_ENTRY")
+    validated: list[dict[str, Any]] = []
+    for entry in entries:
+        if not isinstance(entry, dict) or set(entry) != {
+            "attestation_commitment_hex", "charity_id", "script_pubkey_hex",
+            "valid_from_height", "valid_until_height",
+        }:
+            raise ValueError("MALFORMED_CHARITY_ENTRY")
+        try:
+            validated.append(charity_genesis_entry(**entry))
+        except (TypeError, ValueError) as exc:
+            raise ValueError("MALFORMED_CHARITY_ENTRY") from exc
+    ids = [entry["charity_id"] for entry in validated]
+    if len(ids) != len(set(ids)):
+        raise ValueError("DUPLICATE_CHARITY_ENTRY")
+    if ids != sorted(ids):
+        raise ValueError("MALFORMED_CHARITY_ENTRY")
+    expected = charity_set_commitment(validated)
+    if obj["commitment_hex"] != expected["commitment_hex"]:
+        raise ValueError("CHARITY_SET_COMMITMENT_INVALID")
+    return expected
+
+
 def donation_commitment_preimage(
     *,
     new_ledger_chain_id: str,
