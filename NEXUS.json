@@ -1,7 +1,9 @@
 {
   "schema": "nexus.lab/v1",
   "lab_id": "NEXUS-LAB",
-  "title": "Nexus Private Research Lab",
+  "title": "Nexus Public Research Lab",
+  "observed_repository_visibility": "PUBLIC",
+  "visibility_policy_status": "PRIVATE_REQUIREMENT_CONFLICT_HUMAN_DECISION_REQUIRED",
   "visibility_requirement": "PRIVATE",
   "authoritative_store": "one_git_repository",
   "default_branch": "main",

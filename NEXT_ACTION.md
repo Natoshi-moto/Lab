@@ -1,9 +1,17 @@
 # NEXT ACTION
 
-Design R017 as a new reversible proposal round that tests multi-host replication and explicit fork evidence over the canonically promoted R016 synthetic custody kernel.
+Review and adjudicate draft PR #22, the proposed R017 replica-independent history
+attestation and fork-evidence implementation, against promoted R016 and its bounded
+nonclaims. Decide whether it should be accepted, revised, replaced, or closed.
 
-R017 should test deterministic replication, conflicting sibling histories, explicit fork detection, bounded reconciliation evidence, authenticated checkpoint exchange, replay from exact genesis, and fail-closed behavior under delay, duplication, reordering, omission, corruption, and competing writers.
+Do not describe R017 as accepted unless a human-authorized merge is recorded on
+`main`. Draft PR #23 proposes R018 on top of the R017 proposal and must not be
+promoted or treated as accepted before its prerequisite and its own evidence are
+separately adjudicated. PR #24 is a separate public-protocol documentation
+proposal and does not change accepted round state.
 
-R017 must not claim network consensus, fork choice, global double-spend prevention, global finality, Byzantine fault tolerance, availability, economic security, money, stable value, operational custody, deployment readiness, or authorization for live funds.
-
-R016 is canonically promoted only at exact proposal head `75343b7f00d4ab38a11086180193b8fd26ccd435`, merged by commit `206cd013d5de59a5e12d861223278c0591f4758b`. Its bounded nonclaims remain controlling.
+The repository is demonstrably public while `NEXUS.json` and
+`constitution/PRIVACY.md` retain a private-repository design requirement. Whether
+to revise that constitution and its data classifications, or restore private
+visibility through an authorized administrative action, is
+`HUMAN_DECISION_REQUIRED`.

@@ -16,7 +16,8 @@
     ],
     "target_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8"
   },
-  "active_task": "TSK-R007-REMAINING-AUDIT-ADJUDICATION",
+  "active_task": null,
+  "current_round": "R016",
   "authoritative_store": "one_git_repository",
   "default_branch": "main",
   "entrypoints": {

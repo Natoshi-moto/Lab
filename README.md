@@ -1,5 +1,7 @@
 # Nexus Public Research Lab
 
+**Observed repository visibility: `PUBLIC`.**
+
 **Public, one-repository research infrastructure for human-directed collaboration across ChatGPT, Claude, local tools, GitHub, terminal workflows, and future interfaces.**
 
 ➡️ Begin with [`README_START_HERE.md`](README_START_HERE.md).
@@ -15,6 +17,10 @@ snapshots        = deterministic CANONICAL_AS_IS artifacts
 audit overlays   = append-only observations bound to target hashes
 AI accounts      = replaceable, attributed research seats
 ```
+
+The constitutional privacy model still says the repository is designed to remain
+private. That mismatch is recorded as `HUMAN_DECISION_REQUIRED`; public visibility
+does not waive `LOCAL_ONLY`, `SECRET`, provider-routing, or redaction rules.
 
 ## Demonstrated in R001
 
