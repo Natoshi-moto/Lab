@@ -14,6 +14,7 @@
   "prior_breaker_pr": 29,
   "prior_breaker_head": "54bca3f827ab062dda0a5888590ebda924a673f5",
   "stacked_base_branch": "codex/beneficial-genesis-diff-repair-002",
+  "retest_commit": "b9de462ef42e232dc6012cc728f5fcfe8e29c2fd",
   "draft_pr": null,
   "authorized_paths": [
     "experiments/BENEFICIAL_GENESIS_RETEST_002/**",
