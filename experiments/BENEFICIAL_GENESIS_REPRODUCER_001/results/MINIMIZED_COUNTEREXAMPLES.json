@@ -1,0 +1,36 @@
+[
+  {
+    "name": "commitment_version_true",
+    "expect": "TYPE_ERROR",
+    "actual": "TYPE_ERROR",
+    "agree": true
+  },
+  {
+    "name": "commitment_version_string",
+    "expect": "TYPE_ERROR",
+    "actual": "TYPE_ERROR",
+    "agree": true
+  },
+  {
+    "name": "nullifier_field_disagreement",
+    "expect": "NULLIFIER_COLLISION",
+    "actual": "NULLIFIER_COLLISION",
+    "agree": true
+  },
+  {
+    "name": "pq_domain_malformed",
+    "expect": "PQ_DOMAIN_INVALID",
+    "actual": "PQ_DOMAIN_INVALID",
+    "agree": true
+  },
+  {
+    "name": "amount_bool",
+    "expect": "TYPE_ERROR",
+    "actual": "TYPE_ERROR",
+    "agree": true
+  },
+  {
+    "name": "python_pq_domain_hex_crash_probe",
+    "note": "Python reference uses bytes.fromhex(domain) without try/except in verify path — possible uncaught ValueError"
+  }
+]

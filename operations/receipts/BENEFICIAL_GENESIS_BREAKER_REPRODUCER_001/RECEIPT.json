@@ -1,0 +1,74 @@
+{
+  "task_id": "TSK-BENEFICIAL-GENESIS-BREAKER-REPRO-001",
+  "github_issue": 28,
+  "designer_pr": 27,
+  "seat": "Breaker/Reproducer",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / INDEPENDENT_BREAKER_REPRODUCER",
+  "round_assignment": null,
+  "independent_review_claimed": false,
+  "provider_model_label": "xAI Grok (grok-4.5 class interactive CLI agent)",
+  "reasoning_setting": "default agentic tool use",
+  "tool_network_availability": "local shell+git+gh+node+python; network available for GitHub",
+  "launch_timestamp_utc": "2026-07-20T17:16:58Z",
+  "prior_beneficial_genesis_context": false,
+  "branch": "grok/beneficial-genesis-breaker-repro-001",
+  "subject_commit": "575f22fea039a25197510e481b7837d2b9611131",
+  "subject_staleness": false,
+  "base_for_stacked_pr": "claude/beneficial-genesis-design-001",
+  "authorized_write_paths": [
+    "experiments/BENEFICIAL_GENESIS_REPRODUCER_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_BREAKER_REPRODUCER_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_BREAKER_REPRODUCER_001/**"
+  ],
+  "designer_files_modified": false,
+  "canonical_status_changed": false,
+  "synthetic_only": true,
+  "cleanroom_language": "Node.js (dependency-free, node:test / node:crypto)",
+  "phase_boundary": {
+    "cleanroom_frozen_before_python_inspection": true,
+    "freeze_marker": "experiments/BENEFICIAL_GENESIS_REPRODUCER_001/results/CLEANROOM_FREEZE.json"
+  },
+  "command_results": {
+    "node --test experiments/BENEFICIAL_GENESIS_REPRODUCER_001/tests/*.test.mjs": {
+      "exit_code": 0,
+      "summary": "30/30 pass"
+    },
+    "node experiments/BENEFICIAL_GENESIS_REPRODUCER_001/verify.mjs": {
+      "exit_code": 0,
+      "summary": "fixture compatibility report; 0 crashes; 4 constructor-binding disagreements"
+    },
+    "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py": {
+      "exit_code": 0,
+      "summary": "Designer gate PASS (does not catch F-001..F-003)"
+    },
+    "git diff --check": {
+      "exit_code": 0,
+      "summary": "clean"
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS with WARN WORKTREE_DIRTY (expected before commit)"
+    },
+    "python3 -m unittest discover -s tests -v": {
+      "exit_code": 1,
+      "summary": "FAILED failures=9 errors=2 — pre-existing missing @noble/ed25519 for R013/R016 independent verifiers; unrelated to this task write scope"
+    },
+    "./nexus verify": {
+      "exit_code": 1,
+      "summary": "FAIL Independent R013 verifier missing @noble/ed25519 — pre-existing environment gap; not introduced by breaker paths"
+    },
+    "git status --short": {
+      "exit_code": 0,
+      "summary": "only authorized untracked paths under BENEFICIAL_GENESIS_REPRODUCER_001 and breaker audit/receipt dirs"
+    }
+  },
+  "critical_findings": [
+    "F-001 Python crash on malformed pq_sig_domain_bytes",
+    "F-002 Python false accept commitment_version true/string via int()",
+    "F-003 Python ignores disagreeing claim.nullifier_hex"
+  ],
+  "final_recommendation": "REPAIR_AND_RETEST",
+  "receipt_schema": "nexus.task-receipt.beneficial-genesis-breaker-repro/v0",
+  "label": "SANITIZED_TASK_RECEIPT_NO_SECRETS"
+}

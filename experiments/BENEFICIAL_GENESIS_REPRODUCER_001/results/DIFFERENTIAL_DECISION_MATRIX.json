@@ -1,0 +1,90 @@
+{
+  "schema": "bgen.reproducer.differential-matrix/v0",
+  "subject_commit": "575f22fea039a25197510e481b7837d2b9611131",
+  "rows": [
+    {
+      "probe": "nullifier_hex field disagrees with computed nullifier",
+      "clean_room": "NULLIFIER_COLLISION",
+      "python_reference": "OK (field ignored; only presented_nullifier_hex checked)",
+      "severity": "false_accept",
+      "severity": "HIGH",
+      "minimized": "hostile_fixtures/nullifier_field_disagreement.json"
+    },
+    {
+      "probe": "commitment_version = true (JSON boolean)",
+      "clean_room": "TYPE_ERROR",
+      "python_reference": "OK (int(True)==1 coerces to version 1)",
+      "severity": "false_accept",
+      "severity": "HIGH",
+      "minimized": "hostile_fixtures/commitment_version_true.json"
+    },
+    {
+      "probe": "commitment_version = \"1\" (JSON string)",
+      "clean_room": "TYPE_ERROR",
+      "python_reference": "OK (int(\"1\")==1)",
+      "severity": "false_accept",
+      "severity": "HIGH",
+      "minimized": "hostile_fixtures/commitment_version_string.json"
+    },
+    {
+      "probe": "pq_sig_domain_bytes non-hex",
+      "clean_room": "PQ_DOMAIN_INVALID",
+      "python_reference": "CRASH ValueError from bytes.fromhex",
+      "severity": "uncaught_exception",
+      "severity": "CRITICAL",
+      "minimized": "hostile_fixtures/pq_domain_malformed.json"
+    },
+    {
+      "probe": "amount_sats = true",
+      "clean_room": "TYPE_ERROR",
+      "python_reference": "TYPE_ERROR",
+      "severity": "agree",
+      "severity": "INFO"
+    },
+    {
+      "probe": "unexpected claim properties",
+      "clean_room": "OK (ignored)",
+      "python_reference": "OK (ignored)",
+      "severity": "agree_open_object",
+      "severity": "INFO"
+    },
+    {
+      "probe": "tip_height_override without matching tip header height",
+      "clean_room": "constructor CHECKPOINT_MISMATCH",
+      "python_reference": "constructor CHECKPOINT_MISMATCH",
+      "severity": "agree",
+      "severity": "INFO",
+      "note": "Makes several EXPECTED documentary fixtures and claim_at_cutoff_boundary non-executable under repaired constructor"
+    },
+    {
+      "probe": "insufficient_confirmations fixture tip_height_override=101",
+      "clean_room": "CHECKPOINT_MISMATCH @constructor",
+      "python_reference": "CHECKPOINT_MISMATCH @constructor",
+      "severity": "fixture_label_mismatch",
+      "severity": "MEDIUM",
+      "note": "EXPECTED code INSUFFICIENT_CONFIRMATIONS not reachable; documentary-only"
+    },
+    {
+      "probe": "valid multi-output claims",
+      "clean_room": "OK",
+      "python_reference": "OK",
+      "severity": "agree",
+      "severity": "INFO"
+    },
+    {
+      "probe": "allocation bool eligible",
+      "clean_room": "ARITHMETIC_OVERFLOW",
+      "python_reference": "ARITHMETIC_OVERFLOW",
+      "severity": "agree",
+      "severity": "INFO"
+    },
+    {
+      "probe": "duplicate JSON keys",
+      "clean_room": "JSON.parse last-key-wins",
+      "python_reference": "json.loads last-key-wins",
+      "severity": "shared_parser_ambiguity",
+      "severity": "MEDIUM",
+      "note": "Neither implementation rejects duplicate keys; cross-parser risk remains"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "phase": "CLEANROOM_RESULTS_FROZEN",
+  "frozen_at_utc": "2026-07-20T17:35:00Z",
+  "subject_commit": "575f22fea039a25197510e481b7837d2b9611131",
+  "branch": "grok/beneficial-genesis-breaker-repro-001",
+  "note": "Clean-room Node verifier results frozen before intentional post-freeze inspection of Python reference for disagreement explanation.",
+  "pre_freeze_artifact": "FIXTURE_COMPATIBILITY_REPORT.json",
+  "post_freeze_python_probes": "POST_FREEZE_PYTHON_PROBES.json"
+}
