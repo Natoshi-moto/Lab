@@ -8,8 +8,8 @@
   "independent_review_claimed": false,
   "branch": "claude/beneficial-genesis-design-001",
   "base_commit": "52bfb27cef4212a82226f9f9281e540e8abb7173",
-  "final_commit": "1ebc179706b8ca175ab0509fd93cfa8617d34e3a",
-  "draft_pr": null,
+  "final_commit": "e689b946956de141230de0150104c6b2ae34e7ca",
+  "draft_pr": 27,
   "observed_origin": "https://github.com/Natoshi-moto/Lab.git",
   "authorized_paths": [
     "experiments/BENEFICIAL_GENESIS_DESIGN_001/**",
@@ -147,5 +147,7 @@
   ],
   "receipt_schema": "nexus.task-receipt.beneficial-genesis-design/v0",
   "label": "SANITIZED_TASK_RECEIPT_NO_SECRETS",
-  "receipt_final_commit_semantics": "Primary design-pack commit containing this receipt body at first authoring; branch tip after PR metadata update is reported in the Designer handoff and may differ by receipt-only commits."
+  "receipt_final_commit_semantics": "Primary design-pack commit containing this receipt body at first authoring; branch tip after PR metadata update is reported in the Designer handoff and may differ by receipt-only commits.",
+  "branch_tip_at_pr_open": "e689b946956de141230de0150104c6b2ae34e7ca",
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/27"
 }
