@@ -9,7 +9,10 @@
   "branch": "claude/beneficial-genesis-design-001",
   "base_commit": "52bfb27cef4212a82226f9f9281e540e8abb7173",
   "previous_reviewed_head": "146d5ab8cde7a75760d6f58efe94c1854292ed9e",
-  "final_commit": "PENDING_REPAIR_COMMIT",
+  "final_commit": "eedaf17c970ddfae5b6c5e4522f1255651128643",
+  "repair_commits": [
+    "eedaf17c970ddfae5b6c5e4522f1255651128643"
+  ],
   "draft_pr": 27,
   "observed_origin": "https://github.com/Natoshi-moto/Lab.git",
   "authorized_paths": [
@@ -163,7 +166,7 @@
   ],
   "receipt_schema": "nexus.task-receipt.beneficial-genesis-design/v0",
   "label": "SANITIZED_TASK_RECEIPT_NO_SECRETS",
-  "receipt_final_commit_semantics": "Primary design-pack commit containing this receipt body at first authoring; branch tip after PR metadata update is reported in the Designer handoff and may differ by receipt-only commits.",
+  "receipt_final_commit_semantics": "Exact repair implementation/evidence commit verified by this receipt; the subsequent receipt-only commit and final branch tip are reported in the amended handoff.",
   "branch_tip_at_pr_open": "e689b946956de141230de0150104c6b2ae34e7ca",
   "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/27"
 }
