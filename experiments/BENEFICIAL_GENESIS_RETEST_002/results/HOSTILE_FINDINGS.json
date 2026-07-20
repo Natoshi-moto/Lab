@@ -1,0 +1,66 @@
+{
+  "schema": "bgen.retest-002.hostile-findings/v1",
+  "subject_commit": "46a7de63fd800029a05793d7d8204a900690f68e",
+  "subject_pr": 30,
+  "recommendation": "DIFF_RETEST_PASS",
+  "breaker_findings_retest": [
+    {
+      "id": "F-001",
+      "title": "malformed pq_sig_domain_bytes must not crash",
+      "node": "UNKNOWN_FIELD",
+      "python": "UNKNOWN_FIELD",
+      "crash": false,
+      "status": "REPAIRED"
+    },
+    {
+      "id": "F-002",
+      "title": "commitment_version coercion false accept",
+      "node_rejects": ["true", "\"1\"", "-1", "2", "2^32", "1.5"],
+      "python_rejects": ["true", "\"1\"", "-1", "2", "2^32"],
+      "codes": "COMMITMENT_VERSION_INVALID",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "F-003",
+      "title": "nullifier_hex binding",
+      "missing": "MISSING_FIELD",
+      "malformed_or_uppercase": "NULLIFIER_INVALID",
+      "disagreeing": "NULLIFIER_INVALID",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "F-004",
+      "title": "unexpected keys at consensus nesting levels",
+      "claim_level": "UNKNOWN_FIELD",
+      "nested_proof": "INCLUSION_PROOF_INVALID",
+      "nested_auth": "SOURCE_AUTH_INVALID",
+      "nested_tx": "UNSUPPORTED_TX_FORM",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "F-005",
+      "title": "raw duplicate JSON keys",
+      "node": "DUPLICATE_JSON_KEY",
+      "python_canonical_loader": "rejects with ValueError duplicate JSON object key",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "F-006",
+      "title": "normative constants / PQ message without implementation inspection",
+      "domains_and_framing": "published in schemas/protocol_constants.json + TECHNICAL_DESIGN.md",
+      "pq_message_bytes": "reproduced from design alone",
+      "public_test_seeds": "NOT published in protocol_constants.json; recovered post-freeze from protocol/crypto_synth.PUBLIC_TEST_SEEDS",
+      "status": "RESIDUAL_SPEC_GAP_SEEDS_ONLY"
+    }
+  ],
+  "additional_probes": [
+    "accepted tip later than last-eligible checkpoint",
+    "eligibility boundary via D-005 default context",
+    "insufficient confirmations with consistent shorter chain",
+    "quantum cutoff independent of eligibility",
+    "commitment multiplicity / same-carrier duplication",
+    "atomic nullifier rebuild retains prior state on failed revalidation",
+    "full committed fixture matrix: 43 agreements, 0 disagreements, 0 crashes"
+  ],
+  "new_blockers_against_subject": []
+}

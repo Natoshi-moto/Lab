@@ -1,0 +1,86 @@
+{
+  "task_id": "TSK-BENEFICIAL-GENESIS-DIFF-RETEST-002",
+  "github_issue": 31,
+  "seat": "Grok-Code-fresh-independent-retest",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / FRESH_INDEPENDENT_RETEST",
+  "round_assignment": null,
+  "independent_review_claimed": false,
+  "provider_model_label": "xAI Grok interactive CLI (grok-4.5 class)",
+  "branch": "grok/beneficial-genesis-diff-retest-002",
+  "subject_pr": 30,
+  "subject_branch": "codex/beneficial-genesis-diff-repair-002",
+  "subject_commit": "46a7de63fd800029a05793d7d8204a900690f68e",
+  "prior_breaker_pr": 29,
+  "prior_breaker_head": "54bca3f827ab062dda0a5888590ebda924a673f5",
+  "stacked_base_branch": "codex/beneficial-genesis-diff-repair-002",
+  "draft_pr": null,
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_RETEST_002/**",
+    "operations/audits/BENEFICIAL_GENESIS_DIFF_RETEST_002/**",
+    "operations/receipts/BENEFICIAL_GENESIS_DIFF_RETEST_002/**"
+  ],
+  "scope_respected": true,
+  "paths_outside_scope_modified": [],
+  "subject_branch_modified": false,
+  "canonical_status_changed": false,
+  "synthetic_only": true,
+  "secrets_committed": false,
+  "command_results": {
+    "node --test experiments/BENEFICIAL_GENESIS_RETEST_002/tests/*.test.mjs": {
+      "exit_code": 0,
+      "summary": "19 tests OK"
+    },
+    "node experiments/BENEFICIAL_GENESIS_RETEST_002/verify.mjs": {
+      "exit_code": 0,
+      "summary": "43 agreements, 0 disagreements, 0 crashes; seeds_loaded=true"
+    },
+    "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py": {
+      "exit_code": 0,
+      "summary": "PASS; executable invalid=34; documentary=1; residual=8"
+    },
+    "git diff --check": {
+      "exit_code": 0,
+      "summary": "clean"
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS with WARN WORKTREE_DIRTY before commit"
+    },
+    "python3 -m unittest discover -s tests -v": {
+      "exit_code": 0,
+      "summary": "185 tests OK after npm ci environmental fix"
+    },
+    "./nexus verify": {
+      "exit_code": 0,
+      "summary": "PASS after npm ci environmental fix"
+    }
+  },
+  "environmental_failures_separate_from_subject": [
+    {
+      "symptom": "missing node_modules/@noble/ed25519 for R013 independent verifier",
+      "resolution": "npm ci",
+      "subject_related": false
+    }
+  ],
+  "cleanroom": {
+    "freeze": "experiments/BENEFICIAL_GENESIS_RETEST_002/results/CLEANROOM_FREEZE.json",
+    "interpretation": "experiments/BENEFICIAL_GENESIS_RETEST_002/CLEANROOM_INTERPRETATION.md",
+    "forbidden_paths_content_not_opened_before_freeze": true,
+    "post_freeze_seed_recovery": true
+  },
+  "gate_recommendation": "DIFF_RETEST_PASS",
+  "residual_risks": [
+    "PUBLIC_TEST_SEEDS not published in protocol_constants.json",
+    "synthetic cryptographic primitives",
+    "no Bitcoin consensus or real PQ algorithms"
+  ],
+  "nonclaims": [
+    "no merge or promotion authority",
+    "no R-round assignment",
+    "no production readiness",
+    "no legal ownership or charity honesty"
+  ],
+  "receipt_schema": "bgen.diff-retest-002.receipt/v1",
+  "label": "SANITIZED_TASK_RECEIPT"
+}

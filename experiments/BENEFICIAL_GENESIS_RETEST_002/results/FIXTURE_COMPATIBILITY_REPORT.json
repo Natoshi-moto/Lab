@@ -1,0 +1,344 @@
+{
+  "schema": "bgen.retest-002.verify-summary/v1",
+  "subject_commit": "46a7de63fd800029a05793d7d8204a900690f68e",
+  "seeds_loaded": true,
+  "agreements": 43,
+  "disagreements": 0,
+  "crashes": 0,
+  "results": [
+    {
+      "name": "claim_single_alpha.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "claim_single_beta.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "claim_multi_out0.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "claim_multi_out1.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "claim_stolen_source_key_crypto_ok.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true
+    },
+    {
+      "name": "claim_charity_rebate_collusion_crypto_ok.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "claim_at_cutoff_boundary.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true
+    },
+    {
+      "name": "allocation_after_epoch.json",
+      "kind": "valid",
+      "expected": "OK",
+      "got": "OK",
+      "agree": true
+    },
+    {
+      "name": "address_string_ambiguity",
+      "kind": "invalid",
+      "expected": "UNKNOWN_FIELD",
+      "got": "UNKNOWN_FIELD",
+      "agree": true,
+      "detail": "charity_address_string"
+    },
+    {
+      "name": "allocation_overflow_bool",
+      "kind": "invalid",
+      "expected": "ARITHMETIC_OVERFLOW",
+      "got": "ARITHMETIC_OVERFLOW",
+      "agree": true
+    },
+    {
+      "name": "amount_mismatch",
+      "kind": "invalid",
+      "expected": "AMOUNT_MISMATCH",
+      "got": "AMOUNT_MISMATCH",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "amount_not_positive",
+      "kind": "invalid",
+      "expected": "AMOUNT_NOT_POSITIVE",
+      "got": "AMOUNT_NOT_POSITIVE",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "charity_destination_key_compromise_assumption",
+      "kind": "invalid",
+      "status": "DOCUMENTARY_ONLY",
+      "expected": "CHARITY_SCRIPT_MISMATCH",
+      "got": "CHARITY_SCRIPT_MISMATCH",
+      "agree": true
+    },
+    {
+      "name": "claim_after_cutoff",
+      "kind": "invalid",
+      "expected": "EPOCH_CLOSED",
+      "got": "EPOCH_CLOSED",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "conflicting_checkpoint",
+      "kind": "invalid",
+      "expected": "CHECKPOINT_MISMATCH",
+      "got": "CHECKPOINT_MISMATCH",
+      "agree": true
+    },
+    {
+      "name": "cross_chain_replay",
+      "kind": "invalid",
+      "expected": "CROSS_CHAIN_REPLAY",
+      "got": "CROSS_CHAIN_REPLAY",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "cross_epoch_replay",
+      "kind": "invalid",
+      "expected": "CROSS_EPOCH_REPLAY",
+      "got": "CROSS_EPOCH_REPLAY",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "double_claim_same_output",
+      "kind": "invalid",
+      "expected": "NULLIFIER_ALREADY_CONSUMED",
+      "got": "NULLIFIER_ALREADY_CONSUMED",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "duplicate_charity_entries",
+      "kind": "invalid",
+      "expected": "DUPLICATE_CHARITY_ENTRY",
+      "got": "DUPLICATE_CHARITY_ENTRY",
+      "agree": true
+    },
+    {
+      "name": "front_run_different_pq_key",
+      "kind": "invalid",
+      "expected": "COMMITMENT_INVALID",
+      "got": "COMMITMENT_INVALID",
+      "agree": true,
+      "detail": "declared mismatch"
+    },
+    {
+      "name": "front_run_rewritten_commitment",
+      "kind": "invalid",
+      "expected": "COMMITMENT_INVALID",
+      "got": "COMMITMENT_INVALID",
+      "agree": true,
+      "detail": "commitment carrier policy"
+    },
+    {
+      "name": "inclusion_after_cutoff",
+      "kind": "invalid",
+      "expected": "HEADER_ANCESTRY_INVALID",
+      "got": "HEADER_ANCESTRY_INVALID",
+      "agree": true,
+      "detail": "height mismatch"
+    },
+    {
+      "name": "inclusion_after_cutoff_epoch",
+      "kind": "invalid",
+      "expected": "INCLUSION_AFTER_CUTOFF",
+      "got": "INCLUSION_AFTER_CUTOFF",
+      "agree": true
+    },
+    {
+      "name": "insufficient_confirmations",
+      "kind": "invalid",
+      "expected": "INSUFFICIENT_CONFIRMATIONS",
+      "got": "INSUFFICIENT_CONFIRMATIONS",
+      "agree": true
+    },
+    {
+      "name": "invalid_merkle_branch",
+      "kind": "invalid",
+      "expected": "INCLUSION_PROOF_INVALID",
+      "got": "INCLUSION_PROOF_INVALID",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "malformed_charity_entry",
+      "kind": "invalid",
+      "expected": "MALFORMED_CHARITY_ENTRY",
+      "got": "MALFORMED_CHARITY_ENTRY",
+      "agree": true
+    },
+    {
+      "name": "nullifier_domain_omission",
+      "kind": "invalid",
+      "expected": "NULLIFIER_INVALID",
+      "got": "NULLIFIER_INVALID",
+      "agree": true,
+      "detail": "presented nullifier mismatch"
+    },
+    {
+      "name": "pq_signature_mutation",
+      "kind": "invalid",
+      "expected": "PQ_SIGNATURE_INVALID",
+      "got": "PQ_SIGNATURE_INVALID",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "pq_wrong_algorithm",
+      "kind": "invalid",
+      "expected": "PQ_ALGORITHM_UNSUPPORTED",
+      "got": "PQ_ALGORITHM_UNSUPPORTED",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "pq_wrong_domain",
+      "kind": "invalid",
+      "expected": "PQ_SIGNATURE_INVALID",
+      "got": "PQ_SIGNATURE_INVALID",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "pq_wrong_key",
+      "kind": "invalid",
+      "expected": "COMMITMENT_INVALID",
+      "got": "COMMITMENT_INVALID",
+      "agree": true,
+      "detail": "declared mismatch"
+    },
+    {
+      "name": "quantum_compromise_cutoff",
+      "kind": "invalid",
+      "expected": "QUANTUM_COMPROMISE_CUTOFF",
+      "got": "QUANTUM_COMPROMISE_CUTOFF",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "reorg_after_provisional_acceptance",
+      "kind": "invalid",
+      "expected": "HEADER_ANCESTRY_INVALID",
+      "got": "HEADER_ANCESTRY_INVALID",
+      "agree": true,
+      "detail": "replace_failed:HEADER_ANCESTRY_INVALID"
+    },
+    {
+      "name": "reorg_before_acceptance",
+      "kind": "invalid",
+      "expected": "HEADER_ANCESTRY_INVALID",
+      "got": "HEADER_ANCESTRY_INVALID",
+      "agree": true,
+      "detail": "not ancestor of tip"
+    },
+    {
+      "name": "script_substitution",
+      "kind": "invalid",
+      "expected": "CHARITY_SCRIPT_MISMATCH",
+      "got": "CHARITY_SCRIPT_MISMATCH",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "script_substitution_identity_break",
+      "kind": "invalid",
+      "expected": "TX_MALLEABILITY_REENCODING",
+      "got": "TX_MALLEABILITY_REENCODING",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "stale_checkpoint",
+      "kind": "invalid",
+      "expected": "CHECKPOINT_MISMATCH",
+      "got": "CHECKPOINT_MISMATCH",
+      "agree": true
+    },
+    {
+      "name": "tx_malleability_reencoding",
+      "kind": "invalid",
+      "expected": "TX_MALLEABILITY_REENCODING",
+      "got": "TX_MALLEABILITY_REENCODING",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "unsupported_script_form",
+      "kind": "invalid",
+      "expected": "UNSUPPORTED_TX_FORM",
+      "got": "UNSUPPORTED_TX_FORM",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "unsupported_source_chain",
+      "kind": "invalid",
+      "expected": "UNSUPPORTED_SOURCE_CHAIN",
+      "got": "UNSUPPORTED_SOURCE_CHAIN",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "unsupported_tx_form",
+      "kind": "invalid",
+      "expected": "UNSUPPORTED_TX_FORM",
+      "got": "UNSUPPORTED_TX_FORM",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "wrong_charity_id_script_mismatch",
+      "kind": "invalid",
+      "expected": "CHARITY_SCRIPT_MISMATCH",
+      "got": "CHARITY_SCRIPT_MISMATCH",
+      "agree": true,
+      "detail": null
+    },
+    {
+      "name": "wrong_output_index",
+      "kind": "invalid",
+      "expected": "AMOUNT_MISMATCH",
+      "got": "AMOUNT_MISMATCH",
+      "agree": true,
+      "detail": null
+    }
+  ]
+}

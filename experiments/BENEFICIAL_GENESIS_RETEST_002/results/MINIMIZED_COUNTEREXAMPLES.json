@@ -1,0 +1,42 @@
+{
+  "schema": "bgen.retest-002.minimized-counterexamples/v1",
+  "subject_commit": "46a7de63fd800029a05793d7d8204a900690f68e",
+  "note": "Minimized against the repaired subject. Prior PR #29 counterexamples no longer admit or crash.",
+  "cases": [
+    {
+      "id": "MX-001",
+      "derived_from": "F-001",
+      "mutation": "add claim.pq_sig_domain_bytes = 'not-hex!!!'",
+      "expected_before_repair": "Python ValueError crash",
+      "observed_on_subject": "UNKNOWN_FIELD typed reject",
+      "node": "UNKNOWN_FIELD",
+      "python": "UNKNOWN_FIELD"
+    },
+    {
+      "id": "MX-002",
+      "derived_from": "F-002",
+      "mutation": "commitment_version = true",
+      "expected_before_repair": "OK via int(True)==1",
+      "observed_on_subject": "COMMITMENT_VERSION_INVALID",
+      "node": "COMMITMENT_VERSION_INVALID",
+      "python": "COMMITMENT_VERSION_INVALID"
+    },
+    {
+      "id": "MX-003",
+      "derived_from": "F-003",
+      "mutation": "nullifier_hex = 'ab'*32 (disagrees with recompute)",
+      "expected_before_repair": "OK (field ignored)",
+      "observed_on_subject": "NULLIFIER_INVALID",
+      "node": "NULLIFIER_INVALID",
+      "python": "NULLIFIER_INVALID"
+    },
+    {
+      "id": "MX-004",
+      "derived_from": "F-005",
+      "raw_json": "{\"schema\":\"BeneficialGenesisClaim\",\"version\":1,\"version\":2}",
+      "observed_on_subject": "duplicate-key reject at raw parser boundary",
+      "node": "DUPLICATE_JSON_KEY",
+      "python": "ValueError from canonical_json_loads"
+    }
+  ]
+}

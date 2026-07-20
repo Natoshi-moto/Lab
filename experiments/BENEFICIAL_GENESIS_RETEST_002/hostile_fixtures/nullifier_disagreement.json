@@ -1,0 +1,5 @@
+{
+  "note": "Minimized F-003 retest vector: disagreeing nullifier_hex must reject",
+  "mutation": { "nullifier_hex": "ababababababababababababababababababababababababababababababababab" },
+  "expected_code": "NULLIFIER_INVALID"
+}
