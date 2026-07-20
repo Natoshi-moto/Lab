@@ -374,11 +374,13 @@ def main() -> int:
     tip_height = tip["height"]
     tip_hash = tip["header_hash_hex"]
 
-    # last_clean = tip for open epoch mid-state; for close use tip.
+    eligibility_header = all_headers[10]  # height 110; accepted tip is height 120.
     epoch_open = migration_epoch_close(
         epoch_id=DEFAULT_EPOCH_ID,
-        last_clean_source_height=tip_height,
-        last_clean_source_header_hash_hex=tip_hash,
+        accepted_source_tip_height=tip_height,
+        accepted_source_tip_header_hash_hex=tip_hash,
+        last_eligible_inclusion_height=eligibility_header["height"],
+        last_eligible_inclusion_header_hash_hex=eligibility_header["header_hash_hex"],
         min_confirmations=DEFAULT_MIN_CONFIRMATIONS,
         closed=False,
         quantum_compromise_cutoff_height=1_000_000,
@@ -400,6 +402,7 @@ def main() -> int:
         "headers": all_headers,
         "tip_height": tip_height,
         "tip_hash_hex": tip_hash,
+        "eligibility_cutoff_hash_hex": eligibility_header["header_hash_hex"],
         "fixed_bitcoin_genesis_pool": DEFAULT_FIXED_BITCOIN_GENESIS_POOL,
         "new_ledger_chain_id": DEFAULT_NEW_LEDGER_CHAIN_ID,
         "source_chain": DEFAULT_SOURCE_CHAIN,
@@ -457,16 +460,15 @@ def main() -> int:
     claim_stolen = attach_inclusion(
         claim_stolen, headers=stolen_chain, block_index=0, txids_in_block=stolen_txids
     )
-    claim_stolen["notes_expected"] = [
-        "Stolen-source-key scenario: crypto control may hold; legal ownership is a non-claim."
-    ]
     stolen_ctx = {
         "headers": stolen_chain,
         "tip_height": stolen_chain[-1]["height"],
         "tip_hash_hex": stolen_chain[-1]["header_hash_hex"],
         "epoch": migration_epoch_close(
-            last_clean_source_height=stolen_chain[-1]["height"],
-            last_clean_source_header_hash_hex=stolen_chain[-1]["header_hash_hex"],
+            accepted_source_tip_height=stolen_chain[-1]["height"],
+            accepted_source_tip_header_hash_hex=stolen_chain[-1]["header_hash_hex"],
+            last_eligible_inclusion_height=stolen_chain[-1]["height"],
+            last_eligible_inclusion_header_hash_hex=stolen_chain[-1]["header_hash_hex"],
             min_confirmations=6,
             closed=False,
             quantum_compromise_cutoff_height=1_000_000,
@@ -579,7 +581,7 @@ def main() -> int:
     wc["charity_id"] = "CHARITY_BETA"
     wc["charity_address_string"] = "bc1q-synth-lookalike-not-real"
     # Will hit ADDRESS_STRING first due to address field
-    inv("address_string_ambiguity", wc, "ADDRESS_STRING_AMBIGUITY")
+    inv("address_string_ambiguity", wc, "UNKNOWN_FIELD")
 
     wc2 = json.loads(json.dumps(claim_a))
     wc2["charity_id"] = "CHARITY_BETA"
@@ -590,13 +592,13 @@ def main() -> int:
     ss = json.loads(json.dumps(claim_a))
     ss["transaction"] = json.loads(json.dumps(claim_a["transaction"]))
     ss["transaction"]["outputs"][0]["script_pubkey_hex"] = beta_script
-    # txid changes -> malleability/reencoding OR we force attack flag after fixing txid
+    # Recompute txid so exact charity-script validation is reached.
     ss["donation_txid_hex"] = txid_from_tx(ss["transaction"])
     # txid field rewritten to match mutated body so identity check passes;
     # exact script comparison then rejects under the script-substitution attack label.
     inv("script_substitution", ss, "CHARITY_SCRIPT_MISMATCH")
 
-    # script substitution with corrected inclusion is heavy; add force flag path
+    # A second case retains the old txid so identity validation rejects first.
     ss2 = json.loads(json.dumps(claim_a))
     ss2["transaction"] = json.loads(json.dumps(claim_a["transaction"]))
     ss2["transaction"]["outputs"][0]["script_pubkey_hex"] = beta_script
@@ -672,16 +674,11 @@ def main() -> int:
 
     # 12. Stale checkpoint
     stale = json.loads(json.dumps(claim_a))
-    stale["claimed_checkpoint"] = source_header_checkpoint(all_headers[0], note="stale")
-    inv("stale_checkpoint", stale, "STALE_CHECKPOINT", epoch_last_clean_height_override=tip_height)
+    inv("stale_checkpoint", stale, "CHECKPOINT_MISMATCH", checkpoint_probe="stale_tip")
 
     # 13. Conflicting checkpoint
     conf = json.loads(json.dumps(claim_a))
-    conf["claimed_checkpoint"] = {
-        "header_hash_hex": "ee" * 32,
-        "height": 999,
-    }
-    inv("conflicting_checkpoint", conf, "CONFLICTING_CHECKPOINT")
+    inv("conflicting_checkpoint", conf, "CHECKPOINT_MISMATCH", checkpoint_probe="conflicting_tip")
 
     # 14. Invalid Merkle branch
     bad_m = json.loads(json.dumps(claim_a))
@@ -705,11 +702,11 @@ def main() -> int:
 
     # 17. Nullifier domain omission
     nd = json.loads(json.dumps(claim_a))
-    nd["presented_nullifier_hex"] = domain_omission_attempt(
+    nd["nullifier_hex"] = domain_omission_attempt(
         donation_txid_hex=nd["donation_txid_hex"],
         donation_vout=nd["donation_vout"],
     )
-    inv("nullifier_domain_omission", nd, "NULLIFIER_COLLISION")
+    inv("nullifier_domain_omission", nd, "NULLIFIER_INVALID")
 
     # 18. PQ signature mutation / wrong alg / wrong key / wrong domain
     pqm = json.loads(json.dumps(claim_a))
@@ -719,16 +716,22 @@ def main() -> int:
     inv("pq_signature_mutation", pqm, "PQ_SIGNATURE_INVALID")
 
     pqa = json.loads(json.dumps(claim_a))
-    pqa["pq_alg"] = "NOT_A_REAL_PQ_ALG"
+    raw_pqa = bytes.fromhex(pqa["pq_signature_hex"])
+    pqa["pq_signature_hex"] = b"NOT_A_REAL_PQ_ALG\x00".hex() + raw_pqa.split(b"\x00", 1)[1].hex()
     inv("pq_wrong_algorithm", pqa, "PQ_ALGORITHM_UNSUPPORTED")
 
     pqk = json.loads(json.dumps(claim_a))
-    pqk["expected_pq_key_hex"] = derive_pq_public_key(pq_bob)
-    inv("pq_wrong_key", pqk, "PQ_KEY_WRONG")
+    pqk["pq_destination_public_key_hex"] = derive_pq_public_key(pq_bob)
+    inv("pq_wrong_key", pqk, "COMMITMENT_INVALID")
 
     pqd = json.loads(json.dumps(claim_a))
-    pqd["pq_sig_domain_bytes"] = b"WRONG-DOMAIN".hex()
-    inv("pq_wrong_domain", pqd, "PQ_DOMAIN_INVALID")
+    pqd["pq_signature_hex"] = pq_sign(pq_alice, pq_message_for_claim(
+        new_ledger_chain_id=pqd["new_ledger_chain_id"], epoch_id=pqd["epoch_id"],
+        charity_id=pqd["charity_id"], donation_txid_hex=pqd["donation_txid_hex"],
+        donation_vout=pqd["donation_vout"], amount_sats=pqd["amount_sats"],
+        commitment_hex=pqd["declared_commitment_hex"], nullifier_hex=pqd["nullifier_hex"]),
+        domain=b"BGEN-WRONG-PQ-DOMAIN-v1")
+    inv("pq_wrong_domain", pqd, "PQ_SIGNATURE_INVALID")
 
     # 19. Cross-chain / cross-epoch replay
     xchain = json.loads(json.dumps(claim_a))
@@ -765,6 +768,7 @@ def main() -> int:
         "block_height": 100,
         "merkle_branch_hex": [],
         "merkle_index": 0,
+        "schema": "DonationInclusionProof",
     }
     inv(
         "reorg_before_acceptance",
@@ -859,11 +863,6 @@ def main() -> int:
         "invalid_expected_codes": expected_map,
         "documentary_only": [
             "charity_destination_key_compromise_assumption",
-            "conflicting_checkpoint",
-            "inclusion_after_cutoff_epoch",
-            "insufficient_confirmations",
-            "reorg_after_provisional_acceptance",
-            "stale_checkpoint",
         ],
         "residual_risks": [
             "synthetic cryptographic primitives",
@@ -883,6 +882,10 @@ def main() -> int:
         },
     }
     _write(FIXTURES / "EXPECTED.json", expected)
+    (INVALID / "duplicate_raw_claim.json").write_text(
+        '{"schema":"BeneficialGenesisClaim","version":1,"version":2}\n',
+        encoding="utf-8",
+    )
 
     # Rejection codes schema dump
     _write(

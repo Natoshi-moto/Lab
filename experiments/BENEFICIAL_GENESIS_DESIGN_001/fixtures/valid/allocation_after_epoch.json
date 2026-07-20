@@ -21,6 +21,12 @@
       "nullifier_hex": "d23787d27f97a69774d253dc7b94e1be98eeb6ba4b71cc3b0ec620bce83a2322"
     }
   ],
+  "epoch_checkpoint_binding": {
+    "accepted_source_tip_header_hash_hex": "23d62bd29ca036edabbcee4a2daac90fa9d7ee27e6baf04f6bfe66206f442eb2",
+    "accepted_source_tip_height": 120,
+    "last_eligible_inclusion_header_hash_hex": "b08d7d19cfb7abd9a7bc0f0c09371f9c436749864c8210f1c7d7187d730c1650",
+    "last_eligible_inclusion_height": 110
+  },
   "epoch_id": "epoch-synth-0001",
   "fixed_bitcoin_genesis_pool": 1000000000,
   "remainder_handling": "UNISSUED_FLOOR_REMAINDER",

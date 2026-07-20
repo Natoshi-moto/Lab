@@ -8,7 +8,6 @@
     "donation_txid_hex": "ac3c1d41aba49d7207c47d8927ef25d01b05a3570ef51e0614ae8599c5a1cf24",
     "donation_vout": 0,
     "epoch_id": "epoch-synth-0001",
-    "expected_pq_key_hex": "397ae269d07b798f9936c98b0d3c881a095022d0397933d660834e86c616f4ce",
     "inclusion_proof": {
       "block_header_hash_hex": "b1a258b474913c9a695d6eb514185fd3438e129938b23594a0d4e868847c6974",
       "block_height": 100,
@@ -21,7 +20,7 @@
     "label": "SYNTHETIC_CLAIM_FIXTURE",
     "new_ledger_chain_id": "bgen-synth-ledger-v0",
     "nullifier_hex": "7777272a103f4e724555d95dcded15a133b3aea33c07416596f926fb93556975",
-    "pq_destination_public_key_hex": "1b7b72ea0fc2a7d2ff659b72d3dbf532c52ce50e36675ab23b581d37a5d6fc97",
+    "pq_destination_public_key_hex": "397ae269d07b798f9936c98b0d3c881a095022d0397933d660834e86c616f4ce",
     "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f763100301bb0238c160c90243a7f0c3dcbe7ba8f44e0ae58f3ce9ba82759f3aa08fcb2",
     "schema": "BeneficialGenesisClaim",
     "source_authorization": {
@@ -57,5 +56,5 @@
     },
     "version": 1
   },
-  "expected_code": "PQ_KEY_WRONG"
+  "expected_code": "COMMITMENT_INVALID"
 }

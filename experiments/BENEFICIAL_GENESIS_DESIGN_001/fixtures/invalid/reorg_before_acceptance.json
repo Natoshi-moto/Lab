@@ -12,7 +12,8 @@
       "block_header_hash_hex": "b69f26147b640cd702613d2203a2cce14d3d62c76761dd42f1abdbb954d6652b",
       "block_height": 100,
       "merkle_branch_hex": [],
-      "merkle_index": 0
+      "merkle_index": 0,
+      "schema": "DonationInclusionProof"
     },
     "label": "SYNTHETIC_CLAIM_FIXTURE",
     "new_ledger_chain_id": "bgen-synth-ledger-v0",

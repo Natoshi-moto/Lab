@@ -29,6 +29,14 @@ class NullifierSet:
     def snapshot(self) -> list[str]:
         return sorted(self._seen)
 
+    def replace(self, nullifiers: Iterable[str]) -> None:
+        """Atomically replace provisional state after checkpoint revalidation."""
+        presented = list(nullifiers)
+        candidate = set(presented)
+        if len(candidate) != len(presented):
+            raise ValueError("duplicate nullifier in replacement state")
+        self._seen = candidate
+
 
 def compute_nullifier(
     *,

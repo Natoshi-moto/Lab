@@ -24,6 +24,7 @@ if str(EXP) not in sys.path:
 
 from protocol.allocation import assert_supply_invariant  # noqa: E402
 from protocol.constants import REJECTION_CODES  # noqa: E402
+from protocol.encoding import canonical_json_loads  # noqa: E402
 from protocol.nullifier import NullifierSet  # noqa: E402
 from protocol.objects import charity_set_commitment  # noqa: E402
 from protocol.verifier import ClaimVerifier  # noqa: E402
@@ -43,6 +44,7 @@ REQUIRED_PATHS = [
     EXP / "generate_fixtures.py",
     EXP / "schemas" / "protocol_objects.schema.json",
     EXP / "schemas" / "rejection_codes.json",
+    EXP / "schemas" / "protocol_constants.json",
     EXP / "protocol" / "verifier.py",
     EXP / "protocol" / "allocation.py",
     EXP / "protocol" / "nullifier.py",
@@ -87,6 +89,8 @@ def base_verifier(**overrides: Any) -> ClaimVerifier:
     epoch = load(GENESIS / "EPOCH_OPEN.json")
     if overrides.get("epoch") == "closed":
         epoch = load(GENESIS / "EPOCH_CLOSED.json")
+    elif isinstance(overrides.get("epoch"), dict):
+        epoch = overrides["epoch"]
     if "epoch_last_clean_height_override" in overrides:
         epoch = dict(epoch)
         epoch["last_clean_source_height"] = overrides["epoch_last_clean_height_override"]
@@ -134,6 +138,14 @@ def verify_valid_and_allocation() -> None:
         raise EvidenceError("allocation exceeds pool")
     if alloc["total_issued"] + alloc["remainder_unissued"] != alloc["fixed_bitcoin_genesis_pool"]:
         raise EvidenceError("issued + remainder != pool")
+
+    raw_duplicate = INVALID / "duplicate_raw_claim.json"
+    try:
+        canonical_json_loads(raw_duplicate.read_bytes())
+    except ValueError:
+        pass
+    else:
+        raise EvidenceError("duplicate raw JSON key accepted")
 
 
 def verify_invalid_catalog() -> None:
@@ -188,6 +200,68 @@ def verify_invalid_catalog() -> None:
                 executed += 1
                 continue
             raise EvidenceError("allocation bool accepted")
+        if name == "inclusion_after_cutoff_epoch":
+            ctx = load(GENESIS / "CONTEXT.json")
+            epoch = dict(ctx["epoch_open"])
+            anchor = ctx["headers"][0]
+            epoch["last_eligible_inclusion_height"] = anchor["height"]
+            epoch["last_eligible_inclusion_header_hash_hex"] = anchor["header_hash_hex"]
+            result = base_verifier(epoch=epoch).verify_claim(payload["claim"])
+            if result.code != code:
+                raise EvidenceError(f"{name}: expected {code}, got {result.code}")
+            executed += 1
+            continue
+        if name == "insufficient_confirmations":
+            ctx = load(GENESIS / "CONTEXT.json")
+            headers = ctx["headers"][:5]
+            epoch = dict(ctx["epoch_open"])
+            epoch.update({
+                "accepted_source_tip_height": headers[-1]["height"],
+                "accepted_source_tip_header_hash_hex": headers[-1]["header_hash_hex"],
+                "last_eligible_inclusion_height": headers[0]["height"],
+                "last_eligible_inclusion_header_hash_hex": headers[0]["header_hash_hex"],
+            })
+            result = ClaimVerifier(charity_set=ctx["charity_set"], epoch=epoch,
+                headers_by_hash={h["header_hash_hex"]: h for h in headers},
+                tip_height=headers[-1]["height"], tip_hash_hex=headers[-1]["header_hash_hex"],
+                new_ledger_chain_id=ctx["new_ledger_chain_id"]).verify_claim(payload["claim"])
+            if result.code != code:
+                raise EvidenceError(f"{name}: expected {code}, got {result.code}")
+            executed += 1
+            continue
+        if name in {"stale_checkpoint", "conflicting_checkpoint"}:
+            ctx = load(GENESIS / "CONTEXT.json")
+            bad_height = ctx["tip_height"] - 1 if name == "stale_checkpoint" else ctx["tip_height"]
+            bad_hash = ctx["headers"][-2]["header_hash_hex"] if name == "stale_checkpoint" else "ee" * 32
+            try:
+                ClaimVerifier(charity_set=ctx["charity_set"], epoch=ctx["epoch_open"],
+                    headers_by_hash={h["header_hash_hex"]: h for h in ctx["headers"]},
+                    tip_height=bad_height, tip_hash_hex=bad_hash,
+                    new_ledger_chain_id=ctx["new_ledger_chain_id"])
+            except ValueError as exc:
+                if str(exc) == code:
+                    executed += 1
+                    continue
+            raise EvidenceError(f"{name}: checkpoint constructor did not reject with {code}")
+        if name == "reorg_after_provisional_acceptance":
+            headers = payload["new_tip_only_headers"]
+            ctx = load(GENESIS / "CONTEXT.json")
+            epoch = dict(ctx["epoch_open"])
+            epoch.update({
+                "accepted_source_tip_height": headers[-1]["height"],
+                "accepted_source_tip_header_hash_hex": headers[-1]["header_hash_hex"],
+                "last_eligible_inclusion_height": headers[10]["height"],
+                "last_eligible_inclusion_header_hash_hex": headers[10]["header_hash_hex"],
+            })
+            replacement = ClaimVerifier(charity_set=ctx["charity_set"], epoch=epoch,
+                headers_by_hash={h["header_hash_hex"]: h for h in headers},
+                tip_height=headers[-1]["height"], tip_hash_hex=headers[-1]["header_hash_hex"],
+                new_ledger_chain_id=ctx["new_ledger_chain_id"])
+            result = replacement.revalidate_admitted_claims([payload["claim"]])[0]
+            if result.code != code or replacement.nullifiers.snapshot():
+                raise EvidenceError(f"{name}: revalidation/rollback failed")
+            executed += 1
+            continue
         claim = payload["claim"]
         kwargs: dict[str, Any] = {}
         if "pre_consume_nullifier" in payload:

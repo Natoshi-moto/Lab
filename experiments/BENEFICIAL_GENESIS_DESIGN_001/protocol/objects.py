@@ -34,7 +34,9 @@ def charity_genesis_entry(
     require_hex("attestation_commitment_hex", attestation_commitment_hex, expected_bytes=32)
     if not charity_id or not isinstance(charity_id, str):
         raise ValueError("charity_id required")
-    if valid_from_height < 0 or valid_until_height < valid_from_height:
+    if (type(valid_from_height) is not int or type(valid_until_height) is not int or
+            not 0 <= valid_from_height <= 0xFFFFFFFF or
+            not valid_from_height <= valid_until_height <= 0xFFFFFFFF):
         raise ValueError("invalid charity validity window")
     return {
         "attestation_commitment_hex": attestation_commitment_hex,
@@ -116,6 +118,9 @@ def donation_commitment_preimage(
     separately bind the concrete (txid, vout) once the txid is known.
     """
 
+    if not all(isinstance(x, str) and x and "\x00" not in x
+               for x in (new_ledger_chain_id, epoch_id, charity_id)):
+        raise ValueError("string identifiers must be non-empty and NUL-free")
     pq = require_hex("pq_destination_public_key_hex", pq_destination_public_key_hex, expected_bytes=32)
     nonce = require_hex("nonce_hex", nonce_hex, expected_bytes=16)
     return b"".join(
@@ -187,22 +192,28 @@ def source_header_checkpoint(header: dict[str, Any], *, note: str = "") -> dict[
 def migration_epoch_close(
     *,
     epoch_id: str = DEFAULT_EPOCH_ID,
-    last_clean_source_height: int,
-    last_clean_source_header_hash_hex: str,
+    accepted_source_tip_height: int,
+    accepted_source_tip_header_hash_hex: str,
+    last_eligible_inclusion_height: int,
+    last_eligible_inclusion_header_hash_hex: str,
     min_confirmations: int,
     closed: bool,
     quantum_compromise_cutoff_height: int | None = None,
 ) -> dict[str, Any]:
     require_hex(
-        "last_clean_source_header_hash_hex",
-        last_clean_source_header_hash_hex,
+        "accepted_source_tip_header_hash_hex",
+        accepted_source_tip_header_hash_hex,
         expected_bytes=32,
     )
+    require_hex("last_eligible_inclusion_header_hash_hex",
+                last_eligible_inclusion_header_hash_hex, expected_bytes=32)
     obj: dict[str, Any] = {
+        "accepted_source_tip_header_hash_hex": accepted_source_tip_header_hash_hex,
+        "accepted_source_tip_height": accepted_source_tip_height,
         "closed": closed,
         "epoch_id": epoch_id,
-        "last_clean_source_header_hash_hex": last_clean_source_header_hash_hex,
-        "last_clean_source_height": last_clean_source_height,
+        "last_eligible_inclusion_header_hash_hex": last_eligible_inclusion_header_hash_hex,
+        "last_eligible_inclusion_height": last_eligible_inclusion_height,
         "min_confirmations": min_confirmations,
         "schema": "MigrationEpochClose",
         "version": PROTOCOL_VERSION,

@@ -21,8 +21,7 @@
     "new_ledger_chain_id": "bgen-synth-ledger-v0",
     "nullifier_hex": "7777272a103f4e724555d95dcded15a133b3aea33c07416596f926fb93556975",
     "pq_destination_public_key_hex": "1b7b72ea0fc2a7d2ff659b72d3dbf532c52ce50e36675ab23b581d37a5d6fc97",
-    "pq_sig_domain_bytes": "57524f4e472d444f4d41494e",
-    "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f763100301bb0238c160c90243a7f0c3dcbe7ba8f44e0ae58f3ce9ba82759f3aa08fcb2",
+    "pq_signature_hex": "53594e5448455449435f484d41435f5348413235365f50515f5354414e44494e5f7631008b103e8ddb85465d456dadafa2429c31dd59b4a12d58edba5b44103329c2badb",
     "schema": "BeneficialGenesisClaim",
     "source_authorization": {
       "alg": "SYNTHETIC_SOURCE_HMAC_v1",
@@ -57,5 +56,5 @@
     },
     "version": 1
   },
-  "expected_code": "PQ_DOMAIN_INVALID"
+  "expected_code": "PQ_SIGNATURE_INVALID"
 }

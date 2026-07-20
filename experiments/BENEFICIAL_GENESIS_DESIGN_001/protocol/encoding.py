@@ -34,13 +34,13 @@ def double_sha256_hex(data: bytes) -> str:
 
 
 def u32_be(value: int) -> bytes:
-    if not isinstance(value, int) or value < 0 or value > 0xFFFFFFFF:
+    if type(value) is not int or value < 0 or value > 0xFFFFFFFF:
         raise ValueError("u32 out of range")
     return struct.pack(">I", value)
 
 
 def u64_be(value: int) -> bytes:
-    if not isinstance(value, int) or value < 0 or value > 0xFFFFFFFFFFFFFFFF:
+    if type(value) is not int or value < 0 or value > 0xFFFFFFFFFFFFFFFF:
         raise ValueError("u64 out of range")
     return struct.pack(">Q", value)
 
@@ -69,9 +69,24 @@ def canonical_json_bytes(obj: Any) -> bytes:
 
 
 def canonical_json_loads(text: str | bytes) -> Any:
+    """Load one canonical JSON value and reject duplicate object keys.
+
+    Duplicate names are invalid before consensus-object verification.  This
+    avoids parser-dependent last-key/first-key interpretations.
+    """
+
     if isinstance(text, bytes):
         text = text.decode("utf-8")
-    return json.loads(text)
+
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in out:
+                raise ValueError(f"duplicate JSON object key: {key}")
+            out[key] = value
+        return out
+
+    return json.loads(text, object_pairs_hook=reject_duplicates)
 
 
 def deep_sorted(obj: Any) -> Any:

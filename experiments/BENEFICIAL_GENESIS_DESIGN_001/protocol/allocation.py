@@ -108,7 +108,7 @@ def allocate_proportional(
 def assert_supply_invariant(record: dict) -> None:
     required = {"claims", "epoch_id", "fixed_bitcoin_genesis_pool", "remainder_handling",
                 "remainder_unissued", "schema", "total_eligible_sats", "total_issued", "version"}
-    if not isinstance(record, dict) or set(record) != required:
+    if not isinstance(record, dict) or set(record) not in (required, required | {"epoch_checkpoint_binding"}):
         raise AllocationError("ALLOCATION_NONCANONICAL", "record shape")
     if record["schema"] != "GenesisAllocationRecord" or record["version"] != PROTOCOL_VERSION:
         raise AllocationError("ALLOCATION_NONCANONICAL", "schema/version")
@@ -116,6 +116,21 @@ def assert_supply_invariant(record: dict) -> None:
         raise AllocationError("TYPE_ERROR", "epoch_id")
     if record["remainder_handling"] != "UNISSUED_FLOOR_REMAINDER":
         raise AllocationError("ALLOCATION_NONCANONICAL", "remainder handling")
+    if "epoch_checkpoint_binding" in record:
+        binding = record["epoch_checkpoint_binding"]
+        expected_keys = {"accepted_source_tip_header_hash_hex", "accepted_source_tip_height",
+                         "last_eligible_inclusion_header_hash_hex", "last_eligible_inclusion_height"}
+        if not isinstance(binding, dict) or set(binding) != expected_keys:
+            raise AllocationError("ALLOCATION_NONCANONICAL", "checkpoint binding shape")
+        for key in ("accepted_source_tip_header_hash_hex", "last_eligible_inclusion_header_hash_hex"):
+            try:
+                require_hex(key, binding[key], expected_bytes=32)
+            except (TypeError, ValueError) as exc:
+                raise AllocationError("ALLOCATION_NONCANONICAL", key) from exc
+        for key in ("accepted_source_tip_height", "last_eligible_inclusion_height"):
+            value = binding[key]
+            if type(value) is not int or not 0 <= value <= 0xFFFFFFFF:
+                raise AllocationError("ALLOCATION_NONCANONICAL", key)
     pool = _as_nonneg_int("fixed_bitcoin_genesis_pool", record["fixed_bitcoin_genesis_pool"])
     issued = _as_nonneg_int("total_issued", record["total_issued"])
     rem = _as_nonneg_int("remainder_unissued", record["remainder_unissued"])
