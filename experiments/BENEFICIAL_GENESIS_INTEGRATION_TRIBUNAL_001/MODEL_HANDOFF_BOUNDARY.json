@@ -1,0 +1,107 @@
+{
+  "schema": "bgen.tribunal.model-handoff-boundary/v1",
+  "task_id": "BGEN-INTEGRATION-TRIBUNAL-001",
+  "initial_model_label": "Fable 5",
+  "continuation_model_label": "Sonnet 5",
+  "handoff_reason": "initial model (Fable 5) reached its monthly spend limit mid-task",
+  "same_conversation": true,
+  "same_worktree": true,
+  "same_branch": true,
+  "worktree_path": "/home/anon/Downloads/Lab-fable-tribunal",
+  "branch": "fable/bgen-integration-tribunal-001",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "head_at_handoff": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "handoff_timestamp_utc": "2026-07-21T15:41:16Z",
+  "git_status_at_handoff": "clean except one untracked directory: experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/",
+  "git_diff_check_at_handoff": "PASS (exit 0, no whitespace errors)",
+  "files_present_before_continuation": [
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/SOURCE_INVENTORY.json",
+      "sha256": "3a1d3dee0b8cd5d74a12a5b00aef1a264b1800feb06fb487af4eb482e7f690b2",
+      "committed_at_handoff": false,
+      "known_from_transcript": true
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/FINDINGS_LEDGER.md",
+      "sha256": "6c8ce764be03c41bd1815da58fa2aa9c3b8df14ba64334a66967362686d73428",
+      "committed_at_handoff": false,
+      "known_from_transcript": true
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/FINDINGS_LEDGER.json",
+      "sha256": "dfec5f35d977e3af3dcb787c36c2ecb888e78ac805ce9af234ce9ecbf43eea35",
+      "committed_at_handoff": false,
+      "known_from_transcript": true
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/TECHNICAL_ADJUDICATION.md",
+      "sha256": "f68f06ab380b816b69c51d9a3dafaf214f6c99b5197ba9c682fa484c7b797382",
+      "committed_at_handoff": false,
+      "known_from_transcript": true
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/MECHANISM_ADJUDICATION.md",
+      "sha256": "474252ec5abc5ae4a296fa4f4e9a63b946e7cf1d0b94680f3c1385b04f402559",
+      "committed_at_handoff": false,
+      "known_from_transcript": true
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/PROCESS_ADJUDICATION.md",
+      "sha256": "a0204e81e9afba4a27694a385814e515c9437fa857772f61041a176527d7fe29",
+      "committed_at_handoff": false,
+      "known_from_transcript": true,
+      "note": "listed explicitly by the operator as written before exhaustion; hash confirms it is present and non-empty in the current worktree"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/REPAIR_ACCEPTANCE_PLAN.md",
+      "sha256": "75c61e756e2a147d96e2ac4f89bd7b4e4a530100132d33d1ca650adae8b5106a",
+      "committed_at_handoff": false,
+      "known_from_transcript": true,
+      "note": "operator-listed as written before exhaustion; confirmed present"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/REPAIR_ACCEPTANCE_PLAN.json",
+      "sha256": "04bf0e02d51cc9a741976ae5ecfe0795b146dad59d20e9247fc6e960291c95a2",
+      "committed_at_handoff": false,
+      "known_from_transcript": true,
+      "note": "operator-listed as written before exhaustion; confirmed present"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/STRONGEST_CASES.md",
+      "sha256": "cbff2236d4405fb2ed9388ee6cfcfe5e23dc8567a2212d0092db00737016cd9b",
+      "committed_at_handoff": false,
+      "known_from_transcript": true,
+      "note": "operator-listed as written before exhaustion; confirmed present"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/DECISIVE_NEXT_STEP.md",
+      "sha256": "75242cf111aa77fb8685dc02063f398013ced1819b166370f72ddbe9fdc2580b",
+      "committed_at_handoff": false,
+      "known_from_transcript": true,
+      "note": "operator-listed as written before exhaustion; confirmed present"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/probes/tribunal_probes.py",
+      "sha256": "c5fbc15d3825014f9c63715e4170b236cb7bbc74cda2bf5b0eb116a8fa9511e3",
+      "committed_at_handoff": false,
+      "known_from_transcript": true,
+      "note": "additional file present, not explicitly named in the operator's handoff list; independent probe code from the pre-handoff phase"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/results/TRIBUNAL_PROBE_RESULTS.json",
+      "sha256": "86843fb9ec07f141865efe1ad6e0f98ca393beea343228aaf958abb2870adf7f",
+      "committed_at_handoff": false,
+      "known_from_transcript": true,
+      "note": "additional file present, not explicitly named in the operator's handoff list; machine-readable probe results from the pre-handoff phase"
+    }
+  ],
+  "other_files_present_beyond_operator_named_list": [
+    "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/probes/tribunal_probes.py",
+    "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/results/TRIBUNAL_PROBE_RESULTS.json"
+  ],
+  "operations_audits_dir_at_handoff": "created, empty (no files)",
+  "operations_receipts_dir_at_handoff": "created, empty (no files)",
+  "manifest_authorship_statement": "This MODEL_HANDOFF_BOUNDARY.json file was created entirely by the continuation model (displayed as Sonnet 5), reading the pre-handoff worktree state as evidence rather than from any memory of having written it.",
+  "identity_disclaimer": "No claim is made that the 'Fable 5' / 'Sonnet 5' model labels are cryptographically proven, nor that the two phases of this tribunal constitute independently verified provider seats. Both phases ran in the same conversation, the same local git worktree, and under the same operator session. This is one continuous tribunal with a disclosed, non-independent model handoff partway through.",
+  "status_authority": "NONE"
+}

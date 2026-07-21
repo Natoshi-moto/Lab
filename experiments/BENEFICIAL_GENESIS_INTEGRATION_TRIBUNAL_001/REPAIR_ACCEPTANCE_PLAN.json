@@ -1,0 +1,79 @@
+{
+  "schema": "bgen.tribunal.repair-acceptance-plan/v1",
+  "task_id": "BGEN-INTEGRATION-TRIBUNAL-001",
+  "subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "implemented_by_tribunal": false,
+  "historical_artifacts_policy": "immutable; superseded by new receipted commits, never rewritten",
+  "immediate_evidence_hygiene_repairs": [
+    {
+      "id": "R1",
+      "title": "Scheme-parameter validation and supply-invariant gate",
+      "findings": ["TRIB-F-001", "TRIB-F-002", "TRIB-F-008"],
+      "targets": [
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/allocation.py",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/scenario.py"
+      ],
+      "prohibited_scope_creep": ["no arithmetic change on valid inputs", "no committed manifest/result change", "no design/Breaker/RETEST changes", "no new schemes"],
+      "acceptance_tests": [
+        "per-parameter adversarial set {-1000, 0, boundary, boundary+1, True, False, float, string} -> ParticipantValidationError, never TypeError, never silent acceptance",
+        "scenario runner rejects any result with total_issued outside [0, pool]; T-010 manifest is the regression case",
+        "time_weighted ordering test for positive early_bonus_bps",
+        "existing 72 tests pass; 27 scenarios regenerate byte-identically"
+      ],
+      "independent_retest_required": true,
+      "retest_form": "fresh different-session seat, exact repaired commit bound in receipt (PR #39 pattern)",
+      "changes_prior_results": false,
+      "changes_prior_claims": "retest verdict language must scope pass claims to tested input domains"
+    },
+    {
+      "id": "R2",
+      "title": "Design README evidence counts",
+      "findings": ["TRIB-F-003"],
+      "targets": ["experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md"],
+      "prohibited_scope_creep": ["no fixture, EXPECTED.json, or gate logic changes"],
+      "acceptance_tests": ["gate assertion that README counts match EXPECTED.json-derived counts (34/1/8 + separately-exercised raw-parse fixture note)"],
+      "independent_retest_required": false,
+      "changes_prior_results": false
+    },
+    {
+      "id": "R3",
+      "title": "Environment prerequisite documentation",
+      "findings": ["TRIB-F-004"],
+      "targets": ["README.md or AUDIT_START_HERE.md", "receipt schema/template (environment_prerequisites field)", "cwd notes for prescribed commands"],
+      "prohibited_scope_creep": ["no dependency version changes", "no vendoring decision"],
+      "acceptance_tests": ["clean-clone script: npm ci && full unittest discover && ./nexus verify exit 0"],
+      "independent_retest_required": false,
+      "changes_prior_results": false
+    },
+    {
+      "id": "R4",
+      "title": "Rejection-code specificity",
+      "findings": ["TRIB-F-007"],
+      "targets": ["experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/EXPECTED.json", "protocol/verifier.py code selection", "schemas/rejection_codes.json overload documentation"],
+      "prohibited_scope_creep": ["no new codes without schema entry", "no fixture semantics changes"],
+      "acceptance_tests": ["per-fixture expected-code stability tests; gate PASS with updated expectations"],
+      "independent_retest_required": false,
+      "changes_prior_results": "EXPECTED.json bytes change -> supersede old freeze hash, do not rewrite history"
+    },
+    {
+      "id": "R5",
+      "title": "Verdict-vocabulary and receipt-field conventions for future audits",
+      "findings": ["TRIB-F-005", "TRIB-F-017", "TRIB-F-018"],
+      "targets": ["operations-level audit task template"],
+      "prohibited_scope_creep": ["no retro-editing of existing audit packages"],
+      "acceptance_tests": ["next audit round's receipts validate against template (prescribed vocabulary, receipted adjudications, environment fields, optional seat attestations)"],
+      "independent_retest_required": false,
+      "changes_prior_results": false
+    }
+  ],
+  "mechanism_specification_work": [
+    {"id": "S1", "title": "Product/ledger function specification with executable acceptance table", "findings": ["TRIB-F-011"], "note": "identical to PR40 BGEN-LEDGER-FUNCTION-SPEC-001, PR44 DECISIVE_NEXT_EXPERIMENT, PR45 BGEN-PRODUCT-FUNCTION-AND-TRANSFER-REGIME-LOCK-001", "controlling": true},
+    {"id": "S2", "title": "Transfer-regime default: non-transferable-or-delayed pending S1", "findings": ["TRIB-F-011"], "reversal_condition": "a required function only a transferable design passes (executable falsifier)"},
+    {"id": "S3", "title": "Fixed-pool vs flow-linked issuance; sole-donor and dust-floor policy", "findings": ["TRIB-F-014"]},
+    {"id": "S4", "title": "Identity stance declaration", "findings": ["TRIB-F-012"]},
+    {"id": "S5", "title": "Governance separation from raw allocation", "findings": ["TRIB-F-015"]},
+    {"id": "S6", "title": "Preregistered empirical participation/flow-composition research design", "findings": ["TRIB-F-010", "TRIB-F-016"], "sequenced_after": "S1"}
+  ],
+  "ordering": ["R1", "R2|R3|R4 (parallel)", "independent retest of repaired economics package", "S1", "S2|S3|S4|S5", "S6"],
+  "status_authority": "NONE"
+}

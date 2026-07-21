@@ -1,0 +1,112 @@
+{
+  "schema": "bgen.tribunal.source-inventory/v1",
+  "task_id": "BGEN-INTEGRATION-TRIBUNAL-001",
+  "role": "fresh adversarial integration tribunal and evidence adjudicator",
+  "status_authority": "NONE",
+  "repository": "Natoshi-moto/Lab",
+  "repository_visibility_observed": "PUBLIC",
+  "repository_visibility_note": "CLAUDE.md describes the repository as private; the GitHub API reports it PUBLIC. Recorded as a documentation discrepancy, not adjudicated further.",
+  "working_branch": "fable/bgen-integration-tribunal-001",
+  "frozen_subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "head_at_session_start": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "status_json_at_start": {
+    "current_round": "R016",
+    "current_mode": "R016_USER_AUTHORIZED_PROMOTION_MERGED",
+    "canonical_tag": "baseline-001",
+    "modified_by_tribunal": false
+  },
+  "session_disclosure": {
+    "fresh_session": true,
+    "prior_beneficial_genesis_context_in_session": false,
+    "prior_fable_audit_session_resumed": false,
+    "session_contamination": false,
+    "note": "This session began with no conversation history. The checked-in CLAUDE.md still describes an older R007 adjudication assignment; the operator's explicit BGEN-INTEGRATION-TRIBUNAL-001 instruction and the pre-created working branch were treated as the operative task. The tribunal seat is a Claude-family model (claude-fable-5) adjudicating, among others, a Claude-family audit (PR #40) and Claude-attributed subject packages; no cross-family independence is claimed for this seat."
+  },
+  "runtime": {
+    "python": "3.14.6",
+    "node": "v24.14.0",
+    "npm": "11.9.0",
+    "git": "2.54.0",
+    "gh": "2.94.0",
+    "os": "Linux 7.0.12-201.fc44.x86_64",
+    "network_available": true
+  },
+  "audit_prs_inspected": [
+    {"pr": 40, "title": "BGEN-EPISTEMIC-AUDIT-001", "branch": "fable/bgen-epistemic-audit-001", "head": "22a236d4c2973395594050e49a61890c097be62b", "state": "OPEN_DRAFT"},
+    {"pr": 42, "title": "BGEN-CODEX-TECH-AUDIT-001", "branch": "codex/bgen-technical-audit-001", "head": "bdfee655d34fe9ff4740786cb2e865933a464367", "state": "OPEN_DRAFT"},
+    {"pr": 43, "title": "BGEN-GROK-TECH-AUDIT-001", "branch": "grok/bgen-technical-audit-001", "head": "6075fdca74b104168d67d648ac136b96ed47f525", "state": "OPEN_DRAFT"},
+    {"pr": 44, "title": "BGEN-CODEX-MECHANISM-AUDIT-001", "branch": "codex/bgen-mechanism-audit-001", "head": "d9a0d722b6848e2370aa88988b765723a182ab37", "state": "OPEN_DRAFT"},
+    {"pr": 45, "title": "BGEN-GROK-MECHANISM-AUDIT-001", "branch": "grok/bgen-mechanism-audit-001", "head": "81499ae895d63940d9ba973a0a1b9c98469ea36f", "state": "OPEN_DRAFT"}
+  ],
+  "audit_refs_fetched_read_only": true,
+  "audit_content_merged_into_subject": false,
+  "receipts_and_verdict_objects_inspected": [
+    "PR40: experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/FINAL_VERDICT.json",
+    "PR40: experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/PROCESS_AND_PROVENANCE_AUDIT.md",
+    "PR42: operations/audits/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/AUDIT_REPORT.md",
+    "PR42: operations/receipts/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/RECEIPT.json",
+    "PR42: pull-request body (via GitHub API); zero review comments",
+    "PR43: experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/FINAL_VERDICT.md",
+    "PR43: experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/FINAL_VERDICT.json",
+    "PR43: experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/FINDINGS.md",
+    "PR43: experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/probes/run_probes.py",
+    "PR43: operations/receipts/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/RECEIPT.json",
+    "PR44: experiments/BENEFICIAL_GENESIS_CODEX_MECHANISM_AUDIT_001/FINAL_VERDICT.json",
+    "PR44: experiments/BENEFICIAL_GENESIS_CODEX_MECHANISM_AUDIT_001/FINAL_VERDICT.md",
+    "PR44: experiments/BENEFICIAL_GENESIS_CODEX_MECHANISM_AUDIT_001/CLAIM_LEDGER.md",
+    "PR44: experiments/BENEFICIAL_GENESIS_CODEX_MECHANISM_AUDIT_001/SOURCE_INVENTORY.json",
+    "PR44: experiments/BENEFICIAL_GENESIS_CODEX_MECHANISM_AUDIT_001/README.md",
+    "PR44: operations/receipts/BENEFICIAL_GENESIS_CODEX_MECHANISM_AUDIT_001/RECEIPT.json",
+    "PR45: experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/FINAL_VERDICT.json",
+    "PR45: experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/results/SUMMARY.json",
+    "PR45: operations/receipts/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/RECEIPT.json"
+  ],
+  "subject_files_inspected": [
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/allocation.py (full)",
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/scenario.py (manifest handling, run_scenario, governance block)",
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/metrics.py (unissued_remainder)",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/allocation.py (function inventory, parameter validation, lottery rule)",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/allocation.py (function inventory, invariant helpers)",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md (evidence-count section, lines ~60-95)",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/EXPECTED.json (full key/count analysis)",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py (invalid-catalog and raw-duplicate logic, lines 135-200)",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/invalid/ (file census: 36 files)",
+    "experiments/BENEFICIAL_GENESIS_RETEST_002/README.md (prescribed commands)",
+    "package.json, package-lock.json (@noble/ed25519 declaration)",
+    "STATUS.json, CLAUDE.md, repository root file listing"
+  ],
+  "files_not_inspected": [
+    "corpus/raw/** (treated as historical data per task boundary)",
+    "Individual scenario/result JSON bodies in REDTEAM/BREAKER packages beyond those named above (suites rerun instead)",
+    "PR #40 CLAIM_LEDGER.json full body, CHRONOLOGY.md, repro scripts (verdict, process audit, and final-verdict artifacts read instead)",
+    "PR #44 independent_model.py and PR #45 model/*.py full source (their committed results and receipts were consumed; their suites were not rerun by the tribunal)",
+    "Prior abandoned Codex attempt transcripts (not in repository; operator-reported only)"
+  ],
+  "commands_run": [
+    {"cmd": "git status / git rev-parse HEAD / git branch --show-current", "result": "clean tree; HEAD 8349de7a5978be6a9984aa33fd59ba3725ebaaca; branch fable/bgen-integration-tribunal-001"},
+    {"cmd": "gh pr list --repo Natoshi-moto/Lab --state all (heads for PRs 40/42/43/44/45)", "result": "heads recorded above"},
+    {"cmd": "gh repo view Natoshi-moto/Lab --json visibility", "result": "PUBLIC"},
+    {"cmd": "git fetch origin <five audit branches>", "result": "fetched read-only; local heads equal API heads"},
+    {"cmd": "gh issue view 41; gh issue list", "result": "issue #41 read; issues 26/28/31/33/34/36/38/41 enumerated"},
+    {"cmd": "cd experiments/BENEFICIAL_GENESIS_DESIGN_001 && python3 verify_evidence.py", "exit": 0, "result": "37 tests OK; gate PASS; executed=34 documentary=1 residual=8"},
+    {"cmd": "python3 -m unittest discover -s tests (BEFORE npm ci)", "result": "185 run; FAILED failures=9 errors=2 (all @noble/ed25519 missing)"},
+    {"cmd": "./nexus verify (BEFORE npm ci)", "result": "FAILED ERR_MODULE_NOT_FOUND @noble/ed25519"},
+    {"cmd": "npm ci", "result": "clean install from lockfile; 0 vulnerabilities"},
+    {"cmd": "python3 -m unittest discover -s tests (AFTER npm ci)", "exit": 0, "result": "185 tests OK"},
+    {"cmd": "./nexus verify (AFTER npm ci)", "exit": 0, "result": "PASS"},
+    {"cmd": "./nexus doctor", "result": "PASS (seed_handoff_binding, git_repository)"},
+    {"cmd": "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests", "exit": 0, "result": "72 tests OK"},
+    {"cmd": "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests", "exit": 0, "result": "25 tests OK"},
+    {"cmd": "cd experiments/BENEFICIAL_GENESIS_RETEST_002 && node verify.mjs", "result": "{\"seeds_loaded\":true,\"agreements\":43,\"disagreements\":0,\"crashes\":0}"},
+    {"cmd": "node --test experiments/BENEFICIAL_GENESIS_RETEST_002/tests/*.test.mjs (from repo root, prescribed form)", "result": "19 tests, 19 pass, 0 fail; note: `node --test tests/` from inside the package directory fails, so the prescribed invocation matters"},
+    {"cmd": "python3 experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/probes/tribunal_probes.py", "exit": 0, "result": "14 probes; see results/TRIBUNAL_PROBE_RESULTS.json"}
+  ],
+  "nonclaims": [
+    "No STATUS.json modification, R-round assignment, merge, or promotion.",
+    "No live funds, donations, charity selection, solicitation, token issuance, deployment, or production authorization.",
+    "No legal conclusions.",
+    "No majority voting was used; findings were adjudicated on evidence class.",
+    "Model-family labels in receipts were not treated as proof of independence.",
+    "Passing tests, merge state, and repeated prose were not treated as proof of truth."
+  ]
+}
