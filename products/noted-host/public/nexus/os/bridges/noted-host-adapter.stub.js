@@ -54,6 +54,18 @@
     return send('diagnostic.ping', { note: 'Nexus host adapter stub ping.' })
   }
 
+  function sendMalformed() {
+    if (!window.parent || window.parent === window) return false
+    window.parent.postMessage(
+      {
+        type: PROTOCOL.inboundMessageType,
+        envelope: { id: makeId('malformed'), channel: 42 },
+      },
+      '*',
+    )
+    return true
+  }
+
   window.addEventListener('message', function (event) {
     if (!event.data || event.data.type !== PROTOCOL.receiptMessageType) return
     diagnostics.receipts += 1
@@ -71,6 +83,7 @@
     protocol: PROTOCOL,
     send,
     ping,
+    sendMalformed,
     onReceipt(listener) {
       listeners.add(listener)
       return function unsubscribe() {
