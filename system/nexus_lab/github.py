@@ -25,9 +25,9 @@ def parse_visibility(payload: str) -> tuple[str, str]:
     return name, visibility
 
 
-def require_private_visibility(name: str, visibility: str) -> None:
-    if visibility != "PRIVATE":
-        raise NexusError(f"Refusing to use {name}: GitHub reports visibility {visibility}, not PRIVATE.")
+def require_public_visibility(name: str, visibility: str) -> None:
+    if visibility != "PUBLIC":
+        raise NexusError(f"Refusing to use {name}: GitHub reports visibility {visibility}, not PUBLIC.")
 
 
 def _result_detail(result: Any) -> str:
@@ -63,13 +63,13 @@ def github_bootstrap(root: Path, *, repo_name: str) -> dict[str, Any]:
     created = False
     if not origin:
         # Deliberately omit --push. Content must not cross the remote boundary
-        # until GitHub independently reports the newly-created repository PRIVATE.
-        _gh(root, "repo", "create", repo_name, "--private", "--source=.", "--remote=origin")
+        # until GitHub independently reports the newly-created repository PUBLIC.
+        _gh(root, "repo", "create", repo_name, "--public", "--source=.", "--remote=origin")
         created = True
 
     view = _gh(root, "repo", "view", "--json", "nameWithOwner,visibility,url")
     full_name, visibility = parse_visibility(view.stdout)
-    require_private_visibility(full_name, visibility)
+    require_public_visibility(full_name, visibility)
     origin_url = git(root, "remote", "get-url", "origin")
 
     # Restrict workflow-token permissions before uploading the repository's
@@ -90,7 +90,7 @@ def github_bootstrap(root: Path, *, repo_name: str) -> dict[str, Any]:
             permission,
         )
         receipt = {
-            "schema": "nexus.github-bootstrap-receipt/v2",
+            "schema": "nexus.github-bootstrap-receipt/v3",
             "status": "FAILED",
             "created_at": utc_now(),
             "repository": full_name,
@@ -104,7 +104,7 @@ def github_bootstrap(root: Path, *, repo_name: str) -> dict[str, Any]:
             "audit_issue_output": "",
             "warnings": [warning],
             "claims": [
-                "GitHub reported the repository as PRIVATE before any Nexus-managed content push.",
+                "GitHub reported the repository as PUBLIC before any Nexus-managed content push.",
                 "No Nexus-managed content push was attempted after the required Actions-permission request failed."
             ],
             "non_claims": [
@@ -147,7 +147,7 @@ def github_bootstrap(root: Path, *, repo_name: str) -> dict[str, Any]:
         warnings.append(_warning("AUDIT_ISSUE_CREATE_FAILED", "create audit issue", issue_result))
 
     receipt = {
-        "schema": "nexus.github-bootstrap-receipt/v2",
+        "schema": "nexus.github-bootstrap-receipt/v3",
         "status": "PARTIAL" if warnings else "PASS",
         "created_at": utc_now(),
         "repository": full_name,
@@ -161,7 +161,7 @@ def github_bootstrap(root: Path, *, repo_name: str) -> dict[str, Any]:
         "audit_issue_output": issue_result.stdout.strip(),
         "warnings": warnings,
         "claims": [
-            "GitHub reported the repository as PRIVATE before the Nexus-managed content push.",
+            "GitHub reported the repository as PUBLIC before the Nexus-managed content push.",
             "The required Actions workflow-permission request returned exit code 0 before the content push."
         ],
         "non_claims": [

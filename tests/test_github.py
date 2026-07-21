@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from system.nexus_lab import github
-from system.nexus_lab.github import parse_visibility, require_private_visibility
+from system.nexus_lab.github import parse_visibility, require_public_visibility
 from system.nexus_lab.util import NexusError
 
 
@@ -18,10 +18,10 @@ class GitHubGuardTests(unittest.TestCase):
         self.assertEqual(name, "owner/lab")
         self.assertEqual(visibility, "PRIVATE")
 
-    def test_public_visibility_is_refused(self) -> None:
-        name, visibility = parse_visibility('{"nameWithOwner":"owner/lab","visibility":"PUBLIC"}')
+    def test_private_visibility_is_refused(self) -> None:
+        name, visibility = parse_visibility('{"nameWithOwner":"owner/lab","visibility":"PRIVATE"}')
         with self.assertRaises(NexusError):
-            require_private_visibility(name, visibility)
+            require_public_visibility(name, visibility)
 
     def test_malformed_response_is_rejected(self) -> None:
         with self.assertRaises(NexusError):
@@ -31,7 +31,7 @@ class GitHubGuardTests(unittest.TestCase):
         self,
         root: Path,
         *,
-        visibility: str = "PRIVATE",
+        visibility: str = "PUBLIC",
         permission_exit: int = 0,
         failed_labels: set[str] | None = None,
         issue_exit: int = 0,
@@ -94,7 +94,7 @@ class GitHubGuardTests(unittest.TestCase):
                 error = exc
         return result, error, calls
 
-    def test_create_verifies_private_and_permissions_before_push(self) -> None:
+    def test_create_verifies_public_and_permissions_before_push(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             result, error, calls = self._exercise_bootstrap(Path(temp))
 
@@ -113,13 +113,13 @@ class GitHubGuardTests(unittest.TestCase):
         self.assertLess(permission_idx, push_idx)
         self.assertNotIn("--push", calls[create_idx][1])
 
-    def test_public_visibility_stops_before_permission_or_push(self) -> None:
+    def test_private_visibility_stops_before_permission_or_push(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
-            result, error, calls = self._exercise_bootstrap(Path(temp), visibility="PUBLIC")
+            result, error, calls = self._exercise_bootstrap(Path(temp), visibility="PRIVATE")
 
         self.assertIsNone(result)
         self.assertIsInstance(error, NexusError)
-        self.assertIn("not PRIVATE", str(error))
+        self.assertIn("not PUBLIC", str(error))
         self.assertFalse(any(call[0] == "gh" and call[1] and call[1][0] == "api" for call in calls))
         self.assertFalse(any(call[0] == "git" and call[1] and call[1][0] == "push" for call in calls))
 
