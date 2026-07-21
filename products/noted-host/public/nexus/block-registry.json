@@ -1,5 +1,5 @@
 {
-  "version": "0.03",
+  "version": "0.05",
   "host": "Noted",
   "router": "Nexus OS",
   "routerPath": "nexus/os/Nexus_OS.html",
@@ -14,13 +14,13 @@
       "role": "Router/kernel/desktop for all embedded blocks"
     },
     {
-      "id": "nexus-agent-v012",
-      "title": "Nexus Agent v0.12",
+      "id": "nexus-agent-v014-scrubbed",
+      "title": "Nexus Agent v0.14 (scrubbed)",
       "kind": "managed-block",
-      "path": "nexus/os/blocks/apps/nexus-agent-v0.12.html",
+      "path": "nexus/nexus-agent-v0.14-scrubbed.html",
       "legacyPath": "nexus/nexus-agent-v0.12.html",
       "notedRoute": "/nexus-agent",
-      "role": "Agent chat, sessions, modules, and AI workspace"
+      "role": "Factory-empty research agent and approval-gated prompt import workspace"
     },
     {
       "id": "prompt-studio-v3",

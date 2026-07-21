@@ -7,7 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-const RAIL_W = 256   // expanded width in px — matches w-64
+const RAIL_W = 170   // expanded width in px — compact density pass
 
 export interface RailState {
   collapsed: boolean

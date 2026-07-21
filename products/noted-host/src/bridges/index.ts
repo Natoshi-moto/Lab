@@ -4,7 +4,7 @@ export * from './nexusBridgeRegistry'
 export * from './nexusBridgeTypes'
 export * from './nexusHostBridge'
 export * from './nexusNostrBridgeStub'
-export * from './nexusPromptImportStub'
+export * from './nexusPromptImport'
 export * from './nexusUiPatchStub'
 export * from './nostrBridgeTypes'
 

@@ -10,7 +10,7 @@ import { useRecentViews } from '../util/recentViews'
 
 const STORAGE_KEY = 'verse-studio:nexus-panel:open'
 const DEFAULT_OPEN_APPLIED_KEY = 'verse-studio:nexus-panel:default-open-applied'
-const PANEL_WIDTH = 320
+const PANEL_WIDTH = 212
 const STRIP_WIDTH = 28
 
 const KIND_LABEL: Record<LinkableType, string> = {
@@ -240,7 +240,7 @@ export function NexusPanel(): JSX.Element {
 
       {open && (
         <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-          <div className="px-3 pt-3 pb-2 border-b border-line">
+          <div className="px-2.5 pt-3 pb-2 border-b border-line">
             <div className="text-[10px] uppercase tracking-[0.14em] text-ink-faint">
               Nexus
             </div>
@@ -251,7 +251,7 @@ export function NexusPanel(): JSX.Element {
 
           {!context && (
             <div
-              className="flex-1 flex flex-col items-center justify-center gap-2 px-4 py-8 text-center"
+              className="flex-1 flex flex-col items-center justify-center gap-2 px-2.5 py-8 text-center"
               data-test="nexus-panel-empty"
             >
               <div className="text-[11px] text-ink-faint leading-relaxed">

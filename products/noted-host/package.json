@@ -8,6 +8,8 @@
     "build": "vite build && node pack.js",
     "bridge:smoke": "node scripts/bridge-smoke.mjs",
     "ods:p0": "node scripts/ods-p0.mjs",
+    "ods:p1": "node scripts/agent-prompt-smoke.mjs",
+    "agent:prompt-smoke": "node scripts/agent-prompt-smoke.mjs",
     "ods:smoke": "node scripts/ods-p0.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"

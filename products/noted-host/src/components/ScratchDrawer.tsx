@@ -6,7 +6,7 @@ import { RecentlyDeleted } from './docker/RecentlyDeleted'
 import { RecentItems }     from './docker/RecentItems'
 import { Files }           from './docker/Files'
 import { QuickAdd }        from './docker/QuickAdd'
-import { SCRATCH_DRAWER_OPEN_EVENT, isScratchDrawerOpen, persistScratchDrawerOpen } from './scratchDrawerState'
+import { SCRATCH_DRAWER_OPEN_EVENT, persistScratchDrawerOpen } from './scratchDrawerState'
 
 const TAB_KEY  = 'verse-studio:scratch-drawer:tab'
 const HEIGHT_KEY = 'verse-studio:scratch-drawer:height'
@@ -24,12 +24,9 @@ const VALID_TABS: readonly DrawerTab[] = [
 ]
 
 export function ScratchDrawer() {
-  const [open, setOpen] = useState<boolean>(() => {
-    const stored = isScratchDrawerOpen()
-    // true if explicitly stored as 'true'; also true on first boot (null key)
-    const raw = localStorage.getItem('verse-studio:scratch-drawer:open')
-    return raw === null ? true : stored
-  })
+  // Every app mount starts with the middle stage clear. User changes still persist
+  // and broadcast during the session, but an earlier session cannot reopen it.
+  const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<DrawerTab>(() => {
     try {
       const v = localStorage.getItem(TAB_KEY)

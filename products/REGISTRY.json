@@ -24,7 +24,7 @@
       "path": "products/nexus-blocks",
       "kind": "blocks",
       "ring": 0,
-      "status": "scaffold",
+      "status": "build",
       "status_authority": "NONE",
       "parent_programme": "NOTED_PROJECT_OS_001",
       "checkpoint_bind": "BGEN-CANONICAL-CHECKPOINT-001",
