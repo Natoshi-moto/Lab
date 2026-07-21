@@ -51,7 +51,8 @@
     "No franchise affiliation for 'creature' terminology",
     "Could-be-SaaS language is counterfactual gift thesis only"
   ],
-  "binding_commit": "b48d69cea46f583c1e9f861b1b0fee23175bb082",
+  "binding_commit": "7da34b3cefc9f54ab2cfddf2c40c1c7bcb462ef2",
   "seat": "Grok interactive CLI (operator-directed)",
-  "repo": "Natoshi-moto/Lab"
+  "repo": "Natoshi-moto/Lab",
+  "receipt_bind_commit": "3fd3beaa7ab82f80e3a10360e0d28f1f61354d28"
 }
