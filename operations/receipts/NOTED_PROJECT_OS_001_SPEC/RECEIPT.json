@@ -1,0 +1,36 @@
+{
+  "schema": "lab.programme-spec.receipt/v1",
+  "task_id": "TSK-NOTED-PROJECT-OS-001-SPEC",
+  "programme_id": "NOTED_PROJECT_OS_001",
+  "title": "Tech spec + multi-seat routing + containment + cold-drop launch plan",
+  "status_authority": "NONE",
+  "research_only": true,
+  "date_utc": "2026-07-21",
+  "package_path": "experiments/NOTED_PROJECT_OS_001/",
+  "documents": [
+    "experiments/NOTED_PROJECT_OS_001/README.md",
+    "experiments/NOTED_PROJECT_OS_001/TECH_SPEC.md",
+    "experiments/NOTED_PROJECT_OS_001/CONTAINMENT.md",
+    "experiments/NOTED_PROJECT_OS_001/LAUNCH_PLAN.md",
+    "experiments/NOTED_PROJECT_OS_001/AI_ROUTING.md",
+    "experiments/NOTED_PROJECT_OS_001/seats/CODEX_IMPLEMENTER.md",
+    "experiments/NOTED_PROJECT_OS_001/seats/CLAUDE_DEBUGGER.md",
+    "experiments/NOTED_PROJECT_OS_001/seats/GROK_DRIVER.md",
+    "experiments/NOTED_PROJECT_OS_001/operations_task_PHASE_0.md",
+    "experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py"
+  ],
+  "checkpoint_bind": "BGEN-CANONICAL-CHECKPOINT-001",
+  "seats": [
+    "SEAT-CODEX-IMPLEMENT",
+    "SEAT-CLAUDE-DEBUG",
+    "SEAT-GROK-DRIVE"
+  ],
+  "next_task": "TSK-NOTED-OS-PHASE-0",
+  "non_claims": [
+    "Spec only — not implemented software",
+    "No live funds or token authorization",
+    "status_authority NONE"
+  ],
+  "seat": "Grok interactive CLI (operator-directed)",
+  "repo": "Natoshi-moto/Lab"
+}
