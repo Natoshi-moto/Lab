@@ -18,9 +18,10 @@ audit overlays   = append-only observations bound to target hashes
 AI accounts      = replaceable, attributed research seats
 ```
 
-The constitutional privacy model still says the repository is designed to remain
-private. That mismatch is recorded as `HUMAN_DECISION_REQUIRED`; public visibility
-does not waive `LOCAL_ONLY`, `SECRET`, provider-routing, or redaction rules.
+Repository visibility was resolved as `PUBLIC` by
+[`DEC-2026-000002`](corpus/records/decisions/DEC-2026-000002.md), and the
+constitutional privacy model was reconciled accordingly. Public visibility does
+not waive `LOCAL_ONLY`, `SECRET`, provider-routing, or redaction rules.
 
 ## Demonstrated in R001
 
