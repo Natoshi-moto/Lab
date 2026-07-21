@@ -29,9 +29,10 @@ This package freezes one operating doctrine and points all tracks at the same se
 
 1. `OPERATING_MAP.md` — what controls what
 2. `THESIS.md` — protocol → receipt → delayed Haven-class unit
-3. `S1_INPUT_BRIEF.md` — product-function menu for the next research step after R1
-4. `TRACK_INVENTORY.md` — GitHub PR/issue roles
-5. Parent repair work lives in `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001` (R1 code)
+3. `THE_BITCOIN_PAPER.md` — **draft manifesto / research call** (stabilizer ≠ stablecoin; lab-grounded)
+4. `S1_INPUT_BRIEF.md` — product-function menu for the next research step after R1
+5. `TRACK_INVENTORY.md` — GitHub PR/issue roles
+6. Parent repair work lives in `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001` (R1 code)
 
 ## Non-claims
 
