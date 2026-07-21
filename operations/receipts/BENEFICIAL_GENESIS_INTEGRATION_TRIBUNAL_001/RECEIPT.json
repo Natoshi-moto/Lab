@@ -1,0 +1,84 @@
+{
+  "schema": "bgen.tribunal.receipt/v1",
+  "label": "SANITIZED_AUDIT_RECEIPT",
+  "task_id": "BGEN-INTEGRATION-TRIBUNAL-001",
+  "role": "fresh adversarial integration tribunal and evidence adjudicator",
+  "status_authority": "NONE",
+  "mode": "REPORT_ONLY",
+  "subject_repository": "Natoshi-moto/Lab",
+  "repository_visibility_observed": "PUBLIC",
+  "frozen_subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "working_branch": "fable/bgen-integration-tribunal-001",
+  "mixed_model_provenance": {
+    "initial_model_label": "Fable 5",
+    "continuation_model_label": "Sonnet 5",
+    "handoff_reason": "initial model reached its monthly spend limit mid-task",
+    "same_conversation": true,
+    "same_worktree": true,
+    "same_branch": true,
+    "handoff_boundary_commit": "7b29b449f5add87d8a2c220da635196fbc6621e2",
+    "handoff_boundary_manifest": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/MODEL_HANDOFF_BOUNDARY.json",
+    "handoff_changelog": "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/MODEL_HANDOFF_CHANGELOG.md",
+    "independence_claimed_between_phases": false,
+    "provider_identity_cryptographically_proven": false
+  },
+  "audit_prs_inspected_read_only": [
+    {"pr": 40, "branch": "fable/bgen-epistemic-audit-001", "head": "22a236d4c2973395594050e49a61890c097be62b"},
+    {"pr": 42, "branch": "codex/bgen-technical-audit-001", "head": "bdfee655d34fe9ff4740786cb2e865933a464367"},
+    {"pr": 43, "branch": "grok/bgen-technical-audit-001", "head": "6075fdca74b104168d67d648ac136b96ed47f525"},
+    {"pr": 44, "branch": "codex/bgen-mechanism-audit-001", "head": "d9a0d722b6848e2370aa88988b765723a182ab37"},
+    {"pr": 45, "branch": "grok/bgen-mechanism-audit-001", "head": "81499ae895d63940d9ba973a0a1b9c98469ea36f"}
+  ],
+  "audit_prs_merged_or_modified": false,
+  "tribunal_commits": [
+    "7b29b449f5add87d8a2c220da635196fbc6621e2"
+  ],
+  "authorized_write_paths": [
+    "experiments/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_INTEGRATION_TRIBUNAL_001/**"
+  ],
+  "paths_outside_scope_modified": [],
+  "subject_bytes_modified": false,
+  "audit_pr_packages_modified": false,
+  "status_json_modified": false,
+  "verdicts": {
+    "TECHNICAL_EVIDENCE_STATE": "REPAIR_REQUIRED",
+    "MECHANISM_RESEARCH_DIRECTION": "CONTINUE_WITH_CONDITIONS",
+    "TRANSFERABILITY_DEFAULT": "NONTRANSFERABLE_OR_DELAYED_DEFAULT",
+    "EVIDENCE_FOR_FINAL_MECHANISM_CHOICE": "UNDERDETERMINED",
+    "REAL_WORLD_READINESS": "RESEARCH_ONLY",
+    "NEXT_PHASE": "GO_TO_BOUNDED_REPAIR"
+  },
+  "command_results": {
+    "design_evidence_gate": "PASS_37_TESTS_34_1_8",
+    "redteam_econ_tests": "PASS_72",
+    "breaker_econ_tests": "PASS_25",
+    "retest_002_differential": "43_agreements_0_disagreements_0_crashes",
+    "retest_002_node_tests": "PASS_19_root_level_invocation",
+    "full_lab_tests_pre_npm_ci": "FAILED_9_failures_2_errors_noble_ed25519_missing",
+    "full_lab_tests_post_npm_ci": "PASS_185",
+    "nexus_verify": "PASS_after_npm_ci",
+    "nexus_doctor": "PASS",
+    "tribunal_probes": "14_probes_confirmed_reproduced_identically_both_model_phases",
+    "git_diff_frozen_subject_to_tribunal_head_excluding_authorized_paths": "EMPTY",
+    "git_diff_check": "PASS",
+    "status_json_read": "unchanged_R016_R016_USER_AUTHORIZED_PROMOTION_MERGED"
+  },
+  "confirmed_findings_count": 12,
+  "confirmed_with_limits_findings_count": 4,
+  "overclaimed_findings_count": 1,
+  "disputed_findings_remaining": 0,
+  "single_controlling_next_action": "Execute REPAIR_ACCEPTANCE_PLAN R1 (bounded scheme-parameter validation and supply-invariant gate in the REDTEAM economics package), obtain a fresh independent retest of the exact repaired commit, then proceed to S1 (product/ledger function specification).",
+  "live_activity_authorized": false,
+  "legal_conclusions_made": false,
+  "majority_voting_used": false,
+  "cross_family_independence_claimed": false,
+  "nonclaims": [
+    "No merge, promotion, or R-round authority.",
+    "No economic gate pass.",
+    "No exhaustive parameter-space proof beyond the surfaces searched.",
+    "No empirical, legal, market-price, or live-funds conclusion.",
+    "No claim that model-family or provider labels prove independence, within this tribunal's two phases or across the five audited PRs."
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "schema": "bgen.tribunal.final-verdict/v1",
+  "task_id": "BGEN-INTEGRATION-TRIBUNAL-001",
+  "frozen_subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "status_authority": "NONE",
+  "provenance": {
+    "mixed_model_tribunal": true,
+    "initial_model_label": "Fable 5",
+    "continuation_model_label": "Sonnet 5",
+    "handoff_reason": "initial model reached its monthly spend limit",
+    "same_conversation": true,
+    "same_worktree": true,
+    "same_branch": true,
+    "handoff_boundary_commit": "7b29b449f5add87d8a2c220da635196fbc6621e2",
+    "independence_claimed_between_phases": false,
+    "independence_claimed_across_five_audit_prs": false,
+    "identity_cryptographically_proven": false
+  },
+  "verdicts": {
+    "TECHNICAL_EVIDENCE_STATE": {
+      "value": "REPAIR_REQUIRED",
+      "allowed_values": ["PASS_WITH_STATED_LIMITS", "REPAIR_REQUIRED", "NOT_REPRODUCIBLE"],
+      "strongest_supporting_evidence": "Executable counterexample (TRIB-F-001), reproduced independently by both model phases: pool=100, lottery_share_bps=-1000, well-formed sole donor -> issuance 110, unissued_remainder=-10, falsifying the REDTEAM package's own documented supply invariant.",
+      "strongest_counterevidence": "All committed suites reproduce (37/72/25/19/185 tests, 43/0/0 differential); normative design allocation and Breaker lottery surface unaffected and fail closed.",
+      "unresolved_assumptions": [],
+      "confidence": "HIGH",
+      "falsifiers": ["counterexample fails to reproduce on the exact frozen commit (it did not)", "the invariant claim is shown to have always been scoped to valid inputs only (it is not)"],
+      "precise_next_action": "Execute REPAIR_ACCEPTANCE_PLAN R1, then obtain a fresh independent retest of the exact repaired commit."
+    },
+    "MECHANISM_RESEARCH_DIRECTION": {
+      "value": "CONTINUE_WITH_CONDITIONS",
+      "allowed_values": ["STOP_CURRENT_DIRECTION", "CONTINUE_WITH_CONDITIONS", "ADVANCE_TO_NEXT_BOUNDED_TEST"],
+      "strongest_supporting_evidence": "No executable counterexample to the arithmetic core survives after seven adversarial packages; every alleged unconditional economic failure reduces to conditional/policy; three separate mechanism-facing audit sessions independently arrived at CONTINUE_WITH_CONDITIONS from fresh sessions.",
+      "strongest_counterevidence": "The core causal premise (transferable reward induces additional giving) is unmodelled and unmeasured everywhere; every proven risk scales with success; the record's only fully autonomous full-seat pre-tribunal verdict was REJECT_OR_REDESIGN.",
+      "unresolved_assumptions": ["that the attached conditions (S1-S6) are cheap and decisive relative to their information value"],
+      "confidence": "MODERATE",
+      "falsifiers": ["S1 product-function matrix shows no design serves required functions within proven constraints", "S6-grade empirical evidence shows near-zero or adverse induced giving"],
+      "precise_next_action": "S1: product/ledger function specification with executable acceptance table."
+    },
+    "TRANSFERABILITY_DEFAULT": {
+      "value": "NONTRANSFERABLE_OR_DELAYED_DEFAULT",
+      "allowed_values": ["TRANSFERABLE_JUSTIFIED", "NONTRANSFERABLE_OR_DELAYED_DEFAULT", "UNDERDETERMINED_PENDING_FUNCTION_SPEC"],
+      "strongest_supporting_evidence": "Every currently specified ledger function (receipt binding, charitable transfer binding, finite allocation, permissionless claim) is implementable without alienable units; two structurally independent mechanism models reach this by construction; non-transferable regime removes the float powering every proven attack pathway.",
+      "strongest_counterevidence": "Unspecified future functions (payment, fees, staking, security bonding, store of value) are untested and might require transferability.",
+      "unresolved_assumptions": ["only currently-specified functions are held as requirements"],
+      "confidence": "HIGH within specified functions; LOW for unspecified future ledger",
+      "falsifiers": ["an executable required-function acceptance test that only a transferable design passes"],
+      "precise_next_action": "Adopt as working default now; reverse only via S1's acceptance table with an attached falsifier."
+    },
+    "EVIDENCE_FOR_FINAL_MECHANISM_CHOICE": {
+      "value": "UNDERDETERMINED",
+      "allowed_values": ["SUFFICIENT", "UNDERDETERMINED", "CONTRADICTED"],
+      "strongest_supporting_evidence": "Participation elasticity, displacement, rebate-access distribution, token value, and liquidity remain unmeasured everywhere in the record; PR44 and PR45's EVIDENCE_STATE verdicts are compatible once read as answering different questions (bounded decision vs final choice), and both concede these empirical variables are open.",
+      "strongest_counterevidence": "The arithmetic/structural/countermodel layers are unusually thorough and mutually reproduced across 3+ independent implementations; under a narrower reading of 'final choice' as 'which modeled regime to research next', evidence may already be sufficient.",
+      "unresolved_assumptions": ["what 'final mechanism choice' is taken to mean; this verdict adopts the stricter (launchable design decision) reading"],
+      "confidence": "HIGH that sign-controlling empirical variables are unresolved; MODERATE on which reading of 'final choice' governs",
+      "falsifiers": ["a preregistered empirical study (S6) closing participation elasticity and flow composition"],
+      "precise_next_action": "Sequence S6 after S1."
+    },
+    "REAL_WORLD_READINESS": {
+      "value": "RESEARCH_ONLY",
+      "allowed_values": ["RESEARCH_ONLY"],
+      "strongest_supporting_evidence": "All cryptography and Bitcoin interface synthetic by design; no real charity/donor/key/transaction anywhere; economic gate explicitly not passed; all five audited PRs and both tribunal phases independently arrive at RESEARCH_ONLY; STATUS.json unchanged at R016 throughout.",
+      "strongest_counterevidence": "none",
+      "unresolved_assumptions": [],
+      "confidence": "HIGH",
+      "falsifiers": ["separately-governed operator promotion completing real Bitcoin, real PQ, charity ceremony, legal review, and economic-gate-pass tracks"],
+      "precise_next_action": "None from this tribunal; Tracks B-F per program roadmap at operator discretion, outside this tribunal's authority."
+    },
+    "NEXT_PHASE": {
+      "value": "GO_TO_BOUNDED_REPAIR",
+      "allowed_values": ["GO_TO_BOUNDED_REPAIR", "RETURN_TO_SPECIFICATION", "STOP"],
+      "strongest_supporting_evidence": "Exactly one confirmed blocker exists (TRIB-F-001/002), it is small and fully specified (R1), and completing it does not foreclose or prejudge S1 - it removes a false claim from the record before the specification round builds on it.",
+      "strongest_counterevidence": "RETURN_TO_SPECIFICATION (S1 directly) is arguably more research-decisive since it is what discriminates between continuing and stopping the program; the repair is comparatively low-stakes.",
+      "unresolved_assumptions": ["sequencing the mechanical repair before the judgment-heavy specification work is worth the delay"],
+      "confidence": "MODERATE_HIGH",
+      "falsifiers": ["R1 shown to be far more involved than scoped (not observed)", "S1 judged urgent enough to run in parallel with R1 (defensible operator call)"],
+      "precise_next_action": "Execute R1, obtain fresh independent retest, then proceed to S1."
+    }
+  },
+  "confirmed_findings": ["TRIB-F-001", "TRIB-F-002", "TRIB-F-003", "TRIB-F-004", "TRIB-F-007", "TRIB-F-008", "TRIB-F-010", "TRIB-F-011", "TRIB-F-012", "TRIB-F-013", "TRIB-F-014", "TRIB-F-018"],
+  "confirmed_with_limits_findings": ["TRIB-F-009", "TRIB-F-015", "TRIB-F-016", "TRIB-F-017"],
+  "overclaimed_findings": ["TRIB-F-006"],
+  "process_only_findings": ["TRIB-F-005", "TRIB-F-013", "TRIB-F-017", "TRIB-F-018"],
+  "disputed_findings_remaining": [],
+  "ordered_repair_plan": ["R1", "R2", "R3", "R4", "independent_retest", "S1", "S2", "S3", "S4", "S5", "S6"],
+  "single_controlling_next_action": "Execute REPAIR_ACCEPTANCE_PLAN R1 (bounded scheme-parameter validation and supply-invariant gate in the REDTEAM economics package), obtain a fresh independent retest of the exact repaired commit, then proceed to S1 (product/ledger function specification).",
+  "nonclaims": [
+    "No status promotion, R-round assignment, or STATUS.json change.",
+    "No merge of any PR.",
+    "No live funds, donations, charity selection, solicitation, token issuance, deployment, or production authorization.",
+    "No legal conclusions.",
+    "No majority voting was used.",
+    "Model-family labels are not treated as proof of independence, within or across model phases.",
+    "Passing tests, merge state, and repeated prose are not treated as proof of truth."
+  ]
+}
