@@ -21,7 +21,7 @@
   "independent_breaker_evidence_merge_commit": "d8523b29ca7a1e0433ab5afdb494ed8452450dde",
   "independent_breaker_pr": 37,
   "repair_start_head": "d8523b29ca7a1e0433ab5afdb494ed8452450dde",
-  "branch_tip": "pending_commit",
+  "branch_tip": "00402a1b417ea9ac328ab51666364ecbe6c07ae4",
   "draft_pr": 35,
   "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/35",
   "authorized_paths": [
