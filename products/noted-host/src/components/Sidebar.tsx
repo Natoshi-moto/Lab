@@ -53,6 +53,7 @@ const ROUTES_KEEP: RouteSpec[] = [
 ]
 
 const ROUTES_SYSTEM: RouteSpec[] = [
+  { to: '/diagnostics', label: 'Diagnostics', icon: 'Dx', defaultHidden: true },
   { to: '/settings', label: 'Settings', icon: 'Set' }
 ]
 
@@ -180,9 +181,11 @@ export function Sidebar() {
   const { devMode } = useDevMode()
 
   // Sweep 60 — hide `defaultHidden` entries unless dev mode is on.
-  // System routes are never hidden.
+  // Diagnostics is a DEV navigation surface; its direct route remains available in
+  // production with an always-visible research/non-claims banner.
   const visibleMake = ROUTES_MAKE.filter((r) => !r.defaultHidden || devMode)
   const visibleKeep = ROUTES_KEEP.filter((r) => !r.defaultHidden || devMode)
+  const visibleSystem = ROUTES_SYSTEM.filter((r) => !r.defaultHidden || import.meta.env.DEV)
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, collapsed ? 'true' : 'false') } catch {}
@@ -215,7 +218,7 @@ export function Sidebar() {
           <div className="border-t border-line my-2" />
           {visibleKeep.map((r) => <RailItem key={r.to} {...r} />)}
           <div className="border-t border-line my-2" />
-          {ROUTES_SYSTEM.map((r) => <RailItem key={r.to} {...r} />)}
+          {visibleSystem.map((r) => <RailItem key={r.to} {...r} />)}
         </nav>
         <SidebarFooter collapsed />
       </aside>
@@ -263,7 +266,7 @@ export function Sidebar() {
 
         <GroupLabel>System</GroupLabel>
         <div className="px-2 space-y-0.5">
-          {ROUTES_SYSTEM.map((r) => <Item key={r.to} to={r.to} label={r.label} />)}
+          {visibleSystem.map((r) => <Item key={r.to} to={r.to} label={r.label} />)}
         </div>
       </nav>
       <SidebarFooter collapsed={false} />

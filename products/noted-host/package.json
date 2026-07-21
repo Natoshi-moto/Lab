@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build && node pack.js",
     "bridge:smoke": "node scripts/bridge-smoke.mjs",
+    "ods:smoke": "node scripts/ods-0-smoke.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },

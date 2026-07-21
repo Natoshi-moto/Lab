@@ -29,6 +29,7 @@ import { Inbox } from './studios/inbox/Inbox'
 import { NexusAgentStudio } from './studios/nexusAgent/NexusAgentStudio'
 import { PromptStudioV3 } from './studios/promptStudioV3/PromptStudioV3'
 import { NexusRouterStudio } from './studios/nexusRouter/NexusRouterStudio'
+import { DiagnosticsStudio } from './studios/diagnostics/DiagnosticsStudio'
 import { DB_NAME } from './db'
 import { APP_NAME } from './appMeta'
 import { FocusProvider } from './focus/FocusContext'
@@ -255,6 +256,8 @@ function Shell() {
                   <Route path="/prompts" element={<PromptStudio />} />
                   <Route path="/canvas" element={<Canvas />} />
                   <Route path="/nexus-router" element={<NexusRouterStudio />} />
+                  <Route path="/diagnostics" element={<DiagnosticsStudio />} />
+                  <Route path="/ods" element={<Navigate to="/diagnostics" replace />} />
                   <Route path="/nexus-agent" element={<NexusAgentStudio />} />
                   <Route path="/prompt-studio-v3" element={<PromptStudioV3 />} />
                   <Route path="/atlas" element={<Atlas />} />
