@@ -1,0 +1,57 @@
+{
+  "schema": "bgen.canonical-checkpoint.receipt/v1",
+  "task_id": "TSK-BGEN-CANONICAL-CHECKPOINT-001",
+  "checkpoint_id": "BGEN-CANONICAL-CHECKPOINT-001",
+  "title": "First canonical research checkpoint \u2014 anti real-world value mandate + synthetic game/creature economy freeze",
+  "status_authority": "NONE",
+  "research_only": true,
+  "not_a_token_launch": true,
+  "not_live_funds": true,
+  "date_utc": "2026-07-21",
+  "package_path": "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/",
+  "canonical_document": "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md",
+  "sister_documents": [
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/OPERATING_MAP.md",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/THESIS.md",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/THE_BITCOIN_PAPER.md",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/THE_SIDE_PATH_PAPER.md",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/TO_SATOSHI_AND_THE_MAKERS_OF_BITCOIN.md",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/S1_INPUT_BRIEF.md",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/TRACK_INVENTORY.md",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/README.md"
+  ],
+  "epistemic_base": {
+    "description": "Current Lab state as research base: non-claims culture, Beneficial Genesis gauntlet, R1 supply-invariant repair + independent retest, unified thesis package",
+    "binding_branch": "main",
+    "parent_commits_noted": [
+      "1d451ae Add draft Bitcoin Paper: stabilizer unit research call",
+      "b39f633 Merge pull request #53 from Natoshi-moto/claude/full-history-review-001",
+      "3acecb4 Merge BGEN-R1 independent Codex retest evidence",
+      "802b5b7 Merge BGEN-R1 supply-invariant repair and unified thesis map"
+    ]
+  },
+  "hard_mandates": [
+    "NEVER endorse real-world economic value on project credentials or game objects",
+    "Actively engineer AGAINST real-world value projection",
+    "Allowed meanings only: authority, contribution, reputation, social tipping, synthetic game economy",
+    "Cryptographic creature battling universe as synthetic game surface (not money)",
+    "Cold drop doctrine: surprise release to be torn apart",
+    "Side-path falsification conditions standing pre-release checks"
+  ],
+  "operator_human_thesis": {
+    "summary": "Human operator free-drops software (and other software) that could counterfactually be multi-million SaaS, to validate genuine contribution and raise research productivity of project participants",
+    "not_a_financial_forecast": true,
+    "not_an_ico": true
+  },
+  "non_claims": [
+    "No status authority",
+    "No live custody authorization",
+    "No securities/tax/money-transmitter conclusions",
+    "No claim multi-AI agreement is independence",
+    "No franchise affiliation for 'creature' terminology",
+    "Could-be-SaaS language is counterfactual gift thesis only"
+  ],
+  "binding_commit": "b48d69cea46f583c1e9f861b1b0fee23175bb082",
+  "seat": "Grok interactive CLI (operator-directed)",
+  "repo": "Natoshi-moto/Lab"
+}
