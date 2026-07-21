@@ -15,6 +15,9 @@
   "subject_pr": 35,
   "subject_branch": "claude/bgen-econ-redteam-001",
   "stacked_base_branch": "claude/bgen-econ-redteam-001",
+  "breaker_commit": "fa6ed331315957a80ab54dcc905fd3a6ab2929a8",
+  "draft_pr": 37,
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/37",
   "authorized_paths": [
     "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
     "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
