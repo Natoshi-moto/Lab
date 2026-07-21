@@ -1,0 +1,114 @@
+{
+  "schema": "nexus.receipt/v1",
+  "receipt_id": "RCT-NOTED-PROJECT-OS-ODS-1-001",
+  "operation": "noted-project-os-ods-1-p0-complete",
+  "status_authority": "NONE",
+  "seat": "SEAT-CODEX-IMPLEMENT",
+  "baseline_commit": "a745bbdaf3814653e28dfaa340c7bc26bbb4edb2",
+  "verified_at_commit": "57b302d207d7281be33614ff89131889a2bcea6a",
+  "started_at": "2026-07-21T23:13:00+01:00",
+  "finished_at": "2026-07-21T23:28:52+01:00",
+  "exit_code": 0,
+  "inputs": [
+    { "path": "README_START_HERE.md" },
+    { "path": "STATUS.json" },
+    { "path": "NEXT_ACTION.md" },
+    { "path": "constitution/", "description": "Inspected AUDIT, AUTHORITY, CANONICALITY, EVIDENCE, MUTATION, PRIVACY, and ROUTING policy files." },
+    { "path": "experiments/NOTED_PROJECT_OS_001/seats/CODEX_IMPLEMENTER.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/CANONICAL_DIRECTION.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/DIAGNOSTIC_SUITE.md", "sections": "§4.2, §5, §9 ODS-1, §10" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/README.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/CONTAINMENT.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/TECH_SPEC.md", "sections": "§0-6, §8, §11" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/LAUNCH_PLAN.md", "sections": "§2-3" },
+    { "path": "products/noted-host/src/studios/diagnostics/", "description": "Inspected the ODS-0 case catalog and UI runner." },
+    { "path": "products/noted-host/src/bridges/", "description": "Inspected the bridge types, host listener, and registry used by the ODS cases." },
+    { "path": "products/noted-host/scripts/ods-0-smoke.mjs" },
+    { "path": "products/noted-host/scripts/bridge-smoke.mjs" }
+  ],
+  "outputs": [
+    {
+      "path": "products/noted-host/src/studios/diagnostics/DiagnosticsStudio.tsx",
+      "sha256": "0423d88fc73d76b47e604694fdddf4c18e082af32305fe59c9f5b8ff99502b8a",
+      "change": "Completes all nine non-human P0 UI runners, adds one-click Run P0 suite, bounded burst evidence, operator-note redaction, and bounded diagnosis-pack metadata."
+    },
+    {
+      "path": "products/noted-host/src/studios/diagnostics/odsCases.ts",
+      "sha256": "259109e6630d49825a545893ca6e6f12a0c95e6d9cb2dd09745dedaa2ecbf964",
+      "change": "Promotes BR-003, BR-004, and BR-005 from ODS-0 SKIP to implemented P0 cases while retaining the exact shared case IDs."
+    },
+    {
+      "path": "products/noted-host/src/bridges/nexusHostBridge.ts",
+      "sha256": "fdd9a5a5668b01d7fb4dac456fb2cf0b8866dfd01149b1adcde58d56fcd7488c",
+      "change": "Rejects trusted protocol-shaped malformed envelopes with a bounded MALFORMED_ENVELOPE receipt and no mutation."
+    },
+    {
+      "path": "products/noted-host/src/bridges/nexusBridgeTypes.ts",
+      "sha256": "d0d1c548d1c1ebb77e06761e7356267de9d08bd749c4f6057060fb9ae1ed0cf7",
+      "change": "Strengthens runtime envelope-shape validation before bridge handling."
+    },
+    {
+      "path": "products/noted-host/public/nexus/os/bridges/noted-host-adapter.stub.js",
+      "sha256": "666c5ea77031c14eb03d224bd071cf7d33d99ca217da723745bb7e58eb6c63c0",
+      "change": "Adds the inert malformed-envelope diagnostic fixture used by the real iframe-to-host runner."
+    },
+    {
+      "path": "products/noted-host/scripts/ods-p0.mjs",
+      "sha256": "d516e76d2ba2653b045efe330d7a871375446f07493e4b01e394ba3e37a55aec",
+      "change": "Replaces the ODS-0 smoke with the headless P0 twin for DEV and preview, driving the UI catalog and one-click runner and checking exports, redaction, bounded logs, and browser errors."
+    },
+    {
+      "path": "products/noted-host/package.json",
+      "sha256": "abc54e70308ddf33c5a9a9b2e6deee2411e346789a176f8457abacac2a8f5ce8",
+      "change": "Adds npm run ods:p0 and retains ods:smoke as a compatibility alias."
+    },
+    {
+      "path": "products/noted-host/noted-v0.01.html",
+      "sha256": "1a9da7b042834660a10f012dd20dc281554fbbfaef64a54abfcdfbc834999699",
+      "change": "Regenerates the production single-file pack with ODS-1."
+    },
+    {
+      "path": "products/noted-host/verse-studio.html",
+      "sha256": "1a9da7b042834660a10f012dd20dc281554fbbfaef64a54abfcdfbc834999699",
+      "change": "Regenerates the compatibility single-file pack with ODS-1."
+    }
+  ],
+  "claims": [
+    "All nine non-human P0 case IDs from DIAGNOSTIC_SUITE §4.2 execute from the one-click UI runner and pass in DEV and production preview.",
+    "ODS-BR-003 rejects a trusted malformed protocol envelope with MALFORMED_ENVELOPE and no browser crash.",
+    "ODS-BR-004 rejects ods.unknown-channel with an explicit UNKNOWN_CHANNEL receipt naming the channel.",
+    "ODS-BR-005 sends 20 pings, observes all 20 accepted, yields to the browser event loop, and truncates the bridge log to its configured 12-entry bound.",
+    "The exported diagnosis pack remains noted.ods-pack/v1 with status_authority NONE; the automated fixture verifies sk-, Bearer-, and nsec-shaped redaction.",
+    "The diagnosis pack includes bounded storage metadata only and does not dump IndexedDB records or private notes.",
+    "Phase 1 bridge smoke, registry verification, typecheck, build, Lab doctor, 190 Lab unit tests, and Lab verify remain green under the documented dependency-tree condition."
+  ],
+  "non_claims": [
+    "Passing P0 is diagnostic runtime evidence, not full ODS load-bearing process proof unless the separately required real-bug diagnosis or seat-VERIFY adoption criterion is accepted as satisfied.",
+    "This work and receipt are not a security audit or production-readiness claim.",
+    "Phase 2 Agent, prompt product, broker, simulator frame, creature, and Nostr product work were not started.",
+    "Human-only ODS cases remain human and were not automated or claimed as passed.",
+    "No real-world value, funds, token, redeem, or economic authorization surface was added.",
+    "The receipt is committed after the immutable verified product commit named by verified_at_commit; the receipt-only commit does not alter verified product files."
+  ],
+  "checks": [
+    { "command": "python3 experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py", "exit_code": 0, "result": "PASS registry: 3 package(s) ok" },
+    { "command": "cd products/noted-host && npm ci", "exit_code": 0, "result": "PASS; added and audited 166 packages. npm audit reported 5 existing findings (1 low, 3 moderate, 1 high)." },
+    { "command": "cd products/noted-host && npm run typecheck", "exit_code": 0, "result": "PASS; tsc --noEmit returned no errors." },
+    { "command": "cd products/noted-host && npm run build", "exit_code": 0, "result": "PASS; Vite transformed 297 modules and pack.js emitted both single-file HTML artifacts." },
+    { "command": "cd products/noted-host && npm run bridge:smoke", "exit_code": 0, "result": "PASS in DEV; trusted/untrusted bridge checks and browser error checks remained green." },
+    { "command": "cd products/noted-host && npm run ods:p0", "exit_code": 0, "result": "PASS in DEV; all nine P0 cases, one-click runner, bounded burst, pack schema/authority, redaction fixtures, storage boundary, and browser error checks passed." },
+    { "command": "cd products/noted-host && npm run ods:p0 -- --preview", "exit_code": 0, "result": "PASS in production preview with the same P0 and export assertions; production Diagnostics sidebar entry remained hidden." },
+    { "command": "./nexus doctor", "exit_code": 0, "result": "PASS after temporarily moving ignored node_modules outside the worktree; dirty-worktree warning only." },
+    { "command": "python3 -m unittest discover -s tests -q", "exit_code": 0, "result": "PASS; Ran 190 tests in 31.796s." },
+    { "command": "./nexus verify", "exit_code": 0, "result": "PASS after temporarily moving ignored node_modules outside the worktree." },
+    { "command": "git diff --check", "exit_code": 0, "result": "PASS." }
+  ],
+  "limitations": [
+    "Lab doctor recursively inspects ignored node_modules and rejects npm-created .bin symlinks and third-party JSONC; the Lab standard checks pass when that ignored dependency directory is temporarily outside the worktree, and it was restored afterward.",
+    "The in-product pack console arrays remain schema-shaped and empty; Playwright separately captures and asserts console and uncaught page errors in both runtime modes.",
+    "lab_git_head and noted_build_commit remain null because the host has no build-time commit injection; the fields are present without invented values.",
+    "The existing local Playwright Chromium cache is used when the package-expected browser revision is absent.",
+    "npm audit reported 5 dependency findings (1 low, 3 moderate, 1 high); dependency remediation is outside ODS-1 scope."
+  ],
+  "next": "NEXT: SEAT-GROK-DRIVE for ODS-1 acceptance. Do not begin Phase 2."
+}

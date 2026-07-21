@@ -24,8 +24,15 @@ type TimelineEntry = {
 }
 
 type NexusAdapterWindow = Window & {
-  NexusHostAdapterStub?: { ping: () => boolean }
+  NexusHostAdapterStub?: {
+    ping: () => boolean
+    send: (channel: string, payload?: unknown) => boolean
+    sendMalformed: () => boolean
+    getDiagnostics: () => { sent: number; receipts: number; lastSent: unknown; lastReceipt: unknown }
+  }
 }
+
+const BRIDGE_LOG_LIMIT = 12
 
 function isoNow(): string {
   return new Date().toISOString()
@@ -57,7 +64,7 @@ function download(name: string, content: string, type: string) {
   URL.revokeObjectURL(url)
 }
 
-function redactKnownSecrets(content: string): string {
+export function redactKnownSecrets(content: string): string {
   return content
     .replace(/\b(?:sk|xai)-[A-Za-z0-9_-]+/g, '[REDACTED_API_KEY]')
     .replace(/Bearer\s+[A-Za-z0-9._~+\/-]+=*/gi, 'Bearer [REDACTED]')
@@ -82,11 +89,12 @@ function waitFor(predicate: () => boolean, timeoutMs = 3000): Promise<void> {
 export function DiagnosticsStudio(): JSX.Element {
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const getTargetWindow = useCallback(() => iframeRef.current?.contentWindow ?? null, [])
-  const bridge = useNexusHostBridge({ getTargetWindow, maxLogEntries: 40 })
+  const bridge = useNexusHostBridge({ getTargetWindow, maxLogEntries: BRIDGE_LOG_LIMIT })
   const bridgeRef = useRef(bridge)
   const [runs, setRuns] = useState<Record<string, CaseRun>>({})
   const [timeline, setTimeline] = useState<TimelineEntry[]>([])
   const [busy, setBusy] = useState<string | null>(null)
+  const [operatorNotes, setOperatorNotes] = useState('')
 
   useEffect(() => { bridgeRef.current = bridge }, [bridge])
 
@@ -107,10 +115,6 @@ export function DiagnosticsStudio(): JSX.Element {
     const startedAt = isoNow()
     setBusy(testCase.id)
     try {
-      if (testCase.ods0 === 'skip') {
-        finish(testCase, startedAt, 'SKIP', ['Defined for P0; runner deferred to ODS-1.'])
-        return
-      }
       if (testCase.id === 'ODS-ENV-001' || testCase.id === 'ODS-PACK-001') {
         finish(testCase, startedAt, 'PASS', [`Recorded ${env.build_kind} at ${env.href}`], { env })
       } else if (testCase.id === 'ODS-HOST-001') {
@@ -124,6 +128,7 @@ export function DiagnosticsStudio(): JSX.Element {
       } else if (testCase.id === 'ODS-BR-001') {
         const before = bridgeRef.current.accepted
         const target = iframeRef.current?.contentWindow as NexusAdapterWindow | null
+        await waitFor(() => Boolean(target?.NexusHostAdapterStub?.ping))
         if (!target?.NexusHostAdapterStub?.ping()) throw new Error('Nexus host adapter is not ready.')
         await waitFor(() => bridgeRef.current.accepted === before + 1)
         const receipt = bridgeRef.current.lastReceipt
@@ -131,13 +136,19 @@ export function DiagnosticsStudio(): JSX.Element {
         finish(testCase, startedAt, pass ? 'PASS' : 'FAIL', [`Accepted ${before} → ${bridgeRef.current.accepted}.`, receipt?.summary ?? 'No receipt.'], { receipt })
       } else if (testCase.id === 'ODS-BR-002') {
         const before = bridgeRef.current.rejected
+        const messageId = `ods-parent-${Date.now()}`
         let replies = 0
-        const replyListener = (event: MessageEvent) => { if (event.data?.type === 'NEXUS_HOST_BRIDGE_RECEIPT') replies += 1 }
+        const replyListener = (event: MessageEvent) => {
+          if (
+            event.data?.type === 'NEXUS_HOST_BRIDGE_RECEIPT'
+            && event.data?.envelope?.tags?.some((tag: { type?: unknown; value?: unknown }) => tag.type === 'in-reply-to' && tag.value === messageId)
+          ) replies += 1
+        }
         window.addEventListener('message', replyListener)
         const message: NexusHostBridgeMessage = {
           type: 'NEXUS_HOST_BRIDGE',
           envelope: {
-            id: `ods-parent-${Date.now()}`, createdAt: isoNow(),
+            id: messageId, createdAt: isoNow(),
             source: { kind: 'nexus-router', id: 'ods-parent-impersonator' },
             target: { kind: 'noted-host', id: 'noted-host' },
             kind: 'diagnostic.ping', intent: 'ods.foreign-source', capability: 'nexus.emit', channel: 'diagnostic.ping',
@@ -145,12 +156,46 @@ export function DiagnosticsStudio(): JSX.Element {
           },
         }
         window.postMessage(message, '*')
-        await waitFor(() => bridgeRef.current.rejected === before + 1)
+        await waitFor(() => bridgeRef.current.rejected === before + 1 && bridgeRef.current.lastReceipt?.error === 'UNTRUSTED_SOURCE')
+        const receipt = bridgeRef.current.lastReceipt
         await new Promise((resolve) => window.setTimeout(resolve, 100))
         window.removeEventListener('message', replyListener)
-        const receipt = bridgeRef.current.lastReceipt
         const pass = receipt?.error === 'UNTRUSTED_SOURCE' && replies === 0
         finish(testCase, startedAt, pass ? 'PASS' : 'FAIL', [`Rejected ${before} → ${bridgeRef.current.rejected}.`, `Replies to parent: ${replies}.`, receipt?.error ?? 'No receipt error.'], { receipt, replies })
+      } else if (testCase.id === 'ODS-BR-003') {
+        const before = bridgeRef.current.rejected
+        const target = iframeRef.current?.contentWindow as NexusAdapterWindow | null
+        await waitFor(() => Boolean(target?.NexusHostAdapterStub?.sendMalformed))
+        if (!target?.NexusHostAdapterStub?.sendMalformed()) throw new Error('Nexus host adapter is not ready.')
+        await waitFor(() => bridgeRef.current.rejected === before + 1 && bridgeRef.current.lastReceipt?.error === 'MALFORMED_ENVELOPE')
+        const receipt = bridgeRef.current.lastReceipt
+        const pass = receipt?.ok === false && receipt.error === 'MALFORMED_ENVELOPE'
+        finish(testCase, startedAt, pass ? 'PASS' : 'FAIL', [`Rejected ${before} → ${bridgeRef.current.rejected}.`, receipt?.summary ?? 'No receipt.'], { receipt })
+      } else if (testCase.id === 'ODS-BR-004') {
+        const before = bridgeRef.current.rejected
+        const target = iframeRef.current?.contentWindow as NexusAdapterWindow | null
+        await waitFor(() => Boolean(target?.NexusHostAdapterStub?.send))
+        if (!target?.NexusHostAdapterStub?.send('ods.unknown-channel', { fixture: true })) throw new Error('Nexus host adapter is not ready.')
+        await waitFor(() => bridgeRef.current.rejected === before + 1 && bridgeRef.current.lastReceipt?.error === 'UNKNOWN_CHANNEL')
+        const receipt = bridgeRef.current.lastReceipt
+        const pass = receipt?.ok === false && receipt.error === 'UNKNOWN_CHANNEL' && receipt.summary.includes('ods.unknown-channel')
+        finish(testCase, startedAt, pass ? 'PASS' : 'FAIL', [`Rejected ${before} → ${bridgeRef.current.rejected}.`, receipt?.summary ?? 'No receipt.'], { channel: 'ods.unknown-channel', receipt })
+      } else if (testCase.id === 'ODS-BR-005') {
+        const before = bridgeRef.current.accepted
+        const target = iframeRef.current?.contentWindow as NexusAdapterWindow | null
+        await waitFor(() => Boolean(target?.NexusHostAdapterStub?.ping))
+        const started = performance.now()
+        let responsive = false
+        window.setTimeout(() => { responsive = true }, 0)
+        for (let index = 0; index < 20; index += 1) {
+          if (!target?.NexusHostAdapterStub?.ping()) throw new Error(`Nexus host adapter stopped at ping ${index + 1}.`)
+        }
+        await waitFor(() => bridgeRef.current.accepted === before + 20, 5000)
+        await waitFor(() => responsive, 1000)
+        const elapsedMs = Math.round(performance.now() - started)
+        const logEntries = bridgeRef.current.log.length
+        const pass = bridgeRef.current.accepted === before + 20 && responsive && logEntries === BRIDGE_LOG_LIMIT && elapsedMs < 5000
+        finish(testCase, startedAt, pass ? 'PASS' : 'FAIL', ['Sent 20 diagnostic pings.', `Accepted ${before} → ${bridgeRef.current.accepted}.`, `Responsive in ${elapsedMs} ms.`, `Bridge log bounded at ${logEntries}/${BRIDGE_LOG_LIMIT}.`], { ping_count: 20, elapsed_ms: elapsedMs, responsive, log_entries: logEntries, log_limit: BRIDGE_LOG_LIMIT })
       }
     } catch (error) {
       finish(testCase, startedAt, 'ERROR', [error instanceof Error ? error.message : String(error)])
@@ -159,15 +204,19 @@ export function DiagnosticsStudio(): JSX.Element {
     }
   }
 
+  async function runP0Suite() {
+    for (const testCase of ODS_P0_CASES) await runCase(testCase)
+  }
+
   const pack = useMemo(() => ({
     schema: 'noted.ods-pack/v1', status_authority: 'NONE', created_at: isoNow(), programme: 'NOTED_PROJECT_OS_001', checkpoint_bind: 'BGEN-CANONICAL-CHECKPOINT-001',
     env, cases_run: ODS_P0_CASES.map((testCase) => runs[testCase.id]).filter(Boolean), timeline,
     bridge: { status_text: statusText, ok_count: bridge.accepted, fail_count: bridge.rejected, last_receipts: bridge.lastReceipt ? [bridge.lastReceipt] : [] },
     console: { errors: [], warnings: [] },
     storage: { idb_db_name: 'verse-studio', idb_version: null, store_counts: {}, localStorage_keys_sample: [] },
-    security_notes: ['No secrets intentionally included', 'Operator should redact API keys if other tools were open'], operator_notes: '',
-    non_claims: ['This pack is diagnostic evidence, not a security audit', 'Passing ODS does not mean production readiness or sim-frame complete', 'ODS-0 does not claim full P0 coverage'],
-  }), [bridge.accepted, bridge.lastReceipt, bridge.rejected, env, runs, statusText, timeline])
+    security_notes: ['No secrets intentionally included', 'Known sk-/xai-/Bearer/nsec-shaped values are redacted before export', 'No full IndexedDB records or private notes are included'], operator_notes: operatorNotes,
+    non_claims: ['This pack is diagnostic evidence, not a security audit', 'Passing ODS does not mean production readiness or full ODS load-bearing process proof', 'This is not Phase 2 and does not implement sim-frame', 'Human-only cases remain human'],
+  }), [bridge.accepted, bridge.lastReceipt, bridge.rejected, env, operatorNotes, runs, statusText, timeline])
 
   function exportJson() {
     download(`ods-pack-${new Date().toISOString().replace(/[:.]/g, '-')}.json`, redactKnownSecrets(JSON.stringify(pack, null, 2)), 'application/json')
@@ -175,7 +224,7 @@ export function DiagnosticsStudio(): JSX.Element {
 
   function exportMd() {
     const counts = Object.values(runs).reduce<Record<OdsCaseResult, number>>((acc, run) => ({ ...acc, [run.result]: acc[run.result] + 1 }), { PASS: 0, FAIL: 0, SKIP: 0, ERROR: 0 })
-    const body = `# ODS pack summary\n\n- schema: noted.ods-pack/v1\n- status_authority: NONE\n- build: ${env.build_kind}\n- PASS: ${counts.PASS}  FAIL: ${counts.FAIL}  SKIP: ${counts.SKIP}  ERROR: ${counts.ERROR}\n\n## Non-claims\n\nODS-0 diagnostic evidence only; not a security audit, production readiness claim, Phase 2, or sim-frame.\n`
+    const body = `# ODS pack summary\n\n- schema: noted.ods-pack/v1\n- status_authority: NONE\n- build: ${env.build_kind}\n- PASS: ${counts.PASS}  FAIL: ${counts.FAIL}  SKIP: ${counts.SKIP}  ERROR: ${counts.ERROR}\n\n## Operator notes\n\n${operatorNotes || '(none)'}\n\n## Non-claims\n\nODS-1 diagnostic evidence only; not full ODS load-bearing process proof, a security audit, production readiness claim, Phase 2, or sim-frame. Human-only cases remain human.\n`
     download(`ods-pack-${new Date().toISOString().replace(/[:.]/g, '-')}.md`, redactKnownSecrets(body), 'text/markdown')
   }
 
@@ -185,22 +234,23 @@ export function DiagnosticsStudio(): JSX.Element {
         <div className="rounded-xl border border-warn/60 bg-warn/10 p-4" data-test="ods-nonclaims">
           <div className="text-xs font-semibold uppercase tracking-widest text-warn">Operator Diagnostic Suite — research tool</div>
           <p className="mt-2 text-sm text-ink-soft">Does not authorize live funds or real-world value. Passing cases ≠ production readiness. <span className="font-mono">status_authority: NONE</span></p>
-          <p className="mt-1 text-xs text-ink-faint">ODS-0 skeleton: BR-003–005 remain explicit SKIP until ODS-1.</p>
+          <p className="mt-1 text-xs text-ink-faint">ODS-1 P0 automation; human-only cases remain human.</p>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
           <div className="rounded-xl border border-line bg-surface p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div><h1 className="text-lg font-semibold">Diagnostics</h1><p className="text-xs text-ink-faint">{statusText}</p></div>
-              <div className="flex gap-2"><button className="rounded border border-line px-3 py-2 text-xs hover:bg-surface-3" data-test="ods-export-json" onClick={exportJson}>Export JSON</button><button className="rounded border border-line px-3 py-2 text-xs hover:bg-surface-3" data-test="ods-export-md" onClick={exportMd}>Export MD</button></div>
+              <div className="flex flex-wrap gap-2"><button className="rounded border border-accent px-3 py-2 text-xs text-accent hover:bg-surface-3 disabled:opacity-40" data-test="ods-run-p0" disabled={busy !== null} onClick={() => void runP0Suite()}>Run P0 suite</button><button className="rounded border border-line px-3 py-2 text-xs hover:bg-surface-3" data-test="ods-export-json" onClick={exportJson}>Export JSON</button><button className="rounded border border-line px-3 py-2 text-xs hover:bg-surface-3" data-test="ods-export-md" onClick={exportMd}>Export MD</button></div>
             </div>
-            <dl className="mt-4 grid gap-2 text-xs sm:grid-cols-2"><div><dt className="text-ink-faint">Build</dt><dd data-test="ods-env-build">{env.build_kind}</dd></div><div><dt className="text-ink-faint">Route</dt><dd className="truncate">{env.href}</dd></div><div><dt className="text-ink-faint">Viewport</dt><dd>{env.viewport.w} × {env.viewport.h}</dd></div><div><dt className="text-ink-faint">Suite</dt><dd>{env.odssuite_version}</dd></div></dl>
+            <dl className="mt-4 grid gap-2 text-xs sm:grid-cols-2"><div><dt className="text-ink-faint">Build</dt><dd data-test="ods-env-build">{env.build_kind}</dd></div><div><dt className="text-ink-faint">Route</dt><dd className="truncate">{env.href}</dd></div><div><dt className="text-ink-faint">Viewport</dt><dd>{env.viewport.w} × {env.viewport.h}</dd></div><div><dt className="text-ink-faint">Suite</dt><dd>{env.odssuite_version}</dd></div><div><dt className="text-ink-faint">Bridge log</dt><dd data-test="ods-bridge-log-size">{bridge.log.length}/{BRIDGE_LOG_LIMIT}</dd></div></dl>
+            <label className="mt-4 block text-xs text-ink-faint">Operator notes (known secret shapes are redacted on export)<textarea className="mt-1 min-h-16 w-full rounded border border-line bg-bg p-2 text-ink" data-test="ods-operator-notes" value={operatorNotes} onChange={(event) => setOperatorNotes(event.target.value)} /></label>
           </div>
           <div className="rounded-xl border border-line bg-surface p-4"><h2 className="text-sm font-semibold">Timeline</h2><div className="mt-3 max-h-40 space-y-2 overflow-y-auto text-xs" data-test="ods-timeline">{timeline.length === 0 ? <p className="text-ink-faint">Run a case to begin.</p> : timeline.slice().reverse().map((entry, index) => <div key={`${entry.t}-${index}`} className="border-l-2 border-line pl-2"><span className="font-mono text-ink-faint">{entry.t.slice(11, 19)}</span> {entry.msg}</div>)}</div></div>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3" data-test="ods-case-catalog">
-          {ODS_P0_CASES.map((testCase) => { const run = runs[testCase.id]; return <article key={testCase.id} className="rounded-xl border border-line bg-surface p-4" data-test={`ods-case-${testCase.id}`}><div className="flex items-start justify-between gap-2"><div><div className="font-mono text-[11px] text-accent">{testCase.id}</div><h2 className="mt-1 text-sm font-semibold">{testCase.title}</h2></div><span className={`rounded px-2 py-1 text-[10px] ${run?.result === 'PASS' ? 'bg-good/20 text-good' : run?.result === 'FAIL' || run?.result === 'ERROR' ? 'bg-bad/20 text-bad' : 'bg-surface-3 text-ink-faint'}`}>{run?.result ?? (testCase.ods0 === 'skip' ? 'ODS-1' : 'READY')}</span></div><p className="mt-2 text-xs text-ink-soft">{testCase.expected[0]}</p>{run && <p className="mt-2 text-xs text-ink-faint" data-test={`ods-result-${testCase.id}`}>{run.observed.join(' ')}</p>}<button className="mt-3 rounded border border-line px-3 py-1.5 text-xs hover:bg-surface-3 disabled:opacity-40" disabled={busy !== null} onClick={() => void runCase(testCase)}>{busy === testCase.id ? 'Running…' : testCase.ods0 === 'skip' ? 'Record SKIP' : 'Run case'}</button></article> })}
+          {ODS_P0_CASES.map((testCase) => { const run = runs[testCase.id]; return <article key={testCase.id} className="rounded-xl border border-line bg-surface p-4" data-test={`ods-case-${testCase.id}`}><div className="flex items-start justify-between gap-2"><div><div className="font-mono text-[11px] text-accent">{testCase.id}</div><h2 className="mt-1 text-sm font-semibold">{testCase.title}</h2></div><span className={`rounded px-2 py-1 text-[10px] ${run?.result === 'PASS' ? 'bg-good/20 text-good' : run?.result === 'FAIL' || run?.result === 'ERROR' ? 'bg-bad/20 text-bad' : 'bg-surface-3 text-ink-faint'}`}>{run?.result ?? 'READY'}</span></div><p className="mt-2 text-xs text-ink-soft">{testCase.expected[0]}</p>{run && <p className="mt-2 text-xs text-ink-faint" data-test={`ods-result-${testCase.id}`}>{run.observed.join(' ')}</p>}<button className="mt-3 rounded border border-line px-3 py-1.5 text-xs hover:bg-surface-3 disabled:opacity-40" disabled={busy !== null} onClick={() => void runCase(testCase)}>{busy === testCase.id ? 'Running…' : 'Run case'}</button></article> })}
         </div>
 
         <div className="rounded-xl border border-line bg-black p-2"><div className="px-2 py-1 text-[10px] uppercase tracking-widest text-ink-faint">ODS trusted Nexus fixture</div><iframe ref={iframeRef} title="ODS Nexus Router fixture" src={NEXUS_ROUTER_SRC} className="h-48 w-full border-0" data-test="ods-nexus-router-iframe" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-downloads allow-same-origin" /></div>

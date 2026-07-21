@@ -83,8 +83,23 @@ export function isNexusHostBridgeMessage(value: unknown): value is NexusHostBrid
   const candidate = value as { type?: unknown; envelope?: unknown }
   if (candidate.type !== 'NEXUS_HOST_BRIDGE') return false
   if (!candidate.envelope || typeof candidate.envelope !== 'object') return false
-  const envelope = candidate.envelope as { id?: unknown; channel?: unknown; kind?: unknown; source?: unknown }
-  return typeof envelope.id === 'string' && typeof envelope.channel === 'string' && typeof envelope.kind === 'string' && !!envelope.source
+  const envelope = candidate.envelope as Record<string, unknown>
+  const source = envelope.source as Record<string, unknown> | null
+  const policy = envelope.policy as Record<string, unknown> | null
+  return (
+    typeof envelope.id === 'string' && envelope.id.length > 0
+    && typeof envelope.createdAt === 'string'
+    && typeof envelope.channel === 'string' && envelope.channel.length > 0
+    && typeof envelope.kind === 'string' && envelope.kind.length > 0
+    && !!source && typeof source === 'object'
+    && typeof source.kind === 'string' && typeof source.id === 'string'
+    && Array.isArray(envelope.tags)
+    && Array.isArray(envelope.refs)
+    && !!policy && typeof policy === 'object'
+    && typeof policy.requiresApproval === 'boolean'
+    && typeof policy.reversible === 'boolean'
+    && typeof policy.risk === 'string'
+  )
 }
 
 // ─── FILE FOOTER ─────────────────────────────────────────────

@@ -220,7 +220,35 @@ export function useNexusHostBridge(options: NexusHostBridgeOptions): NexusHostBr
       }
 
       if (!isNexusHostBridgeMessage(event.data)) {
-        setState((current) => ({ ...current, ignored: current.ignored + 1 }))
+        const protocolShaped = Boolean(
+          event.data
+          && typeof event.data === 'object'
+          && (event.data as { type?: unknown }).type === NEXUS_BRIDGE_PROTOCOL.inboundMessageType,
+        )
+        if (!protocolShaped) {
+          setState((current) => ({ ...current, ignored: current.ignored + 1 }))
+          return
+        }
+
+        const receipt = makeReceipt({
+          ok: false,
+          summary: 'Rejected malformed Nexus host bridge envelope.',
+          error: 'MALFORMED_ENVELOPE',
+        })
+        const sent = postReceiptToNexus(targetWindow, undefined, receipt)
+        setState((current) =>
+          appendLog(
+            { ...current, rejected: current.rejected + 1, lastReceipt: receipt },
+            {
+              id: makeId('rejected'),
+              createdAt: receipt.createdAt,
+              direction: 'rejected',
+              ok: false,
+              summary: sent ? receipt.summary : `${receipt.summary} Receipt could not be posted back.`,
+            },
+            maxLogEntries,
+          ),
+        )
         return
       }
 
