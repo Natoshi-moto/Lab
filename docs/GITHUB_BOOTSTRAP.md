@@ -1,4 +1,4 @@
-# Private GitHub bootstrap
+# Public GitHub bootstrap
 
 The repository includes a guarded bootstrap command but does not embed credentials.
 
@@ -21,8 +21,8 @@ The repository includes a guarded bootstrap command but does not embed credentia
 The command:
 
 1. verifies the local repository and clean working tree;
-2. when no `origin` exists, creates an empty GitHub repository with `--private` **without** `--push`;
-3. queries GitHub and refuses to proceed unless visibility is reported as `PRIVATE`;
+2. when no `origin` exists, creates an empty GitHub repository with `--public` **without** `--push`;
+3. queries GitHub and refuses to proceed unless visibility is reported as `PUBLIC`;
 4. requests read-only default Actions workflow-token permissions;
 5. stops before pushing and writes a `FAILED` receipt if that required permission request fails;
 6. only after those checks, pushes `main` and tags;
@@ -34,10 +34,14 @@ The GitHub CLI documents `--push` as the flag that transfers local commits durin
 
 ## Receipt meanings
 
-- `PASS` — privacy was reported as private, the mandatory permission request returned exit code 0, content was pushed, and optional setup succeeded.
+- `PASS` — visibility was reported as public, the mandatory permission request returned exit code 0, content was pushed, and optional setup succeeded.
 - `PARTIAL` — mandatory checks passed and content was pushed, but one or more optional labels or the audit issue failed. Inspect `warnings`.
 - `FAILED` — a mandatory pre-push condition failed. For Actions-permission failure, a receipt is written and no Nexus-managed content push is attempted.
 
 ## Limits
 
-The command refuses a remote reported as public. It does not independently attest GitHub's provider-side confidentiality, organization policy, branch rules, administrator actions or future visibility changes. A successful API request is evidence that the CLI call returned exit code 0, not a separate provider-state proof.
+The command refuses a remote reported as private. It does not independently attest GitHub's provider-side behavior, organization policy, branch rules, administrator actions or future visibility changes. A successful API request is evidence that the CLI call returned exit code 0, not a separate provider-state proof.
+
+## History
+
+This command required and verified `PRIVATE` visibility from R001 (2026-07-12) until this requirement was reversed on 2026-07-21. See `corpus/records/decisions/DEC-2026-000002.md`.

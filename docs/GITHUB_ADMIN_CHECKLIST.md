@@ -1,10 +1,10 @@
 # GitHub administrator checklist
 
-The bootstrap command creates or verifies a **private** repository, pushes `main` and tags, requests read-only default Actions permissions, creates audit labels and opens the Claude audit issue.
+The bootstrap command creates or verifies a **public** repository, pushes `main` and tags, requests read-only default Actions permissions, creates audit labels and opens the Claude audit issue.
 
 After bootstrap, verify in GitHub:
 
-- repository visibility is Private;
+- repository visibility is Public (see `corpus/records/decisions/DEC-2026-000002.md` for when and why this changed from Private);
 - only intended accounts and applications have access;
 - Actions default token permission is read-only;
 - `Nexus Audit` succeeds on `main`;

@@ -2,13 +2,13 @@
 
 ## Repository perimeter
 
-The repository is designed to remain private. Repository visibility alone is not the complete privacy model: content routed to an authorized AI provider is processed by that provider under the applicable account and service controls.
+The repository is public (resolved `2026-07-21`, see `corpus/records/decisions/DEC-2026-000002.md`). Repository visibility alone was never the complete privacy model: content routed to an authorized AI provider is processed by that provider under the applicable account and service controls.
 
 ## Data classes
 
 | Class | Routing rule |
 |---|---|
-| `LAB_PRIVATE` | May be committed to this private repository and routed to registered laboratory seats. |
+| `LAB_PRIVATE` | May be committed to this repository and routed to registered laboratory seats. Repository visibility is no longer the enforcement boundary for this class — the repository is public. Until a full classification redesign is authorized, do not rely on `LAB_PRIVATE` alone to keep content out of public view; use `ROUTE_ONLY`, `LOCAL_ONLY`, or `SECRET` for anything that must not be publicly visible. |
 | `PROVIDER_BOUND` | May be routed only to providers named by the object or task. |
 | `ROUTE_ONLY` | May be transmitted only through a generated, task-bounded route pack. |
 | `LOCAL_ONLY` | Plaintext remains outside Git; the repository may hold a manifest, digest and retrieval note. |
