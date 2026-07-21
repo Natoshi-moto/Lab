@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXUS :: FORUM</title>
+<!--
+  ════════════════════════════════════════════════════════════════
+  NEXUS FORUM — Nostr-native bulletin board · Matrix Edition
+  Nexus OS block · Standalone capable · Sweep 1 of 3
+  ════════════════════════════════════════════════════════════════
+
+  CHEAP SERVER SETUP (Strfry on any $5 VPS):
+  ─────────────────────────────────────────────
+  curl -L https://github.com/hoytech/strfry/releases/latest/download/strfry-linux-amd64 -o strfry
+  chmod +x strfry && sudo mv strfry /usr/local/bin/
+  strfry relay &
+  # Default: ws://localhost:7777
+  # For production: nginx + certbot for wss://
+
+  Add your relay URL in Settings → Relay Nodes.
+  Forum posts go to your relay + any public relays you list.
+  ════════════════════════════════════════════════════════════════
+
+  NOSTR TAG CONVENTION:
+  Thread root : kind:1 + ["t","nxforum"] + ["t","nxforum-{board}"]
+  Reply        : kind:1 + above + ["e",rootId,"","root"] + ["p",rootAuthor]
+  ════════════════════════════════════════════════════════════════
+-->
+<style>
+:root {
+  --bg:          #000000;
+  --surface:     rgba(0,8,2,0.88);
+  --surface-2:   rgba(0,12,3,0.93);
+  --surface-3:   rgba(0,18,5,0.96);
+  --border:      rgba(0,255,65,0.15);
+  --border-hi:   rgba(0,255,65,0.42);
+  --text:        #00ff41;
+  --text-dim:    #00b32d;
+  --text-muted:  #005c17;
+  --white:       #c8ffc8;
+  --accent:      #00ff41;
+  --accent-dim:  rgba(0,255,65,0.1);
+  --glow:        0 0 8px rgba(0,255,65,0.5);
+  --red:         #ff3333;
+  --amber:       #ffcc00;
+  --font:        'JetBrains Mono','Courier New',Courier,monospace;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; overflow:hidden; font-family:var(--font); font-size:13px; background:var(--bg); color:var(--text); }
+*{ scrollbar-width:thin; scrollbar-color:var(--border-hi) transparent; }
+::-webkit-scrollbar{ width:5px; } ::-webkit-scrollbar-thumb{ background:var(--border-hi); }
+
+canvas#matrix-bg { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.16; }
+
+/* ── Shell ── */
+#shell { position:relative; z-index:1; display:flex; flex-direction:column; height:100%; overflow:hidden; }
+
+/* ── Boot overlay ── */
+#boot-overlay {
+  position:fixed; inset:0; z-index:200; background:#000;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  transition:opacity .5s;
+}
+#boot-overlay.gone { opacity:0; pointer-events:none; }
+.boot-title { font-size:28px; letter-spacing:14px; color:var(--text); text-shadow:var(--glow); }
+.boot-bar { width:240px; height:2px; background:var(--border); overflow:hidden; }
+.boot-fill { height:100%; background:var(--text); width:0%; transition:width .35s ease; box-shadow:var(--glow); }
+.boot-status { font-size:10px; letter-spacing:3px; color:var(--text-dim); min-width:220px; text-align:center; }
+
+/* ── Header ── */
+#header {
+  display:flex; align-items:center; gap:10px;
+  padding:0 14px; height:38px; flex-shrink:0;
+  background:rgba(0,0,0,0.92); border-bottom:1px solid var(--border-hi);
+}
+.hdr-title { font-size:13px; font-weight:700; letter-spacing:5px; color:var(--text); text-shadow:var(--glow); }
+.hdr-sep { color:var(--text-muted); }
+.hdr-board { font-size:10px; color:var(--text-dim); letter-spacing:2px; }
+.hdr-sp { flex:1; }
+.hdr-relays { display:flex; gap:4px; align-items:center; margin-right:6px; }
+.rdot { width:6px; height:6px; border-radius:50%; background:var(--text-muted); transition:background .3s; }
+.rdot.open { background:var(--text); box-shadow:var(--glow); }
+.rdot.connecting { background:var(--amber); animation:blink 1s infinite; }
+.rdot.error,.rdot.closed { background:var(--red); }
+@keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
+.hdr-btn { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:2px 9px; font-family:var(--font); font-size:10px; cursor:pointer; letter-spacing:1px; transition:all .15s; }
+.hdr-btn:hover { border-color:var(--text); color:var(--text); box-shadow:var(--glow); }
+
+/* ── Main layout ── */
+#main { display:flex; flex:1; overflow:hidden; min-height:0; }
+
+/* ── Sidebar ── */
+#sidebar {
+  width:176px; flex-shrink:0; display:flex; flex-direction:column;
+  border-right:1px solid var(--border); background:rgba(0,0,0,0.72); overflow:hidden;
+}
+.sb-label { font-size:9px; letter-spacing:3px; color:var(--text-muted); padding:8px 12px 5px; text-transform:uppercase; }
+.board-item {
+  display:flex; align-items:center; padding:5px 12px;
+  cursor:pointer; transition:all .1s; font-size:11px; color:var(--text-dim);
+  letter-spacing:1px; border-left:2px solid transparent; gap:4px;
+}
+.board-item:hover { background:var(--accent-dim); color:var(--text); }
+.board-item.active { color:var(--text); border-left-color:var(--text); background:var(--accent-dim); }
+.board-item .bc { margin-left:auto; font-size:9px; color:var(--text-muted); }
+.board-item.active .bc { color:var(--text-dim); }
+
+#identity-panel { margin-top:auto; padding:10px 12px; border-top:1px solid var(--border); }
+.id-av { width:30px; height:30px; border:1px solid var(--border-hi); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; text-shadow:var(--glow); }
+.id-handle { font-size:11px; font-weight:700; color:var(--text); letter-spacing:1px; }
+.id-rank { font-size:9px; color:var(--text-dim); letter-spacing:2px; margin-top:2px; }
+.id-count { font-size:9px; color:var(--text-muted); }
+.id-sig { font-size:9px; color:var(--text-muted); margin-top:6px; padding-top:5px; border-top:1px solid var(--border); cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.id-sig:hover { color:var(--text-dim); }
+
+/* ── Content ── */
+#content { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; min-height:0; }
+
+/* ── Thread list view ── */
+#tlv { display:flex; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
+#tlv.hidden { display:none; }
+
+.board-hdr {
+  display:flex; align-items:center; gap:10px; padding:7px 14px;
+  border-bottom:1px solid var(--border); background:rgba(0,0,0,0.6); flex-shrink:0;
+}
+.board-path { font-size:10px; color:var(--text-dim); letter-spacing:1px; }
+.new-btn {
+  margin-left:auto; background:transparent; border:1px solid var(--border-hi);
+  color:var(--text); padding:3px 10px; font-family:var(--font); font-size:10px;
+  cursor:pointer; letter-spacing:1px; transition:all .15s;
+}
+.new-btn:hover { background:var(--accent-dim); box-shadow:var(--glow); }
+
+.tl-cols {
+  display:grid; grid-template-columns:32px 1fr 94px 54px 46px;
+  padding:4px 14px; border-bottom:1px solid var(--border-hi);
+  font-size:9px; color:var(--text-muted); letter-spacing:2px;
+  background:rgba(0,8,0,0.8); flex-shrink:0;
+}
+#thread-list { flex:1; overflow-y:auto; }
+
+.trow {
+  display:grid; grid-template-columns:32px 1fr 94px 54px 46px;
+  padding:7px 14px; border-bottom:1px solid var(--border);
+  cursor:pointer; transition:background .1s; align-items:center;
+  animation:fadein .3s ease;
+}
+.trow:hover { background:var(--accent-dim); }
+@keyframes fadein { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:none} }
+
+.tr-num { font-size:9px; color:var(--text-muted); }
+.tr-subj { min-width:0; }
+.tr-title { font-size:12px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tr-badges { display:flex; gap:4px; margin-top:2px; }
+.badge { font-size:8px; letter-spacing:1px; padding:1px 4px; border:1px solid; }
+.badge.hot    { color:var(--text); border-color:var(--text); animation:pulse 2s infinite; }
+.badge.pinned { color:var(--amber); border-color:var(--amber); }
+.badge.locked { color:var(--red); border-color:var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.tr-author { font-size:10px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tr-reps { font-size:10px; color:var(--text-dim); text-align:center; }
+.tr-age  { font-size:10px; color:var(--text-muted); text-align:right; }
+.empty-board { text-align:center; padding:60px 20px; color:var(--text-muted); font-size:11px; letter-spacing:2px; line-height:3; }
+
+/* ── New thread composer ── */
+#compose-wrap {
+  border-top:1px solid var(--border-hi); background:rgba(0,6,0,0.95);
+  flex-shrink:0; overflow:hidden; max-height:0; transition:max-height .25s ease;
+}
+#compose-wrap.open { max-height:260px; }
+.cw-inner { padding:12px 14px; }
+.cw-top { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.cw-label { font-size:9px; letter-spacing:2px; color:var(--text-muted); }
+.bd-sel { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:3px 6px; font-family:var(--font); font-size:10px; cursor:pointer; outline:none; }
+.bd-sel option { background:#000; color:var(--text); }
+.cc-count { margin-left:auto; font-size:9px; color:var(--text-muted); }
+.subj-input {
+  width:100%; background:transparent; border:1px solid var(--border); color:var(--text);
+  padding:5px 8px; font-family:var(--font); font-size:12px; outline:none; margin-bottom:7px;
+  letter-spacing:.5px;
+}
+.subj-input::placeholder { color:var(--text-muted); font-size:11px; }
+.subj-input:focus { border-color:var(--border-hi); }
+textarea.body-ta {
+  width:100%; height:78px; background:transparent; border:1px solid var(--border);
+  color:var(--white); padding:7px 8px; font-family:var(--font); font-size:12px;
+  outline:none; resize:none; line-height:1.65; display:block; margin-bottom:7px; letter-spacing:.2px;
+}
+textarea.body-ta::placeholder { color:var(--text-muted); }
+textarea.body-ta:focus { border-color:var(--border-hi); }
+.cw-foot { display:flex; align-items:center; gap:8px; }
+
+/* ── Buttons ── */
+.fx-btn {
+  background:transparent; border:1px solid var(--border-hi); color:var(--text);
+  padding:4px 12px; font-family:var(--font); font-size:10px; cursor:pointer;
+  letter-spacing:1px; transition:all .15s; position:relative; overflow:hidden;
+}
+.fx-btn:hover { background:var(--accent-dim); box-shadow:var(--glow); }
+.fx-btn.cancel-mode { border-color:var(--red); color:var(--red); }
+.fx-btn .pb { position:absolute; left:0; top:0; bottom:0; background:rgba(255,50,50,.2); z-index:0; width:100%; transition:none; }
+.fx-btn span { position:relative; z-index:1; }
+.ghost-btn { background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:4px 9px; font-family:var(--font); font-size:10px; cursor:pointer; letter-spacing:1px; }
+.ghost-btn:hover { color:var(--text); border-color:var(--border-hi); }
+
+/* ── Thread view ── */
+#tv { display:flex; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
+#tv.hidden { display:none; }
+
+.tv-hdr {
+  display:flex; align-items:center; gap:10px; padding:7px 14px;
+  border-bottom:1px solid var(--border-hi); background:rgba(0,0,0,0.7); flex-shrink:0;
+}
+.back-btn { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:3px 9px; font-family:var(--font); font-size:10px; cursor:pointer; letter-spacing:1px; transition:all .15s; }
+.back-btn:hover { border-color:var(--text); color:var(--text); }
+.tv-crumb { font-size:10px; color:var(--text-dim); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:.5px; }
+.tv-repcount { font-size:9px; color:var(--text-muted); }
+
+#thread-scroll { flex:1; overflow-y:auto; }
+
+.post-block { border-bottom:1px solid var(--border); padding:13px 14px; animation:fadein .25s ease; }
+.post-block.op { background:rgba(0,10,2,0.5); border-bottom:2px solid var(--border-hi); }
+.post-block.reply:hover { background:rgba(0,255,65,0.02); }
+
+.post-hdr { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:7px; }
+.post-handle { font-size:11px; font-weight:700; color:var(--text); letter-spacing:1px; cursor:pointer; }
+.post-handle:hover { text-shadow:var(--glow); }
+.post-rank { font-size:9px; color:var(--text-dim); letter-spacing:1px; }
+.post-pc { font-size:9px; color:var(--text-muted); }
+.post-num { font-size:9px; color:var(--text-muted); }
+.post-time { font-size:9px; color:var(--text-muted); margin-left:auto; }
+.post-divider { border:none; border-top:1px solid var(--border); margin:7px 0; }
+
+.post-body { font-size:12px; line-height:1.75; color:var(--white); white-space:pre-wrap; word-break:break-word; }
+.post-body .qline { color:var(--text-dim); }
+.post-body .mention { color:var(--text); text-shadow:var(--glow); }
+
+.post-sig { font-size:10px; color:var(--text-muted); margin-top:9px; padding-top:5px; border-top:1px dashed var(--border); white-space:pre-wrap; font-style:italic; }
+
+.post-acts { display:flex; gap:14px; margin-top:10px; flex-wrap:wrap; align-items:center; }
+.pact { background:none; border:none; color:var(--text-muted); font-family:var(--font); font-size:10px; cursor:pointer; letter-spacing:1px; transition:all .15s; padding:0; }
+.pact:hover { color:var(--text); text-shadow:var(--glow); }
+.pact.boosted { color:var(--text); }
+.bcount { font-size:9px; color:var(--text-dim); margin-left:2px; }
+
+/* ── Reply composer ── */
+#reply-c {
+  border-top:1px solid var(--border-hi); background:rgba(0,6,0,0.95);
+  flex-shrink:0; padding:10px 14px;
+}
+.rc-quote { font-size:10px; color:var(--text-dim); background:rgba(0,255,65,0.04); border-left:2px solid var(--border-hi); padding:5px 9px 5px 9px; margin-bottom:7px; white-space:pre-wrap; word-break:break-word; max-height:72px; overflow-y:auto; position:relative; }
+.rc-quote.hidden { display:none; }
+.rc-qclose { position:absolute; right:5px; top:3px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:13px; line-height:1; padding:0; }
+.rc-qclose:hover { color:var(--text); }
+textarea#reply-ta {
+  width:100%; height:66px; background:transparent; border:1px solid var(--border);
+  color:var(--white); padding:7px 8px; font-family:var(--font); font-size:12px;
+  outline:none; resize:none; line-height:1.65; margin-bottom:7px;
+}
+textarea#reply-ta::placeholder { color:var(--text-muted); }
+textarea#reply-ta:focus { border-color:var(--border-hi); }
+.rc-foot { display:flex; align-items:center; gap:8px; }
+.rc-cc { font-size:9px; color:var(--text-muted); margin-right:auto; }
+
+/* ── Modals ── */
+.modal-ov {
+  position:fixed; inset:0; background:rgba(0,0,0,0.9); backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center; z-index:100;
+  opacity:0; pointer-events:none; transition:opacity .15s;
+}
+.modal-ov.open { opacity:1; pointer-events:all; }
+.mbox {
+  background:var(--surface-2); border:1px solid var(--border-hi);
+  border-top:2px solid var(--text); padding:20px; width:100%; max-width:380px;
+  max-height:86vh; overflow-y:auto;
+}
+.m-title { font-size:12px; font-weight:700; letter-spacing:4px; color:var(--text); margin-bottom:4px; }
+.m-desc { font-size:10px; color:var(--text-dim); margin-bottom:16px; line-height:1.6; letter-spacing:.4px; }
+.m-label { display:block; font-size:9px; letter-spacing:2px; color:var(--text-muted); margin-bottom:4px; }
+.m-input {
+  width:100%; background:#000; border:1px solid var(--border); color:var(--text);
+  padding:7px 9px; font-family:var(--font); font-size:12px; outline:none; margin-bottom:13px;
+}
+.m-input:focus { border-color:var(--text); }
+.key-box { background:#000; border:1px dashed var(--border-hi); padding:9px; margin-bottom:11px; }
+.key-val { font-size:10px; color:var(--text-muted); word-break:break-all; line-height:1.5; }
+.key-val.secret { filter:blur(4px); user-select:none; }
+.key-val.secret.rev { filter:none; user-select:text; color:var(--red); }
+.key-acts { display:flex; gap:5px; margin-top:7px; justify-content:flex-end; }
+.m-btn { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:4px 11px; font-family:var(--font); font-size:10px; cursor:pointer; letter-spacing:1px; transition:all .15s; }
+.m-btn:hover { border-color:var(--text); color:var(--text); }
+.m-btn.primary { border-color:var(--border-hi); color:var(--text); }
+.m-btn.primary:hover { background:var(--accent-dim); box-shadow:var(--glow); }
+.m-acts { display:flex; gap:8px; justify-content:flex-end; margin-top:14px; }
+.m-note { font-size:9px; color:var(--text-muted); margin-top:8px; padding:7px; background:rgba(0,0,0,0.6); border:1px solid var(--border); line-height:1.6; }
+.seed-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px 10px; background:#000; padding:11px; margin-bottom:11px; border:1px solid var(--border); }
+.sw-row { display:flex; gap:4px; align-items:baseline; }
+.sw-n { font-size:8px; color:var(--text-muted); width:14px; text-align:right; }
+.sw { font-size:11px; color:var(--text); }
+.relay-row { display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px solid var(--border); font-size:10px; }
+.relay-url-txt { flex:1; color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.relay-st { font-size:8px; color:var(--text-muted); width:68px; text-align:right; letter-spacing:1px; }
+.relay-rm { background:none; border:none; color:var(--text-muted); cursor:pointer; font-family:var(--font); font-size:11px; }
+.relay-rm:hover { color:var(--red); }
+.sig-ta { width:100%; height:46px; resize:none; background:#000; border:1px solid var(--border); color:var(--text-dim); padding:5px 8px; font-family:var(--font); font-size:10px; outline:none; margin-bottom:4px; }
+.sig-ta:focus { border-color:var(--text); }
+
+/* ── Toast ── */
+#nx-toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--surface-2); border:1px solid var(--border-hi); color:var(--text); font-size:10px; padding:5px 13px; z-index:300; pointer-events:none; opacity:0; transition:opacity .2s; white-space:nowrap; letter-spacing:1px; }
+#nx-toast.show { opacity:1; }
+
+/* ── Wallet chip in header ── */
+.wallet-chip {
+  font-size:9px; letter-spacing:1.5px; color:var(--text-dim);
+  border:1px solid var(--border); padding:2px 8px; cursor:default;
+  transition:all .15s; background:rgba(0,255,65,0.03);
+}
+.wallet-chip.live { color:var(--text); border-color:var(--border-hi); text-shadow:var(--glow); }
+
+/* ── Conviction chip (post header) ── */
+.conviction-chip {
+  font-size:8px; letter-spacing:1px; padding:1px 5px;
+  border:1px solid rgba(0,255,65,0.3); color:var(--text-dim);
+  background:rgba(0,255,65,0.04);
+}
+.conviction-chip.active { color:var(--text); border-color:var(--border-hi); text-shadow:var(--glow); }
+
+/* ── Stake indicator on posts ── */
+.post-stake-ind {
+  display:inline-flex; align-items:center; gap:5px;
+  margin-top:8px; font-size:9px; letter-spacing:1px; padding:3px 7px;
+  border:1px solid rgba(0,255,65,0.25); background:rgba(0,255,65,0.04);
+  color:var(--text-dim);
+}
+.post-stake-ind .psi-amt { color:var(--text); text-shadow:var(--glow); font-weight:700; }
+.post-stake-ind .psi-st { font-size:8px; letter-spacing:2px; }
+.post-stake-ind .psi-st.ready { color:var(--text); animation:pulse 1.5s infinite; }
+
+/* ── Stake button in post actions ── */
+.pact.stake-act { color:var(--text-muted); }
+.pact.stake-act:hover { color:var(--text); text-shadow:var(--glow); }
+.pact.staked-act { color:var(--text); text-shadow:var(--glow); }
+
+/* ── Stake indicator on thread rows ── */
+.tr-stake { font-size:9px; color:var(--text-dim); letter-spacing:0; }
+
+/* ── Pin / Lock action buttons ── */
+.pact.pin-act  { color:var(--amber); }
+.pact.lock-act { color:var(--red); }
+.pact.pin-act:hover  { text-shadow:0 0 6px var(--amber); }
+.pact.lock-act:hover { text-shadow:0 0 6px var(--red); }
+
+/* ── Locked thread notice ── */
+.locked-notice {
+  padding:7px 14px; border-top:1px solid rgba(255,51,51,0.3);
+  font-size:9px; letter-spacing:2px; color:var(--red);
+  background:rgba(255,51,51,0.04); text-align:center;
+  flex-shrink:0;
+}
+
+/* ── Sidebar conviction line ── */
+.id-conviction { font-size:9px; color:var(--text-muted); margin-top:2px; letter-spacing:1px; }
+.id-conviction.live { color:var(--text-dim); }
+
+/* ── Stake modal (matrix palette) ── */
+#modal-stake { z-index:150; }
+#modal-stake .mbox { border-top-color:var(--text); }
+.stake-ev-box {
+  background:#000; border:1px solid var(--border); padding:8px 10px;
+  margin-bottom:12px; font-size:9px; color:var(--text-dim);
+  word-break:break-all; line-height:1.6; cursor:pointer; letter-spacing:.5px;
+  transition:border-color .15s;
+}
+.stake-ev-box:hover { border-color:var(--border-hi); color:var(--text); }
+.stake-ev-box .seb-label { font-size:8px; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:3px; }
+.stake-ev-box .seb-preview { font-size:10px; color:var(--text-dim); margin-top:4px; font-style:italic; letter-spacing:.2px; }
+.stake-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+.sw-field label { display:block; font-size:8px; letter-spacing:2px; color:var(--text-muted); margin-bottom:3px; }
+.ws-bar {
+  display:flex; align-items:center; gap:8px; padding:5px 9px; margin-bottom:10px;
+  border:1px solid var(--border); font-size:9px; letter-spacing:1px;
+  background:rgba(0,255,65,0.03);
+}
+.ws-bar.no-wallet { border-color:rgba(255,51,51,0.25); color:var(--red); }
+.ws-dot-f { width:5px; height:5px; border-radius:50%; background:var(--text); box-shadow:var(--glow); flex-shrink:0; }
+.ws-dot-f.off { background:var(--text-muted); box-shadow:none; }
+</style>
+</head>
+<body>
+
+<canvas id="matrix-bg"></canvas>
+
+<div id="boot-overlay">
+  <div class="boot-title">NEXUS</div>
+  <div class="boot-bar"><div class="boot-fill" id="boot-fill"></div></div>
+  <div class="boot-status" id="boot-status">INITIALISING_</div>
+</div>
+
+<div id="shell">
+
+  <div id="header">
+    <span class="hdr-title">NEXUS</span>
+    <span class="hdr-sep"> :: </span>
+    <span class="hdr-board" id="hdr-board">FORUM/GENERAL</span>
+    <div class="hdr-sp"></div>
+    <div class="hdr-relays" id="hdr-relays"></div>
+    <div class="wallet-chip" id="wallet-chip" title="Wallet state">NO WALLET</div>
+    <button class="hdr-btn" onclick="openSettings()">[ SETTINGS ]</button>
+  </div>
+
+  <div id="main">
+
+    <div id="sidebar">
+      <div class="sb-label">BOARDS</div>
+      <div id="board-list"></div>
+      <div id="identity-panel">
+        <div class="id-av" id="id-av">?</div>
+        <div class="id-handle" id="id-handle">ANONYMOUS</div>
+        <div class="id-rank" id="id-rank">LURKER</div>
+        <div class="id-count" id="id-count">0 POSTS</div>
+        <div class="id-conviction" id="id-conviction"></div>
+        <div class="id-sig" id="id-sig" title="Edit in Settings" onclick="openSettings()">-- no signature</div>
+      </div>
+    </div>
+
+    <div id="content">
+
+      <!-- Thread List View -->
+      <div id="tlv">
+        <div class="board-hdr">
+          <span class="board-path" id="board-path">/nexus/general/</span>
+          <button class="new-btn" onclick="toggleCompose()">[ + NEW THREAD ]</button>
+        </div>
+        <div class="tl-cols">
+          <span>#</span><span>SUBJECT</span><span>AUTHOR</span>
+          <span style="text-align:center">REPLIES</span><span style="text-align:right">AGE</span>
+        </div>
+        <div id="thread-list"></div>
+        <div id="compose-wrap">
+          <div class="cw-inner">
+            <div class="cw-top">
+              <span class="cw-label">NEW THREAD</span>
+              <select class="bd-sel" id="cw-board">
+                <option value="general">general</option>
+                <option value="tech">tech</option>
+                <option value="philosophy">philosophy</option>
+                <option value="off-topic">off-topic</option>
+              </select>
+              <span class="cc-count" id="cw-cc">0 / 1000</span>
+            </div>
+            <input type="text" class="subj-input" id="cw-subj" placeholder="SUBJECT LINE" maxlength="120">
+            <textarea class="body-ta" id="cw-body" placeholder="TYPE YOUR SIGNAL HERE..." oninput="cwCount()"></textarea>
+            <div class="cw-foot">
+              <button class="ghost-btn" onclick="toggleCompose()">CANCEL</button>
+              <button class="fx-btn" id="post-btn" onclick="postThread()"><span>BROADCAST</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thread View -->
+      <div id="tv" class="hidden">
+        <div class="tv-hdr">
+          <button class="back-btn" onclick="backToList()">◄ BACK</button>
+          <span class="tv-crumb" id="tv-crumb">—</span>
+          <span class="tv-repcount" id="tv-rc"></span>
+        </div>
+        <div id="thread-scroll">
+          <div id="thread-posts"></div>
+        </div>
+        <div id="reply-c">
+          <div class="rc-quote hidden" id="rc-quote">
+            <button class="rc-qclose" onclick="clearQuote()">×</button>
+            <span id="rc-qtext"></span>
+          </div>
+          <textarea id="reply-ta" placeholder="TRANSMIT REPLY..." oninput="replyCount()"></textarea>
+          <div class="rc-foot">
+            <span class="rc-cc" id="reply-cc">0 / 1000</span>
+            <button class="ghost-btn" onclick="clearReply()">CLEAR</button>
+            <button class="fx-btn" id="reply-btn" onclick="postReply()"><span>TRANSMIT</span></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Stake Intent Modal -->
+<div class="modal-ov" id="modal-stake">
+  <div class="mbox" style="max-width:360px">
+    <div class="m-title">⚡ STAKE ON SIGNAL</div>
+    <div class="m-desc">Lock funds as conviction behind this post. RELEASE to stand firm. AWARD to concede. SLASH to burn rather than yield.</div>
+    <div class="ws-bar" id="stake-ws-bar">
+      <div class="ws-dot-f" id="stake-ws-dot"></div>
+      <span id="stake-ws-info">WALLET NOT CONNECTED</span>
+    </div>
+    <div class="stake-ev-box" id="stake-ev-box" onclick="window.copyStakeId()">
+      <div class="seb-label">EVENT ID — CLICK TO COPY</div>
+      <div id="stake-ev-display" style="color:var(--text);word-break:break-all"></div>
+      <div class="seb-preview" id="stake-ev-preview"></div>
+    </div>
+    <div class="stake-row2">
+      <div class="sw-field"><label>AMOUNT</label><input type="number" class="m-input" id="si-amt" value="100" min="1" step="1" style="margin-bottom:0;font-size:12px;padding:5px 7px"></div>
+      <div class="sw-field"><label>WINDOW (HRS)</label><input type="number" class="m-input" id="si-win" value="72" min="1" max="8760" style="margin-bottom:0;font-size:12px;padding:5px 7px"></div>
+    </div>
+    <label class="m-label" style="margin-top:8px">COUNTERPARTY NX4ADDR</label>
+    <input type="text" class="m-input" id="si-cp" placeholder="NX4ADDR:SID:pubkey_x:pubkey_y" style="font-size:10px">
+    <div class="m-acts">
+      <button class="m-btn" onclick="window.closeStakeModal()">CANCEL</button>
+      <button class="m-btn" onclick="window.copyStakeId()">COPY ID</button>
+      <button class="m-btn primary" onclick="window.sendStakeIntent()">⚡ SEND TO WALLET</button>
+    </div>
+    <div style="font-size:9px;color:var(--text-muted);margin-top:8px;line-height:1.6;letter-spacing:.5px" id="stake-status"></div>
+  </div>
+</div>
+
+<!-- Onboarding -->
+<div class="modal-ov" id="modal-ob">
+  <div class="mbox" id="ob-box"></div>
+</div>
+
+<!-- Settings -->
+<div class="modal-ov" id="modal-st">
+  <div class="mbox">
+    <div class="m-title">SYSTEM SETTINGS</div>
+    <label class="m-label">DISPLAY NAME</label>
+    <input type="text" class="m-input" id="st-handle" placeholder="your handle" maxlength="24">
+    <label class="m-label">SIGNATURE</label>
+    <textarea class="sig-ta" id="st-sig" placeholder="-- signature text (max 120 chars)" maxlength="120"></textarea>
+    <label class="m-label" style="margin-top:6px">PUBLIC KEY (npub)</label>
+    <div class="key-box">
+      <div class="key-val" id="st-npub">—</div>
+      <div class="key-acts"><button class="m-btn" onclick="copyEl('st-npub')">COPY</button></div>
+    </div>
+    <label class="m-label">PRIVATE KEY (nsec)</label>
+    <div class="key-box">
+      <div class="key-val secret" id="st-nsec">—</div>
+      <div class="key-acts">
+        <button class="m-btn" id="st-rev-btn" onclick="toggleReveal()">REVEAL</button>
+        <button class="m-btn" onclick="copyNsec()">COPY</button>
+      </div>
+    </div>
+    <label class="m-label" style="margin-top:6px">RELAY NODES</label>
+    <div id="relay-list" style="margin-bottom:8px"></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <input type="text" class="m-input" id="relay-in" placeholder="wss://your-relay.com" style="margin-bottom:0;flex:1">
+      <button class="m-btn" onclick="addRelay()">+ ADD</button>
+    </div>
+    <div class="m-note">
+      Your own relay: <span style="color:var(--text)">github.com/hoytech/strfry</span><br>
+      Single binary, SQLite, runs on any $5 VPS. Add it here to own your data.
+    </div>
+    <div class="m-acts">
+      <button class="m-btn" onclick="closeSt()">CANCEL</button>
+      <button class="m-btn primary" onclick="saveSt()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<div id="nx-toast"></div>
+
+<script type="module">
+"use strict";
+/* ════════════════════════════════════════════════════════════════
+   NEXUS FORUM — Sweep 1
+   Crypto stack verbatim from Social Cosmos r3.6
+   ════════════════════════════════════════════════════════════════ */
+
+const ID_KEY      = 'nx.forum.identity';
+const RELAY_KEY   = 'nx.forum.relays';
+const SIG_KEY     = 'nx.forum.sig';
+const FEED_MAX    = 200;
+const CHAR_LIMIT  = 1000;
+const FORUM_TAG   = 'nxforum';
+const NIP06_PATH  = "m/44'/1237'/0'/0/0";
+const BOARDS      = ['general','tech','philosophy','off-topic'];
+const RANKS       = ['LURKER','AWAKENED','REDPILLED','OPERATIVE','GHOST','OPERATOR','ZION COUNCIL'];
+const RANK_T      = [0,5,20,50,100,250,500];
+let _rq = 0;
+const nrid = () => 'f-'+(++_rq);
+
+const DEF_RELAYS = [
+  'wss://relay.damus.io',
+  'wss://nos.lol',
+  'wss://relay.nostr.band',
+];
+
+/* ─── DEPS (verbatim Social Cosmos) ──────────────────────────── */
+let secp, bip39m, WL, HDKey, depsLoaded = false;
+const _SRC = [
+  {name:'secp',     local:'./libs/secp256k1.js',   remote:'https://esm.sh/@noble/curves@1.4.0/secp256k1?bundle'},
+  {name:'bip39m',   local:'./libs/bip39.js',       remote:'https://esm.sh/@scure/bip39@1.3.0?bundle'},
+  {name:'wordlist', local:'./libs/wordlist-en.js', remote:'https://esm.sh/@scure/bip39@1.3.0/wordlists/english?bundle'},
+  {name:'hdkey',    local:'./libs/hdkey.js',       remote:'https://esm.sh/@scure/bip32@1.4.0?bundle'},
+];
+
+async function loadDeps() {
+  if(depsLoaded===true) return;
+  if(typeof crypto==='undefined'||!crypto.subtle) throw new Error('Web Crypto unavailable. Use localhost or HTTPS.');
+  for(const s of _SRC){
+    let ok=false;
+    for(const src of [s.local,s.remote]){
+      try{const m=await import(src);_asgDep(s.name,m);ok=true;break;}catch(e){console.warn('[forum]',s.name,'from',src,e?.message);}
+    }
+    if(!ok) console.warn('[forum] failed:',s.name);
+  }
+  if(!secp?.schnorr?.sign||!bip39m?.generateMnemonic||!Array.isArray(WL)||typeof HDKey?.fromMasterSeed!=='function')
+    throw new Error('Crypto libs missing or malformed. Check /libs/ folder or network.');
+  depsLoaded=true;
+}
+function _asgDep(n,m){
+  if(n==='secp')     secp   = m.schnorr?m:(m.default?.schnorr?m.default:m);
+  if(n==='bip39m')   bip39m = m.generateMnemonic?m:(m.default?.generateMnemonic?m.default:m);
+  if(n==='wordlist') WL     = m.wordlist??m.default?.wordlist;
+  if(n==='hdkey')    HDKey  = m.HDKey??m.default?.HDKey??m.default;
+}
+function _resetDeps(){depsLoaded=false;secp=bip39m=WL=HDKey=null;}
+
+/* ─── HEX / CRYPTO (verbatim) ────────────────────────────────── */
+const h2b = h => new Uint8Array(h.match(/.{1,2}/g).map(b=>parseInt(b,16)));
+const b2h = b => Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+async function sha256h(s){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return b2h(new Uint8Array(buf));
+}
+
+/* ─── BECH32 NIP-19 (verbatim) ──────────────────────────────── */
+const B32C='qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+const B32G=[0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3];
+function b32poly(v){let c=1;for(const d of v){const t=c>>25;c=(c&0x1ffffff)<<5^d;for(let i=0;i<5;i++)if((t>>i)&1)c^=B32G[i]}return c;}
+function b32exp(s){const r=[];for(let i=0;i<s.length;i++)r.push(s.charCodeAt(i)>>5);r.push(0);for(let i=0;i<s.length;i++)r.push(s.charCodeAt(i)&31);return r;}
+function b32chk(hrp,d){const p=b32poly(b32exp(hrp).concat(d).concat([0,0,0,0,0,0]))^1;return Array.from({length:6},(_,i)=>(p>>(5*(5-i)))&31);}
+function b32enc(hrp,d){return hrp+'1'+d.concat(b32chk(hrp,d)).map(x=>B32C[x]).join('');}
+function cvBits(data,fr,to,pad=true){let acc=0,bits=0;const r=[],mv=(1<<to)-1;for(const v of data){acc=(acc<<fr)|v;bits+=fr;while(bits>=to){bits-=to;r.push((acc>>bits)&mv)}}if(pad&&bits>0)r.push((acc<<(to-bits))&mv);return r;}
+const npubEnc=hex=>b32enc('npub',cvBits(Array.from(h2b(hex)),8,5));
+const nsecEnc=hex=>b32enc('nsec',cvBits(Array.from(h2b(hex)),8,5));
+function b32dec(str){str=str.toLowerCase();const sep=str.lastIndexOf('1');if(sep<1)return null;const hrp=str.slice(0,sep);const data=str.slice(sep+1).split('').map(c=>B32C.indexOf(c));if(data.includes(-1))return null;return{hrp,bytes:new Uint8Array(cvBits(data.slice(0,-6),5,8,false))};}
+
+/* ─── NOSTR EVENT (verbatim) ─────────────────────────────────── */
+async function buildEv(priv,pub,kind,content,tags=[]){
+  const ev={pubkey:pub,created_at:Math.floor(Date.now()/1000),kind,tags,content};
+  ev.id=await sha256h(JSON.stringify([0,ev.pubkey,ev.created_at,ev.kind,ev.tags,ev.content]));
+  ev.sig=b2h(secp.schnorr.sign(ev.id,priv));
+  return ev;
+}
+
+/* ─── IDENTITY (verbatim) ────────────────────────────────────── */
+async function genIdentity(){return deriveId(bip39m.generateMnemonic(WL));}
+async function deriveId(mnemonic){
+  const seed=await bip39m.mnemonicToSeed(mnemonic);
+  const child=HDKey.fromMasterSeed(seed).derive(NIP06_PATH);
+  if(!child.privateKey)throw new Error('key derivation failed');
+  const priv=b2h(child.privateKey),pub=b2h(secp.schnorr.getPublicKey(child.privateKey));
+  return{mnemonic,privkey:priv,pubkey:pub,npub:npubEnc(pub),nsec:nsecEnc(priv),displayName:null,createdAt:Date.now()};
+}
+
+/* ─── SCRAMBLE (verbatim) ────────────────────────────────────── */
+function scramble(el,txt,ms=400){
+  const CH='█▓▒░◈@#$%<>[]|~?';
+  const FT=Math.max(1,Math.floor(ms/40));let f=0;
+  const id=setInterval(()=>{
+    const p=f/FT;
+    el.textContent=txt.split('').map((c,i)=>{if(c===' '||c==='\n')return c;return i<Math.floor(txt.length*p)?c:CH[Math.floor(Math.random()*CH.length)];}).join('');
+    if(f++>=FT){clearInterval(id);el.textContent=txt;}
+  },40);
+}
+
+/* ─── RELAY POOL (verbatim) ──────────────────────────────────── */
+class RelayPool{
+  constructor(){this._rs=new Map();this._ss=new Map();this._onEv=null;this._onSt=null;this._onEose=null;}
+  onEvent(cb){this._onEv=cb;}onStatus(cb){this._onSt=cb;}onEose(cb){this._onEose=cb;}
+  connect(urls){for(const u of urls)if(!this._rs.has(u))this._open(u);for(const u of this._rs.keys())if(!urls.includes(u))this._drop(u);}
+  _open(url){const r={url,ws:null,status:'connecting',retries:0};this._rs.set(url,r);this._dial(r);}
+  _dial(r){
+    try{
+      const ws=new WebSocket(r.url);r.ws=ws;r.status='connecting';this._notify();
+      ws.onopen=()=>{r.status='open';r.retries=0;this._notify();for(const[id,fs]of this._ss)ws.send(JSON.stringify(['REQ',id,...fs]));};
+      ws.onclose=()=>{r.status='closed';this._notify();const d=Math.min(30000,1000*Math.pow(2,r.retries++));setTimeout(()=>{if(this._rs.has(r.url))this._dial(r);},d);};
+      ws.onerror=()=>{r.status='error';this._notify();};
+      ws.onmessage=({data})=>{
+        try{const m=JSON.parse(data);if(!Array.isArray(m))return;
+          if(m[0]==='EVENT'&&m[2]&&this._onEv)this._onEv(m[2]);
+          if(m[0]==='EOSE'&&this._onEose)this._onEose(m[1]);
+        }catch(e){}
+      };
+    }catch(e){r.status='error';this._notify();}
+  }
+  _drop(url){const r=this._rs.get(url);if(r?.ws)try{r.ws.close()}catch(e){}this._rs.delete(url);}
+  subscribe(id,filters){this._ss.set(id,filters);for(const[,r]of this._rs)if(r.status==='open')r.ws.send(JSON.stringify(['REQ',id,...filters]));}
+  unsubscribe(id){this._ss.delete(id);for(const[,r]of this._rs)if(r.status==='open')try{r.ws.send(JSON.stringify(['CLOSE',id]))}catch(e){}}
+  publish(ev){const msg=JSON.stringify(['EVENT',ev]);let n=0;for(const[,r]of this._rs)if(r.status==='open')try{r.ws.send(msg);n++}catch(e){}return n;}
+  stat(){let o=0,c=0,e=0;for(const[,r]of this._rs){if(r.status==='open')o++;else if(r.status==='connecting')c++;else e++;}return{open:o,connecting:c,error:e,total:this._rs.size,relays:this._rs};}
+  _notify(){if(this._onSt)this._onSt(this.stat());}
+}
+
+const pool=new RelayPool();
+
+/* ─── STATE ──────────────────────────────────────────────────── */
+const F={
+  id:null, relayUrls:[...DEF_RELAYS], sig:'',
+  threads:new Map(),   // id → event (root posts)
+  replies:new Map(),   // id → event (replies)
+  profiles:new Map(),  // pubkey → meta
+  reactions:new Map(), // evId → {boosts:Set}
+  myBoosts:new Set(),
+  currentBoard:'general',
+  currentThread:null,
+  quotePost:null,
+  port:null, mounted:false,
+  _pending:[], _cancelT:{},
+  // Wallet bridge
+  walletState: null,
+  _stakeIntent: null,
+  // Rank-gated moderation (localStorage persisted, local-only until DB block connected)
+  pinned: new Set(),   // thread IDs pinned by OPERATOR+
+  locked: new Set(),   // thread IDs locked by ZION COUNCIL
+};
+
+/* ─── NEXUS OS SHIM ──────────────────────────────────────────── */
+const APP={title:'Forum',icon:'█',description:'Nostr-native bulletin board',emits:['forum.post','nexus.notification','nexus.stake.intent'],consumes:['nexus.identity','nexus.wallet.state']};
+let _once=false;
+const _st=setTimeout(async()=>{if(!F.mounted&&!_once){F.mounted=true;_once=true;await _mount();}},800);
+window.addEventListener('message',async evt=>{
+  if(!evt.data||evt.data.type!=='BOOT'||!evt.ports?.[0])return;
+  clearTimeout(_st);F.port=evt.ports[0];F.port.onmessage=_kernel;
+  F.port.postMessage({type:'DECLARE',manifest:{emits:APP.emits,consumes:APP.consumes},app:{title:APP.title,icon:APP.icon,description:APP.description,visible:true}});
+});
+async function _kernel({data:m}){
+  if(!m||typeof m.type!=='string')return;
+  if(m.type==='MOUNT_CHALLENGE'){
+    F.port.postMessage({type:'MOUNT_ACK',nonce:m.nonce});
+    // Subscribe to wallet state after successful mount
+    F.port.postMessage({type:'SUB',channel:'nexus.wallet.state'});
+  }
+  if(m.type==='MOUNTED'){F.mounted=true;if(!_once){_once=true;await _mount();}}
+  if(m.type==='PING')F.port.postMessage({type:'PONG',nonce:m.nonce});
+  if(m.type==='MSG'){
+    if(m.channel==='nexus.identity'&&m.payload?.privkey){Object.assign(F.id||={},m.payload);_saveId();renderIdPanel();}
+    if(m.channel==='nexus.wallet.state'&&m.payload){
+      F.walletState=m.payload;
+      _refreshWalletChip();
+      _updateAllPostStakeIndicators();
+      _refreshStakeModal();
+      renderIdPanel();
+    }
+  }
+}
+function emit(ch,p){if(F.mounted&&F.port)F.port.postMessage({type:'EMIT',channel:ch,payload:p});}
+
+/* ─── STORAGE ────────────────────────────────────────────────── */
+const _saveId  =()=>{try{localStorage.setItem(ID_KEY,JSON.stringify(F.id));}catch(e){}};
+const _loadId  =()=>{try{const r=localStorage.getItem(ID_KEY);if(r)F.id=JSON.parse(r);}catch(e){}};
+const _saveRly =()=>{try{localStorage.setItem(RELAY_KEY,JSON.stringify(F.relayUrls));}catch(e){}};
+const _loadRly =()=>{try{const r=localStorage.getItem(RELAY_KEY);if(r)F.relayUrls=JSON.parse(r);}catch(e){}};
+const _saveSig =()=>{try{localStorage.setItem(SIG_KEY,F.sig);}catch(e){}};
+const _loadSig =()=>{try{const r=localStorage.getItem(SIG_KEY);if(r)F.sig=r;}catch(e){}};
+const _saveMod =()=>{try{localStorage.setItem('nx.forum.pinned',JSON.stringify([...F.pinned]));localStorage.setItem('nx.forum.locked',JSON.stringify([...F.locked]));}catch(e){}};
+const _loadMod =()=>{try{const p=localStorage.getItem('nx.forum.pinned');if(p)F.pinned=new Set(JSON.parse(p));const l=localStorage.getItem('nx.forum.locked');if(l)F.locked=new Set(JSON.parse(l));}catch(e){}};
+
+/* ─── BOOT ───────────────────────────────────────────────────── */
+function bstatus(msg,pct){
+  const el=document.getElementById('boot-status');
+  if(el)scramble(el,msg,180);
+  if(pct!==undefined){const f=document.getElementById('boot-fill');if(f)f.style.width=pct+'%';}
+}
+let _wireDone=false;
+async function _mount(){
+  bstatus('LOADING LIBRARIES',15);
+  try{await loadDeps();}catch(e){bstatus('ERROR: '+(e.message||'?').slice(0,40));_showOb('error',e.message);_bootGone();return;}
+  bstatus('DECRYPTING IDENTITY',45);
+  _loadId();_loadRly();_loadSig();_loadMod();
+  if(!_wireDone){_wireDone=true;_wire();}
+  bstatus('CONNECTING TO NETWORK',72);
+  await new Promise(r=>setTimeout(r,550));
+  bstatus('ONLINE',100);
+  await new Promise(r=>setTimeout(r,380));
+  _bootGone();
+  renderIdPanel();
+  renderBoards();
+  if(!F.id)_showOb('generate');
+  else _startNostr();
+}
+function _bootGone(){const ov=document.getElementById('boot-overlay');if(ov)ov.classList.add('gone');}
+
+function _wire(){
+  document.getElementById('relay-in').addEventListener('keydown',e=>{if(e.key==='Enter')addRelay();});
+  document.getElementById('cw-subj').addEventListener('input',cwCount);
+  document.getElementById('modal-st').addEventListener('click',e=>{if(e.target.id==='modal-st')closeSt();});
+  document.getElementById('modal-ob').addEventListener('click',e=>{if(e.target.id==='modal-ob'&&document.getElementById('ob-box').dataset.close)_closeOb();});
+  document.getElementById('modal-stake').addEventListener('click',e=>{if(e.target.id==='modal-stake')window.closeStakeModal();});
+}
+
+/* ─── NOSTR START ────────────────────────────────────────────── */
+function _startNostr(){
+  pool.onEvent(_onEv);
+  pool.onStatus(_onStat);
+  pool.connect(F.relayUrls);
+  const since=Math.floor(Date.now()/1000)-3600*24*14;
+  pool.subscribe('forum',[{kinds:[1],'#t':[FORUM_TAG],limit:FEED_MAX,since}]);
+  pool.subscribe('reactions',[{kinds:[7],'#t':[FORUM_TAG],limit:2000,since}]);
+  pool.subscribe('profiles',[{kinds:[0],limit:300,since:Math.floor(Date.now()/1000)-3600*24*30}]);
+  renderThreadList();
+}
+
+/* ─── STATUS ─────────────────────────────────────────────────── */
+function _onStat(s){
+  const el=document.getElementById('hdr-relays');
+  if(!el)return;
+  el.innerHTML='';
+  for(const[url,r]of s.relays){const d=document.createElement('div');d.className='rdot '+r.status;d.title=url+' · '+r.status;el.appendChild(d);}
+  if(s.open>0&&F._pending.length>0){
+    const retry=[...F._pending];F._pending=[];
+    for(const ev of retry){if(pool.publish(ev)===0)F._pending.push(ev);}
+    if(F._pending.length<retry.length)toast('✓ QUEUED POSTS SENT');
+  }
+}
+
+/* ─── EVENT HANDLER ──────────────────────────────────────────── */
+async function _onEv(ev){
+  if(!ev.id||!ev.pubkey||!ev.sig||typeof ev.kind!=='number')return;
+  const eid=await sha256h(JSON.stringify([0,ev.pubkey,ev.created_at,ev.kind,ev.tags,ev.content]));
+  if(ev.id!==eid)return;
+  try{if(!secp.schnorr.verify(ev.sig,ev.id,ev.pubkey))return;}catch(e){return;}
+
+  if(ev.kind===0){_cacheProf(ev);return;}
+
+  if(ev.kind===7){
+    const et=ev.tags?.find(t=>t[0]==='e');if(!et)return;
+    const tid=et[1];
+    if(!F.reactions.has(tid))F.reactions.set(tid,{boosts:new Set()});
+    if(ev.content==='+')F.reactions.get(tid).boosts.add(ev.pubkey);
+    _updateBoost(tid);return;
+  }
+
+  if(ev.kind!==1)return;
+  const tags=ev.tags||[];
+  if(!tags.some(t=>t[0]==='t'&&t[1]===FORUM_TAG))return;
+
+  const eTag=tags.find(t=>t[0]==='e'&&(t[3]==='root'||t[3]==='reply'||!t[3]));
+  if(!eTag){
+    // Thread root
+    if(F.threads.has(ev.id))return;
+    F.threads.set(ev.id,ev);
+    if(!F.currentThread)_prependRow(ev);
+    if(!F.profiles.has(ev.pubkey))pool.subscribe('p-'+ev.pubkey.slice(0,8),[{kinds:[0],authors:[ev.pubkey],limit:1}]);
+    if(F.id&&(ev.content.includes(F.id.npub)||tags.some(t=>t[0]==='p'&&t[1]===F.id.pubkey)))
+      emit('nexus.notification',{type:'mention',from:ev.pubkey,eventId:ev.id,content:ev.content.slice(0,80)});
+  } else {
+    // Reply
+    if(F.replies.has(ev.id))return;
+    F.replies.set(ev.id,ev);
+    const rootId=eTag[1];
+    if(F.currentThread===rootId)_appendReply(ev);
+    _updateRepCount(rootId);
+    if(F.id&&(ev.content.includes(F.id.npub)||tags.some(t=>t[0]==='p'&&t[1]===F.id.pubkey)))
+      emit('nexus.notification',{type:'reply',from:ev.pubkey,eventId:ev.id,content:ev.content.slice(0,80)});
+  }
+}
+
+function _cacheProf(ev){
+  try{
+    const m=JSON.parse(ev.content);
+    const ex=F.profiles.get(ev.pubkey);
+    if(!ex||ev.created_at>ex._ts)F.profiles.set(ev.pubkey,{name:m.name||null,display_name:m.display_name||null,about:m.about||null,picture:m.picture||null,_ts:ev.created_at});
+  }catch(_){}
+}
+
+/* ─── RANKS ──────────────────────────────────────────────────── */
+function getRank(pubkey){
+  const n=[...F.threads.values(),...F.replies.values()].filter(e=>e.pubkey===pubkey).length;
+  let r=0;for(let i=0;i<RANK_T.length;i++)if(n>=RANK_T[i])r=i;
+  return{name:RANKS[r],count:n};
+}
+function getHandle(pubkey){
+  if(F.id?.pubkey===pubkey)return(F.id.displayName||trunc(pubkey)).toUpperCase();
+  const p=F.profiles.get(pubkey);
+  return((p?.display_name||p?.name||trunc(pubkey)).toUpperCase());
+}
+function trunc(hex){return(hex||'').slice(0,8).toUpperCase();}
+function getBoardTag(ev){const t=(ev.tags||[]).find(t=>t[0]==='t'&&t[1].startsWith('nxforum-'));return t?t[1].replace('nxforum-',''):'general';}
+function getTitle(ev){return(ev.content||'').split('\n')[0].trim().slice(0,100)||'(untitled)';}
+function timeAgo(ts){const s=Math.floor(Date.now()/1000)-ts;if(s<60)return s+'s';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';if(s<604800)return Math.floor(s/86400)+'d';return Math.floor(s/604800)+'w';}
+
+/* ─── BOARDS ─────────────────────────────────────────────────── */
+function renderBoards(){
+  const el=document.getElementById('board-list');el.innerHTML='';
+  const mkItem=(label,board,count)=>{
+    const d=document.createElement('div');
+    d.className='board-item'+(F.currentBoard===board?' active':'');
+    d.innerHTML=`<span>${label}</span><span class="bc">${count}</span>`;
+    d.onclick=()=>switchBoard(board);
+    el.appendChild(d);
+  };
+  mkItem('ALL BOARDS','all',[...F.threads.values()].length);
+  BOARDS.forEach(b=>mkItem('/'+b+'/'  ,b,[...F.threads.values()].filter(e=>getBoardTag(e)===b).length));
+}
+
+function switchBoard(board){
+  F.currentBoard=board;F.currentThread=null;
+  renderBoards();showList();renderThreadList();
+  document.getElementById('hdr-board').textContent='FORUM/'+(board==='all'?'*':board).toUpperCase();
+  document.getElementById('board-path').textContent='/nexus/'+(board==='all'?'*/':board+'/');
+  const sel=document.getElementById('cw-board');if(sel&&board!=='all')sel.value=board;
+}
+
+/* ─── THREAD LIST ────────────────────────────────────────────── */
+function renderThreadList(){
+  const el=document.getElementById('thread-list');el.innerHTML='';
+  let threads=[...F.threads.values()];
+  if(F.currentBoard!=='all')threads=threads.filter(e=>getBoardTag(e)===F.currentBoard);
+  // Pinned float to top, rest sort by time
+  const pinned=threads.filter(e=>F.pinned.has(e.id)).sort((a,b)=>b.created_at-a.created_at);
+  const rest=threads.filter(e=>!F.pinned.has(e.id)).sort((a,b)=>b.created_at-a.created_at);
+  threads=[...pinned,...rest];
+  if(!threads.length){el.innerHTML='<div class="empty-board">NO SIGNALS IN THIS SECTOR<br>BE THE FIRST TO TRANSMIT<br>[ + NEW THREAD ]</div>';return;}
+  threads.slice(0,FEED_MAX).forEach((ev,i)=>el.appendChild(_buildRow(ev,threads.length-i)));
+}
+
+function _buildRow(ev,num){
+  const title=getTitle(ev).toUpperCase();
+  const handle=getHandle(ev.pubkey);
+  const reps=[...F.replies.values()].filter(r=>r.tags?.some(t=>t[0]==='e'&&t[1]===ev.id));
+  const repCount=reps.length;
+  // HOT: velocity — 3+ replies in last 6 hours
+  const now=Math.floor(Date.now()/1000);
+  const hot6h=reps.filter(r=>r.created_at>now-3600*6).length>=3;
+  const isPinned=F.pinned.has(ev.id);
+  const isLocked=F.locked.has(ev.id);
+  // Stake indicator — any lock on this thread root from current user's wallet
+  const threadStakes=_getEvStakes(ev.id);
+
+  const row=document.createElement('div');row.className='trow';row.dataset.id=ev.id;row.onclick=()=>openThread(ev.id);
+  const numEl=document.createElement('div');numEl.className='tr-num';numEl.textContent=num;
+  const subjEl=document.createElement('div');subjEl.className='tr-subj';
+  const titleEl=document.createElement('div');titleEl.className='tr-title';titleEl.id='trt-'+ev.id;titleEl.textContent=title;
+  const badges=document.createElement('div');badges.className='tr-badges';
+  if(isPinned)badges.innerHTML+='<span class="badge pinned">[PINNED]</span>';
+  if(isLocked)badges.innerHTML+='<span class="badge locked">[LOCKED]</span>';
+  if(hot6h)badges.innerHTML+='<span class="badge hot">[HOT]</span>';
+  if(threadStakes.length){
+    const stakeAmt=(threadStakes.reduce((s,l)=>s+l.amount,0)/100000000).toFixed(0);
+    badges.innerHTML+=`<span class="badge" style="color:var(--text);border-color:var(--border-hi)">⚡${stakeAmt}</span>`;
+  }
+  subjEl.append(titleEl,badges);
+  const authEl=document.createElement('div');authEl.className='tr-author';authEl.textContent='@'+handle;
+  const repEl=document.createElement('div');repEl.className='tr-reps';repEl.id='trr-'+ev.id;repEl.textContent=repCount;
+  const ageEl=document.createElement('div');ageEl.className='tr-age';ageEl.textContent=timeAgo(ev.created_at);
+  row.append(numEl,subjEl,authEl,repEl,ageEl);
+  return row;
+}
+
+function _prependRow(ev){
+  const el=document.getElementById('thread-list');if(!el||F.currentThread)return;
+  if(F.currentBoard!=='all'&&getBoardTag(ev)!==F.currentBoard)return;
+  const count=[...F.threads.values()].filter(e=>F.currentBoard==='all'||getBoardTag(e)===F.currentBoard).length;
+  const row=_buildRow(ev,count);
+  const titleEl=row.querySelector('.tr-title');
+  if(titleEl)setTimeout(()=>scramble(titleEl,titleEl.textContent,700),30);
+  el.prepend(row);renderBoards();
+}
+
+function _updateRepCount(rootId){
+  const el=document.getElementById('trr-'+rootId);if(!el)return;
+  el.textContent=[...F.replies.values()].filter(r=>r.tags?.some(t=>t[0]==='e'&&t[1]===rootId)).length;
+}
+
+function _updateBoost(evId){
+  const el=document.getElementById('bc-'+evId);if(!el)return;
+  el.textContent=F.reactions.get(evId)?.boosts.size||0;
+}
+
+/* ─── THREAD VIEW ────────────────────────────────────────────── */
+function openThread(id){
+  const ev=F.threads.get(id);if(!ev)return;
+  F.currentThread=id;F.quotePost=null;
+  const title=getTitle(ev).toUpperCase();
+  const board=getBoardTag(ev);
+  document.getElementById('tv-crumb').textContent='/nexus/'+board+'/ — '+title.slice(0,55);
+  const reps=[...F.replies.values()].filter(r=>r.tags?.some(t=>t[0]==='e'&&t[1]===id)).length;
+  document.getElementById('tv-rc').textContent=reps+' REPLIES';
+  document.getElementById('hdr-board').textContent='FORUM/'+board.toUpperCase();
+  _renderPosts(id);showThread();
+  document.getElementById('reply-ta').value='';clearQuote();replyCount();
+
+  // Locked thread — disable reply composer
+  const replyC=document.getElementById('reply-c');
+  const existingNotice=document.getElementById('locked-notice');
+  if(existingNotice)existingNotice.remove();
+  if(F.locked.has(id)){
+    document.getElementById('reply-ta').disabled=true;
+    document.getElementById('reply-ta').placeholder='THREAD LOCKED — REPLIES DISABLED';
+    document.getElementById('reply-btn').disabled=true;
+    const notice=document.createElement('div');
+    notice.className='locked-notice';notice.id='locked-notice';
+    notice.textContent='[ THREAD LOCKED BY ZION COUNCIL ]';
+    replyC.parentNode.insertBefore(notice,replyC);
+  } else {
+    document.getElementById('reply-ta').disabled=false;
+    document.getElementById('reply-ta').placeholder='TRANSMIT REPLY...';
+    document.getElementById('reply-btn').disabled=false;
+  }
+}
+
+function _renderPosts(threadId){
+  const el=document.getElementById('thread-posts');el.innerHTML='';
+  const root=F.threads.get(threadId);if(!root)return;
+  el.appendChild(_buildPost(root,true,1));
+  const reps=[...F.replies.values()].filter(r=>r.tags?.some(t=>t[0]==='e'&&t[1]===threadId)).sort((a,b)=>a.created_at-b.created_at);
+  reps.forEach((r,i)=>el.appendChild(_buildPost(r,false,i+2)));
+  setTimeout(()=>{const s=document.getElementById('thread-scroll');if(s)s.scrollTop=s.scrollHeight;},40);
+}
+
+function _buildPost(ev,isOP,num){
+  const handle=getHandle(ev.pubkey);
+  const rank=getRank(ev.pubkey);
+  const isOwn=ev.pubkey===F.id?.pubkey;
+  const boosts=F.reactions.get(ev.id)?.boosts.size||0;
+  const boosted=F.myBoosts.has(ev.id);
+  const myRank=F.id?getRank(F.id.pubkey):null;
+  const myRankIdx=myRank?RANKS.indexOf(myRank.name):-1;
+
+  // Conviction chip — only for own identity, shows active stakes on this post
+  const postStakes=_getEvStakes(ev.id);
+  const hasStake=postStakes.length>0;
+
+  const block=document.createElement('div');
+  block.className='post-block '+(isOP?'op':'reply');
+  block.id='post-'+ev.id;
+
+  // Header
+  const hdr=document.createElement('div');hdr.className='post-hdr';
+  const hEl=document.createElement('span');hEl.className='post-handle';hEl.textContent='@'+handle;
+  const rEl=document.createElement('span');rEl.className='post-rank';rEl.textContent='['+rank.name+']';
+  const pcEl=document.createElement('span');pcEl.className='post-pc';pcEl.textContent=rank.count+' POSTS';
+  // Conviction chip — show for current user's own posts if wallet connected
+  if(isOwn&&F.walletState){
+    const allLocks=F.walletState.activeLocks||[];
+    const totalLocked=allLocks.reduce((s,l)=>s+l.amount,0);
+    const cEl=document.createElement('span');
+    cEl.className='conviction-chip'+(totalLocked>0?' active':'');
+    const tokens=(totalLocked/100000000).toFixed(0);
+    cEl.textContent=totalLocked>0?`⚡${tokens} ${F.walletState.symbol||''}`:'⚡—';
+    cEl.title='Your active stakes across all posts';
+    hdr.append(hEl,rEl,pcEl,cEl);
+  } else {
+    hdr.append(hEl,rEl,pcEl);
+  }
+  const nEl=document.createElement('span');nEl.className='post-num';nEl.textContent='#'+num;
+  const tEl=document.createElement('span');tEl.className='post-time';tEl.textContent=timeAgo(ev.created_at);
+  hdr.append(nEl,tEl);
+
+  const div=document.createElement('hr');div.className='post-divider';
+
+  // Body
+  const body=document.createElement('div');body.className='post-body';
+  _renderBody(body,ev.content);
+
+  // Stake indicator (if user has staked on this post)
+  let stakeIndEl=null;
+  if(hasStake){
+    stakeIndEl=document.createElement('div');
+    stakeIndEl.className='post-stake-ind';
+    stakeIndEl.id='psi-'+ev.id;
+    _renderPostStakeInd(stakeIndEl,postStakes);
+  }
+
+  // Signature
+  const sig=isOwn&&F.sig?F.sig:'';
+  const sigEl=document.createElement('div');sigEl.className='post-sig';
+  if(sig){sigEl.textContent='-- \n'+sig;}else{sigEl.style.display='none';}
+
+  // Actions
+  const acts=document.createElement('div');acts.className='post-acts';
+
+  const boostBtn=document.createElement('button');
+  boostBtn.className='pact'+(boosted?' boosted':'');boostBtn.id='boost-btn-'+ev.id;
+  boostBtn.onclick=()=>doBoost(ev.id);
+  boostBtn.textContent='+ BOOST ';
+  const bcount=document.createElement('span');bcount.className='bcount';bcount.id='bc-'+ev.id;bcount.textContent=boosts;
+  boostBtn.appendChild(bcount);
+
+  const replyBtn=document.createElement('button');replyBtn.className='pact';replyBtn.textContent='↩ REPLY';
+  replyBtn.onclick=()=>document.getElementById('reply-ta').focus();
+
+  const quoteBtn=document.createElement('button');quoteBtn.className='pact';quoteBtn.textContent='❝ QUOTE';
+  quoteBtn.onclick=()=>setQuote(ev.id,handle,ev.content);
+
+  // Stake button
+  const stakeBtn=document.createElement('button');
+  stakeBtn.className='pact stake-act'+(hasStake?' staked-act':'');
+  stakeBtn.textContent=hasStake?('⚡ STAKED'):'⚡ STAKE';
+  stakeBtn.id='stake-btn-'+ev.id;
+  stakeBtn.onclick=()=>window.openStakeIntent(ev.id,ev.content);
+
+  acts.append(boostBtn,replyBtn,quoteBtn,stakeBtn);
+
+  // Rank-gated: OPERATOR+ can pin (rank index 5), ZION COUNCIL can lock (rank index 6)
+  if(isOP&&myRankIdx>=5){
+    const pinBtn=document.createElement('button');
+    pinBtn.className='pact pin-act';
+    pinBtn.textContent=F.pinned.has(ev.id)?'◆ UNPIN':'◇ PIN';
+    pinBtn.onclick=()=>togglePin(ev.id);
+    acts.appendChild(pinBtn);
+  }
+  if(isOP&&myRankIdx>=6){
+    const lockBtn=document.createElement('button');
+    lockBtn.className='pact lock-act';
+    lockBtn.textContent=F.locked.has(ev.id)?'🔓 UNLOCK':'🔒 LOCK';
+    lockBtn.onclick=()=>toggleLock(ev.id);
+    acts.appendChild(lockBtn);
+  }
+
+  block.append(hdr,div,body);
+  if(stakeIndEl)block.appendChild(stakeIndEl);
+  block.append(sigEl,acts);
+  return block;
+}
+
+function _renderBody(el,content){
+  (content||'').split('\n').forEach((line,i,arr)=>{
+    const span=document.createElement('span');
+    if(line.startsWith('>')){span.className='qline';span.textContent=line;}
+    else if(/nostr:npub|@[a-zA-Z0-9_]+/.test(line)){span.className='mention';span.textContent=line;}
+    else span.textContent=line;
+    el.appendChild(span);
+    if(i<arr.length-1)el.appendChild(document.createElement('br'));
+  });
+}
+
+function _appendReply(ev){
+  const el=document.getElementById('thread-posts');if(!el)return;
+  const n=el.querySelectorAll('.post-block').length+1;
+  const block=_buildPost(ev,false,n);
+  block.style.opacity='0';el.appendChild(block);
+  setTimeout(()=>{block.style.transition='opacity .3s';block.style.opacity='1';},10);
+  document.getElementById('tv-rc').textContent=(n-1)+' REPLIES';
+  const s=document.getElementById('thread-scroll');if(s)s.scrollTop=s.scrollHeight;
+}
+
+/* ─── VIEW SWITCHING ─────────────────────────────────────────── */
+function showList(){document.getElementById('tlv').classList.remove('hidden');document.getElementById('tv').classList.add('hidden');}
+function showThread(){document.getElementById('tlv').classList.add('hidden');document.getElementById('tv').classList.remove('hidden');}
+function backToList(){
+  F.currentThread=null;
+  document.getElementById('hdr-board').textContent='FORUM/'+(F.currentBoard==='all'?'*':F.currentBoard).toUpperCase();
+  showList();renderThreadList();
+}
+
+/* ─── COMPOSE ────────────────────────────────────────────────── */
+function toggleCompose(){
+  const c=document.getElementById('compose-wrap');c.classList.toggle('open');
+  if(c.classList.contains('open'))setTimeout(()=>document.getElementById('cw-subj').focus(),150);
+}
+function cwCount(){
+  const n=document.getElementById('cw-subj').value.length+document.getElementById('cw-body').value.length;
+  document.getElementById('cw-cc').textContent=n+' / '+CHAR_LIMIT;
+}
+function replyCount(){
+  document.getElementById('reply-cc').textContent=document.getElementById('reply-ta').value.length+' / '+CHAR_LIMIT;
+}
+function setQuote(id,handle,content){
+  F.quotePost={id,handle,content};
+  const prev=content.split('\n').slice(0,3).map(l=>'>'+l).join('\n');
+  document.getElementById('rc-qtext').textContent='> @'+handle+'\n'+prev;
+  document.getElementById('rc-quote').classList.remove('hidden');
+  document.getElementById('reply-ta').focus();
+}
+function clearQuote(){F.quotePost=null;document.getElementById('rc-quote').classList.add('hidden');document.getElementById('rc-qtext').textContent='';}
+function clearReply(){document.getElementById('reply-ta').value='';clearQuote();replyCount();}
+
+/* ─── POST: NEW THREAD ───────────────────────────────────────── */
+function postThread(){
+  if(!F.id){toast('COMPLETE ONBOARDING FIRST');return;}
+  const subj=document.getElementById('cw-subj').value.trim();
+  const body=document.getElementById('cw-body').value.trim();
+  const board=document.getElementById('cw-board').value;
+  if(!subj){toast('SUBJECT REQUIRED');return;}
+  if(!body){toast('BODY REQUIRED');return;}
+  if(subj.length+body.length+2>CHAR_LIMIT){toast('OVER CHARACTER LIMIT');return;}
+  const btn=document.getElementById('post-btn');
+  _countdown(btn,'post',async()=>{
+    const content=subj.toUpperCase()+'\n\n'+body;
+    const tags=[['t',FORUM_TAG],['t',FORUM_TAG+'-'+board]];
+    const ev=await buildEv(F.id.privkey,F.id.pubkey,1,content,tags);
+    const n=pool.publish(ev);
+    F.threads.set(ev.id,ev);emit('forum.post',ev);
+    if(n>0)toast('✓ BROADCAST TO '+n+' RELAY'+(n>1?'S':''));
+    else{F._pending.push(ev);toast('⏳ QUEUED — RELAYS RECONNECTING');}
+    document.getElementById('cw-subj').value='';
+    document.getElementById('cw-body').value='';
+    document.getElementById('compose-wrap').classList.remove('open');
+    cwCount();renderThreadList();renderBoards();
+  });
+}
+
+/* ─── POST: REPLY ────────────────────────────────────────────── */
+function postReply(){
+  if(!F.id){toast('COMPLETE ONBOARDING FIRST');return;}
+  if(!F.currentThread)return;
+  const body=document.getElementById('reply-ta').value.trim();
+  if(!body){toast('REPLY CANNOT BE EMPTY');return;}
+  if(body.length>CHAR_LIMIT){toast('OVER CHARACTER LIMIT');return;}
+  const btn=document.getElementById('reply-btn');
+  const rootEv=F.threads.get(F.currentThread);
+  const board=rootEv?getBoardTag(rootEv):'general';
+  _countdown(btn,'reply',async()=>{
+    let content=body;
+    if(F.quotePost){
+      const qlines=F.quotePost.content.split('\n').slice(0,3).map(l=>'>'+l).join('\n');
+      content='> @'+F.quotePost.handle+'\n'+qlines+'\n\n'+body;
+    }
+    const tags=[['t',FORUM_TAG],['t',FORUM_TAG+'-'+board],['e',F.currentThread,'','root'],['p',rootEv?.pubkey||F.id.pubkey]];
+    const ev=await buildEv(F.id.privkey,F.id.pubkey,1,content,tags);
+    const n=pool.publish(ev);
+    F.replies.set(ev.id,ev);emit('forum.post',ev);
+    clearReply();_appendReply(ev);_updateRepCount(F.currentThread);
+    if(n>0)toast('✓ REPLY TRANSMITTED');
+    else{F._pending.push(ev);toast('⏳ QUEUED');}
+    if(rootEv&&rootEv.pubkey!==F.id.pubkey)
+      emit('nexus.notification',{type:'reply',from:F.id.pubkey,eventId:ev.id,content:content.slice(0,80)});
+  });
+}
+
+/* ─── COUNTDOWN (adapted from Social Cosmos) ─────────────────── */
+function _countdown(btn,tid,onCommit){
+  if(F._cancelT[tid]){
+    clearTimeout(F._cancelT[tid]);delete F._cancelT[tid];
+    btn.classList.remove('cancel-mode');
+    btn.innerHTML='<span>'+(tid==='reply'?'TRANSMIT':'BROADCAST')+'</span>';
+    return;
+  }
+  btn.classList.add('cancel-mode');
+  btn.innerHTML='<div class="pb" style="width:100%;transition:none"></div><span>CANCEL</span>';
+  void btn.offsetWidth;
+  const pb=btn.querySelector('.pb');pb.style.transition='width 3s linear';pb.style.width='0%';
+  F._cancelT[tid]=setTimeout(async()=>{
+    delete F._cancelT[tid];
+    btn.classList.remove('cancel-mode');
+    btn.innerHTML='<span>'+(tid==='reply'?'TRANSMIT':'BROADCAST')+'</span>';
+    try{await onCommit();}catch(e){toast('ERROR: '+(e.message||'?').slice(0,40));console.error(e);}
+  },3000);
+}
+
+/* ─── BOOST ──────────────────────────────────────────────────── */
+async function doBoost(evId){
+  if(!F.id){toast('COMPLETE ONBOARDING FIRST');return;}
+  if(F.myBoosts.has(evId))return;
+  F.myBoosts.add(evId);
+  if(!F.reactions.has(evId))F.reactions.set(evId,{boosts:new Set()});
+  F.reactions.get(evId).boosts.add(F.id.pubkey);
+  _updateBoost(evId);
+  const btn=document.getElementById('boost-btn-'+evId);if(btn)btn.classList.add('boosted');
+  const ev=F.threads.get(evId)||F.replies.get(evId);
+  if(ev)try{pool.publish(await buildEv(F.id.privkey,F.id.pubkey,7,'+',[['e',evId],['p',ev.pubkey]]));}catch(e){}
+}
+
+/* ─── IDENTITY PANEL ─────────────────────────────────────────── */
+function renderIdPanel(){
+  if(!F.id)return;
+  const h=(F.id.displayName||trunc(F.id.pubkey)).toUpperCase();
+  const rank=getRank(F.id.pubkey);
+  document.getElementById('id-av').textContent=h[0]||'?';
+  document.getElementById('id-handle').textContent='@'+h;
+  document.getElementById('id-rank').textContent=rank.name;
+  document.getElementById('id-count').textContent=rank.count+' POSTS';
+  // Conviction display
+  const convEl=document.getElementById('id-conviction');
+  if(convEl){
+    if(F.walletState){
+      const locks=F.walletState.activeLocks||[];
+      const total=(locks.reduce((s,l)=>s+l.amount,0)/100000000).toFixed(0);
+      const sym=F.walletState.symbol||'';
+      convEl.className='id-conviction live';
+      convEl.textContent=total>0?`⚡ ${total} ${sym} STAKED`:`⚡ ${sym} CONNECTED`;
+    } else {
+      convEl.className='id-conviction';
+      convEl.textContent='';
+    }
+  }
+  document.getElementById('id-sig').textContent=F.sig?('-- '+F.sig):'-- no signature';
+}
+
+/* ─── SETTINGS ───────────────────────────────────────────────── */
+function openSettings(){
+  if(!F.id){_showOb('generate');return;}
+  document.getElementById('st-handle').value=F.id.displayName||'';
+  document.getElementById('st-sig').value=F.sig||'';
+  document.getElementById('st-npub').textContent=F.id.npub;
+  document.getElementById('st-nsec').textContent=F.id.nsec;
+  document.getElementById('st-nsec').classList.remove('rev');
+  document.getElementById('st-rev-btn').textContent='REVEAL';
+  _renderRelays();
+  document.getElementById('modal-st').classList.add('open');
+}
+function closeSt(){document.getElementById('modal-st').classList.remove('open');}
+function toggleReveal(){
+  const el=document.getElementById('st-nsec'),btn=document.getElementById('st-rev-btn');
+  el.classList.toggle('rev');btn.textContent=el.classList.contains('rev')?'HIDE':'REVEAL';
+}
+function copyNsec(){document.getElementById('st-nsec').classList.add('rev');navigator.clipboard?.writeText(F.id?.nsec||'').then(()=>toast('NSEC COPIED — GUARD IT'));}
+function saveSt(){
+  const h=document.getElementById('st-handle').value.trim().replace(/^@/,'').slice(0,24);
+  const sig=document.getElementById('st-sig').value.trim().slice(0,120);
+  if(h&&F.id){F.id.displayName=h;_saveId();_pubProf().catch(()=>{});}
+  F.sig=sig;_saveSig();closeSt();renderIdPanel();toast('SETTINGS SAVED');
+}
+async function _pubProf(){if(!F.id)return;pool.publish(await buildEv(F.id.privkey,F.id.pubkey,0,JSON.stringify({name:F.id.displayName||'',about:F.id.bio||''})));}
+
+function _renderRelays(){
+  const el=document.getElementById('relay-list');if(!el)return;el.innerHTML='';
+  const stat=pool.stat();
+  F.relayUrls.forEach(url=>{
+    const r=stat.relays.get(url);
+    const row=document.createElement('div');row.className='relay-row';
+    const u=document.createElement('span');u.className='relay-url-txt';u.textContent=url;
+    const s=document.createElement('span');s.className='relay-st';s.textContent='['+(r?.status||'—').toUpperCase()+']';
+    const rm=document.createElement('button');rm.className='relay-rm';rm.textContent='×';rm.onclick=()=>_rmRelay(url);
+    row.append(u,s,rm);el.appendChild(row);
+  });
+}
+function addRelay(){
+  const input=document.getElementById('relay-in');
+  const url=input.value.trim();
+  if(!url.startsWith('wss://')){toast('RELAY MUST START WITH wss://');return;}
+  if(F.relayUrls.includes(url)){toast('ALREADY IN LIST');return;}
+  F.relayUrls.push(url);_saveRly();pool.connect(F.relayUrls);input.value='';_renderRelays();toast('RELAY ADDED');
+}
+function _rmRelay(url){
+  if(F.relayUrls.length<=1){toast('NEED AT LEAST ONE RELAY');return;}
+  F.relayUrls=F.relayUrls.filter(u=>u!==url);_saveRly();pool.connect(F.relayUrls);_renderRelays();toast('RELAY REMOVED');
+}
+
+/* ─── ONBOARDING ─────────────────────────────────────────────── */
+function _showOb(state,err){
+  const ov=document.getElementById('modal-ob'),box=document.getElementById('ob-box');
+  ov.classList.add('open');box.dataset.close='';
+  if(state==='generate'){
+    box.innerHTML=`<div class="m-title">INITIALISE NODE IDENTITY</div>
+      <div class="m-desc">Deriving keypair from the noise. This happens once.</div>
+      <div style="text-align:center;padding:22px;font-size:22px;color:var(--text);text-shadow:var(--glow)">█</div>
+      <div style="text-align:center;font-size:10px;color:var(--text-muted);letter-spacing:3px" id="ob-st">GENERATING...</div>`;
+    const gu=setTimeout(()=>_showOb('error','Key generation timed out.'),12000);
+    genIdentity().then(id=>{clearTimeout(gu);F.id=id;_showOb('seed');}).catch(e=>{clearTimeout(gu);_showOb('error',e.message||String(e));});
+  } else if(state==='seed'){
+    const words=F.id.mnemonic.split(' ');
+    const grid=words.map((w,i)=>`<div class="sw-row"><span class="sw-n">${i+1}.</span><span class="sw" id="sw${i}">████</span></div>`).join('');
+    box.innerHTML=`<div class="m-title">YOUR SEED PHRASE</div>
+      <div class="m-desc">These 12 words ARE your identity. Write them offline. Lose them = lose access forever.</div>
+      <div class="seed-grid">${grid}</div>
+      <div style="background:rgba(255,50,0,.07);border:1px solid rgba(255,50,0,.3);padding:7px 10px;font-size:9px;color:#ff8888;margin-bottom:14px;line-height:1.6;letter-spacing:.5px">⚠ NEVER SHARE THIS PHRASE. ANYONE WITH THESE WORDS CONTROLS YOUR NODE.</div>
+      <div style="display:flex;gap:8px;justify-content:space-between">
+        <button class="m-btn" onclick="window._showOb('import')">IMPORT EXISTING</button>
+        <button class="m-btn primary" onclick="window._obDone()">▶ SAVED — ENTER THE MATRIX</button>
+      </div>`;
+    words.forEach((w,i)=>setTimeout(()=>{const el=document.getElementById('sw'+i);if(el)scramble(el,w,500);},i*75));
+  } else if(state==='import'){
+    box.innerHTML=`<div class="m-title">IMPORT IDENTITY</div>
+      <div class="m-desc">Enter your nsec1 private key or 12-word seed phrase.</div>
+      <label class="m-label">nsec1... or 12-word mnemonic</label>
+      <input type="text" class="m-input" id="ob-in" autocomplete="off" spellcheck="false" placeholder="nsec1... or word1 word2...">
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+        <button class="m-btn" onclick="window._showOb('seed')">BACK</button>
+        <button class="m-btn primary" onclick="window._obImport()">IMPORT</button>
+      </div>`;
+    setTimeout(()=>document.getElementById('ob-in')?.focus(),100);
+  } else if(state==='error'){
+    const safe=(err||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    box.innerHTML=`<div class="m-title" style="color:var(--red)">NODE ERROR</div>
+      <div class="m-desc">${safe}</div>
+      <div style="font-size:9px;color:var(--text-muted);margin-bottom:14px">Use localhost or HTTPS — not a bare IP address.</div>
+      <div style="display:flex;justify-content:flex-end">
+        <button class="m-btn primary" onclick="window._obRetry()">↻ RETRY</button>
+      </div>`;
+  }
+}
+function _closeOb(){document.getElementById('modal-ob').classList.remove('open');}
+function _obDone(){_saveId();_closeOb();renderIdPanel();_startNostr();}
+async function _obImport(){
+  const raw=document.getElementById('ob-in')?.value.trim();if(!raw)return;
+  try{
+    let id;const ws=raw.split(/\s+/);
+    if(ws.length===12||ws.length===24){id=await deriveId(raw);}
+    else if(raw.startsWith('nsec1')){
+      const d=b32dec(raw);if(!d||d.hrp!=='nsec')throw new Error('invalid nsec');
+      const priv=b2h(d.bytes),pub=b2h(secp.schnorr.getPublicKey(h2b(priv)));
+      id={mnemonic:null,privkey:priv,pubkey:pub,npub:npubEnc(pub),nsec:raw,displayName:null,createdAt:Date.now()};
+    }else throw new Error('unrecognised format');
+    F.id=id;_obDone();
+  }catch(e){toast('COULD NOT PARSE KEY — CHECK FORMAT');}
+}
+async function _obRetry(){_resetDeps();await _mount();}
+
+/* ─── UTILS ──────────────────────────────────────────────────── */
+function copyEl(id){const t=document.getElementById(id)?.textContent;if(!t)return;navigator.clipboard?.writeText(t).then(()=>toast('COPIED')).catch(()=>toast('COPY FAILED'));}
+let _tt=null;
+function toast(msg){const el=document.getElementById('nx-toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2500);}
+
+/* ─── MATRIX RAIN ────────────────────────────────────────────── */
+function startRain(){
+  const cv=document.getElementById('matrix-bg');
+  const ctx=cv.getContext('2d');
+  let w=cv.width=window.innerWidth,h=cv.height=window.innerHeight;
+  const CH='アイウエオカキクケコサシスセソタチツテトラリルレロ0123456789ABCDEF';
+  const CW=18;let cols=Math.floor(w/CW);
+  const drops=Array.from({length:cols},()=>Math.random()*-(h/14));
+  function draw(){
+    ctx.fillStyle='rgba(0,0,0,0.045)';ctx.fillRect(0,0,w,h);
+    ctx.font='13px "JetBrains Mono",monospace';
+    for(let i=0;i<drops.length;i++){
+      const ch=CH[Math.floor(Math.random()*CH.length)];
+      ctx.fillStyle='rgba(0,255,65,0.88)';
+      ctx.fillText(ch,i*CW,drops[i]*14);
+      if(drops[i]*14>h&&Math.random()>.975)drops[i]=0;
+      drops[i]+=0.55;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize',()=>{
+    w=cv.width=window.innerWidth;h=cv.height=window.innerHeight;
+    cols=Math.floor(w/CW);drops.length=cols;
+    for(let i=0;i<cols;i++)if(drops[i]==null)drops[i]=Math.random()*-(h/14);
+  });
+}
+
+/* ─── WALLET BRIDGE ──────────────────────────────────────────── */
+function _getEvStakes(evId){
+  if(!F.walletState?.activeLocks)return[];
+  return F.walletState.activeLocks.filter(l=>l.terms_raw===`nostr:event:${evId}`);
+}
+
+function _renderPostStakeInd(el,stakes){
+  const total=stakes.reduce((s,l)=>s+l.amount,0);
+  const tokens=(total/100000000).toFixed(0);
+  const sym=F.walletState?.symbol||'';
+  const anyReady=stakes.some(l=>l.resolvable);
+  el.innerHTML=`⚡ <span class="psi-amt">${tokens} ${sym}</span> STAKED · ${stakes.length} LOCK${stakes.length>1?'S':''} <span class="psi-st ${anyReady?'ready':''}">[${anyReady?'RESOLVABLE':'LOCKED'}]</span>`;
+}
+
+function _updateAllPostStakeIndicators(){
+  // Update existing indicators
+  document.querySelectorAll('.post-stake-ind').forEach(el=>{
+    const id=el.id.replace('psi-','');
+    const stakes=_getEvStakes(id);
+    if(stakes.length){_renderPostStakeInd(el,stakes);}
+    else el.remove();
+  });
+  // Add new indicators for posts without one
+  document.querySelectorAll('[id^="post-"]').forEach(block=>{
+    const id=block.id.replace('post-','');
+    const stakes=_getEvStakes(id);
+    if(stakes.length&&!document.getElementById('psi-'+id)){
+      const ind=document.createElement('div');
+      ind.className='post-stake-ind';ind.id='psi-'+id;
+      _renderPostStakeInd(ind,stakes);
+      const acts=block.querySelector('.post-acts');
+      if(acts)acts.parentNode.insertBefore(ind,acts);
+    }
+    // Update stake button state
+    const sBtn=document.getElementById('stake-btn-'+id);
+    if(sBtn){
+      sBtn.className='pact stake-act'+(stakes.length?' staked-act':'');
+      sBtn.textContent=stakes.length?'⚡ STAKED':'⚡ STAKE';
+    }
+  });
+}
+
+function _refreshWalletChip(){
+  const chip=document.getElementById('wallet-chip');if(!chip)return;
+  if(F.walletState){
+    const bal=(F.walletState.balance/100000000).toFixed(0);
+    const sym=F.walletState.symbol||'';
+    chip.className='wallet-chip live';
+    chip.textContent=`⚡ ${bal} ${sym}`;
+    chip.title=`Wallet: ${F.walletState.sid} · ${F.walletState.unspentCount} outputs`;
+  } else {
+    chip.className='wallet-chip';
+    chip.textContent='NO WALLET';
+    chip.title='Wallet block not connected';
+  }
+}
+
+function _refreshStakeModal(){
+  const bar=document.getElementById('stake-ws-bar');
+  const dot=document.getElementById('stake-ws-dot');
+  const info=document.getElementById('stake-ws-info');
+  if(!bar)return;
+  if(F.walletState){
+    bar.className='ws-bar';dot.className='ws-dot-f';
+    const bal=(F.walletState.balance/100000000).toFixed(0);
+    info.textContent=`${F.walletState.sid} · ${bal} ${F.walletState.symbol||''} AVAILABLE`;
+  } else {
+    bar.className='ws-bar no-wallet';dot.className='ws-dot-f off';
+    info.textContent='WALLET NOT CONNECTED — OPEN WALLET BLOCK';
+  }
+}
+
+/* ─── STAKE INTENT ───────────────────────────────────────────── */
+window.openStakeIntent=function(evId,content){
+  F._stakeIntent={evId,content:content||''};
+  const d=document.getElementById('stake-ev-display');if(d)d.textContent=evId;
+  const p=document.getElementById('stake-ev-preview');if(p)p.textContent=content?'"'+(content.slice(0,80))+(content.length>80?'…':'')+'"':'';
+  const st=document.getElementById('stake-status');if(st)st.textContent='';
+  _refreshStakeModal();
+  document.getElementById('modal-stake').classList.add('open');
+};
+
+window.closeStakeModal=function(){
+  document.getElementById('modal-stake').classList.remove('open');
+  F._stakeIntent=null;
+};
+
+window.copyStakeId=function(){
+  if(!F._stakeIntent?.evId)return;
+  navigator.clipboard?.writeText(F._stakeIntent.evId).then(()=>toast('EVENT ID COPIED'));
+};
+
+window.sendStakeIntent=function(){
+  if(!F._stakeIntent?.evId)return;
+  const amt=parseFloat(document.getElementById('si-amt').value)||100;
+  const win=parseInt(document.getElementById('si-win').value)||72;
+  const cp=document.getElementById('si-cp').value.trim();
+  emit('nexus.stake.intent',{eventId:F._stakeIntent.evId,postContent:F._stakeIntent.content.slice(0,80),amount:amt,windowHours:win,counterparty:cp||null});
+  const st=document.getElementById('stake-status');
+  if(st){
+    st.textContent=F.mounted?'✓ STAKE INTENT SENT — SWITCH TO WALLET BLOCK → ⚡ STAKE TAB':'⚠ NOT CONNECTED TO NEXUS OS — PASTE EVENT ID IN WALLET MANUALLY';
+    st.style.color=F.mounted?'var(--text)':'var(--amber)';
+  }
+  toast('⚡ STAKE INTENT SENT');
+};
+
+/* ─── PIN / LOCK (OPERATOR+ / ZION COUNCIL only) ─────────────── */
+// Local-only state until DB block connection is added.
+// Flag: this is not shared across users yet — scoped to this session's localStorage.
+function togglePin(threadId){
+  const myRank=F.id?getRank(F.id.pubkey):null;
+  const myRankIdx=myRank?RANKS.indexOf(myRank.name):-1;
+  if(myRankIdx<5){toast('OPERATOR RANK REQUIRED TO PIN');return;}
+  if(F.pinned.has(threadId)){F.pinned.delete(threadId);toast('THREAD UNPINNED');}
+  else{F.pinned.add(threadId);toast('THREAD PINNED');}
+  _saveMod();renderThreadList();
+}
+
+function toggleLock(threadId){
+  const myRank=F.id?getRank(F.id.pubkey):null;
+  const myRankIdx=myRank?RANKS.indexOf(myRank.name):-1;
+  if(myRankIdx<6){toast('ZION COUNCIL RANK REQUIRED TO LOCK');return;}
+  if(F.locked.has(threadId)){F.locked.delete(threadId);toast('THREAD UNLOCKED');}
+  else{F.locked.add(threadId);toast('THREAD LOCKED');}
+  _saveMod();
+  // If currently viewing this thread, refresh the locked state
+  if(F.currentThread===threadId)openThread(threadId);
+  else renderThreadList();
+}
+
+/* ─── WINDOW EXPORTS ─────────────────────────────────────────── */
+window._showOb      = _showOb;
+window._obDone      = _obDone;
+window._obImport    = _obImport;
+window._obRetry     = _obRetry;
+window.openSettings = openSettings;
+window.closeSt      = closeSt;
+window.saveSt       = saveSt;
+window.toggleReveal = toggleReveal;
+window.copyNsec     = copyNsec;
+window.copyEl       = copyEl;
+window.addRelay     = addRelay;
+window.switchBoard  = switchBoard;
+window.openThread   = openThread;
+window.backToList   = backToList;
+window.toggleCompose= toggleCompose;
+window.postThread   = postThread;
+window.postReply    = postReply;
+window.clearQuote   = clearQuote;
+window.clearReply   = clearReply;
+window.cwCount      = cwCount;
+window.replyCount   = replyCount;
+window.setQuote     = setQuote;
+window.toast        = toast;
+// Stake modal already assigned as window.X above
+
+/* ─── INIT ───────────────────────────────────────────────────── */
+startRain();
+_mount();
+</script>
+</body>
+</html>

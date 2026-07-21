@@ -1,0 +1,34 @@
+{
+  "status": "pass",
+  "command": "npm run smoke",
+  "deterministicChecks": 21,
+  "starter": {
+    "id": "c:e293bc08",
+    "name": "Mororo of the Mossbed"
+  },
+  "slot": {
+    "slotId": "manifest:v1:Glassfen-91:Neo:surface:6",
+    "anchorX": 5113.437507534027,
+    "temperament": "TERRITORIAL"
+  },
+  "wild": {
+    "id": "c:287b4ee8",
+    "name": "Fenvirellis of the Pale Vapor"
+  },
+  "offspring": {
+    "id": "c:9e3e837a",
+    "name": "Lueessvi under the Root Arch",
+    "generation": 1,
+    "birthX": 4827.12,
+    "spatialMarks": [
+      "born on a rising slope; carriage lifted",
+      "born under Glassfen light; coloring drifted cool",
+      "born under the Root Arch; tendrils branched dense"
+    ]
+  },
+  "save": {
+    "creatureCount": 3,
+    "lineageCount": 1,
+    "proofHash": "b7f72b1d"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "version": "0.04",
+  "actions": [
+    {
+      "id": "diagnostic.ping",
+      "capability": "nexus.emit",
+      "risk": "low",
+      "implemented": "BB-01"
+    },
+    {
+      "id": "prompt.import",
+      "capability": "noted.write",
+      "risk": "medium",
+      "implemented": "BB-04"
+    },
+    {
+      "id": "ui.patch.preview",
+      "capability": "ui.patch",
+      "risk": "medium",
+      "implemented": "BB-06"
+    },
+    {
+      "id": "nostr.publish",
+      "capability": "nostr.publish",
+      "risk": "high",
+      "implemented": "BB-10"
+    },
+    {
+      "id": "agent.patch.propose",
+      "capability": "agent.evolve",
+      "risk": "critical",
+      "implemented": "BB-12"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="nexus-app" content='{"title":"Kin Forge","icon":"🧬","description":"Deterministic Eidolon breeding console"}' />
+<title>Kin Forge · Nexus Moot</title>
+<style>
+:root{--bg:#0b0c10;--panel:#131722;--line:#273044;--text:#e9eefc;--muted:#94a3b8;--accent:#9b8cff;--ok:#4ade80;--warn:#fbbf24;--bad:#fb7185}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#172033,#090a0f);color:var(--text);font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;min-height:100vh}
+header{padding:18px 20px;border-bottom:1px solid var(--line);background:rgba(11,12,16,.7);position:sticky;top:0;backdrop-filter:blur(12px)}
+h1{margin:0;font-size:18px} .sub{color:var(--muted);font-size:12px;margin-top:4px}
+main{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}.panel{background:rgba(19,23,34,.9);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+h2{font-size:14px;margin:0 0 10px;color:#c7d2fe}.row{display:grid;gap:6px;margin:10px 0}label{color:var(--muted);font-size:12px}input,select,textarea,button{width:100%;border-radius:10px;border:1px solid var(--line);background:#080b12;color:var(--text);padding:9px;font:inherit}button{cursor:pointer;background:linear-gradient(135deg,#5b4bb7,#7b61ff);border:none;font-weight:700}button.secondary{background:#1d2535}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.log{height:180px;overflow:auto;background:#080b12;border:1px solid var(--line);border-radius:10px;padding:10px;white-space:pre-wrap;color:#cbd5e1}.card{border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;background:#0d111b}.muted{color:var(--muted)}.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}.twins{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dna{font-size:11px;word-break:break-all;color:#a7f3d0} @media(max-width:900px){main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>🧬 Kin Forge</h1><div class="sub">Platform breeding console. Eidolon artifacts stay untouched; Library entries provide DNA.</div></header>
+<main>
+  <section class="panel">
+    <h2>Offer</h2>
+    <div class="row"><label>Parent A · local full creature</label><select id="parentA"></select></div>
+    <div class="row"><label>Partner Nostr pubkey</label><input id="partner" placeholder="64-char hex pubkey" /></div>
+    <div class="row"><label>Parent B hash/id shared by partner</label><input id="parentB" placeholder="sha256:... or local id/hash" /></div>
+    <div class="grid"><button id="refresh">Refresh creatures</button><button id="sendOffer">Send offer</button></div>
+    <div class="row"><label>Local twin preview helper</label><button class="secondary" id="preview">Preview deterministic twins from selected local parents</button></div>
+  </section>
+  <section class="panel">
+    <h2>Incoming / active offers</h2>
+    <button class="secondary" id="loadInbox">Load inbox</button>
+    <div id="inbox"></div>
+  </section>
+  <section class="panel">
+    <h2>Twins</h2>
+    <div id="twins" class="twins"></div>
+  </section>
+  <section class="panel">
+    <h2>Protocol log</h2>
+    <div id="log" class="log"></div>
+  </section>
+</main>
+<script src="../../engines/breed-engine.js"></script>
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+let client = null;
+let creatures = [];
+let loaded = new Map();
+let nonceCounter = 0;
+function newNonce(prefix){ const b=new Uint8Array(12); if(window.crypto&&crypto.getRandomValues){ crypto.getRandomValues(b); return prefix+'_'+Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join(''); } nonceCounter+=1; return prefix+'_'+nonceCounter; }
+function eventWindow(){ const ts=Date.now(); return {ts, expires:Math.floor((ts+15*60*1000)/1000)}; }
+function log(m, cls='') { const el=$('log'); el.innerHTML += `${cls?`<span class="${cls}">`:''}${esc(String(m))}${cls?'</span>':''}\n`; el.scrollTop = el.scrollHeight; }
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function hashOf(env){return env.content_hash || env.content_addr || env.birthHash || env.id;}
+function dnaOf(env){const p=env&&env.payload||{}; return Array.isArray(p.dna)?p.dna:null;}
+function huesOf(env){const p=env&&env.payload||{}; return Array.isArray(p.hues)?p.hues:[];}
+function manifest(){return {emits:['vibe.list','vibe.load','vibe.breed.offer','vibe.breed.inbox','vibe.breed.accept'], consumes:['vibe.result'], app:{title:'Kin Forge',icon:'🧬',description:'Deterministic breeding',visible:true}};}
+async function req(channel,payload={},timeout=10000){ const r = await client.request(channel,payload,{timeout}); if(!r.ok) throw new Error(r.error||'request failed'); return r; }
+async function refreshCreatures(){
+  const r = await req('vibe.list',{type:'creature/*',sort:'recent'});
+  creatures = (r.data||[]).filter(x=>!x.foreign_stub && x.full_artifact !== false);
+  const sel=$('parentA'); sel.innerHTML = creatures.map(c=>`<option value="${esc(c.id)}">${esc(c.name||c.id)} · ${esc(c.content_hash||c.birthHash||c.id).slice(0,18)}</option>`).join('') || '<option value="">No full creatures</option>';
+  log(`loaded ${creatures.length} full local creature(s)`,'ok');
+}
+async function loadCreature(id){ if(loaded.has(id)) return loaded.get(id); const r=await req('vibe.load',{id}); loaded.set(id,r.envelope); return r.envelope; }
+async function sendOffer(){
+  const id=$('parentA').value; const env=await loadCreature(id); const parentA=hashOf(env); const partner=$('partner').value.trim(); const parentB=$('parentB').value.trim();
+  const t=eventWindow(); const r=await req('vibe.breed.offer',{parent_a:id,parent_a_hash:parentA,parent_b_hash:parentB,partner_pubkey:partner,nonce:newNonce('breed'),ts:t.ts,expires:t.expires},15000);
+  log(`offer ${r.data.offer.id} published=${r.data.published}`,'ok'); await loadInbox();
+}
+async function loadInbox(){
+  const r=await req('vibe.breed.inbox',{mine:true});
+  $('inbox').innerHTML=(r.data||[]).map(o=>`<div class="card"><b>${esc(o.id)}</b><div class="muted">from ${esc(o.pubkey||'—').slice(0,16)} → ${esc(o.partner||'—').slice(0,16)}</div><div>parents ${esc(o.parent_a||'').slice(0,18)} × ${esc(o.parent_b||'').slice(0,18)}</div><div>status ${esc(o.status||'offered')}</div><button data-accept="${esc(o.id)}">Accept / run protocol</button></div>`).join('')||'<div class="muted">No offers seen.</div>';
+  document.querySelectorAll('[data-accept]').forEach(btn=>btn.addEventListener('click',()=>acceptOffer(btn.dataset.accept)));
+}
+async function acceptOffer(id){
+  log(`running commit-reveal for ${id}`,'warn');
+  try{ const r=await req('vibe.breed.accept',{offer_id:id,timeout:20000,ts:Date.now()},25000); log(`done ${r.data.breed_id} twin1=${r.data.twin1_hash} twin2=${r.data.twin2_hash}`,'ok'); renderTwins(r.data); }
+  catch(e){ log(`forfeit ${e.message}`,'bad'); }
+}
+function renderTwins(data){ $('twins').innerHTML=`<div class="card"><b>Twin 1</b><div class="dna">${esc(data.twin1_hash||'')}</div></div><div class="card"><b>Twin 2</b><div class="dna">${esc(data.twin2_hash||'')}</div></div>`; }
+async function previewTwins(){
+  const id=$('parentA').value; const a=await loadCreature(id); const bRef=$('parentB').value.trim(); let b=null;
+  const local = creatures.find(c=>[c.id,c.content_hash,c.birthHash].includes(bRef)); if(local) b=await loadCreature(local.id);
+  if(!dnaOf(a)||!b||!dnaOf(b)){ log('preview requires parent B to be a loaded local creature id/hash','warn'); return; }
+  const out=window.NexusBreedEngine.sexualBreed({dnaA:dnaOf(a),dnaB:dnaOf(b),huesA:huesOf(a),huesB:huesOf(b),jointSeed:'preview:'+hashOf(a)+':'+hashOf(b)});
+  $('twins').innerHTML=`<div class="card"><b>Twin 1 preview</b><div class="dna">${out.twin1.dna.join(',')}</div></div><div class="card"><b>Twin 2 preview</b><div class="dna">${out.twin2.dna.join(',')}</div></div>`;
+}
+client = window.NexusBlockClient.bootBlock({manifest:manifest()});
+client.ready.then(()=>{ log('mounted'); refreshCreatures().catch(e=>log(e.message,'bad')); });
+$('refresh').onclick=()=>refreshCreatures().catch(e=>log(e.message,'bad'));
+$('sendOffer').onclick=()=>sendOffer().catch(e=>log(e.message,'bad'));
+$('loadInbox').onclick=()=>loadInbox().catch(e=>log(e.message,'bad'));
+$('preview').onclick=()=>previewTwins().catch(e=>log(e.message,'bad'));
+</script>
+</body>
+</html>

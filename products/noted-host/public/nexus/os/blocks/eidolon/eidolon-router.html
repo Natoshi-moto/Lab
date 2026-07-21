@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · ROUTER</title>
+<meta name="nexus-block" content="managed">
+<meta name="nexus-emits" content="eidolon.challenger.appears eidolon.world.tick eidolon.battle.auto vibe.save vibe.list vibe.load">
+<meta name="nexus-consumes" content="eidolon.battle.result vibe.result eidolon.sim.speed">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   EIDOLON ROUTER — World Engine
+   Runs invisible. Can be surfaced as a Nexus window.
+   Phosphor-amber radar aesthetic.
+   ═══════════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#020304;
+  --deep:#050709;
+  --surface:#080b10;
+  --border:rgba(201,146,10,.18);
+  --border-hi:rgba(201,146,10,.38);
+  --amber:#c9920a;
+  --amber-hi:#e6a51a;
+  --amber-dim:rgba(201,146,10,.08);
+  --green:#1db954;
+  --rose:#c0392b;
+  --ink:#ddd8aa;
+  --ink-2:#887a55;
+  --ink-3:#4a4430;
+  --mono:'IBM Plex Mono',monospace;
+}
+html,body{height:100%;background:var(--void);color:var(--ink);font-family:var(--mono);font-size:11px;overflow:hidden;}
+
+/* CRT grain */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:100;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0,rgba(0,0,0,.14) 1px,transparent 1px,transparent 3px);
+  mix-blend-mode:multiply;
+}
+
+#app{
+  display:grid;
+  grid-template-rows:36px 1fr 36px;
+  height:100vh;
+}
+
+/* ── Header ── */
+#topbar{
+  display:flex;align-items:center;gap:12px;padding:0 14px;
+  background:var(--deep);border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+#brand{font-size:10px;letter-spacing:3px;font-weight:600;color:var(--amber);}
+#world-tag{font-size:9px;color:var(--ink-3);letter-spacing:1px;}
+.pulse-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;
+  animation:pdot 2s ease-in-out infinite;
+}
+@keyframes pdot{0%,100%{opacity:.5;box-shadow:0 0 3px var(--amber);}50%{opacity:1;box-shadow:0 0 8px var(--amber);}}
+.pulse-dot.red{background:var(--rose);animation:none;opacity:.7;}
+#header-right{margin-left:auto;font-size:9px;color:var(--ink-3);letter-spacing:1px;}
+
+/* ── Main ── */
+#main{
+  display:grid;
+  grid-template-columns:1fr 240px;
+  min-height:0;overflow:hidden;
+}
+
+/* ── World map pane ── */
+#map-pane{
+  position:relative;overflow:hidden;
+  background:var(--void);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+}
+#world-label{
+  padding:6px 10px;font-size:9px;letter-spacing:2px;color:var(--ink-3);
+  border-bottom:1px solid rgba(201,146,10,.08);text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+#world-label .wl-right{font-size:8px;color:var(--ink-3);}
+#map-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px;}
+#map-canvas{display:block;image-rendering:pixelated;}
+
+/* ── Event feed pane ── */
+#feed-pane{
+  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--deep);
+}
+#feed-head{
+  padding:6px 10px;font-size:9px;letter-spacing:2px;color:var(--ink-3);
+  border-bottom:1px solid var(--border);text-transform:uppercase;flex-shrink:0;
+  display:flex;justify-content:space-between;align-items:center;
+}
+#feed-count{font-size:8px;color:var(--ink-3);}
+#feed-body{flex:1;overflow-y:auto;padding:4px 0;}
+#feed-body::-webkit-scrollbar{width:3px;}
+#feed-body::-webkit-scrollbar-thumb{background:var(--border);}
+.feed-entry{
+  padding:4px 10px;font-size:9px;line-height:1.5;letter-spacing:.3px;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  display:grid;grid-template-columns:46px 1fr;gap:4px;
+}
+.feed-ts{color:var(--ink-3);font-size:8px;}
+.feed-msg{color:var(--ink-2);}
+.feed-entry.birth .feed-msg{color:#44bb88;}
+.feed-entry.battle .feed-msg{color:var(--amber);}
+.feed-entry.challenge .feed-msg{color:#ff9944;}
+.feed-entry.death .feed-msg{color:var(--rose);}
+.feed-entry.world .feed-msg{color:#4488ff;}
+.feed-entry.evolve .feed-msg{color:#cc44ff;}
+
+/* ── Status bar ── */
+#statusbar{
+  display:flex;align-items:center;gap:0;
+  background:var(--deep);border-top:1px solid var(--border);
+  padding:0 10px;
+}
+.stat-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:0 10px;height:100%;font-size:9px;color:var(--ink-3);
+  border-right:1px solid var(--border);letter-spacing:.5px;
+}
+.stat-pill .sk{color:var(--ink-3);}
+.stat-pill .sv{color:var(--amber);font-weight:600;}
+.stat-pill .sv.green{color:var(--green);}
+.stat-pill .sv.rose{color:var(--rose);}
+#bar-controls{margin-left:auto;display:flex;gap:4px;align-items:center;}
+.bar-btn{
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--ink-3);
+  background:transparent;border:1px solid var(--border);padding:3px 8px;
+  cursor:pointer;border-radius:1px;transition:all .1s;
+}
+.bar-btn:hover{color:var(--amber);border-color:var(--amber);}
+.bar-btn.active{color:var(--void);background:var(--amber);border-color:var(--amber);}
+</style>
+<script src="../../engines/substrate.js"></script>
+<script src="../../engines/battle-engine.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <div id="topbar">
+    <div class="pulse-dot" id="pulse-dot"></div>
+    <span id="brand">◉ EIDOLON ROUTER</span>
+    <span id="world-tag">world engine v1</span>
+    <span id="header-right" id="tick-count">tick 0</span>
+  </div>
+
+  <div id="main">
+    <div id="map-pane">
+      <div id="world-label">
+        <span id="world-label-text">WORLD 0x00000000 · epoch 1</span>
+        <span class="wl-right" id="world-pop">pop: 0</span>
+      </div>
+      <div id="map-canvas-wrap">
+        <canvas id="map-canvas"></canvas>
+      </div>
+    </div>
+    <div id="feed-pane">
+      <div id="feed-head">
+        <span>EVENT FEED</span>
+        <span class="feed-count" id="feed-count">0 events</span>
+      </div>
+      <div id="feed-body" id="feed-body"></div>
+    </div>
+  </div>
+
+  <div id="statusbar">
+    <div class="stat-pill"><span class="sk">POP</span><span class="sv" id="sv-pop">0</span></div>
+    <div class="stat-pill"><span class="sk">BATTLES</span><span class="sv" id="sv-battles">0</span></div>
+    <div class="stat-pill"><span class="sk">VICTORIES</span><span class="sv green" id="sv-wins">0</span></div>
+    <div class="stat-pill"><span class="sk">WORLDS</span><span class="sv" id="sv-worlds">0</span></div>
+    <div class="stat-pill"><span class="sk">CHALLENGES</span><span class="sv" style="color:#ff9944" id="sv-challenges">0</span></div>
+    <div id="bar-controls">
+      <button class="bar-btn" id="btn-slow">0.5×</button>
+      <button class="bar-btn active" id="btn-norm">1×</button>
+      <button class="bar-btn" id="btn-fast">3×</button>
+      <button class="bar-btn" id="btn-turbo">10×</button>
+      <button class="bar-btn" id="btn-pause">pause</button>
+    </div>
+  </div>
+
+</div>
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════════════
+   EIDOLON ROUTER — Infinite World Engine
+
+   SECTION 0: NEXUS ADAPTER
+   SECTION 1: WORLD SUBSTRATE (deterministic, mulberry32)
+   SECTION 2: CREATURE ENGINE (DNA→stats→moves, headless)
+   SECTION 3: POPULATION MANAGER
+   SECTION 4: WORLD WALKER (creature movement)
+   SECTION 5: BATTLE RESOLVER (headless simulation)
+   SECTION 6: GENERATION SYSTEM (mutation, evolution)
+   SECTION 7: CHALLENGER QUEUE (routes to Eidolon OS)
+   SECTION 8: VIBE INTEGRATION (library persistence)
+   SECTION 9: MAP RENDERER (world map canvas)
+   SECTION 10: FEED & STATS UI
+   SECTION 11: TICK LOOP
+   SECTION 12: BOOT
+*/
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 0 — NEXUS ADAPTER  ·  uses engines/nexus-block-client.js
+// ════════════════════════════════════════════════════════════════════
+
+let mounted = false;
+let totalEvents = 0;
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ['eidolon.challenger.appears','eidolon.world.tick','eidolon.battle.auto','vibe.save','vibe.list','vibe.load'],
+    consumes: ['eidolon.battle.result','vibe.result','eidolon.sim.speed'],
+    app: {
+      title: 'Eidolon Router',
+      icon: '◉',
+      description: 'World engine — infinite battles, procedural creatures',
+      visible: true
+    }
+  },
+  // vibe.result correlation is handled automatically by nx.request — only the
+  // domain-specific channels need explicit dispatch here.
+  onMessage({ channel, payload }) {
+    if (channel === 'eidolon.battle.result') {
+      onPlayerBattleResult(payload);
+      return;
+    }
+    if (channel === 'eidolon.sim.speed') {
+      // Mission Control (or any authorised block) can adjust tick rate live.
+      const ms = Number(payload && payload.tickIntervalMs);
+      if (!isFinite(ms) || ms < 5 || ms > 5000) return;
+      const buttonForMs = { 1200:'btn-slow', 600:'btn-norm', 200:'btn-fast', 50:'btn-turbo' };
+      const btnId = buttonForMs[ms] || 'btn-fast';
+      setSpeed(ms, btnId);
+      feedEntry('world', `tick interval → ${ms}ms (remote)`);
+    }
+  }
+});
+
+if (nx) {
+  nx.ready.then(() => {
+    nx.subscribe('eidolon.battle.result');
+    nx.subscribe('vibe.result');
+    nx.subscribe('eidolon.sim.speed');
+    mounted = true;
+    dot('green');
+    feedEntry('world', `Nexus mounted — routing active`);
+    setTimeout(loadLibraryCreatures, 2000);
+  });
+}
+
+function emit(channel, payload) {
+  if (nx && mounted) nx.emit(channel, payload);
+}
+
+// `call` is a thin wrapper preserving the previous API; nx.request() does
+// the work. Kept as a named function because lots of router code calls it.
+function call(channel, payload) {
+  if (!nx || !mounted) return Promise.reject(new Error('not mounted'));
+  return nx.request(channel, payload, { timeout: 8000 });
+}
+
+function dot(color) {
+  const d = document.getElementById('pulse-dot');
+  if (color === 'green') { d.style.background = '#1db954'; }
+  else if (color === 'red') { d.classList.add('red'); }
+  else { d.style.background = 'var(--amber)'; }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 1 — WORLD SUBSTRATE
+// ════════════════════════════════════════════════════════════════════
+
+<!-- substrate functions loaded via substrate.js -->
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 2 — CREATURE ENGINE (canonical battle-engine adapters)
+// ════════════════════════════════════════════════════════════════════
+
+const NAME_P=['PHAN','VEX','AETH','KRON','LUMI','ETH','ARC','SPEC','ZYN','NETH','GLYPH','OMNI'];
+const NAME_M=['TI','LA','VO','RU','NI','KA','MO','EL','SI','RA','PHI','SU'];
+const NAME_S=['EX','ON','IX','AR','UM','AN','OX','IS','OR','EN','AX','UR'];
+
+function requireBattleEngine() {
+  const engine = window.NexusBattleEngine;
+  if (!engine) throw new Error('NexusBattleEngine unavailable; load ../../engines/battle-engine.js before eidolon-router inline script');
+  return engine;
+}
+function routerStats(dna) { return requireBattleEngine().deriveStats(dna); }
+function routerMoves(dna) { return requireBattleEngine().deriveMoves(dna); }
+function routerTypes(dna) { return requireBattleEngine().deriveTypes(dna); }
+function makeName(dna){ return NAME_P[dna[0]%NAME_P.length]+NAME_M[dna[1]%NAME_M.length]+NAME_S[dna[2]%NAME_S.length]; }
+
+function makeHues(dna){
+  const base=(dna[0]/255)*360;
+  return[Math.round(base),Math.round((base+120+(dna[1]/255)*60)%360),Math.round((base+240+(dna[2]/255)*60)%360)];
+}
+
+function makeBoard(creature){
+  const base=routerStats(creature.dna);
+  return{
+    name:creature.name,dna:creature.dna,hues:creature.hues,
+    types:routerTypes(creature.dna),moves:routerMoves(creature.dna),
+    maxHp:base.maxHp,hp:base.maxHp,base,
+    atkSt:0,defSt:0,spASt:0,spDSt:0,spdSt:0,
+    status:null,dodging:false,accDown:false,
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 3 — POPULATION MANAGER
+// ════════════════════════════════════════════════════════════════════
+
+// Active world
+let world = null;
+
+// Creature registry: id → creature object
+const creatures = new Map();
+let creatureSeq = 0;
+
+function mkId(){ return 'c_'+(++creatureSeq).toString(36).padStart(4,'0'); }
+
+function spawnCreature(opts = {}) {
+  const dna   = opts.dna   || Array.from({length:16}, ()=>Math.floor(Math.random()*256));
+  const hues  = opts.hues  || makeHues(dna);
+  const name  = opts.name  || makeName(dna);
+  const gen   = opts.gen   || 1;
+  const x     = opts.x     !== undefined ? opts.x : Math.floor(Math.random()*world.width);
+  const y     = opts.y     !== undefined ? opts.y : Math.floor(Math.random()*world.height);
+
+  const c = {
+    id: mkId(),
+    dna, hues, name, gen,
+    x, y,
+    path: [{x,y}],
+    wins: opts.wins || 0,
+    losses: 0,
+    battles: 0,
+    hp: null,     // set after canonical stat derivation
+    maxHp: null,
+    board: null,  // lazy
+    pendingChallenge: false,
+    battling: false,
+    fromLibrary: !!opts.fromLibrary,
+    vibeId: opts.vibeId || null,
+    // Render
+    flashTimer: 0,
+    deathTimer: 0,
+  };
+
+  const base = routerStats(dna);
+  c.maxHp = base.maxHp;
+  c.hp = c.maxHp;
+
+  creatures.set(c.id, c);
+  STATS.population++;
+  return c;
+}
+
+function despawnCreature(id, reason) {
+  const c = creatures.get(id);
+  if (!c) return;
+  c.deathTimer = 1.0;
+  feedEntry('death', `${c.name} fainted · ${c.wins}W/${c.losses}L`);
+  creatures.delete(id);
+  STATS.population--;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 4 — WORLD WALKER
+// ════════════════════════════════════════════════════════════════════
+
+// Visited tile set per creature would be memory-heavy; use a global explored set
+const exploredTiles = new Set();
+
+function tileKey(x,y){ return `${x},${y}`; }
+
+function stepCreature(c) {
+  if (c.battling || c.pendingChallenge) return;
+
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  // Shuffle dirs
+  for(let i=dirs.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [dirs[i],dirs[j]]=[dirs[j],dirs[i]]; }
+
+  // Prefer unexplored tiles
+  let chosen = null;
+  for(const [dx,dy] of dirs){
+    const nx=c.x+dx, ny=c.y+dy;
+    if(nx<0||ny<0||nx>=world.width||ny>=world.height) continue;
+    if(!exploredTiles.has(tileKey(nx,ny))){ chosen=[nx,ny]; break; }
+  }
+  // Fallback: any valid tile
+  if(!chosen){
+    for(const [dx,dy] of dirs){
+      const nx=c.x+dx, ny=c.y+dy;
+      if(nx>=0&&ny>=0&&nx<world.width&&ny<world.height){ chosen=[nx,ny]; break; }
+    }
+  }
+  if(!chosen) return;
+
+  c.x=chosen[0]; c.y=chosen[1];
+  c.path.push({x:c.x,y:c.y});
+  if(c.path.length>50) c.path.shift();
+  exploredTiles.add(tileKey(c.x,c.y));
+}
+
+function checkEncounters() {
+  // Build tile→creatures map
+  const tileMap = new Map();
+  for(const c of creatures.values()){
+    const k=tileKey(c.x,c.y);
+    if(!tileMap.has(k)) tileMap.set(k,[]);
+    tileMap.get(k).push(c);
+  }
+
+  for(const [key,group] of tileMap.entries()){
+    if(group.length < 2) continue;
+    // Pick two that aren't already battling
+    const available = group.filter(c=>!c.battling&&!c.pendingChallenge);
+    if(available.length < 2) continue;
+    const [a,b] = available.slice(0,2);
+    a.battling=true; b.battling=true;
+    queueBattle(a,b);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 5 — BATTLE RESOLVER (canonical engine orchestration)
+// ════════════════════════════════════════════════════════════════════
+
+function toBattleEidolon(c) {
+  return {
+    id: c.id,
+    name: c.name,
+    payload: { dna: c.dna, hues: c.hues, name: c.name }
+  };
+}
+
+function chooseRouterMove(state) {
+  const moves = state && Array.isArray(state.moves) ? state.moves : [];
+  let best = 0;
+  let bestPower = -1;
+  for (let i=0; i<moves.length; i++) {
+    const power = Number(moves[i] && moves[i].power) || 0;
+    if (power > bestPower) { best = i; bestPower = power; }
+  }
+  return best;
+}
+
+async function routerTurnSeed(battleIndex, turn) {
+  const world_seed = world && world.seed !== undefined ? world.seed : null;
+  const hex = await sha256Hex(canonical({world_seed, battle_index:battleIndex, turn}));
+  return 'sha256:' + hex;
+}
+
+async function simulateBattle(cA, cB, opts = {}) {
+  const engine = requireBattleEngine();
+  const battleIndex = opts.battleIndex !== undefined ? opts.battleIndex : nextBattleIndex();
+  const battleSeed = opts.battleSeed || `router:${world && world.seed !== undefined ? world.seed : 'no-world'}:${battleIndex}`;
+  let { stateA, stateB } = engine.initBattle({
+    eidolonA: toBattleEidolon(cA),
+    eidolonB: toBattleEidolon(cB),
+    battleSeed
+  });
+
+  // Router world creatures carry persistent HP across encounters; canonical
+  // initializes from max HP, so the world shell overlays current HP only here.
+  if (cA.hp !== null && cA.hp !== undefined && Number.isFinite(Number(cA.hp))) stateA.hp = Math.max(0, Math.min(stateA.maxHp, Math.floor(Number(cA.hp))));
+  if (cB.hp !== null && cB.hp !== undefined && Number.isFinite(Number(cB.hp))) stateB.hp = Math.max(0, Math.min(stateB.maxHp, Math.floor(Number(cB.hp))));
+
+  let turns=0;
+  const moments=[];
+  while(!engine.isOver({stateA,stateB}) && turns<80){
+    turns++;
+    const moveA = chooseRouterMove(stateA);
+    const moveB = chooseRouterMove(stateB);
+    const r = engine.resolveTurn({
+      stateA,
+      stateB,
+      moveA,
+      moveB,
+      turnSeed: await routerTurnSeed(battleIndex, turns)
+    });
+    stateA = r.newStateA;
+    stateB = r.newStateB;
+    if(turns===1||turns===5||stateA.hp<stateA.maxHp*0.3||stateB.hp<stateB.maxHp*0.3){
+      moments.push(`T${turns}: ${stateA.name} ${stateA.hp}HP vs ${stateB.name} ${stateB.hp}HP`);
+    }
+  }
+
+  const over = engine.isOver({stateA,stateB});
+  const winner = over ? over.toLowerCase() : (stateA.hp >= stateB.hp ? 'a' : 'b');
+  return{
+    winner,
+    survivorHp: winner==='a'?stateA.hp:stateB.hp,
+    turns,
+    moments,
+    finalHp: {a:stateA.hp, b:stateB.hp},
+    battleIndex,
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 6 — GENERATION SYSTEM (mutation + evolution)
+// ════════════════════════════════════════════════════════════════════
+
+function mutate(dna, rate=0.08) {
+  return dna.map(b => {
+    if(Math.random()<rate){
+      const delta=Math.round((Math.random()-0.5)*60);
+      return Math.min(255,Math.max(0,b+delta));
+    }
+    return b;
+  });
+}
+
+function breed(dnaA, dnaB) {
+  // Uniform crossover
+  return dnaA.map((b,i) => Math.random()<0.5 ? b : dnaB[i]);
+}
+
+function evolveCreature(winner, loser) {
+  // Winner gets slight HP restore
+  winner.hp = Math.min(winner.maxHp, winner.hp + Math.floor(winner.maxHp * 0.25));
+
+  // After 5 wins: mutate to become slightly stronger
+  if(winner.wins >= 5 && winner.wins % 5 === 0){
+    const newDna = mutate(winner.dna, 0.06);
+    const newHues = makeHues(newDna);
+    winner.dna = newDna;
+    winner.hues = newHues;
+    // Recompute stats
+    const base=routerStats(newDna);
+    winner.maxHp=base.maxHp;
+    winner.hp=Math.min(winner.hp,winner.maxHp);
+    feedEntry('evolve', `${winner.name} evolved! Gen ${winner.gen+1}`);
+    winner.gen++;
+    STATS.evolves++;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 7 — BATTLE QUEUE & CHALLENGER SYSTEM
+// ════════════════════════════════════════════════════════════════════
+
+const STATS = {
+  population:0, battles:0, wins:0, losses:0,
+  challenges:0, worlds:0, evolves:0, tick:0
+};
+
+const battleQueue = [];
+let processingBattle = false;
+let worldBattleSeq = 0;
+function nextBattleIndex(){ return ++worldBattleSeq; }
+let awaitingPlayerResult = false;
+let challengerBattleCount = 0;
+const CHALLENGE_EVERY = 6;  // route every Nth auto-battle to OS
+
+function queueBattle(a, b) {
+  battleQueue.push({a, b});
+}
+
+async function processBattles() {
+  if(processingBattle || battleQueue.length===0) return;
+  processingBattle = true;
+
+  const {a,b} = battleQueue.shift();
+  const result = await simulateBattle(a, b);
+
+  const winner = result.winner==='a' ? a : b;
+  const loser  = result.winner==='a' ? b : a;
+
+  winner.wins++;
+  loser.losses++;
+  winner.battles++;
+  loser.battles++;
+  STATS.battles++;
+  STATS.wins++;
+
+  evolveCreature(winner, loser);
+  feedEntry('battle', `${winner.name} ⚔ ${loser.name} → ${winner.name} wins (${result.turns}t)`);
+
+  // Emit auto battle event
+  emit('eidolon.battle.auto', {
+    winner: {name:winner.name,dna:winner.dna,hues:winner.hues,wins:winner.wins},
+    loser:  {name:loser.name,dna:loser.dna,hues:loser.hues,wins:loser.wins},
+    turns: result.turns,
+  });
+
+  // Loser: despawn if too many losses, else restore partial HP and keep going
+  if(loser.losses >= 3){
+    // Save interesting losers before death
+    if(loser.wins >= 2) saveCreatureToLibrary(loser);
+    despawnCreature(loser.id, 'fainted');
+    loser.battling = false;
+  } else {
+    loser.hp = Math.floor(loser.maxHp * 0.3);
+    loser.battling = false;
+  }
+  winner.battling = false;
+
+  // Every N auto-battles: route one to Eidolon OS as player challenge
+  challengerBattleCount++;
+  if(challengerBattleCount >= CHALLENGE_EVERY && !awaitingPlayerResult){
+    challengerBattleCount = 0;
+    sendChallengerToOS(winner);
+  }
+
+  processingBattle = false;
+}
+
+function sendChallengerToOS(challenger) {
+  if(!mounted) return;
+  awaitingPlayerResult = true;
+  STATS.challenges++;
+  challenger.pendingChallenge = true;
+
+  feedEntry('challenge', `→ OS: ${challenger.name} sent as challenger (${challenger.wins}W)`);
+
+  emit('eidolon.challenger.appears', {
+    id:     challenger.id,
+    name:   challenger.name,
+    dna:    challenger.dna,
+    hues:   challenger.hues,
+    gen:    challenger.gen,
+    wins:   challenger.wins,
+    losses: challenger.losses,
+    battles:challenger.battles,
+  });
+}
+
+function onPlayerBattleResult(payload) {
+  awaitingPlayerResult = false;
+  const challenger = creatures.get(payload.enemyId);
+
+  if(payload.winner === 'player'){
+    feedEntry('battle', `OS player defeated challenger ${payload.enemyName||'?'}`);
+    if(challenger){ challenger.losses++; challenger.pendingChallenge=false; }
+  } else {
+    feedEntry('battle', `Challenger ${payload.enemyName||'?'} defeated OS player`);
+    if(challenger){ challenger.wins++; challenger.pendingChallenge=false; evolveCreature(challenger, challenger); }
+  }
+
+  // Repopulate if population is low
+  maintainPopulation();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 8 — VIBE INTEGRATION
+// ════════════════════════════════════════════════════════════════════
+
+let vibeSeq = 0;
+async function sha256Hex(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function canonical(v){
+  if(v===null||v===undefined)return JSON.stringify(v);
+  if(typeof v!=='object')return JSON.stringify(v);
+  if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';
+  return'{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';
+}
+
+async function saveCreatureToLibrary(c) {
+  if(!mounted) return;
+  try {
+    const payload={format:'eidolon-forge/1',name:c.name,savedAt:new Date().toISOString(),
+      gen:c.gen,wins:c.wins,worldSeed:world?.seed,
+      axes:c.dna.map((v,i)=>({id:`dna_${i}`,value:v,label:`dna[${i}]`,renamed:false}))
+    };
+    const hash=await sha256Hex(canonical(payload));
+    const id=`v_creature_${hash.slice(0,16)}`;
+    const envelope={format:'vibe/1',id,type:'creature',subFormat:'eidolon-forge/1',
+      name:c.name,tags:[`gen${c.gen}`,`wins${c.wins}`,`world_${(world?.seed||0).toString(16)}`],
+      parents:[],birthHash:`sha256:${hash}`,createdAt:new Date().toISOString(),
+      source:'eidolon-router',payload};
+    await call('vibe.save',{envelope});
+    c.vibeId=id;
+    feedEntry('world',`${c.name} saved to library (${c.wins}W)`);
+  } catch(e){ /* library not available */ }
+}
+
+async function loadLibraryCreatures() {
+  if(!mounted) return;
+  try {
+    const res=await call('vibe.list',{type:'creature'});
+    if(!res.ok||!res.data) return;
+    const items=res.data.slice(0,4); // load up to 4 saved creature summaries
+    for(const item of items){
+      const full=await call('vibe.load',{id:item.id});
+      const env=full && full.ok ? full.envelope : null;
+      const payload=env && env.payload;
+      if(!payload||!payload.axes) continue;
+      const dna=payload.axes.map(a=>a.value||0);
+      if(dna.length<16) continue;
+      const c=spawnCreature({dna,hues:makeHues(dna),name:env.name||item.name||makeName(dna),
+        gen:payload.gen||1,wins:payload.wins||0,fromLibrary:true,vibeId:item.id});
+      feedEntry('world',`Loaded ${c.name} from library (Gen ${c.gen})`);
+    }
+  } catch(e){ /* library not available */ }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 9 — MAP RENDERER
+// ════════════════════════════════════════════════════════════════════
+
+const mapCanvas = document.getElementById('map-canvas');
+const mapCtx = mapCanvas.getContext('2d');
+const TILE = 16; // pixels per tile
+
+function initMapCanvas() {
+  if(!world) return;
+  mapCanvas.width  = world.width  * TILE;
+  mapCanvas.height = world.height * TILE;
+}
+
+let mapAnimT = 0;
+function renderMap(dt) {
+  if(!world||!mapCanvas.width) return;
+  mapAnimT += dt;
+  const ctx=mapCtx, W=mapCanvas.width, H=mapCanvas.height;
+
+  // Background — void with subtle grid
+  ctx.fillStyle='#020304';
+  ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle='rgba(201,146,10,.06)';
+  ctx.lineWidth=0.5;
+  for(let x=0;x<=world.width;x++){
+    ctx.beginPath();ctx.moveTo(x*TILE,0);ctx.lineTo(x*TILE,H);ctx.stroke();
+  }
+  for(let y=0;y<=world.height;y++){
+    ctx.beginPath();ctx.moveTo(0,y*TILE);ctx.lineTo(W,y*TILE);ctx.stroke();
+  }
+
+  // Explored tiles
+  for(const key of exploredTiles){
+    const [x,y]=key.split(',').map(Number);
+    ctx.fillStyle='rgba(201,146,10,.04)';
+    ctx.fillRect(x*TILE,y*TILE,TILE,TILE);
+  }
+
+  // Creature-tile markers from world substrate (faint)
+  const subRng=mulberry32((world.seed^0xDEAD)>>>0);
+  for(let y=0;y<world.height;y++){
+    for(let x=0;x<world.width;x++){
+      if(generateAt(world.seed,x,y)){
+        ctx.fillStyle='rgba(201,146,10,.10)';
+        ctx.beginPath();
+        ctx.arc(x*TILE+TILE/2,y*TILE+TILE/2,1.2,0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
+
+  // Creature paths (trails)
+  for(const c of creatures.values()){
+    if(c.path.length<2) continue;
+    const hue=c.hues[0];
+    ctx.strokeStyle=`hsla(${hue},80%,55%,.15)`;
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(c.path[0].x*TILE+TILE/2,c.path[0].y*TILE+TILE/2);
+    for(let i=1;i<c.path.length;i++){
+      ctx.lineTo(c.path[i].x*TILE+TILE/2,c.path[i].y*TILE+TILE/2);
+    }
+    ctx.stroke();
+  }
+
+  // Creature dots
+  for(const c of creatures.values()){
+    const cx_=c.x*TILE+TILE/2, cy_=c.y*TILE+TILE/2;
+    const hue=c.hues[0];
+    const radius=c.pendingChallenge?5:(c.wins>5?4.5:3.5);
+
+    // Flash for battling
+    const alpha=c.battling?(0.6+Math.sin(mapAnimT*12)*0.4):0.85;
+
+    // Glow
+    const glow=mapCtx.createRadialGradient(cx_,cy_,0,cx_,cy_,radius*2.5);
+    glow.addColorStop(0,`hsla(${hue},90%,70%,${alpha*0.5})`);
+    glow.addColorStop(1,'transparent');
+    ctx.fillStyle=glow;
+    ctx.beginPath();ctx.arc(cx_,cy_,radius*2.5,0,Math.PI*2);ctx.fill();
+
+    // Core dot
+    ctx.fillStyle=`hsl(${hue},80%,${c.pendingChallenge?70:60}%)`;
+    ctx.shadowColor=`hsla(${hue},90%,65%,.8)`;
+    ctx.shadowBlur=c.pendingChallenge?8:4;
+    ctx.beginPath();ctx.arc(cx_,cy_,radius,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+
+    // Win count badge for champions
+    if(c.wins>=3){
+      ctx.fillStyle=`hsla(${hue},80%,90%,.9)`;
+      ctx.font='5px IBM Plex Mono';
+      ctx.textAlign='center';
+      ctx.fillText(c.wins.toString(),cx_,cy_-radius-1);
+    }
+  }
+
+  // Battle flash tiles
+  for(const c of creatures.values()){
+    if(c.battling){
+      ctx.fillStyle=`rgba(255,150,50,0.1)`;
+      ctx.fillRect(c.x*TILE,c.y*TILE,TILE,TILE);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 10 — FEED & STATS UI
+// ════════════════════════════════════════════════════════════════════
+
+let feedTotal = 0;
+function feedEntry(type, msg) {
+  feedTotal++;
+  const body = document.getElementById('feed-body');
+  const entry = document.createElement('div');
+  entry.className = `feed-entry ${type}`;
+  const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  entry.innerHTML = `<span class="feed-ts">${ts}</span><span class="feed-msg">${msg}</span>`;
+  body.appendChild(entry);
+  while(body.children.length > 200) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+  document.getElementById('feed-count').textContent = feedTotal + ' events';
+}
+
+function updateStats() {
+  document.getElementById('sv-pop').textContent      = creatures.size;
+  document.getElementById('sv-battles').textContent  = STATS.battles;
+  document.getElementById('sv-wins').textContent     = STATS.wins;
+  document.getElementById('sv-worlds').textContent   = STATS.worlds;
+  document.getElementById('sv-challenges').textContent = STATS.challenges;
+  document.getElementById('header-right').textContent = `tick ${STATS.tick}`;
+  document.getElementById('world-pop').textContent   = `pop: ${creatures.size}`;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 11 — TICK LOOP
+// ════════════════════════════════════════════════════════════════════
+
+const MIN_POP = 6;
+const MAX_POP = 20;
+let tickIntervalMs = 600;
+let paused = false;
+let tickTimer = null;
+let lastRafT = performance.now();
+let rafId = null;
+
+function maintainPopulation() {
+  if(creatures.size < MIN_POP){
+    const toSpawn = MIN_POP - creatures.size;
+    for(let i=0;i<toSpawn;i++){
+      // Try to spawn from unexplored world tile
+      let placed=false;
+      for(let attempt=0;attempt<30;attempt++){
+        const x=Math.floor(Math.random()*world.width);
+        const y=Math.floor(Math.random()*world.height);
+        const substrate=generateAt(world.seed,x,y);
+        if(substrate){
+          const c=spawnCreature({dna:substrate.dna,hues:makeHues(substrate.dna),x,y});
+          feedEntry('birth',`${c.name} born at (${x},${y})`);
+          placed=true; break;
+        }
+      }
+      if(!placed){
+        // Just random DNA
+        const c=spawnCreature({});
+        feedEntry('birth',`${c.name} wandered in`);
+      }
+    }
+  }
+}
+
+function maybeNewWorld() {
+  // If all creatures have visited most tiles, retire this world
+  if(exploredTiles.size > world.width*world.height*0.7){
+    spawnWorld();
+  }
+}
+
+function spawnWorld(seed) {
+  const s = seed || (Math.random()*0xFFFFFFFF>>>0);
+  world = {seed:s, epoch:1, width:20, height:15};
+  worldBattleSeq = 0;
+  exploredTiles.clear();
+  STATS.worlds++;
+  feedEntry('world',`World 0x${s.toString(16).padStart(8,'0')} spawned`);
+  document.getElementById('world-label-text').textContent=
+    `WORLD 0x${s.toString(16).toUpperCase().padStart(8,'0')} · epoch ${world.epoch}`;
+  initMapCanvas();
+  maintainPopulation();
+
+  // Emit world tick
+  emit('eidolon.world.tick', {seed:s, epoch:world.epoch, width:world.width, height:world.height,
+    population:creatures.size, battles:STATS.battles});
+}
+
+function tick() {
+  if(paused||!world) return;
+  STATS.tick++;
+
+  // Walk all creatures
+  for(const c of creatures.values()) stepCreature(c);
+
+  // Check encounters
+  checkEncounters();
+
+  // Process queued battles (one per tick)
+  processBattles();
+
+  // Maintain population
+  if(STATS.tick%10===0) maintainPopulation();
+
+  // Maybe save champions to library every 50 ticks
+  if(STATS.tick%50===0){
+    for(const c of creatures.values()){
+      if(c.wins>=3&&!c.vibeId) saveCreatureToLibrary(c);
+    }
+  }
+
+  // Maybe retire world
+  if(STATS.tick%100===0) maybeNewWorld();
+
+  // Update stats UI
+  updateStats();
+}
+
+function rafLoop() {
+  const now = performance.now();
+  const dt = Math.min((now-lastRafT)/1000, 0.1);
+  lastRafT = now;
+  renderMap(dt);
+  rafId = requestAnimationFrame(rafLoop);
+}
+
+function setSpeed(ms, activeBtn) {
+  tickIntervalMs = ms;
+  clearInterval(tickTimer);
+  if(!paused) tickTimer = setInterval(tick, tickIntervalMs);
+  document.querySelectorAll('.bar-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(activeBtn).classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 12 — BOOT
+// ════════════════════════════════════════════════════════════════════
+
+document.getElementById('btn-slow').onclick  = ()=>setSpeed(1200,'btn-slow');
+document.getElementById('btn-norm').onclick  = ()=>setSpeed(600, 'btn-norm');
+document.getElementById('btn-fast').onclick  = ()=>setSpeed(200, 'btn-fast');
+document.getElementById('btn-turbo').onclick = ()=>setSpeed(50,  'btn-turbo');
+document.getElementById('btn-pause').onclick = () => {
+  paused=!paused;
+  const btn=document.getElementById('btn-pause');
+  btn.textContent=paused?'resume':'pause';
+  btn.classList.toggle('active',paused);
+  clearInterval(tickTimer);
+  if(!paused) tickTimer=setInterval(tick,tickIntervalMs);
+  dot(paused?'red':'green');
+};
+
+
+window.__eidolonRouterTestHooks = {
+  simulateBattle,
+  chooseRouterMove,
+  routerTurnSeed,
+  _setWorldForTest(seed){ world = {seed, epoch:1, width:20, height:15}; worldBattleSeq = 0; },
+  _nextBattleIndex: nextBattleIndex,
+};
+
+function boot() {
+  feedEntry('world','EIDOLON ROUTER booting…');
+  feedEntry('world','Generating substrate…');
+
+  // Spawn first world
+  spawnWorld();
+
+  // Start tick
+  tickTimer = setInterval(tick, tickIntervalMs);
+
+  // Start render loop
+  rafLoop();
+
+  feedEntry('world',`World engine online · tick interval ${tickIntervalMs}ms`);
+  feedEntry('world','Awaiting Nexus mount for challenge routing…');
+
+  // Standalone mode: if no BOOT in 3s, self-contained mode
+  setTimeout(()=>{
+    if(!mounted){
+      feedEntry('world','Running standalone — no OS routing active');
+      dot('amber');
+    }
+  }, 3000);
+}
+
+boot();
+</script>
+</body>
+</html>

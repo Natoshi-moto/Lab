@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · WORLD BUILDER</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050508;--bg2:#0d0e14;--bg3:#151621;--line:#2a2a38;--line2:#44445c;
+  --text:#eeeaf6;--dim:#858394;--dim2:#525061;--accent:#ffcc44;--accent2:#aaeeff;--danger:#ff5566;--good:#76ffad;
+  --mono:'IBM Plex Mono','Cascadia Mono','SF Mono',Menlo,Consolas,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;overflow:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0,rgba(0,0,0,.10) 1px,transparent 1px,transparent 4px);pointer-events:none;z-index:1000}
+#app{height:100vh;display:grid;grid-template-rows:40px 1fr 36px;overflow:hidden}
+/* TOPBAR */
+#topbar{background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0}
+#brand{font-size:11px;letter-spacing:3px;font-weight:700;white-space:nowrap}#brand b{color:var(--accent)}
+#world-name{flex:0 0 200px;background:transparent;border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;letter-spacing:1px}
+#world-name:focus{outline:none;border-color:var(--accent)}
+#world-desc{flex:1 1 0;background:transparent;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:10px;padding:4px 8px}
+#world-desc:focus{outline:none;border-color:var(--line2);color:var(--text)}
+#status{margin-left:auto;color:var(--dim);font-size:10px;white-space:nowrap}
+/* THREE PANELS */
+#panels{display:grid;grid-template-columns:1fr 1fr 1fr;overflow:hidden}
+.panel{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden}
+.panel:last-child{border-right:none}
+.panel-head{padding:9px 12px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim2);border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg2);display:flex;align-items:center;gap:8px}
+.panel-head span{color:var(--dim);font-size:10px}
+.panel-tools{padding:8px 10px;border-bottom:1px solid var(--line);display:flex;gap:5px;flex-wrap:wrap;align-items:center;flex-shrink:0;background:var(--bg)}
+.panel-scroll{overflow-y:auto;flex:1 1 0}
+/* STATUS BAR */
+#statusbar{background:var(--bg2);border-top:1px solid var(--line);display:flex;align-items:center;padding:0 14px;gap:16px;font-size:9px;color:var(--dim);letter-spacing:.5px}
+#statusbar span{color:var(--dim2)}
+/* BUTTONS */
+.btn{font-family:inherit;font-size:10px;letter-spacing:.6px;color:var(--dim);background:transparent;border:1px solid var(--line);padding:5px 8px;border-radius:2px;cursor:pointer;text-transform:lowercase;transition:all .1s}
+.btn:hover{border-color:var(--line2);color:var(--text);background:var(--bg3)}
+.btn.primary{color:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent);color:#111}
+.btn.danger{color:var(--danger);border-color:var(--danger)}
+.btn-sm{font-family:inherit;font-size:10px;color:var(--dim2);background:transparent;border:1px solid var(--line);padding:2px 6px;border-radius:2px;cursor:pointer;transition:all .1s}
+.btn-sm:hover{color:var(--text);border-color:var(--line2)}
+.btn-sm.danger{color:var(--danger)}
+/* INPUTS */
+.inp{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 7px;border-radius:2px}
+.inp:focus{outline:none;border-color:var(--accent)}
+.inp-sm{background:var(--bg);border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:10px;padding:3px 5px;border-radius:2px}
+.inp-sm:focus{outline:none;border-color:var(--accent)}
+select.inp{cursor:pointer}
+/* REGISTRY */
+.reg-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);transition:background .1s}
+.reg-row:hover{background:var(--bg2)}
+.reg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mini-canvas{border-radius:2px;background:#06060a;flex-shrink:0}
+.reg-info{flex:1;min-width:0}
+.reg-name{font-size:11px;font-weight:700;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reg-sub{font-size:9px;color:var(--dim);margin-top:2px}
+.reg-chips{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
+.reg-actions{display:flex;gap:3px;flex-shrink:0}
+/* CHIPS */
+.chip{font-size:8px;letter-spacing:1px;text-transform:uppercase;border:1px solid currentColor;padding:1px 5px;border-radius:2px;background:rgba(255,255,255,.03)}
+/* CARDS */
+.card{margin:8px 10px;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.card-head{display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;background:var(--bg2);user-select:none;transition:background .1s}
+.card-head:hover{background:var(--bg3)}
+.card-title{font-size:10px;letter-spacing:1px;font-weight:700}
+.card-body{padding:10px;display:flex;flex-direction:column;gap:7px}
+.field-row{display:flex;align-items:center;gap:7px;font-size:9px;color:var(--dim2)}
+.field-row label{flex:0 0 64px;text-align:right;text-transform:uppercase;letter-spacing:.5px;font-size:9px}
+/* TYPE TOGGLES */
+.type-toggles{display:flex;gap:3px;flex-wrap:wrap}
+.type-toggle{font-family:inherit;font-size:8px;letter-spacing:.8px;text-transform:uppercase;padding:2px 6px;border:1px solid var(--line);background:transparent;color:var(--dim2);cursor:pointer;border-radius:2px;transition:all .1s}
+.type-toggle.active{background:rgba(var(--tc,255,255,255),.15);color:var(--tc);border-color:var(--tc)}
+/* TEAM ROWS */
+.team-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--line);font-size:10px}
+.team-row:last-child{border-bottom:none}
+.team-name{flex:1;font-weight:700;letter-spacing:.8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* SECTION DIVIDERS */
+.section-div{padding:8px 12px 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim2);border-bottom:1px solid var(--line);background:var(--bg)}
+/* STARTERS */
+#starters-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px}
+.starter-slot{border:1px solid var(--line);padding:8px;display:flex;flex-direction:column;align-items:center;gap:5px;border-radius:2px;background:var(--bg2)}
+.starter-slot canvas{border-radius:2px}
+.starter-name{font-size:9px;letter-spacing:1px;text-align:center;overflow:hidden;text-overflow:ellipsis;width:100%}
+/* EVOLUTION ROWS */
+.evo-row{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--line);font-size:10px}
+.evo-arrow{color:var(--dim2)}
+.evo-cond{color:var(--dim);font-size:9px;margin-left:2px}
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(4px)}
+#modal-overlay.show{display:flex}
+#modal{background:var(--bg2);border:1px solid var(--line2);width:480px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;border-radius:2px}
+#modal-title{padding:12px 14px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);flex-shrink:0}
+#modal-content{overflow-y:auto;flex:1;padding:0}
+#modal-footer{padding:10px 14px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:6px;flex-shrink:0}
+/* PICKER ROWS */
+.picker-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .1s}
+.picker-row:hover{background:var(--bg3)}
+.picker-name{font-size:11px;font-weight:700;letter-spacing:1px}
+.picker-sub{font-size:9px;color:var(--dim);margin-top:2px}
+.picker-chips{display:flex;gap:3px;margin-top:2px}
+/* WARNINGS */
+#warnings{display:none;background:rgba(255,85,102,.08);border-bottom:2px solid var(--danger);padding:8px 14px;font-size:9px;color:var(--danger);line-height:1.7;flex-shrink:0}
+#warnings .w-close{float:right;cursor:pointer;color:var(--danger);font-size:12px}
+/* DROP */
+.drop{position:fixed;inset:0;background:rgba(5,5,8,.92);border:3px dashed var(--accent);display:none;align-items:center;justify-content:center;z-index:999;color:var(--accent);font-size:20px;letter-spacing:4px}
+.drop.show{display:flex}
+/* TOAST */
+.toast{position:fixed;left:50%;bottom:50px;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--line2);padding:7px 14px;opacity:0;transition:opacity .15s;z-index:999;font-size:10px;letter-spacing:.5px}
+.toast.show{opacity:1}
+input[type=file]{display:none}
+/* SCROLLBARS */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--line2)}
+/* ADD FORM */
+.add-form{padding:10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div id="brand">🌍 <b>EIDOLON</b> WORLD BUILDER</div>
+    <input id="world-name" placeholder="World name..." maxlength="80" oninput="onWorldMeta()" />
+    <input id="world-desc" placeholder="Lore / description (max 280 chars)..." maxlength="280" oninput="onWorldMeta()" />
+    <div id="status">ready</div>
+    <div style="display:flex;gap:5px">
+      <button class="btn primary" onclick="exportWorld()">export .world.json</button>
+      <button class="btn" onclick="exportRoster()">export roster</button>
+      <button class="btn" onclick="$('file-import').click()">import</button>
+      <input id="file-import" type="file" accept=".json,application/json" onchange="handleImport(event)">
+    </div>
+  </div>
+  <div id="panels">
+    <!-- REGISTRY -->
+    <div class="panel" id="panel-registry">
+      <div class="panel-head">Registry <span id="reg-count">0</span></div>
+      <div class="panel-tools">
+        <input class="inp" id="reg-search" placeholder="search..." style="flex:1" oninput="renderRegistry()">
+        <select class="inp" id="reg-sort" style="flex:0 0 100px" onchange="renderRegistry()">
+          <option value="name">A-Z</option>
+          <option value="stats">BST ↓</option>
+          <option value="type">type</option>
+          <option value="catch">catch rate</option>
+        </select>
+        <button class="btn" onclick="showRosterPicker()">+ roster</button>
+        <button class="btn" onclick="addRandomCreature()">+ random</button>
+      </div>
+      <div id="warnings">
+        <span class="w-close" onclick="$('warnings').style.display='none'">✕</span>
+        <div id="warnings-list"></div>
+      </div>
+      <div class="panel-scroll" id="registry-list"></div>
+    </div>
+    <!-- GYMS -->
+    <div class="panel" id="panel-gyms">
+      <div class="panel-head">Gyms <span id="gym-count">0</span></div>
+      <div class="panel-tools">
+        <button class="btn" onclick="addGym()">+ new gym</button>
+      </div>
+      <div class="panel-scroll" id="gym-list"></div>
+    </div>
+    <!-- ROUTES & EXTRAS -->
+    <div class="panel" id="panel-extras">
+      <div class="panel-head">Routes &amp; Extras</div>
+      <div class="panel-tools">
+        <button class="btn" onclick="addRoute()">+ new route</button>
+      </div>
+      <div class="panel-scroll" id="extras-scroll">
+        <div id="route-list"></div>
+        <div class="section-div">Starters — player picks 1 of 3</div>
+        <div id="starters-grid"></div>
+        <div class="section-div">Evolution Chains</div>
+        <div id="evo-list"></div>
+        <div style="padding:8px 10px">
+          <button class="btn" onclick="showEvoForm()">+ add evolution chain</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="statusbar">
+    <div id="sb-counts"></div>
+    <span>·</span>
+    <div id="sb-save">not saved</div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="closeModal()">
+  <div id="modal" onclick="event.stopPropagation()">
+    <div id="modal-title"></div>
+    <div id="modal-content"></div>
+    <div id="modal-footer">
+      <button class="btn" onclick="closeModal()">close</button>
+    </div>
+  </div>
+</div>
+
+<div class="drop" id="drop">DROP .world.json / .creature.json</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+const KEY_ROSTER = 'eidolon:roster:v1';
+const KEY_WORLD  = 'eidolon:world:v1';
+
+const TYPE_COLOR = {TOXIC:'#cc44ff',SPECTRAL:'#33eeff',WILD:'#44ff88',IRON:'#8899cc',VOID:'#5566ff',ANCIENT:'#ffaa44',LIGHT:'#ffdd33',SHADOW:'#aa55cc'};
+const TYPE_LIST  = Object.keys(TYPE_COLOR);
+const TERRAIN_COLORS = {fire:'#ff6633',forest:'#44cc66',cave:'#8866aa',water:'#33aaff',ruins:'#ccaa55',void:'#5544ff'};
+const TERRAINS   = Object.keys(TERRAIN_COLORS);
+const RARITIES   = ['common','uncommon','rare','legendary'];
+
+// ── UTILITIES ────────────────────────────────────────────────────────────────
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function $(id){return document.getElementById(id)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function statsTotal(c){const s=c.baseStats||{};return(s.hp||0)+(s.atk||0)+(s.def||0)+(s.spAtk||0)+(s.spDef||0)+(s.spd||0)}
+function toast(msg,dur=2200){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),dur);$('status').textContent=msg}
+function timeSince(ts){if(!ts)return'never';const s=Math.floor((Date.now()-ts)/1000);if(s<5)return'just now';if(s<60)return s+'s ago';return Math.floor(s/60)+'m ago'}
+
+// ── STORAGE ──────────────────────────────────────────────────────────────────
+function sharedRead(key){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null}catch{return null}}
+function sharedWrite(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch(e){toast('storage error: '+e.message)}}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let roster   = sharedRead(KEY_ROSTER)||[];
+let world    = sharedRead(KEY_WORLD)||newWorld();
+let lastSave = world.updatedAt||null;
+let saveTimer, sbTimer;
+let gymExpanded   = new Set(world.gyms.map(g=>g.id));
+let routeExpanded = new Set(world.routes.map(r=>r.id));
+let modalCtx = null;
+const t0 = performance.now();
+const creaturePool = new Map(); // id → render proxy
+
+function newWorld(){
+  return {format:'eidolon-world/1',id:uid(),name:'',description:'',version:'0.1.0',
+    createdAt:Date.now(),updatedAt:Date.now(),registry:[],gyms:[],routes:[],starters:[],evolutions:[]};
+}
+function saveWorld(){
+  world.updatedAt = Date.now();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{sharedWrite(KEY_WORLD,world);lastSave=Date.now();updateStatusBar();},400);
+}
+
+// ── RENDERING — verbatim from eidolon-battle-theatre.html ────────────────────
+function mulberry32(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let r=s;r=Math.imul(r^(r>>>15),r|1);r^=r+Math.imul(r^(r>>>7),r|61);return((r^(r>>>14))>>>0)/4294967296}}
+
+function renderCreatureOn(ctx,b,x,y,size,t,flip=false,hit=0){ctx.save();ctx.translate(x,y);if(flip)ctx.scale(-1,1);const dna=b.dna,hues=b.hues;const baseR=size*(.18+dna[0]/255*.08),pulse=Math.sin(t*(.5+dna[4]/255*1.2))*.5+.5;const ecy=Math.sin(t*.9)*baseR*.05;const nT=2+Math.floor(dna[1]/255*5),len=baseR*(1+dna[2]/255*1.4),wob=dna[3]/255*.45;let glowR=baseR*(2.1+dna[14]/255*2);let ag=ctx.createRadialGradient(0,ecy,0,0,ecy,glowR);ag.addColorStop(0,`hsla(${hues[0]},80%,55%,${.16*(1+pulse*.3)})`);ag.addColorStop(1,'transparent');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(0,ecy,glowR,0,Math.PI*2);ctx.fill();for(let i=0;i<nT;i++){let a=i/nT*Math.PI*2+Math.sin(t*.5+i*.7)*wob,tx=Math.cos(a)*len,ty=ecy+Math.sin(a)*len*.85,cx=Math.cos(a+.3)*len*.5,cy=ecy+Math.sin(a+.3)*len*.45,tw=4+dna[(i+3)%16]/255*5;ctx.lineCap='round';ctx.strokeStyle='rgba(0,0,0,.9)';ctx.lineWidth=tw+4;ctx.beginPath();ctx.moveTo(0,ecy);ctx.quadraticCurveTo(cx,cy,tx,ty);ctx.stroke();ctx.strokeStyle=`hsla(${hues[i%3]},80%,60%,.78)`;ctx.lineWidth=tw;ctx.beginPath();ctx.moveTo(0,ecy);ctx.quadraticCurveTo(cx,cy,tx,ty);ctx.stroke()}let pts=[];for(let i=0;i<10;i++){let a=i/10*Math.PI*2-Math.PI/2,n=Math.sin(t*.85+i*.95)*(2+dna[3]/255*5);pts.push([Math.cos(a)*(baseR+n),ecy+Math.sin(a)*(baseR+n)])}function path(){ctx.beginPath();for(let i=0;i<pts.length;i++){let p0=pts[(i-1+10)%10],p1=pts[i],p2=pts[(i+1)%10],p3=pts[(i+2)%10],c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];if(!i)ctx.moveTo(p1[0],p1[1]);ctx.bezierCurveTo(c1[0],c1[1],c2[0],c2[1],p2[0],p2[1])}ctx.closePath()}path();ctx.fillStyle=`hsl(${hues[0]},65%,${47+hit*35}%)`;ctx.fill();path();ctx.lineWidth=5;ctx.strokeStyle='rgba(0,0,0,.92)';ctx.stroke();ctx.save();path();ctx.clip();let sg=ctx.createLinearGradient(0,-baseR,0,baseR);sg.addColorStop(.45,'transparent');sg.addColorStop(1,'rgba(0,0,0,.46)');ctx.fillStyle=sg;ctx.fillRect(-baseR*2,-baseR*2,baseR*4,baseR*4);ctx.restore();for(let e=-1;e<=1;e+=2){let ex=e*baseR*.32,ey=ecy-baseR*.14,er=baseR*.2;ctx.fillStyle=`hsl(${hues[2]},18%,93%)`;ctx.strokeStyle='rgba(0,0,0,.82)';ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(ex,ey,er,er,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#030305';ctx.beginPath();ctx.arc(ex+Math.sin(t*.55)*2,ey,er*.38,0,Math.PI*2);ctx.fill()}let cg=ctx.createRadialGradient(0,ecy,0,0,ecy,baseR*.6);cg.addColorStop(0,`hsla(${hues[2]},95%,90%,.75)`);cg.addColorStop(1,'transparent');ctx.fillStyle=cg;ctx.beginPath();ctx.arc(0,ecy,baseR*.65,0,Math.PI*2);ctx.fill();ctx.restore()}
+
+// ── RENDER PROXY ──────────────────────────────────────────────────────────────
+function getRenderProxy(creature){
+  let dna;
+  if(creature._dna16){dna=creature._dna16;}
+  else if(Array.isArray(creature.dna)){
+    dna=creature.dna.length>=16?creature.dna.slice(0,16):[...creature.dna,...Array(Math.max(0,16-creature.dna.length)).fill(128)];
+  } else {
+    const d=creature.dna||{};
+    dna=[d.body_radius??128,d.arm_count??100,d.body_radius??120,d.body_lumpiness??100,
+      d.saturation??150,d.lightness??128,d.particle_count??128,d.eye_count??128,
+      d.hue_primary??128,d.hue_accent??100,d.hue_glow??180,128,128,128,d.glow_radius??200,128];
+  }
+  return{dna,hues:creature.hues||[120,200,300]};
+}
+function getProxy(id){
+  if(creaturePool.has(id))return creaturePool.get(id);
+  const c=world.registry.find(x=>x.id===id)||roster.find(x=>x.id===id);
+  if(!c)return null;
+  const p=getRenderProxy(c);creaturePool.set(id,p);return p;
+}
+
+// ── MAKE RANDOM CREATURE ──────────────────────────────────────────────────────
+function makeRandomCreature(){
+  const r=mulberry32(Date.now()^(Math.random()*0xffffffff>>>0));
+  const _dna16=Array.from({length:16},()=>Math.floor(r()*256));
+  const dna={body_radius:_dna16[0],arm_count:_dna16[1],body_lumpiness:_dna16[3],
+    saturation:_dna16[4],lightness:_dna16[5],glow_radius:_dna16[14],
+    hue_primary:_dna16[8],hue_accent:_dna16[9],hue_glow:_dna16[10],
+    particle_count:_dna16[6],eye_count:_dna16[7]};
+  const hues=[Math.round(_dna16[8]/255*359),Math.round(_dna16[9]/255*359),Math.round(_dna16[10]/255*359)];
+  const nameR=mulberry32(_dna16[0]*17+_dna16[1]);
+  const P=['PHAN','VEX','AETH','KRON','LUMI','ETH','ARC','SPEC','ZYN','NETH'];
+  const M=['TI','LA','VO','RU','NI','KA','MO','EL','SI','RA'];
+  const S=['EX','ON','IX','AR','UM','AN','OX','IS','OR','EN'];
+  const name=P[Math.floor(nameR()*P.length)]+M[Math.floor(nameR()*M.length)]+S[Math.floor(nameR()*S.length)];
+  const h=hues[0];
+  const types=[h<45?'TOXIC':h<90?'WILD':h<150?'SPECTRAL':h<210?'IRON':h<270?'VOID':h<315?'SHADOW':'ANCIENT'];
+  return{format:'eidolon-creature/1',id:uid(),name,species:'Unknown Species',flavor:'',catchRate:128,
+    dna,seed:null,hues,types,ability:{id:'pressure',name:'Pressure',desc:'drains extra PP from enemy moves'},
+    baseStats:{hp:60,atk:50,def:50,spAtk:50,spDef:50,spd:50},
+    moves:[
+      {name:'PULSE',type:'SPECTRAL',cat:'special',power:40,accuracy:100,pp:20,effect:null,desc:'reliable 40'},
+      {name:'STRIKE',type:'WILD',cat:'physical',power:45,accuracy:95,pp:20,effect:null,desc:'solid physical'},
+      {name:'SHIELD',type:'IRON',cat:'status',power:null,accuracy:100,pp:10,effect:'defUp2',desc:'raise def'},
+      {name:'MEND',type:'LIGHT',cat:'status',power:null,accuracy:100,pp:10,effect:'heal25',desc:'restore 25%'},
+    ],evolvesInto:null,evolvesFrom:null,createdAt:Date.now(),source:'world-builder-generated',_dna16};
+}
+
+// ── TYPE CHIP HELPER ──────────────────────────────────────────────────────────
+function typeChips(types){return(types||[]).map(t=>`<span class="chip" style="color:${TYPE_COLOR[t]||'#888'};border-color:${TYPE_COLOR[t]||'#888'}55">${esc(t)}</span>`).join('')}
+
+// ── REGISTRY PANEL ────────────────────────────────────────────────────────────
+function renderRegistry(){
+  let list=[...world.registry];
+  const q=($('reg-search').value||'').toLowerCase();
+  const sort=$('reg-sort').value;
+  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q));
+  if(sort==='name')list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==='stats')list.sort((a,b)=>statsTotal(b)-statsTotal(a));
+  else if(sort==='type')list.sort((a,b)=>((a.types||[''])[0]).localeCompare((b.types||[''])[0]));
+  else if(sort==='catch')list.sort((a,b)=>(b.catchRate||0)-(a.catchRate||0));
+  $('reg-count').textContent=world.registry.length;
+  $('registry-list').innerHTML=list.map(c=>{
+    const col=TYPE_COLOR[(c.types||[])[0]]||'#525061';
+    return`<div class="reg-row">
+      <div class="reg-dot" style="background:${col}"></div>
+      <canvas class="mini-canvas" width="48" height="48" data-cid="${esc(c.id)}"></canvas>
+      <div class="reg-info">
+        <div class="reg-name">${esc(c.name)}</div>
+        <div class="reg-sub">${esc(c.species||'Unknown')} · BST ${statsTotal(c)}</div>
+        <div class="reg-chips">${typeChips(c.types)}</div>
+      </div>
+      <div class="reg-actions">
+        <button class="btn-sm danger" onclick="removeFromRegistry('${esc(c.id)}')" title="remove">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function addRandomCreature(){
+  if(world.registry.length>=200)toast('registry 200+ — consider trimming');
+  const c=makeRandomCreature();
+  world.registry.push(c);creaturePool.delete(c.id);
+  saveWorld();renderRegistry();updateStatusBar();toast('generated '+c.name);
+}
+function removeFromRegistry(id){
+  const uses=checkInUse(id);
+  if(uses.length&&!confirm(`Used in: ${uses.join(', ')}. Remove anyway?`))return;
+  world.registry=world.registry.filter(c=>c.id!==id);creaturePool.delete(id);
+  saveWorld();renderRegistry();renderGyms();renderRoutes();renderStarters();updateStatusBar();
+}
+function checkInUse(id){
+  const u=[];
+  world.gyms.forEach(g=>{if(g.team.some(m=>m.creatureId===id))u.push('Gym: '+(g.name||'unnamed'))});
+  world.routes.forEach(r=>{if(r.encounters.some(e=>e.creatureId===id))u.push('Route: '+(r.name||'unnamed'))});
+  if(world.starters.includes(id))u.push('Starters');return u;
+}
+
+// ── GYM PANEL ─────────────────────────────────────────────────────────────────
+function addGym(){
+  const g={id:uid(),order:world.gyms.length+1,name:'',leader:'',badge:'',badgeDesc:'',
+    specialization:[],team:[],rewardMoney:1000,introText:'',defeatText:'',locationName:''};
+  world.gyms.push(g);gymExpanded.add(g.id);
+  saveWorld();renderGyms();updateStatusBar();
+}
+function renderGyms(){
+  $('gym-count').textContent=world.gyms.length;
+  $('gym-list').innerHTML=world.gyms.map((gym,idx)=>{
+    const tcol=TYPE_COLOR[gym.specialization[0]]||'#2a2a38';
+    const exp=gymExpanded.has(gym.id);
+    const specChips=TYPE_LIST.map(t=>{
+      const on=gym.specialization.includes(t);
+      const col=(TYPE_COLOR[t]||'#888').replace('#','');
+      return`<button class="type-toggle${on?' active':''}" style="--tc:${TYPE_COLOR[t]||'#888'}" onclick="toggleGymSpec('${esc(gym.id)}','${t}')">${t}</button>`;
+    }).join('');
+    const teamRows=gym.team.map((m,ti)=>{
+      const c=world.registry.find(x=>x.id===m.creatureId);
+      return`<div class="team-row">
+        ${c?`<canvas class="mini-canvas" width="32" height="32" data-cid="${esc(m.creatureId)}"></canvas>`:`<div style="width:32px;height:32px;background:#1a1a22;border:1px solid var(--danger)22;border-radius:2px"></div>`}
+        <span class="team-name" style="${c?'':'color:var(--danger)'}">
+          ${c?esc(c.name):'missing'}
+        </span>
+        ${c?typeChips(c.types):''}
+        <input class="inp-sm" type="number" min="1" max="100" value="${m.level||1}" style="width:48px"
+          onchange="setGymTeamLevel('${esc(gym.id)}',${ti},this.value)">
+        <button class="btn-sm danger" onclick="removeGymMember('${esc(gym.id)}',${ti})">×</button>
+      </div>`;
+    }).join('');
+    return`<div class="card" style="border-left:3px solid ${tcol}33">
+      <div class="card-head" onclick="toggleGymExpand('${esc(gym.id)}')">
+        <span class="card-title">GYM ${gym.order}${gym.name?' · '+esc(gym.name):''}</span>
+        <span style="color:var(--dim);font-size:9px;margin-left:4px">${gym.team.length} creature${gym.team.length!==1?'s':''}</span>
+        <div style="display:flex;gap:3px;margin-left:auto">
+          <button class="btn-sm" onclick="event.stopPropagation();moveGym('${esc(gym.id)}',-1)">↑</button>
+          <button class="btn-sm" onclick="event.stopPropagation();moveGym('${esc(gym.id)}',1)">↓</button>
+          <button class="btn-sm danger" onclick="event.stopPropagation();removeGym('${esc(gym.id)}')">×</button>
+        </div>
+      </div>
+      ${exp?`<div class="card-body">
+        <div class="field-row"><label>name</label><input class="inp" value="${esc(gym.name)}" placeholder="Gym name..." oninput="setGymF('${esc(gym.id)}','name',this.value)"></div>
+        <div class="field-row"><label>leader</label><input class="inp" value="${esc(gym.leader)}" placeholder="Leader name..." oninput="setGymF('${esc(gym.id)}','leader',this.value)"></div>
+        <div class="field-row"><label>badge</label><input class="inp" value="${esc(gym.badge)}" placeholder="Badge name..." oninput="setGymF('${esc(gym.id)}','badge',this.value)"></div>
+        <div class="field-row"><label>location</label><input class="inp" value="${esc(gym.locationName)}" placeholder="Location..." oninput="setGymF('${esc(gym.id)}','locationName',this.value)"></div>
+        <div class="field-row"><label>reward</label><input class="inp-sm" type="number" value="${gym.rewardMoney}" style="width:80px" onchange="setGymF('${esc(gym.id)}','rewardMoney',+this.value)"> coins</div>
+        <div class="field-row"><label>types</label><div class="type-toggles">${specChips}</div></div>
+        <div class="field-row"><label>intro</label><input class="inp" value="${esc(gym.introText)}" placeholder="Intro text shown before battle..." oninput="setGymF('${esc(gym.id)}','introText',this.value)"></div>
+        <div class="field-row"><label>defeat</label><input class="inp" value="${esc(gym.defeatText)}" placeholder="Text shown after player wins..." oninput="setGymF('${esc(gym.id)}','defeatText',this.value)"></div>
+        <div style="border-top:1px solid var(--line);padding-top:7px;margin-top:2px;font-size:9px;color:var(--dim2);letter-spacing:1px;text-transform:uppercase">Team</div>
+        <div>${teamRows}</div>
+        ${gym.team.length<6?`<button class="btn" onclick="openPicker('gym-team','${esc(gym.id)}')">+ add creature</button>`:'<div style="font-size:9px;color:var(--dim)">team full (6/6)</div>'}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function toggleGymExpand(id){gymExpanded.has(id)?gymExpanded.delete(id):gymExpanded.add(id);renderGyms()}
+function moveGym(id,dir){
+  const i=world.gyms.findIndex(g=>g.id===id);const j=i+dir;
+  if(j<0||j>=world.gyms.length)return;
+  [world.gyms[i],world.gyms[j]]=[world.gyms[j],world.gyms[i]];
+  world.gyms.forEach((g,k)=>g.order=k+1);saveWorld();renderGyms();
+}
+function removeGym(id){if(!confirm('Delete this gym?'))return;world.gyms=world.gyms.filter(g=>g.id!==id);world.gyms.forEach((g,k)=>g.order=k+1);saveWorld();renderGyms();updateStatusBar();}
+function setGymF(id,field,val){const g=world.gyms.find(x=>x.id===id);if(g){g[field]=val;saveWorld();}if(field==='name')renderGyms();}
+function toggleGymSpec(id,type){
+  const g=world.gyms.find(x=>x.id===id);if(!g)return;
+  const i=g.specialization.indexOf(type);
+  if(i>=0)g.specialization.splice(i,1);else g.specialization.push(type);
+  saveWorld();renderGyms();
+}
+function setGymTeamLevel(gymId,ti,val){const g=world.gyms.find(x=>x.id===gymId);if(g&&g.team[ti])g.team[ti].level=Math.max(1,Math.min(100,+val||1));saveWorld();}
+function removeGymMember(gymId,ti){const g=world.gyms.find(x=>x.id===gymId);if(g){g.team.splice(ti,1);saveWorld();renderGyms();}}
+
+// ── ROUTES PANEL ──────────────────────────────────────────────────────────────
+function addRoute(){
+  const r={id:uid(),name:'New Route',description:'',terrain:'forest',encounters:[]};
+  world.routes.push(r);routeExpanded.add(r.id);
+  saveWorld();renderRoutes();updateStatusBar();
+}
+function renderRoutes(){
+  $('route-list').innerHTML=world.routes.map((route,idx)=>{
+    const tcol=TERRAIN_COLORS[route.terrain]||'#2a2a38';
+    const exp=routeExpanded.has(route.id);
+    const terrBtns=TERRAINS.map(t=>`<button class="type-toggle${route.terrain===t?' active':''}" style="--tc:${TERRAIN_COLORS[t]}" onclick="setRouteTerrain('${esc(route.id)}','${t}')">${t}</button>`).join('');
+    const encRows=route.encounters.map((e,ei)=>{
+      const c=world.registry.find(x=>x.id===e.creatureId);
+      return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)">
+        <span style="font-size:9px;color:${tcol}">◆</span>
+        ${c?`<canvas class="mini-canvas" width="24" height="24" data-cid="${esc(e.creatureId)}"></canvas>`:''}
+        <span style="flex:1;font-size:10px;font-weight:700;${c?'':'color:var(--danger)'}">${c?esc(c.name):'missing'}</span>
+        <select class="inp-sm" onchange="setEncounterRarity('${esc(route.id)}',${ei},this.value)">
+          ${RARITIES.map(r=>`<option${e.rarity===r?' selected':''}>${r}</option>`).join('')}
+        </select>
+        <button class="btn-sm danger" onclick="removeEncounter('${esc(route.id)}',${ei})">×</button>
+      </div>`;
+    }).join('');
+    return`<div class="card" style="border-left:3px solid ${tcol}55">
+      <div class="card-head" onclick="toggleRouteExpand('${esc(route.id)}')">
+        <span class="card-title" style="color:${tcol}">${esc(route.name||'unnamed route')}</span>
+        <span style="color:var(--dim);font-size:9px;margin-left:6px">${route.terrain} · ${route.encounters.length} enc.</span>
+        <button class="btn-sm danger" style="margin-left:auto" onclick="event.stopPropagation();removeRoute('${esc(route.id)}')">×</button>
+      </div>
+      ${exp?`<div class="card-body">
+        <div class="field-row"><label>name</label><input class="inp" value="${esc(route.name)}" placeholder="Route name..." oninput="setRouteF('${esc(route.id)}','name',this.value)"></div>
+        <div class="field-row"><label>desc</label><input class="inp" value="${esc(route.description)}" placeholder="Description..." oninput="setRouteF('${esc(route.id)}','description',this.value)"></div>
+        <div class="field-row"><label>terrain</label><div class="type-toggles">${terrBtns}</div></div>
+        <div style="font-size:9px;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-top:2px">Encounters</div>
+        <div>${encRows}</div>
+        <button class="btn" onclick="openPicker('route-enc','${esc(route.id)}')">+ add encounter</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function toggleRouteExpand(id){routeExpanded.has(id)?routeExpanded.delete(id):routeExpanded.add(id);renderRoutes();}
+function removeRoute(id){if(!confirm('Delete this route?'))return;world.routes=world.routes.filter(r=>r.id!==id);saveWorld();renderRoutes();updateStatusBar();}
+function setRouteF(id,field,val){const r=world.routes.find(x=>x.id===id);if(r){r[field]=val;saveWorld();}if(field==='name')renderRoutes();}
+function setRouteTerrain(id,terrain){const r=world.routes.find(x=>x.id===id);if(r){r.terrain=terrain;saveWorld();renderRoutes();}}
+function setEncounterRarity(routeId,ei,rarity){const r=world.routes.find(x=>x.id===routeId);if(r&&r.encounters[ei]){r.encounters[ei].rarity=rarity;saveWorld();}}
+function removeEncounter(routeId,ei){const r=world.routes.find(x=>x.id===routeId);if(r){r.encounters.splice(ei,1);saveWorld();renderRoutes();}}
+
+// ── STARTERS ─────────────────────────────────────────────────────────────────
+function renderStarters(){
+  const slots=[0,1,2];
+  $('starters-grid').innerHTML=slots.map(i=>{
+    const id=world.starters[i];const c=id?world.registry.find(x=>x.id===id):null;
+    return`<div class="starter-slot">
+      ${c?`<canvas class="mini-canvas" width="64" height="64" data-cid="${esc(c.id)}"></canvas>`:`<div style="width:64px;height:64px;background:var(--bg);border:1px dashed var(--line);border-radius:2px"></div>`}
+      <div class="starter-name">${c?esc(c.name):'—'}</div>
+      ${c?typeChips(c.types):''}
+      <button class="btn" onclick="openPicker('starter',${i})" style="font-size:9px;padding:3px 6px">change</button>
+    </div>`;
+  }).join('');
+}
+
+// ── EVOLUTIONS ─────────────────────────────────────────────────────────────
+function renderEvolutions(){
+  $('evo-list').innerHTML=world.evolutions.length?world.evolutions.map((ev,i)=>{
+    const from=world.registry.find(c=>c.id===ev.fromId);
+    const to=world.registry.find(c=>c.id===ev.toId);
+    return`<div class="evo-row">
+      <span style="font-weight:700">${from?esc(from.name):esc(ev.fromId)}</span>
+      <span class="evo-arrow">→</span>
+      <span style="font-weight:700">${to?esc(to.name):esc(ev.toId)}</span>
+      <span class="evo-cond">[${esc(ev.condition||'?')}]</span>
+      <input class="inp-sm" value="${esc(ev.condition)}" placeholder="level 16, item: Stone..." style="flex:1" onchange="setEvoCond(${i},this.value)">
+      <button class="btn-sm danger" onclick="removeEvo(${i})">×</button>
+    </div>`;
+  }).join(''):'<div style="padding:10px 12px;color:var(--dim2);font-size:10px">no evolution chains defined</div>';
+}
+function setEvoCond(i,val){if(world.evolutions[i]){world.evolutions[i].condition=val;saveWorld();}}
+function removeEvo(i){world.evolutions.splice(i,1);saveWorld();renderEvolutions();updateStatusBar();}
+function showEvoForm(){
+  if(!world.registry.length){toast('add creatures to registry first');return;}
+  const opts=world.registry.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  openModal('Add Evolution Chain',`
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div class="field-row"><label>FROM</label><select class="inp" id="evo-from">${opts}</select></div>
+      <div class="field-row"><label>TO</label><select class="inp" id="evo-to">${opts}</select></div>
+      <div class="field-row"><label>condition</label><input class="inp" id="evo-cond" placeholder="level 16, item: Fire Stone, trade..."></div>
+    </div>
+  `,[{label:'add chain',fn:'confirmEvo()'}]);
+}
+function confirmEvo(){
+  const from=$('evo-from').value,to=$('evo-to').value,cond=$('evo-cond').value;
+  if(from===to){toast('from and to must be different creatures');return;}
+  world.evolutions.push({fromId:from,toId:to,condition:cond});
+  saveWorld();renderEvolutions();updateStatusBar();closeModal();
+}
+
+// ── WORLD META ────────────────────────────────────────────────────────────────
+function onWorldMeta(){world.name=$('world-name').value;world.description=$('world-desc').value;saveWorld();}
+
+// ── MODAL SYSTEM ──────────────────────────────────────────────────────────────
+function openModal(title,body,extraBtns=[]){
+  $('modal-title').textContent=title;
+  $('modal-content').innerHTML=body;
+  const footer=$('modal-footer');
+  footer.innerHTML='';
+  extraBtns.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='btn primary';btn.textContent=b.label;
+    btn.onclick=()=>eval(b.fn);footer.appendChild(btn);
+  });
+  const cl=document.createElement('button');cl.className='btn';cl.textContent='close';cl.onclick=closeModal;footer.appendChild(cl);
+  $('modal-overlay').classList.add('show');
+}
+function closeModal(){$('modal-overlay').classList.remove('show');modalCtx=null;}
+
+// ── CREATURE PICKER ───────────────────────────────────────────────────────────
+function pickerRow(c,selectFn){
+  const col=TYPE_COLOR[(c.types||[])[0]]||'#525061';
+  return`<div class="picker-row" onclick="${selectFn}('${esc(c.id)}')">
+    <div style="width:6px;height:6px;border-radius:50%;background:${col};flex-shrink:0"></div>
+    <canvas class="mini-canvas" width="40" height="40" data-cid="${esc(c.id)}"></canvas>
+    <div>
+      <div class="picker-name">${esc(c.name)}</div>
+      <div class="picker-sub">${esc(c.species||'Unknown')} · BST ${statsTotal(c)}</div>
+      <div class="picker-chips">${typeChips(c.types)}</div>
+    </div>
+  </div>`;
+}
+
+// openPicker(type, extra)
+// types: 'roster','gym-team','route-enc','starter','evo-from','evo-to'
+function openPicker(type,extra){
+  modalCtx={type,extra};
+  const source=type==='roster'?roster:world.registry;
+  if(!source.length){toast(type==='roster'?'no creatures in roster — load a roster JSON':'registry is empty — add creatures first');return;}
+  const searchId='picker-search-'+Date.now();
+  openModal(type==='roster'?'Add from Roster':'Pick Creature',
+    `<div style="padding:8px 12px;border-bottom:1px solid var(--line)">
+       <input class="inp" id="${searchId}" placeholder="search..." oninput="filterPicker('${searchId}')">
+     </div>
+     <div id="picker-list">${source.map(c=>pickerRow(c,'selectCreature')).join('')}</div>`);
+}
+window.filterPicker=function(sid){
+  const q=$( sid).value.toLowerCase();
+  const source=modalCtx?.type==='roster'?roster:world.registry;
+  $('picker-list').innerHTML=source.filter(c=>c.name.toLowerCase().includes(q)).map(c=>pickerRow(c,'selectCreature')).join('');
+};
+window.selectCreature=function(id){
+  if(!modalCtx)return;
+  const{type,extra}=modalCtx;
+  if(type==='roster'){
+    const c=roster.find(x=>x.id===id);
+    if(!c)return;
+    if(world.registry.find(x=>x.id===id)){toast(c.name+' already in registry');closeModal();return;}
+    world.registry.push({...c});creaturePool.delete(id);
+    saveWorld();renderRegistry();updateStatusBar();toast('added '+c.name);closeModal();
+  } else if(type==='gym-team'){
+    const g=world.gyms.find(x=>x.id===extra);
+    if(g&&g.team.length<6){g.team.push({creatureId:id,level:1,heldItem:null});saveWorld();renderGyms();}
+    closeModal();
+  } else if(type==='route-enc'){
+    const r=world.routes.find(x=>x.id===extra);
+    if(r){r.encounters.push({creatureId:id,rarity:'common'});saveWorld();renderRoutes();}
+    closeModal();
+  } else if(type==='starter'){
+    const idx=+extra;
+    world.starters[idx]=id;
+    // keep array length 3
+    while(world.starters.length<3)world.starters.push(null);
+    world.starters=world.starters.slice(0,3);
+    saveWorld();renderStarters();updateStatusBar();closeModal();
+  }
+};
+
+// roster picker shortcut
+function showRosterPicker(){openPicker('roster',null);}
+
+// ── VALIDATION ────────────────────────────────────────────────────────────────
+function validateWorld(){
+  const w=[];
+  if(!world.name)w.push('World has no name');
+  const validStarters=world.starters.filter(Boolean);
+  if(validStarters.length<3)w.push(`Only ${validStarters.length}/3 starters selected`);
+  if(!world.registry.length)w.push('Registry is empty');
+  world.gyms.forEach(g=>{
+    if(!g.team.length)w.push(`${g.name||'A gym'} has no team`);
+    g.team.forEach(m=>{if(!world.registry.find(c=>c.id===m.creatureId))w.push(`${g.name||'Gym'}: creature "${m.creatureId}" not in registry`);});
+  });
+  world.routes.forEach(r=>{
+    r.encounters.forEach(e=>{if(!world.registry.find(c=>c.id===e.creatureId))w.push(`Route "${r.name}": creature missing`);});
+  });
+  return w;
+}
+function showWarnings(ws){
+  $('warnings-list').innerHTML=ws.map(w=>`<div>⚠ ${esc(w)}</div>`).join('');
+  $('warnings').style.display='block';
+}
+
+// ── IMPORT / EXPORT ───────────────────────────────────────────────────────────
+function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function safeName(n){return(n||'').replace(/[^a-z0-9]/gi,'-').toLowerCase()||'my-world';}
+
+function exportWorld(){
+  const ws=validateWorld();
+  if(ws.length)showWarnings(ws);
+  world.updatedAt=Date.now();
+  // strip internal _dna16 field
+  const exportData={...world,registry:world.registry.map(({_dna16,...rest})=>rest)};
+  const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  download(safeName(world.name)+'.world.json',blob);
+  toast(`exported "${world.name||'world'}" — ${world.registry.length} creatures, ${world.gyms.length} gyms`);
+}
+function exportRoster(){
+  const blob=new Blob([JSON.stringify(world.registry.map(({_dna16,...r})=>r),null,2)],{type:'application/json'});
+  download(safeName(world.name)+'-roster.json',blob);
+  toast('exported '+world.registry.length+' creatures as roster');
+}
+function handleImport(e){
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(data.format==='eidolon-world/1'){
+        if(!confirm('Replace current world with imported world?'))return;
+        world=data;
+        if(!world.registry)world.registry=[];
+        if(!world.gyms)world.gyms=[];
+        if(!world.routes)world.routes=[];
+        if(!world.starters)world.starters=[];
+        if(!world.evolutions)world.evolutions=[];
+        gymExpanded=new Set(world.gyms.map(g=>g.id));
+        routeExpanded=new Set(world.routes.map(r=>r.id));
+        creaturePool.clear();
+        sharedWrite(KEY_WORLD,world);
+        fullRender();toast('world imported: '+world.name);
+      } else if(Array.isArray(data)&&data[0]?.format==='eidolon-creature/1'){
+        const added=data.filter(c=>!world.registry.find(x=>x.id===c.id));
+        world.registry.push(...added);creaturePool.clear();
+        saveWorld();renderRegistry();updateStatusBar();toast('merged '+added.length+' creatures into registry');
+      } else if(data.format==='eidolon-creature/1'){
+        if(!world.registry.find(x=>x.id===data.id)){world.registry.push(data);creaturePool.clear();}
+        saveWorld();renderRegistry();updateStatusBar();toast('added '+data.name+' to registry');
+      } else toast('unrecognized file format');
+    }catch(err){toast('import failed: '+err.message);}
+  };reader.readAsText(f);
+}
+
+// ── STATUS BAR ────────────────────────────────────────────────────────────────
+function updateStatusBar(){
+  $('sb-counts').innerHTML=`${world.registry.length} creatures · ${world.gyms.length} gyms · ${world.routes.length} routes · ${world.starters.filter(Boolean).length}/3 starters · ${world.evolutions.length} evolutions`;
+  $('sb-save').textContent='auto-saved '+timeSince(lastSave);
+}
+
+// ── FULL RENDER ───────────────────────────────────────────────────────────────
+function fullRender(){
+  $('world-name').value=world.name||'';
+  $('world-desc').value=world.description||'';
+  renderRegistry();renderGyms();renderRoutes();renderStarters();renderEvolutions();updateStatusBar();
+}
+
+// ── ANIMATION LOOP ────────────────────────────────────────────────────────────
+function loop(){
+  const t=(performance.now()-t0)/1000;
+  document.querySelectorAll('canvas[data-cid]').forEach(canvas=>{
+    const proxy=getProxy(canvas.dataset.cid);if(!proxy)return;
+    const ctx=canvas.getContext('2d');const s=canvas.width;
+    ctx.clearRect(0,0,s,s);ctx.fillStyle='#06060a';ctx.fillRect(0,0,s,s);
+    renderCreatureOn(ctx,proxy,s/2,s*.6,s*3.2,t);
+  });
+  requestAnimationFrame(loop);
+}
+
+// ── DRAG-DROP IMPORT ─────────────────────────────────────────────────────────
+let dragCount=0;
+window.addEventListener('dragenter',e=>{e.preventDefault();dragCount++;$('drop').classList.add('show')});
+window.addEventListener('dragover',e=>e.preventDefault());
+window.addEventListener('dragleave',()=>{dragCount=Math.max(0,dragCount-1);if(!dragCount)$('drop').classList.remove('show')});
+window.addEventListener('drop',async e=>{
+  e.preventDefault();dragCount=0;$('drop').classList.remove('show');
+  for(const f of e.dataTransfer.files){
+    try{
+      const text=await f.text();const data=JSON.parse(text);
+      const evt={target:{files:[new File([text],f.name,{type:f.type})],value:''}};
+      handleImport({target:{files:[f],value:''}});
+      break;
+    }catch(err){toast('drop import failed: '+err.message);}
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+fullRender();
+setInterval(updateStatusBar,5000);
+loop();
+</script>
+</body>
+</html>

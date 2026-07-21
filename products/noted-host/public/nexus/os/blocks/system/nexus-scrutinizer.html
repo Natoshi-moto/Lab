@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nexus Scrutinizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--panel:#10131a;--panel2:#151a22;--line:rgba(77,187,122,.22);--accent:#4dbb7a;--accent-soft:rgba(77,187,122,.14);--text:#d8ffe8;--muted:#799083;--bad:#ff6f6f;--warn:#f5c76b}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:"Space Mono",monospace;font-size:13px;overflow:hidden}
+body{display:flex;flex-direction:column}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(77,187,122,.08),rgba(10,10,15,.94))}.title{font-weight:700;letter-spacing:.1em;color:var(--accent);white-space:nowrap}.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;text-transform:uppercase}.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}#count{color:var(--text)}.filters{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid rgba(77,187,122,.12);background:var(--panel)}button{font:inherit;color:var(--muted);background:transparent;border:1px solid rgba(77,187,122,.28);border-radius:999px;padding:5px 10px;cursor:pointer}button:hover,button.active{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}#log{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}.empty{height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center}.entry{border:1px solid rgba(77,187,122,.17);background:var(--panel);border-radius:10px;overflow:hidden}.summary{display:grid;grid-template-columns:72px 42px 1fr auto;gap:8px;align-items:center;padding:9px 10px;cursor:pointer}.time{color:var(--muted);font-size:11px}.badge{width:max-content;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--accent);font-size:11px}.badge.res{color:var(--muted)}.mainline{min-width:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.block{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}.meta{color:var(--muted);font-size:11px}.endpoint{color:var(--warn)}.ok{color:var(--accent)}.err{color:var(--bad)}.reqid{color:var(--muted);font-size:11px}.detail{display:none;border-top:1px solid rgba(77,187,122,.12);background:#07090d;padding:10px}.entry.open .detail{display:block}pre{margin:0;white-space:pre-wrap;word-break:break-word;color:#b9f7d1;font-size:11px;line-height:1.45}.standalone{border-left:3px solid var(--warn)}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">🔍 SCRUTINIZER</div>
+    <div class="status"><span class="dot"></span><span id="live-label">LIVE</span><span>events <strong id="count">0</strong></span></div>
+  </header>
+  <nav class="filters" aria-label="Audit filters">
+    <button type="button" class="active" data-filter="all">all</button>
+    <button type="button" data-filter="request">requests</button>
+    <button type="button" data-filter="response">responses</button>
+  </nav>
+  <main id="log"><div class="empty">Waiting for AI traffic…</div></main>
+<script>
+(() => {
+  'use strict';
+  const MAX_EVENTS = 200;
+  const events = [];
+  let filter = 'all';
+  let port = null;
+  let mounted = false;
+  const logEl = document.getElementById('log');
+  const countEl = document.getElementById('count');
+  const liveLabel = document.getElementById('live-label');
+
+  function nowStamp(){ return new Date().toLocaleTimeString([], { hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+  function reqShort(id){ return String(id || '—').replace(/^req_/, '').slice(0,8) || '—'; }
+  function hostOnly(endpoint){
+    if (!endpoint) return '—';
+    try { return new URL(endpoint).hostname; } catch (_) { return String(endpoint).slice(0,64); }
+  }
+  function statusOf(ev){
+    const result = ev && ev.result ? ev.result : {};
+    const type = result.type || 'result';
+    const ok = result.ok === false ? 'false' : result.ok === true ? 'true' : '—';
+    return { type, ok };
+  }
+  function visibleEvents(){ return filter === 'all' ? events : events.filter(ev => ev.event === filter); }
+  function addEvent(payload){
+    const entry = Object.assign({ _seenAt: nowStamp() }, payload || {});
+    events.unshift(entry);
+    if (events.length > MAX_EVENTS) events.length = MAX_EVENTS;
+    render();
+  }
+  function render(){
+    countEl.textContent = String(events.length);
+    const rows = visibleEvents();
+    logEl.textContent = '';
+    if (!rows.length) {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = events.length ? 'No events match this filter.' : 'Waiting for AI traffic…';
+      logEl.appendChild(empty);
+      return;
+    }
+    for (const ev of rows) {
+      const isReq = ev.event === 'request';
+      const item = document.createElement('article');
+      item.className = 'entry';
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+
+      const time = document.createElement('span');
+      time.className = 'time';
+      time.textContent = ev._seenAt || '—';
+      const badge = document.createElement('span');
+      badge.className = 'badge' + (isReq ? '' : ' res');
+      badge.textContent = isReq ? 'REQ' : 'RES';
+      const main = document.createElement('div');
+      main.className = 'mainline';
+
+      const block = document.createElement('span');
+      block.className = 'block';
+      block.textContent = ev.requesterBlockId || 'unknown-block';
+      main.appendChild(block);
+
+      if (isReq) {
+        const provider = document.createElement('span');
+        provider.className = 'meta';
+        provider.textContent = ev.provider || 'provider:—';
+        const endpoint = document.createElement('span');
+        endpoint.className = 'endpoint';
+        endpoint.textContent = hostOnly(ev.endpoint);
+        main.append(provider, endpoint);
+      } else {
+        const st = statusOf(ev);
+        const status = document.createElement('span');
+        status.className = st.type === 'error' ? 'err' : 'ok';
+        status.textContent = st.type;
+        const ok = document.createElement('span');
+        ok.className = 'meta';
+        ok.textContent = 'ok:' + st.ok;
+        main.append(status, ok);
+      }
+
+      const req = document.createElement('span');
+      req.className = 'reqid';
+      req.textContent = reqShort(ev._reqId);
+      summary.append(time, badge, main, req);
+      summary.addEventListener('click', () => item.classList.toggle('open'));
+
+      const detail = document.createElement('div');
+      detail.className = 'detail';
+      const pre = document.createElement('pre');
+      pre.textContent = JSON.stringify(ev, null, 2);
+      detail.appendChild(pre);
+      item.append(summary, detail);
+      logEl.appendChild(item);
+    }
+  }
+  function setHosted(){ mounted = true; document.body.classList.remove('standalone'); liveLabel.textContent = 'LIVE'; }
+  function setStandalone(){ if (mounted) return; document.body.classList.add('standalone'); liveLabel.textContent = 'STANDALONE'; }
+  function declare(){
+    if (!port) return;
+    port.postMessage({
+      type: 'DECLARE',
+      manifest: {
+        id: 'nexus-scrutinizer',
+        emits: [],
+        consumes: ['scrutinizer.observe']
+      },
+      app: {
+        title: 'Scrutinizer',
+        icon: '🔍',
+        description: 'AI traffic auditor',
+        visible: true,
+        defaultWidth: 600,
+        defaultHeight: 500
+      }
+    });
+  }
+  function subscribe(){ if (port) port.postMessage({ type: 'SUB', channel: 'scrutinizer.observe' }); }
+
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filter = btn.dataset.filter || 'all';
+      document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('active', b === btn));
+      render();
+    });
+  });
+
+  window.addEventListener('message', evt => {
+    if (!evt.data || evt.data.type !== 'BOOT') return;
+    if (!evt.ports || !evt.ports[0]) return;
+    port = evt.ports[0];
+    port.onmessage = ev => {
+      const msg = ev.data;
+      if (!msg || typeof msg.type !== 'string') return;
+      if (msg.type === 'MOUNT_CHALLENGE') {
+        port.postMessage({ type: 'MOUNT_ACK', nonce: msg.nonce });
+        subscribe();
+        return;
+      }
+      if (msg.type === 'MOUNTED') { setHosted(); return; }
+      if (msg.type === 'PING') { port.postMessage({ type: 'PONG', nonce: msg.nonce }); return; }
+      if (msg.type === 'MSG' && msg.channel === 'scrutinizer.observe') addEvent(msg.payload);
+    };
+    declare();
+    if (port.start) port.start();
+  });
+
+  setTimeout(setStandalone, 800);
+})();
+</script>
+</body>
+</html>

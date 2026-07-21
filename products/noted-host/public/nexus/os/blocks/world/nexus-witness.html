@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXUS · WITNESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  NEXUS · WITNESS — round 1 prototype
+  ──────────────────────────────────────
+  A working demonstration of the deterministic-witness provenance architecture.
+  Five simulated trainers explore a deterministic planet. Each first-encounter
+  produces a signed witness: { dna, planet_seed, epoch, path[], pubkey, sig }.
+  Witnesses gossip through a relay layer. Receivers verify by re-running the
+  generator against the path — invalid witnesses are dropped on first hop.
+
+  Toggles let you:
+    • Inject an ATTACKER who forges witnesses for creatures they didn't path to.
+      Watch their claims fail verification publicly.
+    • Enable ECLIPSE mode where YOUR view of the relay is partitioned. You see
+      a different ledger than the global picture — the architecture is
+      perspective-relative, exactly as I should have said in answer Q1.
+    • Spawn battles when trainers occupy the same tile. Battles are co-signed
+      and feed the reputation graph (eigenvalue over the battle-edge graph).
+
+  Crypto is real (WebCrypto P-256 ECDSA, matches your genesis-verifier).
+  Determinism is real (mulberry32 from canonical seed material).
+  No external deps. Single file. Drop into Nexus blocks/ folder.
+-->
+<style>
+:root {
+  --void: #09090c;
+  --void-deep: #050507;
+  --s1: #111116;
+  --s2: #18181f;
+  --s3: #1f1f28;
+  --border: #2a2a3a;
+  --border-hi: #3d3d58;
+  --amber: #c9920a;
+  --amber-hi: #e6a51a;
+  --amber-dim: rgba(201,146,10,0.10);
+  --amber-glow: rgba(201,146,10,0.05);
+  --green: #2a9d5c;
+  --green-hi: #3dd47b;
+  --green-dim: rgba(42,157,92,0.12);
+  --green-glow: rgba(42,157,92,0.06);
+  --rose: #c0392b;
+  --rose-hi: #e74c3c;
+  --rose-dim: rgba(192,57,43,0.12);
+  --ink: #ddd8cc;
+  --ink-2: #999084;
+  --ink-3: #524e48;
+  --ink-4: #2e2c28;
+  --display: 'Syne', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--void); color: var(--ink); font-family: var(--mono); font-size: 12px; overflow: hidden; }
+
+/* CRT atmosphere — subtle, not gaudy */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 99;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+}
+
+.app {
+  display: grid;
+  grid-template-rows: 44px 1fr 180px;
+  height: 100vh;
+  background-image: radial-gradient(circle at 1px 1px, var(--border) .5px, transparent .5px);
+  background-size: 32px 32px;
+}
+
+/* ─── HEADER STRIP ──────────────────────────────────────── */
+header {
+  display: flex; align-items: center; gap: 24px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--void-deep);
+  position: relative; z-index: 2;
+}
+.brand {
+  font-family: var(--display); font-weight: 800; font-size: 12px;
+  letter-spacing: .28em; color: var(--amber); text-transform: uppercase;
+}
+.brand .dot { color: var(--ink-3); margin: 0 8px; }
+.brand .sub { color: var(--ink-2); font-weight: 400; letter-spacing: .18em; }
+.tag {
+  font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--ink-3); border: 1px solid var(--ink-4);
+  padding: 3px 8px; border-radius: 2px;
+}
+.tag.live { color: var(--green); border-color: var(--green-dim); }
+.tag.live::before { content: "● "; animation: pulse 2s infinite; }
+@keyframes pulse { 50% { opacity: 0.4; } }
+
+.toolbar { display: flex; gap: 6px; margin-left: auto; align-items: center; }
+.btn {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  padding: 6px 12px; background: var(--s1); color: var(--ink-2);
+  border: 1px solid var(--border); border-radius: 2px; cursor: pointer;
+  letter-spacing: .12em; text-transform: uppercase;
+  transition: all .12s ease;
+}
+.btn:hover { background: var(--s2); color: var(--ink); border-color: var(--border-hi); }
+.btn.active { color: var(--amber); border-color: var(--amber); background: var(--amber-dim); }
+.btn.danger { color: var(--rose); border-color: var(--rose-dim); }
+.btn.danger.active { background: var(--rose-dim); border-color: var(--rose); }
+.btn-group { display: flex; }
+.btn-group .btn { border-radius: 0; border-right-width: 0; }
+.btn-group .btn:first-child { border-radius: 2px 0 0 2px; }
+.btn-group .btn:last-child { border-radius: 0 2px 2px 0; border-right-width: 1px; }
+
+/* ─── MAIN GRID ─────────────────────────────────────────── */
+main {
+  display: grid;
+  grid-template-columns: 1.5fr 1.2fr 1fr;
+  gap: 0;
+  overflow: hidden;
+  position: relative; z-index: 1;
+}
+.pane {
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.pane:last-child { border-right: none; }
+.pane-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--s1), transparent);
+}
+.pane-head h2 {
+  font-family: var(--display); font-size: 10px; font-weight: 700;
+  letter-spacing: .25em; text-transform: uppercase; color: var(--amber);
+}
+.pane-head .meta {
+  font-size: 9px; color: var(--ink-3); letter-spacing: .1em;
+  margin-left: auto; text-transform: uppercase;
+}
+.pane-body { flex: 1; overflow: auto; padding: 12px; }
+
+/* ─── PLANET PANE ───────────────────────────────────────── */
+.planet-wrap {
+  display: flex; flex-direction: column; gap: 10px;
+  height: 100%;
+}
+.planet-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(15, 1fr);
+  gap: 1px;
+  background: var(--border);
+  padding: 1px;
+  border: 1px solid var(--border-hi);
+  border-radius: 2px;
+  position: relative;
+  min-height: 360px;
+  font-size: 0;
+}
+.tile {
+  background: var(--void);
+  position: relative;
+  cursor: pointer;
+  transition: background .15s;
+}
+.tile:hover { background: var(--s2); }
+.tile.has-creature::after {
+  content: ""; position: absolute; inset: 25%;
+  background: var(--ink-4); border-radius: 50%;
+  opacity: .7;
+}
+.tile.encountered::after { background: var(--amber); opacity: .9; }
+.tile.witnessed::after { background: var(--green); opacity: 1; }
+.tile.disputed::after { background: var(--rose); opacity: 1; }
+
+.trainer-marker {
+  position: absolute; inset: 5%;
+  border-radius: 50%;
+  z-index: 2;
+  transition: all .35s cubic-bezier(.45,.05,.55,.95);
+  pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.trainer-marker.you {
+  background: var(--amber); box-shadow: 0 0 8px var(--amber);
+  border: 1px solid var(--amber-hi);
+}
+.trainer-marker.bot { background: var(--ink-2); opacity: .65; }
+.trainer-marker.attacker {
+  background: var(--rose);
+  box-shadow: 0 0 6px var(--rose);
+  animation: jitter 1.2s infinite;
+}
+@keyframes jitter {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(0.5px,-0.5px); }
+  50% { transform: translate(-0.5px,0.5px); }
+  75% { transform: translate(0.3px,0.3px); }
+}
+.trainer-marker .label {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  font-size: 7px; color: var(--ink); letter-spacing: .1em;
+  white-space: nowrap; pointer-events: none;
+  text-shadow: 0 0 3px var(--void);
+}
+
+.eclipse-overlay {
+  position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(192,57,43,0.08) 0px, rgba(192,57,43,0.08) 8px,
+    transparent 8px, transparent 16px
+  );
+  z-index: 5;
+  display: none;
+}
+.eclipse-active .eclipse-overlay { display: block; }
+
+.planet-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: var(--border); border: 1px solid var(--border);
+  border-radius: 2px;
+}
+.stat {
+  background: var(--s1); padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.stat .k { font-size: 8px; color: var(--ink-3); letter-spacing: .15em; text-transform: uppercase; }
+.stat .v { font-size: 14px; color: var(--ink); font-weight: 500; font-family: var(--display); }
+.stat .v.amber { color: var(--amber); }
+.stat .v.green { color: var(--green); }
+.stat .v.rose { color: var(--rose); }
+
+.legend { display: flex; gap: 14px; padding: 6px 4px; font-size: 9px; color: var(--ink-2); flex-wrap: wrap; }
+.legend span::before {
+  content: "●"; margin-right: 6px; font-size: 10px;
+}
+.legend .l-amber::before { color: var(--amber); }
+.legend .l-green::before { color: var(--green); }
+.legend .l-rose::before { color: var(--rose); }
+.legend .l-ink::before { color: var(--ink-2); }
+
+/* ─── LEDGER PANE ───────────────────────────────────────── */
+.ledger {
+  display: flex; flex-direction: column;
+  gap: 0;
+}
+.ledger-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: var(--s1);
+}
+.ledger-tab {
+  flex: 1; padding: 8px 12px;
+  font-size: 9px; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--ink-3); cursor: pointer; text-align: center;
+  border-right: 1px solid var(--border);
+  transition: color .12s;
+}
+.ledger-tab:last-child { border-right: none; }
+.ledger-tab.active { color: var(--amber); background: var(--void); }
+.ledger-tab:hover { color: var(--ink); }
+
+.witness {
+  border-bottom: 1px solid var(--ink-4);
+  padding: 10px 12px;
+  font-size: 10px;
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  animation: drop-in .25s ease-out;
+}
+@keyframes drop-in { from { opacity: 0; transform: translateY(-4px); } }
+.witness .mark {
+  width: 14px; height: 14px; border-radius: 50%;
+  margin-top: 1px; position: relative;
+}
+.witness.ok .mark { background: var(--green-dim); border: 1px solid var(--green); }
+.witness.ok .mark::after { content: "✓"; position: absolute; inset: 0; text-align: center; line-height: 12px; color: var(--green); font-size: 9px; }
+.witness.bad .mark { background: var(--rose-dim); border: 1px solid var(--rose); }
+.witness.bad .mark::after { content: "✗"; position: absolute; inset: 0; text-align: center; line-height: 12px; color: var(--rose); font-size: 9px; }
+.witness.eclipsed .mark { background: var(--ink-4); border: 1px solid var(--ink-3); }
+.witness.eclipsed .mark::after { content: "?"; position: absolute; inset: 0; text-align: center; line-height: 12px; color: var(--ink-3); font-size: 9px; }
+.witness .body { min-width: 0; }
+.witness .row1 {
+  display: flex; gap: 8px; align-items: baseline;
+  font-size: 9px;
+}
+.witness .who { color: var(--ink); font-weight: 500; }
+.witness .who.you { color: var(--amber); }
+.witness .who.attacker { color: var(--rose); }
+.witness .pubkey {
+  color: var(--ink-3); font-size: 8px; letter-spacing: .05em;
+}
+.witness .row2 {
+  margin-top: 4px; color: var(--ink-2); font-size: 9px;
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+.witness .dna {
+  display: inline-block; font-family: var(--mono);
+  color: var(--ink-2); font-size: 8px; letter-spacing: .03em;
+}
+.witness .row3 {
+  margin-top: 6px; font-size: 9px; color: var(--ink-3);
+  font-style: italic;
+}
+.witness.bad .row3 { color: var(--rose); }
+.witness.eclipsed { opacity: .55; }
+.witness .time {
+  font-size: 8px; color: var(--ink-3); letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+.ledger-empty {
+  padding: 40px 20px; text-align: center;
+  font-size: 10px; color: var(--ink-3); letter-spacing: .1em;
+}
+
+/* ─── REPUTATION PANE ───────────────────────────────────── */
+.rep-graph {
+  height: 200px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--void-deep);
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.rep-graph svg { width: 100%; height: 100%; display: block; }
+.rep-node circle { transition: all .3s; }
+.rep-node text { font-family: var(--mono); font-size: 8px; fill: var(--ink-2); pointer-events: none; }
+.rep-edge { stroke: var(--ink-4); stroke-width: 1; transition: stroke .3s; }
+.rep-edge.recent { stroke: var(--amber); stroke-width: 1.5; }
+
+.rep-table {
+  border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+  font-size: 10px;
+}
+.rep-row {
+  display: grid;
+  grid-template-columns: 16px 1fr auto auto;
+  gap: 8px; padding: 6px 10px;
+  border-bottom: 1px solid var(--ink-4);
+  align-items: center;
+}
+.rep-row:last-child { border-bottom: none; }
+.rep-row.you { background: var(--amber-glow); }
+.rep-row.attacker { background: var(--rose-dim); }
+.rep-row .swatch { width: 8px; height: 8px; border-radius: 50%; }
+.rep-row .name { color: var(--ink); font-size: 10px; }
+.rep-row .name.you { color: var(--amber); font-weight: 500; }
+.rep-row .name.attacker { color: var(--rose); }
+.rep-row .battles { color: var(--ink-3); font-size: 9px; }
+.rep-row .score {
+  font-family: var(--display); color: var(--ink); font-size: 11px;
+  min-width: 32px; text-align: right;
+}
+
+.notes {
+  margin-top: 14px; padding: 12px;
+  background: var(--s1); border: 1px solid var(--ink-4);
+  border-radius: 2px; font-size: 9px; color: var(--ink-2);
+  line-height: 1.6;
+}
+.notes b { color: var(--amber); font-weight: 500; }
+
+/* ─── TERMINAL ──────────────────────────────────────────── */
+.terminal {
+  border-top: 1px solid var(--border);
+  background: var(--void-deep);
+  display: flex; flex-direction: column;
+  position: relative; z-index: 2;
+}
+.terminal-head {
+  padding: 6px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+  background: var(--s1);
+  font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+.terminal-head .clock { margin-left: auto; color: var(--ink-2); }
+.terminal-body {
+  flex: 1; overflow: auto; padding: 8px 14px;
+  font-size: 10px; line-height: 1.55;
+}
+.tlog { display: flex; gap: 10px; }
+.tlog .ts { color: var(--ink-3); font-size: 9px; min-width: 52px; flex-shrink: 0; }
+.tlog .src { color: var(--amber); font-size: 9px; min-width: 70px; flex-shrink: 0; letter-spacing: .05em; }
+.tlog .msg { color: var(--ink); font-size: 10px; }
+.tlog.warn .src { color: var(--rose); }
+.tlog.good .src { color: var(--green); }
+
+/* ─── MODAL ─────────────────────────────────────────────── */
+.modal {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(5,5,7,0.88); backdrop-filter: blur(2px);
+  display: none; align-items: center; justify-content: center;
+}
+.modal.show { display: flex; }
+.modal-card {
+  background: var(--void); border: 1px solid var(--amber-dim);
+  padding: 28px 32px; max-width: 540px; width: 90%;
+  border-radius: 2px;
+  box-shadow: 0 0 60px rgba(201,146,10,0.15);
+}
+.modal-card h3 {
+  font-family: var(--display); font-size: 12px; font-weight: 700;
+  letter-spacing: .25em; text-transform: uppercase; color: var(--amber);
+  margin-bottom: 14px;
+}
+.modal-card p {
+  font-size: 11px; color: var(--ink-2); line-height: 1.7;
+  margin-bottom: 12px;
+}
+.modal-card p b { color: var(--ink); }
+.modal-card .actions { margin-top: 20px; display: flex; gap: 8px; }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
+</style>
+<script src="../../engines/substrate.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ─── HEADER ─────────────────────────────────────────── -->
+  <header>
+    <div class="brand">NEXUS<span class="dot">·</span>WITNESS<span class="sub" style="margin-left: 16px;">deterministic-witness provenance</span></div>
+    <span class="tag live" id="simStatus">RUNNING</span>
+    <span class="tag" id="planetTag">PLANET 0xa1b2c3d4</span>
+
+    <div class="toolbar">
+      <button class="btn" id="btnPause">Pause</button>
+      <div class="btn-group">
+        <button class="btn" data-speed="1">1×</button>
+        <button class="btn active" data-speed="2">2×</button>
+        <button class="btn" data-speed="4">4×</button>
+      </div>
+      <button class="btn danger" id="btnAttacker">Inject Attacker</button>
+      <button class="btn danger" id="btnEclipse">Eclipse You</button>
+      <button class="btn" id="btnHelp">?</button>
+      <button class="btn" id="btnReset">Reset</button>
+    </div>
+  </header>
+
+  <!-- ─── MAIN ───────────────────────────────────────────── -->
+  <main>
+
+    <!-- PLANET PANE -->
+    <section class="pane">
+      <div class="pane-head">
+        <h2>Planet — Substrate</h2>
+        <span class="meta" id="planetMeta">15 × 20 / deterministic</span>
+      </div>
+      <div class="pane-body">
+        <div class="planet-wrap">
+          <div class="planet-grid" id="grid">
+            <div class="eclipse-overlay"></div>
+          </div>
+          <div class="planet-stats">
+            <div class="stat"><div class="k">Tiles</div><div class="v" id="sTiles">300</div></div>
+            <div class="stat"><div class="k">Creatures</div><div class="v amber" id="sCreatures">—</div></div>
+            <div class="stat"><div class="k">Witnessed</div><div class="v green" id="sWitnessed">0</div></div>
+            <div class="stat"><div class="k">Disputed</div><div class="v rose" id="sDisputed">0</div></div>
+          </div>
+          <div class="legend">
+            <span class="l-ink">creature (unwitnessed)</span>
+            <span class="l-amber">encountered</span>
+            <span class="l-green">witnessed (verified)</span>
+            <span class="l-rose">disputed (failed verify)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEDGER PANE -->
+    <section class="pane">
+      <div class="pane-head">
+        <h2>Ledger — Witnesses</h2>
+        <span class="meta" id="ledgerMeta">your view</span>
+      </div>
+      <div class="ledger-tabs">
+        <div class="ledger-tab active" data-tab="all">ALL</div>
+        <div class="ledger-tab" data-tab="ok">VERIFIED</div>
+        <div class="ledger-tab" data-tab="bad">DISPUTED</div>
+      </div>
+      <div class="pane-body" id="ledgerBody">
+        <div class="ledger-empty">No witnesses yet. The ledger is quiet until a path reaches an inhabited tile.</div>
+      </div>
+    </section>
+
+    <!-- REPUTATION PANE -->
+    <section class="pane">
+      <div class="pane-head">
+        <h2>Reputation — Battle Graph</h2>
+        <span class="meta" id="repMeta">eigentrust / co-signed</span>
+      </div>
+      <div class="pane-body">
+        <div class="rep-graph">
+          <svg id="repSvg" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="rep-table" id="repTable"></div>
+        <div class="notes">
+          <b>Reputation = eigenvalue over the battle-edge graph.</b>
+          A battle is co-signed by both parties (mutual attestation). Sybils
+          and forgers stay isolated — no high-rep trainer will sign with them,
+          so their score never rises. Verification of witnesses is independent
+          of reputation; rep only weights <i>which valid claims you should care about</i>.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── TERMINAL ───────────────────────────────────────── -->
+  <section class="terminal">
+    <div class="terminal-head">
+      <span>kernel.feed</span>
+      <span style="color:var(--ink-2)">witness :: gossip :: verify :: battle</span>
+      <span class="clock" id="clock">t = 00:00</span>
+    </div>
+    <div class="terminal-body" id="termBody"></div>
+  </section>
+
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <h3>NEXUS · WITNESS</h3>
+    <p>Five trainers explore a deterministic planet. The orange node is <b>you</b>; click adjacent tiles or use <b>WASD/arrows</b> to move. Each first-encounter produces a signed witness containing the path you walked to find it.</p>
+    <p><b>Inject Attacker</b> spawns a sixth trainer who forges witnesses without walking the required path. Their signatures are valid but their <i>witnesses</i> fail verification — the deterministic generator rejects the path. Watch the ledger turn rose-red on their claims.</p>
+    <p><b>Eclipse You</b> partitions your view of the relay layer. You see a different ledger than the global picture. This is the threat I should have flagged in Q1: deterministic witnesses defend against fabrication, not against partition. The architecture is perspective-relative — first-encounter is a property of <i>your view</i>, not a global fact.</p>
+    <p><b>Battles</b> happen when two trainers occupy the same tile. They co-sign the outcome and feed the reputation graph. Reputation = eigentrust over co-signed edges only. Unilateral activity (claims, posts) doesn't count — only mutual attestation does.</p>
+    <p style="color:var(--ink-3);font-size:10px;">crypto: WebCrypto P-256 ECDSA · determinism: mulberry32 · single file · vanilla js</p>
+    <div class="actions">
+      <button class="btn active" onclick="document.getElementById('modal').classList.remove('show')">Begin</button>
+    </div>
+  </div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 1 — CRYPTO PRIMITIVES
+   Real WebCrypto. Matches the genesis-verifier conventions in your blocks/.
+   ════════════════════════════════════════════════════════════════════════ */
+
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+function b64u(bytes) {
+  let s = '';
+  const a = bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes;
+  for (let i = 0; i < a.length; i++) s += String.fromCharCode(a[i]);
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64uDec(s) {
+  s = s.replace(/-/g,'+').replace(/_/g,'/');
+  while (s.length % 4) s += '=';
+  const bin = atob(s);
+  const a = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+  return a;
+}
+function hex(bytes) {
+  const a = bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes;
+  return Array.from(a).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function dnaId(dna) {
+  return typeof dna === 'string' ? dna : hex(dna);
+}
+async function sha256(data) {
+  const buf = typeof data === 'string' ? enc.encode(data) : data;
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', buf));
+}
+function canonicalize(o) {
+  if (o === null || typeof o !== 'object') return JSON.stringify(o);
+  if (Array.isArray(o)) return '[' + o.map(canonicalize).join(',') + ']';
+  const ks = Object.keys(o).sort();
+  return '{' + ks.map(k => JSON.stringify(k) + ':' + canonicalize(o[k])).join(',') + '}';
+}
+async function makeKeypair() {
+  const kp = await crypto.subtle.generateKey(
+    { name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign','verify']
+  );
+  const pub = await crypto.subtle.exportKey('jwk', kp.publicKey);
+  return { priv: kp.privateKey, pub: kp.publicKey, pubJwk: pub };
+}
+async function signP256(privKey, body) {
+  const data = enc.encode(canonicalize(body));
+  const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privKey, data);
+  return b64u(sig);
+}
+async function verifyP256(pubJwk, body, sigB64u) {
+  try {
+    const k = await crypto.subtle.importKey(
+      'jwk', { kty: pubJwk.kty, crv: pubJwk.crv, x: pubJwk.x, y: pubJwk.y },
+      { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']
+    );
+    const data = enc.encode(canonicalize(body));
+    return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, k, b64uDec(sigB64u), data);
+  } catch (e) { return false; }
+}
+async function pubkeyHash(jwk) {
+  const h = await sha256(jwk.x + jwk.y);
+  return hex(h).slice(0, 12);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 2 — DETERMINISTIC GENERATOR
+   The planet substrate. Same seed + same coords → same DNA, forever.
+   This is the load-bearing primitive: every receiver re-runs this to verify.
+   ════════════════════════════════════════════════════════════════════════ */
+
+<!-- substrate functions loaded via substrate.js -->
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 3 — WITNESS PROTOCOL
+   A claim is only valid if (a) signature verifies AND (b) the path
+   deterministically arrives at the claimed creature on the claimed planet.
+   Both checks happen locally. No consensus. No round-trip.
+   ════════════════════════════════════════════════════════════════════════ */
+
+async function buildWitness(trainer, planet, path, encounter) {
+  // path = [{x,y}, {x,y}, ...] — ordered traversal ending at encounter
+  const body = {
+    format: 'nexus-witness/1',
+    planet_seed: planet.seed,
+    epoch: planet.epoch,
+    path: path.map(p => [p.x, p.y]),
+    dna: dnaId(encounter.dna),
+    pubkey: trainer.pubkeyId,
+    pubjwk: trainer.pubJwk,
+    timestamp: Date.now()
+  };
+  const bodyHash = hex(await sha256(canonicalize(body)));
+  const sig = await signP256(trainer.priv, body);
+  return { ...body, body_hash: bodyHash, sig };
+}
+
+// Verifier: replay the path against the deterministic generator.
+// If the path ever steps onto a tile the generator says is empty
+// when the witness implies an encounter, OR if the final tile's
+// DNA doesn't match the claimed DNA, reject.
+async function verifyWitness(w, planet) {
+  // 1. Signature must verify against the embedded pubkey
+  const body = {
+    format: w.format, planet_seed: w.planet_seed, epoch: w.epoch,
+    path: w.path, dna: w.dna, pubkey: w.pubkey, pubjwk: w.pubjwk,
+    timestamp: w.timestamp
+  };
+  const sigOk = await verifyP256(w.pubjwk, body, w.sig);
+  if (!sigOk) return { ok: false, reason: 'signature failed' };
+
+  // 2. Planet must match the world we know
+  if (w.planet_seed !== planet.seed) return { ok: false, reason: 'wrong planet seed' };
+  if (w.epoch !== planet.epoch) return { ok: false, reason: 'stale epoch' };
+
+  // 3. Path must be contiguous (each step adjacent to the previous)
+  for (let i = 1; i < w.path.length; i++) {
+    const [px, py] = w.path[i-1], [x, y] = w.path[i];
+    const dx = Math.abs(x - px), dy = Math.abs(y - py);
+    if (dx + dy !== 1) return { ok: false, reason: 'path not contiguous at step ' + i };
+    if (x < 0 || y < 0 || x >= planet.width || y >= planet.height)
+      return { ok: false, reason: 'path leaves planet bounds' };
+  }
+  if (w.path.length < 1) return { ok: false, reason: 'empty path' };
+
+  // 4. The final tile's deterministic creature must match the claim
+  const last = w.path[w.path.length - 1];
+  const there = generateAt(w.planet_seed, last[0], last[1]);
+  if (!there) return { ok: false, reason: 'no creature at final tile' };
+  if (dnaId(there.dna) !== dnaId(w.dna)) return { ok: false, reason: 'dna mismatch with substrate' };
+
+  // ALL PASS
+  return { ok: true };
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 4 — SIMULATION STATE
+   ════════════════════════════════════════════════════════════════════════ */
+
+const state = {
+  planet: { seed: 0xa1b2c3d4, epoch: 1, width: 20, height: 15 },
+  trainers: [],
+  witnesses: [],          // GLOBAL ledger (truth)
+  myView: new Set(),      // ids of witnesses YOU have seen (for eclipse)
+  battles: [],            // co-signed
+  paused: false,
+  speed: 2,
+  tick: 0,
+  attackerActive: false,
+  eclipseActive: false,
+  ledgerFilter: 'all',
+};
+
+const TRAINER_NAMES = ['NYX', 'SOLAS', 'VIREN', 'KAEL'];   // bots
+const YOU_NAME = 'YOU';
+const ATTACKER_NAME = 'ZEROCOST';
+
+class Trainer {
+  constructor(name, kind /* 'you' | 'bot' | 'attacker' */) {
+    this.name = name;
+    this.kind = kind;
+    this.x = Math.floor(Math.random() * state.planet.width);
+    this.y = Math.floor(Math.random() * state.planet.height);
+    this.path = [{ x: this.x, y: this.y }];
+    this.priv = null; this.pubJwk = null; this.pubkeyId = null;
+    this.witnessedDna = new Set(); // dnas this trainer has personally claimed
+    this.battlesWith = new Map();  // pubkeyId -> count
+  }
+  async init() {
+    const kp = await makeKeypair();
+    this.priv = kp.priv; this.pubJwk = kp.pubJwk;
+    this.pubkeyId = await pubkeyHash(kp.pubJwk);
+  }
+  moveStep(dx, dy) {
+    const nx = Math.max(0, Math.min(state.planet.width - 1, this.x + dx));
+    const ny = Math.max(0, Math.min(state.planet.height - 1, this.y + dy));
+    if (nx === this.x && ny === this.y) return false;
+    this.x = nx; this.y = ny;
+    this.path.push({ x: nx, y: ny });
+    if (this.path.length > 200) this.path.shift(); // bounded path memory
+    return true;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 5 — RELAY / GOSSIP LAYER
+   In real life this is Nostr. Here it's an in-memory pub/sub. The eclipse
+   toggle simulates a partition: YOUR view drops half of bot witnesses.
+   ════════════════════════════════════════════════════════════════════════ */
+
+async function publishWitness(witness, fromTrainer) {
+  // The witness joins the global ledger (this is "the truth from outside")
+  state.witnesses.push({ ...witness, _publisher: fromTrainer.name, _kind: fromTrainer.kind });
+
+  // Each receiver verifies independently. We compute the verification once
+  // (it's deterministic) and store it on the record for UI.
+  const result = await verifyWitness(witness, state.planet);
+  state.witnesses[state.witnesses.length - 1]._verify = result;
+
+  // Eclipse simulation: under partition, YOUR view of new witnesses is
+  // probabilistically dropped — except your own claims, which you authored.
+  const isYours = fromTrainer.kind === 'you';
+  const dropForYou = state.eclipseActive && !isYours && Math.random() < 0.55;
+
+  if (!dropForYou) {
+    state.myView.add(witness.body_hash);
+  }
+
+  // Log it
+  if (result.ok) {
+    log('relay', `gossip witness ${witness.body_hash.slice(0,8)}… from ${fromTrainer.name} → verified`, 'good');
+  } else {
+    log('relay', `gossip witness ${witness.body_hash.slice(0,8)}… from ${fromTrainer.name} → rejected: ${result.reason}`, 'warn');
+  }
+
+  if (dropForYou) {
+    log('eclipse', `your relay subset dropped witness ${witness.body_hash.slice(0,8)}…`, 'warn');
+  }
+
+  renderLedger();
+  renderStats();
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 6 — REPUTATION (eigenvalue over battle graph)
+   We compute power-iteration eigenvector centrality on the battle graph.
+   Ten iterations is more than enough for this scale.
+   ════════════════════════════════════════════════════════════════════════ */
+
+function computeReputation() {
+  const ids = state.trainers.map(t => t.pubkeyId);
+  const n = ids.length;
+  if (n === 0) return new Map();
+
+  // Build adjacency from co-signed battles
+  const idx = new Map(ids.map((id, i) => [id, i]));
+  const A = Array.from({ length: n }, () => new Array(n).fill(0));
+  for (const b of state.battles) {
+    const i = idx.get(b.a), j = idx.get(b.b);
+    if (i == null || j == null) continue;
+    A[i][j] += 1; A[j][i] += 1;
+  }
+
+  // Power iteration — eigenvector centrality
+  let v = new Array(n).fill(1 / n);
+  for (let iter = 0; iter < 20; iter++) {
+    const next = new Array(n).fill(0);
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < n; j++)
+        next[i] += A[i][j] * v[j];
+    let norm = Math.sqrt(next.reduce((s, x) => s + x * x, 0)) || 1;
+    v = next.map(x => x / norm);
+  }
+
+  // Normalize to 0-100
+  const max = Math.max(...v);
+  const out = new Map();
+  for (let i = 0; i < n; i++) {
+    const score = max > 0 ? Math.round((v[i] / max) * 100) : 0;
+    out.set(ids[i], score);
+  }
+  return out;
+}
+
+async function recordBattle(t1, t2) {
+  // Both parties co-sign a battle event. Either can refuse.
+  // Attackers can always sign their own side, but if no honest trainer signs back,
+  // the battle never lands in the graph. We model this by having the bot trainers
+  // refuse to sign with anyone whose recent witnesses have been disputed.
+  const otherSide = (t) => state.witnesses
+    .filter(w => w.pubkey === t.pubkeyId)
+    .slice(-5)
+    .every(w => w._verify?.ok);
+
+  const t1Honest = otherSide(t1), t2Honest = otherSide(t2);
+  if (t1.kind === 'attacker' || t2.kind === 'attacker') {
+    // Attacker tries to battle; honest trainer refuses.
+    const honest = t1.kind === 'attacker' ? t2 : t1;
+    if (!otherSide(t1.kind === 'attacker' ? t1 : t2)) {
+      log('battle', `${honest.name} refused to co-sign with ${t1.kind === 'attacker' ? t1.name : t2.name} — disputed witnesses`, 'warn');
+      return;
+    }
+  }
+
+  const body = {
+    format: 'nexus-battle/1',
+    planet_seed: state.planet.seed,
+    epoch: state.planet.epoch,
+    a: t1.pubkeyId, b: t2.pubkeyId,
+    at: { x: t1.x, y: t1.y },
+    timestamp: Date.now()
+  };
+  const sigA = await signP256(t1.priv, body);
+  const sigB = await signP256(t2.priv, body);
+  const battle = { ...body, sigA, sigB };
+
+  // Verify both sigs (honest receiver does this)
+  const okA = await verifyP256(t1.pubJwk, body, sigA);
+  const okB = await verifyP256(t2.pubJwk, body, sigB);
+  if (!okA || !okB) {
+    log('battle', `co-sig invalid (${okA},${okB}) — discarded`, 'warn');
+    return;
+  }
+
+  state.battles.push(battle);
+  t1.battlesWith.set(t2.pubkeyId, (t1.battlesWith.get(t2.pubkeyId)||0) + 1);
+  t2.battlesWith.set(t1.pubkeyId, (t2.battlesWith.get(t1.pubkeyId)||0) + 1);
+  log('battle', `${t1.name} ⇄ ${t2.name} co-signed at (${t1.x},${t1.y})`, 'good');
+  renderRep();
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 7 — TRAINER BEHAVIOUR
+   ════════════════════════════════════════════════════════════════════════ */
+
+async function botStep(t) {
+  // Random walk with a slight bias toward unvisited tiles
+  const opts = [[1,0],[-1,0],[0,1],[0,-1]];
+  const choice = opts[Math.floor(Math.random() * 4)];
+  t.moveStep(choice[0], choice[1]);
+
+  // Encounter check
+  const c = generateAt(state.planet.seed, t.x, t.y);
+  const dna = c && dnaId(c.dna);
+  if (c && !t.witnessedDna.has(dna)) {
+    t.witnessedDna.add(dna);
+    const witness = await buildWitness(
+      t,
+      state.planet,
+      t.path.slice(-Math.min(t.path.length, 12)), // last N steps as the witnessed traversal
+      c
+    );
+    await publishWitness(witness, t);
+  }
+
+  // Battle check: same tile as another trainer
+  for (const other of state.trainers) {
+    if (other === t) continue;
+    if (other.x === t.x && other.y === t.y) {
+      const key = [t.pubkeyId, other.pubkeyId].sort().join('|');
+      if (!battleCooldown.has(key)) {
+        battleCooldown.set(key, Date.now());
+        await recordBattle(t, other);
+      }
+    }
+  }
+}
+
+const battleCooldown = new Map(); // dedupe battle records when trainers stay on same tile
+
+async function attackerStep(t) {
+  // The attacker doesn't really walk — they pick a random tile they have NOT
+  // actually pathed to and try to claim its creature with a forged path.
+  // We forge in two flavours alternately:
+  //   1. valid signature, fake path that doesn't reach the tile
+  //   2. valid signature, valid path, but DNA tampered
+  // Both should fail verification.
+  const flavour = Math.random() < 0.5 ? 'fake-path' : 'tamper-dna';
+
+  // pick a random creature tile somewhere on the planet
+  let target = null;
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const x = Math.floor(Math.random() * state.planet.width);
+    const y = Math.floor(Math.random() * state.planet.height);
+    const c = generateAt(state.planet.seed, x, y);
+    if (c) { target = { x, y, c }; break; }
+  }
+  if (!target) return;
+
+  let path, dna;
+  if (flavour === 'fake-path') {
+    // claim a path of length 2 that doesn't end at the target
+    path = [{ x: target.x, y: target.y }, { x: target.x + 5, y: target.y }];
+    dna = dnaId(target.c.dna);
+  } else {
+    // valid one-step path, but DNA changed to something rarer
+    path = [{ x: target.x, y: target.y }];
+    // tamper a byte
+    dna = '00' + dnaId(target.c.dna).slice(2);
+  }
+
+  const witness = await buildWitness(t, state.planet, path, { dna });
+  await publishWitness(witness, t);
+
+  // Attacker visually "appears" at the claimed tile
+  t.x = target.x; t.y = target.y;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 8 — RENDERING
+   ════════════════════════════════════════════════════════════════════════ */
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  // Build once
+  if (!grid.dataset.built) {
+    grid.style.gridTemplateColumns = `repeat(${state.planet.width}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${state.planet.height}, 1fr)`;
+    for (let y = 0; y < state.planet.height; y++) {
+      for (let x = 0; x < state.planet.width; x++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.dataset.x = x; tile.dataset.y = y;
+        const c = generateAt(state.planet.seed, x, y);
+        if (c) tile.classList.add('has-creature');
+        tile.addEventListener('click', () => tryMoveYouTo(x, y));
+        grid.appendChild(tile);
+      }
+    }
+    // Re-add the eclipse overlay (gridTemplateColumns reset cleared it visually but it's still in DOM)
+    if (!grid.querySelector('.eclipse-overlay')) {
+      const ov = document.createElement('div'); ov.className = 'eclipse-overlay';
+      grid.appendChild(ov);
+    }
+    grid.dataset.built = '1';
+  }
+
+  // Update tile classes based on witness state
+  const witnessed = new Set();
+  const disputed = new Set();
+  const encountered = new Set();
+  for (const w of state.witnesses) {
+    if (state.eclipseActive && !state.myView.has(w.body_hash) && w._kind !== 'you') continue;
+    const last = w.path[w.path.length - 1];
+    const key = last[0] + ',' + last[1];
+    if (w._verify?.ok) witnessed.add(key); else disputed.add(key);
+  }
+  for (const t of state.trainers) {
+    if (t.kind !== 'you') continue;
+    for (const p of t.path) encountered.add(p.x + ',' + p.y);
+  }
+
+  for (const tile of grid.querySelectorAll('.tile')) {
+    const key = tile.dataset.x + ',' + tile.dataset.y;
+    tile.classList.remove('encountered', 'witnessed', 'disputed');
+    if (disputed.has(key)) tile.classList.add('disputed');
+    else if (witnessed.has(key)) tile.classList.add('witnessed');
+    else if (encountered.has(key)) tile.classList.add('encountered');
+  }
+
+  // Render trainer markers
+  let markerLayer = grid.querySelector('.markers');
+  if (!markerLayer) {
+    markerLayer = document.createElement('div');
+    markerLayer.className = 'markers';
+    Object.assign(markerLayer.style, {
+      position: 'absolute', inset: 0, pointerEvents: 'none',
+      display: 'grid',
+      gridTemplateColumns: `repeat(${state.planet.width}, 1fr)`,
+      gridTemplateRows: `repeat(${state.planet.height}, 1fr)`,
+      gap: '1px', padding: '1px', zIndex: 6
+    });
+    grid.appendChild(markerLayer);
+  }
+  markerLayer.innerHTML = '';
+  for (const t of state.trainers) {
+    const cell = document.createElement('div');
+    cell.style.gridColumn = (t.x + 1);
+    cell.style.gridRow = (t.y + 1);
+    cell.style.position = 'relative';
+    const m = document.createElement('div');
+    m.className = 'trainer-marker ' + t.kind;
+    const lbl = document.createElement('div'); lbl.className = 'label'; lbl.textContent = t.name;
+    m.appendChild(lbl);
+    cell.appendChild(m);
+    markerLayer.appendChild(cell);
+  }
+}
+
+function renderStats() {
+  let total = 0;
+  for (let y = 0; y < state.planet.height; y++)
+    for (let x = 0; x < state.planet.width; x++)
+      if (generateAt(state.planet.seed, x, y)) total++;
+  document.getElementById('sCreatures').textContent = total;
+
+  const visible = state.witnesses.filter(w =>
+    !state.eclipseActive || state.myView.has(w.body_hash) || w._kind === 'you'
+  );
+  const ok = visible.filter(w => w._verify?.ok).length;
+  const bad = visible.filter(w => w._verify && !w._verify.ok).length;
+  document.getElementById('sWitnessed').textContent = ok;
+  document.getElementById('sDisputed').textContent = bad;
+  document.getElementById('sTiles').textContent = state.planet.width * state.planet.height;
+}
+
+function renderLedger() {
+  const body = document.getElementById('ledgerBody');
+  let visible = state.witnesses.slice().reverse();
+  if (state.eclipseActive) {
+    visible = visible.filter(w => state.myView.has(w.body_hash) || w._kind === 'you');
+  }
+  const filt = state.ledgerFilter;
+  if (filt === 'ok') visible = visible.filter(w => w._verify?.ok);
+  if (filt === 'bad') visible = visible.filter(w => w._verify && !w._verify.ok);
+
+  if (!visible.length) {
+    body.innerHTML = '<div class="ledger-empty">No witnesses match this filter. The substrate may be speaking elsewhere.</div>';
+    return;
+  }
+  body.innerHTML = '';
+  for (const w of visible.slice(0, 60)) {
+    const div = document.createElement('div');
+    const cls = w._verify?.ok ? 'ok' : 'bad';
+    div.className = 'witness ' + cls;
+    const last = w.path[w.path.length - 1];
+    const t = state.trainers.find(tr => tr.pubkeyId === w.pubkey);
+    const name = t ? t.name : '???';
+    const whoCls = t?.kind === 'you' ? 'you' : t?.kind === 'attacker' ? 'attacker' : '';
+    const elapsed = Math.round((Date.now() - w.timestamp) / 1000);
+    div.innerHTML = `
+      <div class="mark"></div>
+      <div class="body">
+        <div class="row1">
+          <span class="who ${whoCls}">${name}</span>
+          <span class="pubkey">${w.pubkey.slice(0,10)}…</span>
+        </div>
+        <div class="row2">
+          <span>at <b>(${last[0]},${last[1]})</b></span>
+          <span>path-len <b>${w.path.length}</b></span>
+          <span class="dna">dna ${w.dna.slice(0,16)}…</span>
+        </div>
+        <div class="row3">${
+          w._verify?.ok
+            ? 'witness verified · path replays cleanly against substrate'
+            : 'rejected · ' + (w._verify?.reason || 'unknown')
+        }</div>
+      </div>
+      <div class="time">${elapsed}s</div>
+    `;
+    body.appendChild(div);
+  }
+}
+
+function renderRep() {
+  const reps = computeReputation();
+  // Table
+  const table = document.getElementById('repTable');
+  const rows = state.trainers.slice().sort((a,b) => (reps.get(b.pubkeyId)||0) - (reps.get(a.pubkeyId)||0));
+  table.innerHTML = rows.map(t => {
+    const score = reps.get(t.pubkeyId) || 0;
+    const battles = state.battles.filter(b => b.a === t.pubkeyId || b.b === t.pubkeyId).length;
+    const cls = t.kind === 'you' ? 'you' : t.kind === 'attacker' ? 'attacker' : '';
+    const swatchColor = t.kind === 'you' ? 'var(--amber)' : t.kind === 'attacker' ? 'var(--rose)' : 'var(--ink-2)';
+    return `
+      <div class="rep-row ${cls}">
+        <div class="swatch" style="background:${swatchColor}"></div>
+        <div class="name ${cls}">${t.name}</div>
+        <div class="battles">${battles}b</div>
+        <div class="score">${score}</div>
+      </div>
+    `;
+  }).join('');
+
+  // SVG graph — circular layout
+  const svg = document.getElementById('repSvg');
+  const W = 300, H = 200, cx = W/2, cy = H/2, R = 70;
+  const ts = state.trainers;
+  const pos = new Map();
+  ts.forEach((t, i) => {
+    const ang = (i / ts.length) * Math.PI * 2 - Math.PI / 2;
+    pos.set(t.pubkeyId, { x: cx + Math.cos(ang) * R, y: cy + Math.sin(ang) * R });
+  });
+
+  // Edges
+  const edgeMap = new Map();
+  for (const b of state.battles) {
+    const k = [b.a, b.b].sort().join('|');
+    edgeMap.set(k, (edgeMap.get(k) || 0) + 1);
+  }
+  let svgContent = '';
+  for (const [k, count] of edgeMap.entries()) {
+    const [a, b] = k.split('|');
+    const pa = pos.get(a), pb = pos.get(b);
+    if (!pa || !pb) continue;
+    const w = Math.min(3, 0.6 + count * 0.4);
+    svgContent += `<line class="rep-edge" x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" stroke-width="${w}"/>`;
+  }
+  // Nodes
+  for (const t of ts) {
+    const p = pos.get(t.pubkeyId);
+    const score = reps.get(t.pubkeyId) || 0;
+    const r = 4 + score / 16;
+    const color = t.kind === 'you' ? '#c9920a' : t.kind === 'attacker' ? '#c0392b' : '#999084';
+    const fill = t.kind === 'you' ? 'rgba(201,146,10,0.2)' : t.kind === 'attacker' ? 'rgba(192,57,43,0.2)' : 'rgba(153,144,132,0.15)';
+    svgContent += `<g class="rep-node">
+      <circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${fill}" stroke="${color}" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y - r - 4}" text-anchor="middle">${t.name}</text>
+    </g>`;
+  }
+  svg.innerHTML = svgContent;
+}
+
+function log(src, msg, kind) {
+  const term = document.getElementById('termBody');
+  const div = document.createElement('div');
+  div.className = 'tlog' + (kind ? ' ' + kind : '');
+  const ts = formatTime(state.tick);
+  div.innerHTML = `<span class="ts">${ts}</span><span class="src">${src}</span><span class="msg">${msg}</span>`;
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+  // bound terminal length
+  while (term.children.length > 200) term.removeChild(term.firstChild);
+}
+
+function formatTime(tick) {
+  const s = Math.floor(tick / 4);
+  const mm = Math.floor(s / 60).toString().padStart(2, '0');
+  const ss = (s % 60).toString().padStart(2, '0');
+  return `t=${mm}:${ss}`;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 9 — INPUT & SIM LOOP
+   ════════════════════════════════════════════════════════════════════════ */
+
+let you = null;
+
+function tryMoveYouTo(x, y) {
+  if (!you || state.paused) return;
+  // Only allow adjacent moves (Manhattan 1)
+  const dx = x - you.x, dy = y - you.y;
+  if (Math.abs(dx) + Math.abs(dy) !== 1) return;
+  doYourMove(dx, dy);
+}
+
+async function doYourMove(dx, dy) {
+  if (!you.moveStep(dx, dy)) return;
+  const c = generateAt(state.planet.seed, you.x, you.y);
+  const dna = c && dnaId(c.dna);
+  if (c && !you.witnessedDna.has(dna)) {
+    you.witnessedDna.add(dna);
+    const w = await buildWitness(you, state.planet, you.path.slice(-Math.min(you.path.length, 12)), c);
+    await publishWitness(w, you);
+    log('you', `first-encounter at (${you.x},${you.y}) — dna ${dnaId(c.dna).slice(0,12)}…`, 'good');
+  }
+  // battles
+  for (const other of state.trainers) {
+    if (other === you) continue;
+    if (other.x === you.x && other.y === you.y) {
+      const key = [you.pubkeyId, other.pubkeyId].sort().join('|');
+      if (!battleCooldown.has(key) || (Date.now() - battleCooldown.get(key)) > 6000) {
+        battleCooldown.set(key, Date.now());
+        await recordBattle(you, other);
+      }
+    }
+  }
+  renderGrid();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (state.paused) return;
+  let dx = 0, dy = 0;
+  if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dy = -1;
+  else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dy = 1;
+  else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dx = -1;
+  else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dx = 1;
+  if (dx || dy) { e.preventDefault(); doYourMove(dx, dy); }
+});
+
+let simTimer = null;
+async function simStep() {
+  if (state.paused) return;
+  state.tick++;
+  document.getElementById('clock').textContent = formatTime(state.tick);
+
+  // Move bots
+  for (const t of state.trainers) {
+    if (t.kind === 'bot') await botStep(t);
+    else if (t.kind === 'attacker') await attackerStep(t);
+  }
+  renderGrid();
+  renderStats();
+}
+
+function startSim() {
+  if (simTimer) clearInterval(simTimer);
+  simTimer = setInterval(simStep, 1000 / state.speed);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 10 — CONTROLS WIRING
+   ════════════════════════════════════════════════════════════════════════ */
+
+document.getElementById('btnPause').addEventListener('click', (e) => {
+  state.paused = !state.paused;
+  e.target.textContent = state.paused ? 'Resume' : 'Pause';
+  document.getElementById('simStatus').textContent = state.paused ? 'PAUSED' : 'RUNNING';
+});
+
+document.querySelectorAll('[data-speed]').forEach(b => {
+  b.addEventListener('click', (e) => {
+    document.querySelectorAll('[data-speed]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.speed = +b.dataset.speed;
+    startSim();
+  });
+});
+
+document.getElementById('btnAttacker').addEventListener('click', async (e) => {
+  if (state.attackerActive) {
+    // remove attacker
+    state.trainers = state.trainers.filter(t => t.kind !== 'attacker');
+    state.attackerActive = false;
+    e.target.classList.remove('active');
+    log('control', 'attacker removed', 'good');
+  } else {
+    const a = new Trainer(ATTACKER_NAME, 'attacker');
+    await a.init();
+    state.trainers.push(a);
+    state.attackerActive = true;
+    e.target.classList.add('active');
+    log('control', `attacker ${ATTACKER_NAME} injected — pubkey ${a.pubkeyId.slice(0,8)}…`, 'warn');
+  }
+  renderGrid();
+  renderRep();
+});
+
+document.getElementById('btnEclipse').addEventListener('click', (e) => {
+  state.eclipseActive = !state.eclipseActive;
+  document.getElementById('grid').classList.toggle('eclipse-active', state.eclipseActive);
+  document.getElementById('ledgerMeta').textContent = state.eclipseActive ? 'partitioned · 55% drop' : 'your view';
+  e.target.classList.toggle('active', state.eclipseActive);
+  if (state.eclipseActive) {
+    log('control', 'eclipse mode ON — your relay subset is now partitioned. some witnesses are invisible to you.', 'warn');
+  } else {
+    log('control', 'eclipse mode OFF — full relay visibility restored', 'good');
+    // restore: re-add all witnesses to myView
+    for (const w of state.witnesses) state.myView.add(w.body_hash);
+  }
+  renderLedger();
+  renderStats();
+  renderGrid();
+});
+
+document.getElementById('btnReset').addEventListener('click', () => {
+  if (simTimer) clearInterval(simTimer);
+  location.reload();
+});
+
+document.getElementById('btnHelp').addEventListener('click', () => {
+  document.getElementById('modal').classList.add('show');
+});
+
+document.querySelectorAll('.ledger-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.ledger-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    state.ledgerFilter = t.dataset.tab;
+    renderLedger();
+  });
+});
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECTION 11 — BOOT
+   ════════════════════════════════════════════════════════════════════════ */
+
+async function boot() {
+  log('kernel', 'nexus-witness booting…');
+  log('kernel', `planet seed = 0x${state.planet.seed.toString(16)} epoch ${state.planet.epoch}`);
+
+  // YOU first
+  you = new Trainer(YOU_NAME, 'you');
+  await you.init();
+  state.trainers.push(you);
+  log('kernel', `your pubkey = ${you.pubkeyId.slice(0,12)}…`);
+
+  // Bots
+  for (const name of TRAINER_NAMES) {
+    const t = new Trainer(name, 'bot');
+    await t.init();
+    state.trainers.push(t);
+    log('kernel', `spawned ${name} pubkey ${t.pubkeyId.slice(0,8)}…`);
+  }
+
+  renderGrid();
+  renderStats();
+  renderLedger();
+  renderRep();
+  startSim();
+  log('kernel', 'simulation running. arrows/wasd to move. click ? for instructions.', 'good');
+
+  document.getElementById('modal').classList.add('show');
+}
+
+/* ──────────────────────────────────────────────────────────
+   Optional: Nexus kernel handshake (graceful no-op standalone)
+   If hosted in Nexus_OS, declare our manifest. Else just ignore.
+   Migrated to engines/nexus-block-client.js in Round 018; the
+   client also handles the PONG-with-nonce protocol correctly,
+   which the previous hand-rolled handshake omitted (silent
+   protocol violation on every ping).
+   ────────────────────────────────────────────────────────── */
+window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits: [],
+    consumes: [],
+    app: { title: 'Witness', icon: '◉', visible: true }
+  }
+});
+
+boot().catch(err => {
+  console.error(err);
+  log('kernel', 'BOOT FAILED: ' + err.message, 'warn');
+});
+</script>
+</body>
+</html>

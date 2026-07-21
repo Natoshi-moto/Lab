@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus-event-envelope.schema.json",
+  "type": "object",
+  "required": [
+    "id",
+    "createdAt",
+    "source",
+    "kind",
+    "channel",
+    "payload",
+    "policy"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object"
+    },
+    "target": {
+      "type": "object"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "string"
+    },
+    "capability": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array"
+    },
+    "refs": {
+      "type": "array"
+    },
+    "payload": {},
+    "policy": {
+      "type": "object"
+    },
+    "receipt": {
+      "type": "object"
+    }
+  }
+}

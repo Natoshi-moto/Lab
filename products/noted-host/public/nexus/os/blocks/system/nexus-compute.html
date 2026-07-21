@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NexusCompute · Worker Pool Service</title>
+<meta name="theme-color" content="#080a0c" />
+<meta name="color-scheme" content="dark" />
+
+<!-- Block identity (Nexus OS hosts can sniff these without parsing JS). -->
+<meta name="nexus:block-id" content="nexus-compute" />
+<meta name="nexus:version" content="0.1.0" />
+<meta name="nexus:protocol" content="1" />
+<meta name="nexus:capabilities" content="worker-pool,compute-offload,terrain-sample,hash-batch,stream-producer" />
+<meta name="nexus:emits" content="compute.result,compute.metrics,router.register,router.heartbeat,router.deregister,system.block_ready" />
+<meta name="nexus:consumes" content="compute.job,compute.cancel,router.result,system.block_ready" />
+
+<style>
+  :root {
+    --bg: #080a0c;
+    --panel: #0d1114;
+    --line: rgba(214,255,232,0.10);
+    --text: #d6ffe8;
+    --dim: #8aa399;
+    --gold: #f1c673;
+    --cyan: #8fcdff;
+    --red: #ff7a7a;
+    --green: #7dd99a;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px; line-height: 1.5;
+    height: 100vh; overflow: hidden;
+  }
+  body {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .head {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 6px 10px;
+    border-left: 2px solid var(--gold);
+    background: var(--panel);
+  }
+  .head .title { color: var(--gold); font-weight: 700; letter-spacing: .04em; }
+  .head .sub { color: var(--dim); font-size: 10px; }
+  .head .dots { color: var(--gold); margin-left: 6px; }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    padding: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .metric { display: flex; flex-direction: column; }
+  .metric .label { color: var(--dim); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+  .metric .value { color: var(--text); font-size: 13px; font-weight: 700; margin-top: 2px; }
+  .metric .value.gold { color: var(--gold); }
+  .metric .value.cyan { color: var(--cyan); }
+
+  .panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    overflow: hidden;
+  }
+  .pane {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .pane h2 {
+    margin: 0 0 4px 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--cyan);
+    border-bottom: 1px solid var(--line); padding-bottom: 4px;
+  }
+
+  .log-entry { font-size: 10px; word-break: break-word; }
+  .log-entry.err { color: var(--red); }
+  .log-entry.ok { color: var(--green); }
+  .log-entry.sys { color: var(--cyan); }
+  .log-entry.dim { color: var(--dim); }
+
+  .test-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .test-row label { color: var(--dim); font-size: 10px; min-width: 60px; }
+  select, textarea, input, button {
+    background: #14191d; color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 4px 6px;
+    font-family: inherit; font-size: 10px;
+  }
+  textarea { width: 100%; min-height: 60px; box-sizing: border-box; resize: vertical; }
+  button {
+    cursor: pointer;
+    background: linear-gradient(180deg, #1a2228, #0e1316);
+    color: var(--gold);
+    border-color: rgba(241,198,115,0.32);
+    padding: 5px 10px;
+  }
+  button:hover { border-color: var(--gold); }
+  button.cyan { color: var(--cyan); border-color: rgba(143,205,255,0.32); }
+  button.cyan:hover { border-color: var(--cyan); }
+  .result-area {
+    background: #060809;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 6px;
+    font-size: 10px;
+    color: var(--green);
+    white-space: pre-wrap; word-break: break-all;
+    max-height: 200px; overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <span class="title">NEXUS·COMPUTE</span>
+  <span class="sub">v0.1 · worker-pool service</span>
+  <span class="dots" id="dots"></span>
+  <span style="flex:1"></span>
+  <span class="sub" id="status">booting…</span>
+</div>
+
+<div class="metrics" id="metrics">
+  <div class="metric"><span class="label">Workers</span><span class="value gold" id="m-workers">—</span></div>
+  <div class="metric"><span class="label">Queue depth</span><span class="value" id="m-queue">0</span></div>
+  <div class="metric"><span class="label">In flight</span><span class="value" id="m-inflight">0</span></div>
+  <div class="metric"><span class="label">Jobs / sec</span><span class="value cyan" id="m-jps">0</span></div>
+  <div class="metric"><span class="label">Avg ms/job</span><span class="value" id="m-avgms">—</span></div>
+  <div class="metric"><span class="label">Total done</span><span class="value" id="m-total">0</span></div>
+  <div class="metric"><span class="label">Respawns</span><span class="value" id="m-respawns">0</span></div>
+  <div class="metric"><span class="label">Stream</span><span class="value" id="m-stream">—</span></div>
+</div>
+
+<div class="panes">
+  <div class="pane">
+    <h2>EVENT LOG</h2>
+    <div id="log-container"></div>
+  </div>
+
+  <div class="pane">
+    <h2>TEST PANEL</h2>
+    <div class="test-row">
+      <label>handler</label>
+      <select id="t-kind">
+        <option value="noise.sample">noise.sample</option>
+        <option value="hash.batch">hash.batch</option>
+        <option value="terrain.strip">terrain.strip</option>
+      </select>
+      <button id="t-fill">preset payload</button>
+    </div>
+    <textarea id="t-payload" spellcheck="false"></textarea>
+    <div class="test-row">
+      <button id="t-run">Run once</button>
+      <button id="t-burst" class="cyan">Burst ×1000 noise.sample</button>
+      <button id="t-verify">Verify vs main thread</button>
+    </div>
+    <div class="result-area" id="t-result">// result will appear here</div>
+  </div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NexusCompute — Worker Pool Service Block
+   ─────────────────────────────────────────────────────────────────────────
+   A service block (no game UI) that other blocks ask to run heavy
+   computations for them. Owns a pool of dedicated Web Workers and farms
+   out work via the kernel's IPC for one-shot jobs, or via BroadcastChannel
+   for continuous streams.
+
+   Channels:
+     consumes: compute.job, compute.cancel, router.result, system.block_ready
+     emits:    compute.result, compute.metrics, router.register,
+               router.heartbeat, router.deregister, system.block_ready
+
+   Streaming: registers `compute.stream.terrain-strip` with nexus-router
+   on boot. Once registered, listens on the returned BroadcastChannel for
+   request messages and broadcasts terrain strips back. Each consumer
+   filters frames by its own requesterId.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+
+// ── Constants ───────────────────────────────────────────────────────────────
+
+// Worker count formula: hardwareConcurrency-1, clamped to [1, 8].
+// Cap of 8 because more workers stop helping past that on typical machines
+// and each worker has memory overhead.
+function workerCountTarget() {
+  const hw = navigator.hardwareConcurrency || 4;
+  return Math.max(1, Math.min(8, hw - 1));
+}
+
+const QUEUE_BOUND     = 1000;   // reject new jobs above this; prevent unbounded memory growth
+const METRICS_HZ      = 1;      // emit compute.metrics this often
+const STREAM_KIND     = 'compute.stream.terrain-strip';
+const ROUTER_BLOCK_ID = 'nexus_router';
+const HEARTBEAT_MS    = 5000;
+const MAX_RESPAWNS    = 5;      // per-worker respawn cap; past this we leave the slot dead
+const RING_BUFFER_SEC = 10;     // window for jobs/sec calculation
+
+
+// ── Worker source ───────────────────────────────────────────────────────────
+// Inlined as a Blob URL at boot. Self-contained: no imports, no globals
+// beyond what the worker scope provides.
+//
+// IMPORTANT INVARIANT: the deterministic math here (hashString, rand01,
+// hermite, terrainHeightAt, biomes) must match engines'/deterministic.ts
+// byte-for-byte. The "Verify vs main thread" test panel button asserts
+// this against the reference implementation that lives below in this same
+// file. If you change one, change the other.
+
+const WORKER_SRC = `
+'use strict';
+
+/* ── Deterministic primitives (mirror of engines deterministic.ts) ── */
+
+function hashString(str) {
+  // FNV-1a 32-bit body + Murmur3 finalizer.
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return h >>> 0;
+}
+
+const TWO_POW_32 = 0x1_0000_0000;
+function rand01(ns) { return hashString(ns) / TWO_POW_32; }
+
+const TERRAIN_STEP = 128;
+const LAYER_PROFILES = {
+  surface:    { amplitude:  80, baseHeight:    0 },
+  understory: { amplitude:  60, baseHeight:  220 },
+  canopy:     { amplitude:  45, baseHeight: -180 },
+  deep:       { amplitude: 130, baseHeight:  520 }
+};
+
+const BIOME_PERIODS = { glassfen: 11000, mosswake: 13000, ashloom: 17000 };
+const BIOME_INFLUENCE_RADIUS = 4096;
+const BIOME_LIST = ['glassfen', 'mosswake', 'ashloom'];
+
+function hermite(p0, p1, p2, p3, t) {
+  const t2 = t*t, t3 = t2*t;
+  return 0.5 * (
+    (2*p1) +
+    (-p0 + p2) * t +
+    (2*p0 - 5*p1 + 4*p2 - p3) * t2 +
+    (-p0 + 3*p1 - 3*p2 + p3) * t3
+  );
+}
+
+function controlHeight(realmSeed, layer, i) {
+  const noise = rand01('terrain:v1:' + realmSeed + ':' + layer + ':' + i) * 2 - 1;
+  const profile = LAYER_PROFILES[layer] || LAYER_PROFILES.surface;
+  return profile.baseHeight + noise * profile.amplitude;
+}
+
+function terrainHeightAt(realmSeed, layer, x) {
+  const i = Math.floor(x / TERRAIN_STEP);
+  const t = (x - i * TERRAIN_STEP) / TERRAIN_STEP;
+  const p0 = controlHeight(realmSeed, layer, i - 1);
+  const p1 = controlHeight(realmSeed, layer, i);
+  const p2 = controlHeight(realmSeed, layer, i + 1);
+  const p3 = controlHeight(realmSeed, layer, i + 2);
+  return hermite(p0, p1, p2, p3, t);
+}
+
+function smoothstep(t) {
+  const x = t < 0 ? 0 : t > 1 ? 1 : t;
+  return x * x * (3 - 2 * x);
+}
+
+function biomeRawWeight(biome, realmSeed, x) {
+  const period = BIOME_PERIODS[biome];
+  const phaseOffset = rand01('biome:v1:' + realmSeed + ':' + biome + ':phase') * period;
+  const local = ((x - phaseOffset) % period + period) % period;
+  // distance from the nearest anchor (centered at local=0 and local=period)
+  const dist = Math.min(local, period - local);
+  // falloff over the influence radius
+  const t = 1 - Math.min(1, dist / BIOME_INFLUENCE_RADIUS);
+  return smoothstep(t);
+}
+
+function biomeDominantAt(realmSeed, x) {
+  let max = -1, dom = 0;
+  for (let i = 0; i < BIOME_LIST.length; i++) {
+    const w = biomeRawWeight(BIOME_LIST[i], realmSeed, x);
+    if (w > max) { max = w; dom = i; }
+  }
+  return dom;  // 0, 1, or 2
+}
+
+
+/* ── Handler registry ── */
+
+const HANDLERS = {
+  'noise.sample': function(p) {
+    const xStart = +p.xStart, xEnd = +p.xEnd, step = +p.step;
+    const realmSeed = String(p.realmSeed || '');
+    const layer = String(p.layer || 'surface');
+    if (!Number.isFinite(xStart) || !Number.isFinite(xEnd) || !Number.isFinite(step) || step <= 0) {
+      throw new Error('invalid xStart/xEnd/step');
+    }
+    let count = Math.floor((xEnd - xStart) / step);
+    if (count < 0) count = 0;
+    if (count > 10000) throw new Error('sample count > 10000');
+    const out = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      out[i] = terrainHeightAt(realmSeed, layer, xStart + i * step);
+    }
+    return { result: { heights: out, count, xStart, xEnd, step }, transfer: [out.buffer] };
+  },
+
+  'hash.batch': function(p) {
+    const namespaces = Array.isArray(p.namespaces) ? p.namespaces : [];
+    if (namespaces.length > 10000) throw new Error('namespaces > 10000');
+    const out = new Uint32Array(namespaces.length);
+    for (let i = 0; i < namespaces.length; i++) {
+      out[i] = hashString(String(namespaces[i]));
+    }
+    return { result: { hashes: out, count: out.length }, transfer: [out.buffer] };
+  },
+
+  'terrain.strip': function(p) {
+    const xStart = +p.xStart, xEnd = +p.xEnd, step = +p.step;
+    const realmSeed = String(p.realmSeed || '');
+    const layer = String(p.layer || 'surface');
+    if (!Number.isFinite(xStart) || !Number.isFinite(xEnd) || !Number.isFinite(step) || step <= 0) {
+      throw new Error('invalid xStart/xEnd/step');
+    }
+    let count = Math.floor((xEnd - xStart) / step);
+    if (count < 0) count = 0;
+    if (count > 10000) throw new Error('sample count > 10000');
+    const heights = new Float32Array(count);
+    const biomes  = new Uint8Array(count);
+    for (let i = 0; i < count; i++) {
+      const x = xStart + i * step;
+      heights[i] = terrainHeightAt(realmSeed, layer, x);
+      biomes[i]  = biomeDominantAt(realmSeed, x);
+    }
+    return {
+      result: { heights, biomes, count, xStart, xEnd, step },
+      transfer: [heights.buffer, biomes.buffer]
+    };
+  }
+};
+
+
+/* ── Message loop ── */
+
+self.postMessage({ type: 'ready' });
+
+self.onmessage = function(e) {
+  const m = e.data;
+  if (!m || m.type !== 'job') return;
+  const start = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  try {
+    const fn = HANDLERS[m.kind];
+    if (typeof fn !== 'function') throw new Error('unknown kind: ' + m.kind);
+    const { result, transfer } = fn(m.payload || {});
+    const ms = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - start;
+    self.postMessage({ type: 'result', id: m.id, data: result, ms: ms }, transfer || []);
+  } catch (err) {
+    self.postMessage({ type: 'error', id: m.id, error: String(err && err.message ? err.message : err) });
+  }
+};
+`;
+
+
+// ── Main-thread reference implementation for the verify test ───────────────
+// Same math as the worker. Used ONLY by the "Verify vs main thread" test
+// button. Duplication is intentional: two copies you can read side by side,
+// and the verify test fails loudly if they drift.
+
+function ref_hashString(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return h >>> 0;
+}
+const REF_TWO_POW_32 = 0x1_0000_0000;
+function ref_rand01(ns) { return ref_hashString(ns) / REF_TWO_POW_32; }
+const REF_TERRAIN_STEP = 128;
+const REF_LAYER_PROFILES = {
+  surface:    { amplitude:  80, baseHeight:    0 },
+  understory: { amplitude:  60, baseHeight:  220 },
+  canopy:     { amplitude:  45, baseHeight: -180 },
+  deep:       { amplitude: 130, baseHeight:  520 }
+};
+function ref_hermite(p0, p1, p2, p3, t) {
+  const t2 = t*t, t3 = t2*t;
+  return 0.5 * (
+    (2*p1) +
+    (-p0 + p2) * t +
+    (2*p0 - 5*p1 + 4*p2 - p3) * t2 +
+    (-p0 + 3*p1 - 3*p2 + p3) * t3
+  );
+}
+function ref_controlHeight(realmSeed, layer, i) {
+  const noise = ref_rand01('terrain:v1:' + realmSeed + ':' + layer + ':' + i) * 2 - 1;
+  const profile = REF_LAYER_PROFILES[layer] || REF_LAYER_PROFILES.surface;
+  return profile.baseHeight + noise * profile.amplitude;
+}
+function ref_terrainHeightAt(realmSeed, layer, x) {
+  const i = Math.floor(x / REF_TERRAIN_STEP);
+  const t = (x - i * REF_TERRAIN_STEP) / REF_TERRAIN_STEP;
+  const p0 = ref_controlHeight(realmSeed, layer, i - 1);
+  const p1 = ref_controlHeight(realmSeed, layer, i);
+  const p2 = ref_controlHeight(realmSeed, layer, i + 1);
+  const p3 = ref_controlHeight(realmSeed, layer, i + 2);
+  return ref_hermite(p0, p1, p2, p3, t);
+}
+
+
+// ── Worker pool ─────────────────────────────────────────────────────────────
+
+const WORKER_BLOB = new Blob([WORKER_SRC], { type: 'application/javascript' });
+const WORKER_URL  = URL.createObjectURL(WORKER_BLOB);
+
+class WorkerPool {
+  constructor(n) {
+    this.n = n;
+    this.workers   = new Array(n).fill(null);
+    this.ready     = new Array(n).fill(false);
+    this.busy      = new Array(n).fill(false);
+    this.respawns  = new Array(n).fill(0);
+    this.queue     = [];              // pending jobs
+    this.inFlight  = new Map();       // jobId → {idx, startMs, job, retried}
+    this.cancelled = new Set();       // soft-cancel marker
+    this.metrics   = {
+      jobsDone: 0,
+      jobsErr:  0,
+      jobsCancelled: 0,
+      msSum: 0,
+      byKind: new Map(),
+      windowBuckets: new Array(RING_BUFFER_SEC).fill(0),  // 1-sec buckets, rolling
+      windowIndex: 0
+    };
+    // Roll the ring buffer once per second
+    setInterval(() => {
+      this.metrics.windowIndex = (this.metrics.windowIndex + 1) % RING_BUFFER_SEC;
+      this.metrics.windowBuckets[this.metrics.windowIndex] = 0;
+    }, 1000);
+  }
+
+  start() {
+    for (let i = 0; i < this.n; i++) this._spawn(i);
+  }
+
+  _spawn(idx) {
+    const w = new Worker(WORKER_URL);
+    w.onmessage = (e) => this._onMsg(idx, e);
+    w.onerror   = (e) => this._onErr(idx, e);
+    this.workers[idx] = w;
+    this.ready[idx]   = false;
+    this.busy[idx]    = false;
+  }
+
+  submit(job) {
+    // job: { id, kind, payload, onComplete, onError, onCancel }
+    if (this.queue.length >= QUEUE_BOUND) {
+      try { job.onError && job.onError('queue_full'); } catch (_) {}
+      return false;
+    }
+    this.queue.push(job);
+    this._dispatch();
+    return true;
+  }
+
+  cancel(jobId) {
+    // Queue side: remove if present.
+    const qi = this.queue.findIndex(j => j.id === jobId);
+    if (qi !== -1) {
+      const [j] = this.queue.splice(qi, 1);
+      try { j.onCancel && j.onCancel(); } catch (_) {}
+      this.metrics.jobsCancelled++;
+      return 'queued';
+    }
+    // In-flight side: soft cancel, let worker finish, drop result.
+    if (this.inFlight.has(jobId)) {
+      this.cancelled.add(jobId);
+      return 'in-flight';
+    }
+    return 'unknown';
+  }
+
+  _dispatch() {
+    if (this.queue.length === 0) return;
+    for (let i = 0; i < this.n; i++) {
+      if (this.ready[i] && !this.busy[i]) {
+        const job = this.queue.shift();
+        if (!job) return;
+        this.busy[i] = true;
+        this.inFlight.set(job.id, { idx: i, startMs: performance.now(), job, retried: false });
+        this.workers[i].postMessage({ type: 'job', id: job.id, kind: job.kind, payload: job.payload });
+        if (this.queue.length === 0) return;
+      }
+    }
+  }
+
+  _onMsg(idx, e) {
+    const m = e.data;
+    if (!m) return;
+    if (m.type === 'ready') {
+      this.ready[idx] = true;
+      this._dispatch();
+      return;
+    }
+    if (m.type === 'result' || m.type === 'error') {
+      const slot = this.inFlight.get(m.id);
+      this.busy[idx] = false;
+      this.inFlight.delete(m.id);
+
+      if (this.cancelled.has(m.id)) {
+        // Soft-cancelled: discard result, notify caller, keep pool moving.
+        this.cancelled.delete(m.id);
+        try { slot && slot.job.onCancel && slot.job.onCancel(); } catch (_) {}
+        this.metrics.jobsCancelled++;
+        this._dispatch();
+        return;
+      }
+
+      if (m.type === 'result') {
+        const ms = slot ? (performance.now() - slot.startMs) : (m.ms || 0);
+        this.metrics.jobsDone++;
+        this.metrics.msSum += ms;
+        this.metrics.windowBuckets[this.metrics.windowIndex]++;
+        if (slot) {
+          const k = slot.job.kind;
+          if (!this.metrics.byKind.has(k)) this.metrics.byKind.set(k, { count: 0, msSum: 0 });
+          const rec = this.metrics.byKind.get(k);
+          rec.count++; rec.msSum += ms;
+        }
+        try { slot && slot.job.onComplete && slot.job.onComplete({ data: m.data, ms }); } catch (_) {}
+      } else {
+        this.metrics.jobsErr++;
+        try { slot && slot.job.onError && slot.job.onError(m.error || 'unknown'); } catch (_) {}
+      }
+      this._dispatch();
+      return;
+    }
+  }
+
+  _onErr(idx, ev) {
+    log('worker[' + idx + '] crashed: ' + (ev.message || 'unknown'), 'err');
+    // Find any in-flight job assigned to this worker and either retry or fail it.
+    for (const [jobId, slot] of this.inFlight.entries()) {
+      if (slot.idx === idx) {
+        this.inFlight.delete(jobId);
+        if (!slot.retried) {
+          slot.retried = true;
+          this.queue.unshift(slot.job);  // retry at head of queue
+          log('  → retrying job ' + jobId, 'dim');
+        } else {
+          try { slot.job.onError && slot.job.onError('worker crashed twice'); } catch (_) {}
+        }
+      }
+    }
+    // Respawn this slot unless we've hit the cap.
+    try { this.workers[idx].terminate(); } catch (_) {}
+    this.respawns[idx]++;
+    if (this.respawns[idx] > MAX_RESPAWNS) {
+      log('worker[' + idx + '] exceeded respawn cap; leaving slot dead', 'err');
+      this.workers[idx] = null;
+      this.ready[idx] = false;
+      this.busy[idx] = false;
+      return;
+    }
+    this._spawn(idx);
+  }
+
+  snapshot() {
+    const jps = this.metrics.windowBuckets.reduce((a, b) => a + b, 0) / RING_BUFFER_SEC;
+    const avgMs = this.metrics.jobsDone > 0 ? this.metrics.msSum / this.metrics.jobsDone : 0;
+    const byKind = {};
+    for (const [k, v] of this.metrics.byKind.entries()) {
+      byKind[k] = { count: v.count, avgMs: v.count > 0 ? v.msSum / v.count : 0 };
+    }
+    return {
+      workers: this.n,
+      ready: this.ready.filter(Boolean).length,
+      queueDepth: this.queue.length,
+      inFlightCount: this.inFlight.size,
+      jobsPerSec: jps,
+      avgMsPerJob: avgMs,
+      totalDone: this.metrics.jobsDone,
+      totalErr:  this.metrics.jobsErr,
+      totalCancelled: this.metrics.jobsCancelled,
+      respawns: this.respawns.reduce((a, b) => a + b, 0),
+      byKind: byKind
+    };
+  }
+}
+
+
+// ── UI helpers ──────────────────────────────────────────────────────────────
+
+const logContainer = document.getElementById('log-container');
+function log(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'log-entry ' + (type || 'ok');
+  el.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  logContainer.appendChild(el);
+  while (logContainer.children.length > 200) logContainer.firstChild.remove();
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+// Visible heartbeat in the header
+setInterval(() => {
+  const d = document.getElementById('dots');
+  if (d) d.textContent = '.'.repeat(Math.floor((Date.now() / 500) % 4));
+}, 500);
+
+function setMetricsUI(s) {
+  document.getElementById('m-workers').textContent  = s.ready + ' / ' + s.workers;
+  document.getElementById('m-queue').textContent    = s.queueDepth;
+  document.getElementById('m-inflight').textContent = s.inFlightCount;
+  document.getElementById('m-jps').textContent      = s.jobsPerSec.toFixed(1);
+  document.getElementById('m-avgms').textContent    = s.avgMsPerJob > 0 ? s.avgMsPerJob.toFixed(2) + ' ms' : '—';
+  document.getElementById('m-total').textContent    = s.totalDone;
+  document.getElementById('m-respawns').textContent = s.respawns;
+}
+
+
+// ── Pool instance ───────────────────────────────────────────────────────────
+
+const pool = new WorkerPool(workerCountTarget());
+log('pool target: ' + pool.n + ' workers (hw=' + (navigator.hardwareConcurrency || '?') + ')', 'sys');
+
+
+// ── IPC: kernel-side handlers ──────────────────────────────────────────────
+
+let nx = null;
+let blockReadyEmitted = false;
+let streamState = {
+  registered: false,
+  sessionId: null,
+  channelName: null,
+  bc: null,           // BroadcastChannel
+  servedTotal: 0,
+  registerAttempted: false,
+  heartbeatTimer: null
+};
+
+const KNOWN_KINDS = new Set(['noise.sample', 'hash.batch', 'terrain.strip']);
+
+function emit(channel, payload) {
+  if (nx && typeof nx.emit === 'function') nx.emit(channel, payload);
+}
+
+async function handleJob(req) {
+  // req: { id, kind, payload, _reqId, appId }
+  if (!req || !req.id || !req.kind) {
+    return { ok: false, error: 'missing id or kind' };
+  }
+  if (!KNOWN_KINDS.has(req.kind)) {
+    return { ok: false, error: 'unknown kind: ' + req.kind };
+  }
+  return new Promise(resolve => {
+    const queued = pool.submit({
+      id: req.id,
+      kind: req.kind,
+      payload: req.payload || {},
+      onComplete: ({ data, ms }) => resolve({ ok: true, id: req.id, data: data, ms: ms }),
+      onError:    (err)         => resolve({ ok: false, id: req.id, error: err }),
+      onCancel:   ()            => resolve({ ok: false, id: req.id, cancelled: true })
+    });
+    if (!queued) {
+      // submit synchronously failed (already resolved via onError)
+    }
+  });
+}
+
+async function handleCancel(req) {
+  if (!req || !req.id) return { ok: false, error: 'missing id' };
+  const where = pool.cancel(req.id);
+  return { ok: true, id: req.id, where: where };
+}
+
+
+// ── Router registration & stream serving ───────────────────────────────────
+
+async function tryRegisterWithRouter() {
+  if (streamState.registered || streamState.registerAttempted) return;
+  streamState.registerAttempted = true;
+  // Try up to 5 times at 1s intervals at boot. If router shows up later,
+  // we also retry on system.block_ready of the router below.
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      const r = await nx.request('router.register', {
+        kind: STREAM_KIND,
+        blockId: 'nexus_compute',
+        description: 'Streaming terrain strips from the worker pool'
+      }, { timeout: 1500 });
+      if (r && r.ok && r.sessionId && r.channelName) {
+        attachStream(r.sessionId, r.channelName);
+        return;
+      }
+      log('router.register attempt ' + attempt + ' returned ' + JSON.stringify(r), 'dim');
+    } catch (e) {
+      // timeout or no router — try again
+    }
+    await new Promise(res => setTimeout(res, 1000));
+  }
+  streamState.registerAttempted = false;  // allow retry on router-up event
+  log('router not available; streaming disabled until router boots', 'dim');
+  document.getElementById('m-stream').textContent = 'offline';
+}
+
+function attachStream(sessionId, channelName) {
+  streamState.registered  = true;
+  streamState.sessionId   = sessionId;
+  streamState.channelName = channelName;
+  try { if (streamState.bc) streamState.bc.close(); } catch (_) {}
+  streamState.bc = new BroadcastChannel(channelName);
+  streamState.bc.onmessage = onStreamMessage;
+  log('registered with router: kind=' + STREAM_KIND + ' channel=' + channelName, 'sys');
+  document.getElementById('m-stream').textContent = 'serving';
+  // Heartbeat: clear any previous one so we don't double-up after a re-register.
+  if (streamState.heartbeatTimer) clearInterval(streamState.heartbeatTimer);
+  streamState.heartbeatTimer = setInterval(() => {
+    if (streamState.registered) {
+      emit('router.heartbeat', { sessionId: streamState.sessionId });
+    }
+  }, HEARTBEAT_MS);
+}
+
+function onStreamMessage(e) {
+  const m = e.data;
+  if (!m || m.type !== 'request') return;
+  if (!KNOWN_KINDS.has(m.kind || 'terrain.strip')) return;
+  // requesterId required so we can address the response on the same channel
+  if (!m.requesterId) return;
+  const jobId = 'stream:' + m.requesterId + ':' + m.reqSeq;
+  pool.submit({
+    id: jobId,
+    kind: m.kind || 'terrain.strip',
+    payload: m.payload || {},
+    onComplete: ({ data, ms }) => {
+      streamState.servedTotal++;
+      // BroadcastChannel does not accept transferables; structured clone is fine for ~few KB strips.
+      streamState.bc.postMessage({
+        type: 'frame',
+        requesterId: m.requesterId,
+        reqSeq: m.reqSeq,
+        data: data,
+        ms: ms
+      });
+    },
+    onError: (err) => {
+      streamState.bc.postMessage({
+        type: 'frame-error',
+        requesterId: m.requesterId,
+        reqSeq: m.reqSeq,
+        error: String(err)
+      });
+    },
+    onCancel: () => { /* drop */ }
+  });
+}
+
+
+// ── Test panel wiring ──────────────────────────────────────────────────────
+
+const presets = {
+  'noise.sample': { realmSeed: 'demo_realm', layer: 'surface', xStart: 0, xEnd: 1024, step: 4 },
+  'hash.batch':   { namespaces: ['a', 'b', 'c', 'terrain:v1:demo:surface:0'] },
+  'terrain.strip':{ realmSeed: 'demo_realm', layer: 'surface', xStart: 0, xEnd: 1024, step: 4 }
+};
+
+function pretty(obj) {
+  return JSON.stringify(obj, (k, v) => {
+    if (v instanceof Float32Array || v instanceof Uint8Array || v instanceof Uint32Array) {
+      const head = Array.from(v.slice(0, 8)).map(n => typeof n === 'number' ? +n.toFixed(3) : n);
+      return v.constructor.name + '(' + v.length + ') [' + head.join(', ') + (v.length > 8 ? ', …' : '') + ']';
+    }
+    return v;
+  }, 2);
+}
+
+document.getElementById('t-fill').addEventListener('click', () => {
+  const k = document.getElementById('t-kind').value;
+  document.getElementById('t-payload').value = JSON.stringify(presets[k] || {}, null, 2);
+});
+document.getElementById('t-kind').addEventListener('change', () => {
+  document.getElementById('t-fill').click();
+});
+document.getElementById('t-fill').click();  // initial fill
+
+document.getElementById('t-run').addEventListener('click', async () => {
+  const kind = document.getElementById('t-kind').value;
+  let payload;
+  try { payload = JSON.parse(document.getElementById('t-payload').value); }
+  catch (e) {
+    document.getElementById('t-result').textContent = 'JSON parse error: ' + e.message;
+    return;
+  }
+  const jobId = 't-' + Date.now();
+  const t0 = performance.now();
+  const res = await handleJob({ id: jobId, kind: kind, payload: payload, _reqId: 'local', appId: 'self' });
+  const t1 = performance.now();
+  document.getElementById('t-result').textContent =
+    '[' + (res.ok ? 'OK' : 'ERR') + '] end-to-end ' + (t1 - t0).toFixed(2) + ' ms\n' + pretty(res);
+});
+
+document.getElementById('t-burst').addEventListener('click', async () => {
+  document.getElementById('t-result').textContent = 'Bursting 1000 noise.sample jobs…';
+  const payload = presets['noise.sample'];
+  const t0 = performance.now();
+  let ok = 0, err = 0;
+  await Promise.all(Array.from({ length: 1000 }, (_, i) =>
+    handleJob({ id: 'burst-' + i, kind: 'noise.sample', payload: payload, _reqId: 'burst', appId: 'self' })
+      .then(r => { if (r.ok) ok++; else err++; })
+  ));
+  const t1 = performance.now();
+  const total = (t1 - t0);
+  document.getElementById('t-result').textContent =
+    '1000 jobs: ' + ok + ' ok, ' + err + ' err\n' +
+    'wall time: ' + total.toFixed(0) + ' ms\n' +
+    'throughput: ' + (1000 / (total / 1000)).toFixed(1) + ' jobs/sec';
+});
+
+document.getElementById('t-verify').addEventListener('click', async () => {
+  document.getElementById('t-result').textContent = 'Verifying worker output against main-thread reference…';
+  const seeds = ['demo_realm', 'genesis', 'seed_42', 'ZZZ'];
+  const layers = ['surface', 'understory', 'canopy', 'deep'];
+  const xs = [-512, -1, 0, 1, 17, 128, 999, 4096, 100000];
+  let mismatches = 0;
+  let checked = 0;
+  for (const seed of seeds) {
+    for (const layer of layers) {
+      for (const x of xs) {
+        const expected = ref_terrainHeightAt(seed, layer, x);
+        // Sample one point via worker (xStart=x, xEnd=x+1, step=1 → count=1)
+        const res = await handleJob({
+          id: 'verify-' + Math.random(),
+          kind: 'noise.sample',
+          payload: { realmSeed: seed, layer: layer, xStart: x, xEnd: x + 1, step: 1 }
+        });
+        if (!res.ok || !res.data || !res.data.heights || res.data.heights.length !== 1) {
+          mismatches++; continue;
+        }
+        const got = res.data.heights[0];
+        // float32 round-trip: expect bit-equal after Float32Array storage
+        const expected32 = new Float32Array([expected])[0];
+        if (got !== expected32) mismatches++;
+        checked++;
+      }
+    }
+  }
+  document.getElementById('t-result').textContent =
+    'Verify: checked ' + checked + ' samples, ' + mismatches + ' mismatches.\n' +
+    (mismatches === 0 ? 'PASS — worker matches main-thread reference.' : 'FAIL — divergence detected.');
+});
+
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+
+if (window.NexusBlockClient) {
+  nx = window.NexusBlockClient.bootBlock({
+    manifest: {
+      emits:    [
+        'compute.result', 'compute.metrics',
+        'router.register', 'router.heartbeat', 'router.deregister',
+        'system.block_ready'
+      ],
+      consumes: ['compute.job', 'compute.cancel', 'router.result', 'system.block_ready'],
+      app: {
+        title: 'NexusCompute',
+        icon:  '⚙',
+        visible: true,
+        description: 'Worker pool service for off-main-thread compute'
+      }
+    }
+  });
+
+  nx.ready.then(() => {
+    log('kernel handshake complete', 'sys');
+    document.getElementById('status').textContent = 'ONLINE';
+    pool.start();
+
+    // Register request handlers (auto-emits on resultChannel)
+    nx.handle('compute.job',    handleJob,    { resultChannel: 'compute.result' });
+    nx.handle('compute.cancel', handleCancel, { resultChannel: 'compute.result' });
+
+    // Listen for router coming up after us; re-attempt registration.
+    nx.subscribe('system.block_ready', (p) => {
+      if (p && p.blockId === ROUTER_BLOCK_ID && !streamState.registered) {
+        log('router ready signal received; registering…', 'sys');
+        streamState.registerAttempted = false;
+        tryRegisterWithRouter();
+      }
+    });
+
+    // Metrics emission
+    setInterval(() => {
+      const snap = pool.snapshot();
+      setMetricsUI(snap);
+      emit('compute.metrics', snap);
+    }, 1000 / METRICS_HZ);
+
+    // Tell the world we're up
+    emit('system.block_ready', { blockId: 'nexus_compute', status: 'ONLINE' });
+    blockReadyEmitted = true;
+
+    // Try to find the router
+    tryRegisterWithRouter();
+  });
+} else {
+  log('NexusBlockClient missing; running standalone (no IPC)', 'err');
+  document.getElementById('status').textContent = 'STANDALONE';
+  pool.start();
+  setInterval(() => setMetricsUI(pool.snapshot()), 1000);
+}
+
+window.addEventListener('error', (e) => log(String(e.message || e), 'err'));
+window.addEventListener('unhandledrejection', (e) => log('unhandled: ' + String(e.reason), 'err'));
+</script>
+</body>
+</html>

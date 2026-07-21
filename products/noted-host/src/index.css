@@ -1,0 +1,314 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme="matrix"] {
+  /* Matrix locked palette: #0A0E0C, #0E1411, #131B16, #203027, #CDEBD6, #41D880 */
+  --bg:              10 14 12;
+  --surface:         14 20 17;
+  --surface-2:       19 27 22;
+  --surface-3:       26 37 30;
+  --line:            32 48 39;
+
+  --ink:             205 235 214;
+  --ink-dim:         111 140 121;
+  --ink-soft:        111 140 121;
+  --ink-faint:       65 88 74;
+
+  --accent:          65 216 128;
+  --accent-bright:   107 242 162;
+  --accent-dim:      37 143 85;
+  --accent-soft:     37 143 85;
+  --accent-contrast: 6 20 12;
+
+  --danger:          240 86 106;
+  --warning:         227 179 65;
+  --info:            74 192 224;
+  --warn:            227 179 65;
+  --bad:             240 86 106;
+  --good:            65 216 128;
+}
+
+[data-theme="paper"] {
+  --bg:              250 249 246;
+  --surface:         250 249 246;
+  --surface-2:       243 241 236;
+  --surface-3:       230 227 220;
+  --line:            221 217 210;
+
+  --ink:             42 40 37;
+  --ink-dim:         86 82 76;
+  --ink-soft:        86 82 76;
+  --ink-faint:       138 133 125;
+
+  --accent:          109 91 156;
+  --accent-bright:   133 112 184;
+  --accent-dim:      83 70 121;
+  --accent-soft:     207 199 227;
+  --accent-contrast: 250 249 246;
+
+  --danger:          166 70 64;
+  --warning:         176 125 44;
+  --info:            61 125 154;
+  --warn:            176 125 44;
+  --bad:             166 70 64;
+  --good:            79 122 74;
+}
+
+[data-theme="midnight"] {
+  --bg:              16 17 19;
+  --surface:         24 25 27;
+  --surface-2:       32 33 36;
+  --surface-3:       42 45 49;
+  --line:            51 55 64;
+
+  --ink:             226 228 232;
+  --ink-dim:         155 163 175;
+  --ink-soft:        155 163 175;
+  --ink-faint:       107 114 128;
+
+  --accent:          178 155 223;
+  --accent-bright:   205 184 245;
+  --accent-dim:      120 99 166;
+  --accent-soft:     74 63 106;
+  --accent-contrast: 18 14 28;
+
+  --danger:          210 122 115;
+  --warning:         212 163 90;
+  --info:            107 180 211;
+  --warn:            212 163 90;
+  --bad:             210 122 115;
+  --good:            130 169 120;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+textarea, input, button {
+  font-family: inherit;
+  color: inherit;
+}
+
+textarea:focus, input:focus, button:focus {
+  outline: none;
+}
+
+/* Editor surfaces use a quieter, monospace-adjacent feel with generous leading. */
+.editor-surface {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 15px;
+  line-height: 1.75;
+  background: transparent;
+  resize: none;
+  width: 100%;
+  border: none;
+  display: block;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: auto;
+}
+
+/* Sweep 36 — canonical full-width body editor padding. */
+.editor-body-pad {
+  padding-left: clamp(1.5rem, 5vw, 6rem);
+  padding-right: clamp(1.5rem, 5vw, 6rem);
+}
+
+/* Sweep 31 — prevent main prose/prompt fields collapsing to one-line boxes. */
+textarea.editor-surface.flex-1 {
+  min-height: 0;
+}
+
+textarea.editor-surface.min-h-full {
+  height: 100%;
+  min-height: 24rem;
+}
+
+.title-input {
+  background: transparent;
+  border: none;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+
+/* Sweep 5 — compact native-style scrollbars. */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(var(--surface-3)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--ink-faint)); }
+::-webkit-scrollbar-corner { background: transparent; }
+* { scrollbar-width: thin; scrollbar-color: rgb(var(--surface-3)) transparent; }
+
+
+/* Sweep 33b — utility for horizontal tab strips where scrollability should be quiet. */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sweep 34 — Focus Mode hides chrome through one shell-level data attribute. */
+[data-focus-mode="true"] [data-focus-hide="sidebar"],
+[data-focus-mode="true"] [data-focus-hide="topbar"],
+[data-focus-mode="true"] [data-focus-hide="nexus-panel"],
+[data-focus-mode="true"] [data-focus-hide="record-list"] {
+  display: none !important;
+}
+
+[data-focus-mode="true"] [data-test="scratch-drawer"][data-open="false"] {
+  height: 0 !important;
+  border-top-width: 0;
+}
+
+[data-focus-mode="true"] [data-test="scratch-drawer"][data-open="false"] [data-test="scratch-drawer-handle"] {
+  display: none !important;
+}
+
+/* Sweep 31 — suppress ghost text in HighlightedEditor on Wayland/Electron */
+[data-test="prompt-body"]::selection {
+  color: transparent;
+  background: rgb(var(--accent-soft) / 0.7);
+}
+
+
+/* Sweep 59 — atmospheric UI polish: presentation-only tokens/utilities. */
+::selection {
+  background: rgb(var(--accent) / 0.22);
+  color: rgb(var(--ink));
+}
+
+body {
+  background:
+    radial-gradient(circle at 18% -8%, rgb(var(--accent) / 0.10), transparent 34rem),
+    radial-gradient(circle at 88% 8%, rgb(var(--info) / 0.07), transparent 28rem),
+    rgb(var(--bg));
+}
+
+.n-noted-shell {
+  background:
+    linear-gradient(135deg, rgb(var(--surface) / 0.72), rgb(var(--bg) / 0.96)),
+    rgb(var(--bg));
+}
+
+.n-private-glass {
+  background:
+    linear-gradient(180deg, rgb(var(--surface) / 0.94), rgb(var(--surface-2) / 0.78));
+  box-shadow: 0 18px 55px rgb(0 0 0 / 0.20);
+  backdrop-filter: blur(16px);
+}
+
+.n-sidebar-surface {
+  background:
+    radial-gradient(circle at 50% -6rem, rgb(var(--accent) / 0.12), transparent 16rem),
+    linear-gradient(180deg, rgb(var(--surface-2) / 0.98), rgb(var(--surface) / 0.92));
+}
+
+.n-sidebar-active {
+  background:
+    linear-gradient(90deg, rgb(var(--accent) / 0.18), rgb(var(--surface-3) / 0.96));
+  box-shadow: inset 2px 0 0 rgb(var(--accent) / 0.86);
+}
+
+.n-sidebar-link {
+  position: relative;
+}
+
+.n-sidebar-link::after {
+  content: '';
+  position: absolute;
+  inset: 0.4rem 0.45rem auto auto;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: rgb(var(--accent) / 0.0);
+  transition: background-color 160ms ease;
+}
+
+.n-sidebar-link[aria-current='page']::after {
+  background: rgb(var(--accent) / 0.78);
+}
+
+.n-app-mark-orbit {
+  filter: drop-shadow(0 0 16px rgb(var(--accent) / 0.18));
+}
+
+.n-command-card {
+  background:
+    linear-gradient(180deg, rgb(var(--surface) / 0.98), rgb(var(--surface-2) / 0.96));
+  box-shadow: 0 24px 90px rgb(0 0 0 / 0.34);
+}
+
+.n-soft-motion {
+  animation: n-soft-rise 180ms ease-out both;
+}
+
+@keyframes n-soft-rise {
+  from { opacity: 0; transform: translateY(6px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Sweep 59-R — additional presentation-only polish.
+   All new behavior is reduced-motion-respecting via the global guard below. */
+
+/* Global caret takes the brand accent, matching the matrix/paper/midnight tokens. */
+textarea, input, [contenteditable="true"] {
+  caret-color: rgb(var(--accent));
+}
+
+/* Consistent keyboard focus indicator. Scoped via :focus-visible so mouse
+   users still see the existing per-component hover/focus treatments. */
+:focus-visible {
+  outline: 2px solid rgb(var(--accent) / 0.65);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* Editor surfaces keep their typographic feel — they manage focus through
+   the surrounding card chrome, not an outline ring. */
+.editor-surface:focus-visible,
+.title-input:focus-visible {
+  outline: none;
+}
+
+/* Route entry — applied to the route container in App.tsx keyed by pathname,
+   so navigating between studios feels like a dissolve rather than a snap. */
+.n-route-transition {
+  animation: n-route-dissolve 180ms ease-out both;
+}
+@keyframes n-route-dissolve {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Nexus Panel width transition — pairs with the inline width style in
+   NexusPanel.tsx. Width is on the outer shell; the content uses opacity so
+   the strip→panel transition reads as a reveal rather than a stretch. */
+.n-panel-shift { transition: width 200ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+.n-panel-shift > * { transition: opacity 180ms ease; }
+
+/* Toast stack uses the existing n-soft-motion entry; on exit React unmounts
+   so no exit animation is required. Reduced-motion guard below covers entry. */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}

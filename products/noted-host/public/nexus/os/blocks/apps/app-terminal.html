@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terminal</title>
+<style>
+:root { color-scheme: dark; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 13px; }
+body { background: #111318; color: #d2d5de; display: flex; flex-direction: column; }
+#nx-boot-screen {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px;
+}
+#nx-boot-icon  { font-size: 40px; }
+#nx-boot-title { font-size: 15px; font-weight: 600; }
+#nx-boot-state { font-size: 10px; color: #6b7089; letter-spacing: 1px; margin-top: 4px; }
+#nx-app { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; }
+body.nx-mounted #nx-boot-screen { display: none; }
+body.nx-mounted #nx-app         { display: flex; }
+/* Scrollbars */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #262a35; border-radius: 3px; }
+/* Shared surface tokens */
+:root {
+  --bg: #08090c; --surface: #111318; --surface-2: #181b22; --surface-3: #1f222b;
+  --border: #262a35; --border-hi: #363b4a; --text: #d2d5de; --text-dim: #6b7089;
+  --text-muted: #3e4255; --accent: #4dbb7a; --accent-dim: rgba(77,187,122,.10);
+  --danger: #ef4444; --warn: #f59e0b; --info: #3b82f6; --radius: 6px;
+}
+
+#term-feed {
+  flex: 1; overflow-y: auto; padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--bg);
+}
+.term-entry {
+  display: flex; gap: 8px; padding: 3px 4px; border-radius: 4px;
+  font-size: 11px; line-height: 1.4; border-left: 2px solid transparent;
+}
+.term-entry:hover { background: var(--surface-2); }
+.term-time  { color: var(--text-muted); min-width: 52px; flex-shrink: 0; }
+.term-level { font-weight: 700; min-width: 32px; font-size: 10px; flex-shrink: 0; }
+.term-msg   { color: var(--text-dim); word-break: break-all; flex: 1; }
+.lv-ok   { border-left-color: var(--accent); } .lv-ok   .term-level { color: var(--accent); }
+.lv-info .term-level { color: var(--info); }
+.lv-warn { border-left-color: var(--warn); }  .lv-warn .term-level { color: var(--warn); }
+.lv-bad  { border-left-color: var(--danger); } .lv-bad  .term-level { color: var(--danger); }
+#term-toolbar {
+  padding: 6px 10px; border-bottom: 1px solid var(--border); display: flex;
+  gap: 6px; align-items: center; background: var(--surface-2); flex-shrink: 0;
+}
+.term-filter {
+  font-size: 9px; padding: 2px 7px; border-radius: 10px; cursor: pointer;
+  border: 1px solid transparent; color: var(--text-dim); background: var(--surface-3);
+  transition: all .12s;
+}
+.term-filter.f-ok   { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+.term-filter.f-info { color: var(--info);   border-color: var(--info);   background: rgba(59,130,246,.1); }
+.term-filter.f-warn { color: var(--warn);   border-color: var(--warn);   background: rgba(245,158,11,.1); }
+.term-filter.f-bad  { color: var(--danger); border-color: var(--danger); background: rgba(239,68,68,.1); }
+#term-clear { margin-left: auto; font-size: 10px; padding: 2px 8px; border-radius: 4px;
+  cursor: pointer; background: var(--surface-3); border: 1px solid var(--border);
+  color: var(--text-dim); font-family: inherit; transition: all .12s; }
+#term-clear:hover { color: var(--danger); border-color: var(--danger); }
+#term-count { font-size: 10px; color: var(--text-muted); }
+
+</style>
+</head>
+<body>
+
+<!-- Shown during protocol handshake -->
+<div id="nx-boot-screen">
+  <div id="nx-boot-icon">⌬</div>
+  <div id="nx-boot-title">Terminal</div>
+  <div id="nx-boot-state">WAITING</div>
+</div>
+
+<!-- App UI — revealed on MOUNTED -->
+<div id="nx-app">
+  <div id="term-toolbar">
+    <span class="term-filter" data-lv="OK">OK</span>
+    <span class="term-filter" data-lv="INFO">INF</span>
+    <span class="term-filter" data-lv="WARN">WRN</span>
+    <span class="term-filter" data-lv="BAD">ERR</span>
+    <span id="term-count">0 entries</span>
+    <button id="term-clear">clear</button>
+  </div>
+  <div id="term-feed"></div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+"use strict";
+// ══════════════════════════════════════════════════════════════
+//  Nexus OS — Managed Block  |  Terminal
+//  Uses engines/nexus-block-client.js for the kernel handshake.
+// ══════════════════════════════════════════════════════════════
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ["nexus.kernel.ping"],
+    consumes: ["nexus.kernel.log"],
+    app: {
+      title:       "Terminal",
+      icon:        "⌬",
+      description: "System monitor & kernel feed",
+      visible:     true
+    }
+  },
+  onMessage({ channel, payload }) {
+    if (channel === "nexus.kernel.log" && payload) appendEntry(payload);
+  }
+});
+
+
+const feed     = document.getElementById("term-feed");
+const countEl  = document.getElementById("term-count");
+let   filters  = new Set();
+let   total    = 0;
+let   autoScroll = true;
+
+document.querySelectorAll(".term-filter").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const lv = btn.dataset.lv;
+    const cls = "f-" + lv.toLowerCase();
+    btn.classList.toggle(cls);
+    filters.has(lv) ? filters.delete(lv) : filters.add(lv);
+  });
+});
+
+document.getElementById("term-clear").onclick = () => {
+  feed.textContent = "";
+  total = 0;
+  countEl.textContent = "0 entries";
+};
+
+feed.addEventListener("scroll", () => {
+  const { scrollTop, scrollHeight, clientHeight } = feed;
+  autoScroll = (scrollHeight - scrollTop - clientHeight) < 40;
+});
+
+function appendEntry(entry) {
+  total++;
+  countEl.textContent = total + " entries";
+  if (filters.size > 0 && !filters.has(entry.level)) return;
+  const el   = document.createElement("div");
+  el.className = "term-entry lv-" + entry.level.toLowerCase();
+  const ts = new Date(entry.at || Date.now());
+  const t  = document.createElement("span"); t.className = "term-time";
+  t.textContent = ts.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+  const lv = document.createElement("span"); lv.className = "term-level";
+  lv.textContent = entry.level;
+  const msg = document.createElement("span"); msg.className = "term-msg";
+  msg.textContent = String(entry.message || "");
+  el.appendChild(t); el.appendChild(lv); el.appendChild(msg);
+  feed.appendChild(el);
+  if (feed.children.length > 600) feed.firstChild.remove();
+  if (autoScroll) feed.scrollTop = feed.scrollHeight;
+}
+
+if (nx) {
+  nx.ready.then(() => {
+    document.body.classList.add("nx-mounted");
+    nx.subscribe("nexus.kernel.log");
+  });
+}
+
+
+</script>
+</body>
+</html>

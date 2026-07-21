@@ -1,0 +1,40 @@
+{
+  "version": "0.04",
+  "channels": [
+    {
+      "channel": "diagnostic.ping",
+      "owner": "noted-host",
+      "direction": "nexus-to-noted"
+    },
+    {
+      "channel": "diagnostic.receipt",
+      "owner": "noted-host",
+      "direction": "noted-to-nexus"
+    },
+    {
+      "channel": "prompt.snapshot.created",
+      "owner": "prompt-studio-v3",
+      "direction": "block-to-nexus"
+    },
+    {
+      "channel": "prompt.snapshot.import.requested",
+      "owner": "nexus-router",
+      "direction": "nexus-to-noted"
+    },
+    {
+      "channel": "agent.action.proposed",
+      "owner": "nexus-agent",
+      "direction": "block-to-nexus"
+    },
+    {
+      "channel": "ui.patch.proposed",
+      "owner": "nexus-agent",
+      "direction": "block-to-nexus"
+    },
+    {
+      "channel": "nostr.publish.requested",
+      "owner": "nexus-router",
+      "direction": "nexus-to-nostr-bridge"
+    }
+  ]
+}

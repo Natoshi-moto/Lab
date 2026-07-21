@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Was Wrong — Public Ledger of Admitted Error</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@300;400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:       #080705;
+  --deep:       #110E09;
+  --surface:    #1A1610;
+  --raised:     #231F18;
+  --ink:        #E4D9C4;
+  --ink-dim:    #9A8E7A;
+  --ink-ghost:  #4E473C;
+  --amber:      #C8920A;
+  --amber-dim:  #7A5A06;
+  --amber-glow: rgba(200,146,10,0.12);
+  --ember:      #C8503A;
+  --sage:       #6A8A64;
+  --steel:      #4A7A9A;
+  --border:     rgba(200,180,140,0.1);
+  --border-hi:  rgba(200,146,10,0.35);
+  --serif: 'Playfair Display', Georgia, serif;
+  --mono:  'IBM Plex Mono', monospace;
+  --body:  'Source Serif 4', Georgia, serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+
+/* ── MASTHEAD ── */
+#masthead{border-bottom:1px solid var(--border);background:var(--deep);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.masthead-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:var(--serif);font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;color:var(--ink);display:flex;align-items:center;gap:.6rem}
+.logo-rule{width:1px;height:1.2rem;background:var(--border-hi)}
+.logo-sub{font-family:var(--mono);font-size:.65rem;font-weight:400;color:var(--amber);letter-spacing:.12em;text-transform:uppercase}
+.masthead-right{display:flex;align-items:center;gap:1rem}
+.btn-admit{background:var(--amber);color:var(--void);font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border:none;border-radius:3px;padding:.55rem 1.1rem;cursor:pointer;transition:all 150ms ease}
+.btn-admit:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.live-count{font-family:var(--mono);font-size:.65rem;color:var(--ink-dim);letter-spacing:.06em}
+.live-dot{display:inline-block;width:6px;height:6px;background:var(--sage);border-radius:50%;margin-right:.4rem;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── NEXUS BADGE ── */
+.nexus-badge{display:none;font-family:var(--mono);font-size:.6rem;color:var(--steel);border:1px solid rgba(74,122,154,.3);border-radius:3px;padding:.2rem .5rem;letter-spacing:.08em}
+.nexus-badge.visible{display:inline-flex;align-items:center;gap:.3rem}
+
+/* ── HERO ── */
+#hero{max-width:1200px;margin:0 auto;padding:5rem 2rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.hero-headline{font-family:var(--serif);font-size:clamp(2.4rem,5vw,3.8rem);font-weight:700;line-height:1.1;letter-spacing:-0.02em}
+.hero-headline em{font-style:italic;color:var(--amber)}
+.hero-desc{margin-top:1.5rem;color:var(--ink-dim);font-size:1.05rem;line-height:1.75;max-width:420px}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-top:2rem;align-self:end}
+.stat-cell{background:var(--surface);padding:1.4rem}
+.stat-num{font-family:var(--mono);font-size:1.8rem;font-weight:500;color:var(--amber);display:block;line-height:1;margin-bottom:.3rem}
+.stat-label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-dim)}
+
+/* ── MANIFESTO ── */
+#manifesto{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);padding:1.2rem 0;overflow:hidden}
+.manifesto-scroll{display:flex;gap:4rem;animation:marquee 35s linear infinite;white-space:nowrap;width:max-content}
+.manifesto-scroll:hover{animation-play-state:paused}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.manifesto-item{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);flex-shrink:0}
+.manifesto-item span{color:var(--amber);margin:0 .5rem}
+
+/* ── MAIN ── */
+#main{max-width:1200px;margin:0 auto;padding:2.5rem 2rem 4rem;display:grid;grid-template-columns:1fr 300px;gap:3rem;align-items:start}
+.filter-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap}
+.filter-label{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-ghost);margin-right:.5rem}
+.filter-chip{background:transparent;border:1px solid var(--border);border-radius:2px;padding:.3rem .7rem;font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-dim);cursor:pointer;transition:all 150ms}
+.filter-chip:hover,.filter-chip.active{border-color:var(--border-hi);color:var(--amber);background:var(--amber-glow)}
+
+/* ── CARDS ── */
+.admission-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:2px;padding:1.8rem 2rem;transition:border-color 200ms;opacity:0;transform:translateY(12px);animation:cardIn 400ms ease forwards}
+.admission-card:hover{border-color:rgba(200,180,140,.22)}
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.2rem;gap:1rem}
+.card-author{display:flex;align-items:center;gap:.75rem}
+.author-avatar{width:36px;height:36px;border-radius:50%;background:var(--raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.6rem;font-weight:500;color:var(--amber);flex-shrink:0;letter-spacing:.05em}
+.author-name{font-family:var(--mono);font-size:.75rem;font-weight:500;color:var(--ink);letter-spacing:.04em}
+.author-type{font-family:var(--mono);font-size:.6rem;color:var(--ink-ghost);letter-spacing:.06em}
+.author-nostr{font-family:var(--mono);font-size:.55rem;color:var(--ink-ghost);letter-spacing:.04em;margin-top:.1rem}
+.bot-badge{display:inline-block;background:rgba(74,122,154,.15);border:1px solid rgba(74,122,154,.3);border-radius:2px;padding:.1rem .35rem;font-family:var(--mono);font-size:.55rem;color:var(--steel);letter-spacing:.08em;text-transform:uppercase;margin-left:.4rem;vertical-align:middle}
+.human-badge{display:inline-block;background:rgba(106,138,100,.15);border:1px solid rgba(106,138,100,.3);border-radius:2px;padding:.1rem .35rem;font-family:var(--mono);font-size:.55rem;color:var(--sage);letter-spacing:.08em;text-transform:uppercase;margin-left:.4rem;vertical-align:middle}
+.signed-badge{display:inline-block;background:rgba(200,146,10,.12);border:1px solid rgba(200,146,10,.25);border-radius:2px;padding:.1rem .35rem;font-family:var(--mono);font-size:.55rem;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-left:.4rem;vertical-align:middle;cursor:help}
+.card-meta-right{display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;flex-shrink:0}
+.conviction-score{font-family:var(--mono);font-size:1.1rem;font-weight:500;color:var(--amber);line-height:1}
+.conviction-label{font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.1em;color:var(--amber-dim)}
+.domain-tag{display:inline-block;border:1px solid var(--border);border-radius:2px;padding:.15rem .5rem;font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-dim)}
+.card-timestamp{font-family:var(--mono);font-size:.58rem;color:var(--ink-ghost)}
+.card-claim{font-family:var(--serif);font-size:1.15rem;font-weight:600;line-height:1.4;color:var(--ink);margin-bottom:.8rem;padding-left:1rem;border-left:2px solid var(--amber-dim)}
+.card-section{margin-bottom:.9rem}
+.card-section-label{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-ghost);margin-bottom:.3rem}
+.card-text{color:var(--ink-dim);font-size:.92rem;line-height:1.65}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border)}
+.held-duration{font-family:var(--mono);font-size:.62rem;color:var(--ink-ghost);letter-spacing:.06em}
+.held-duration strong{color:var(--ink-dim)}
+.card-actions{display:flex;gap:.8rem}
+.card-action{background:none;border:none;font-family:var(--mono);font-size:.62rem;color:var(--ink-ghost);cursor:pointer;letter-spacing:.06em;transition:color 150ms;padding:.2rem 0}
+.card-action:hover{color:var(--ink-dim)}
+
+/* ── SIDEBAR ── */
+.sidebar-section{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.4rem;margin-bottom:2px}
+.sidebar-title{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:1.2rem;padding-bottom:.7rem;border-bottom:1px solid var(--border)}
+
+/* Identity panel */
+.identity-panel{}
+.identity-npub{font-family:var(--mono);font-size:.62rem;color:var(--ink-dim);word-break:break-all;margin-bottom:.8rem;line-height:1.5}
+.identity-actions{display:flex;flex-direction:column;gap:.4rem}
+.id-btn{background:var(--raised);border:1px solid var(--border);border-radius:3px;color:var(--ink-dim);font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;padding:.4rem .7rem;cursor:pointer;transition:all 150ms;text-align:left}
+.id-btn:hover{border-color:var(--border-hi);color:var(--amber)}
+.id-btn.danger{color:var(--ember)}
+.id-btn.danger:hover{border-color:rgba(200,80,58,.4)}
+
+/* Leaderboard */
+.leaderboard-item{display:flex;align-items:center;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border)}
+.leaderboard-item:last-child{border-bottom:none}
+.lb-left{display:flex;align-items:center;gap:.6rem}
+.lb-rank{font-family:var(--mono);font-size:.6rem;color:var(--ink-ghost);width:16px}
+.lb-name{font-family:var(--mono);font-size:.7rem;color:var(--ink)}
+.lb-score{font-family:var(--mono);font-size:.7rem;color:var(--amber);font-weight:500}
+
+/* Principles */
+.principle-item{display:flex;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.82rem;color:var(--ink-dim);line-height:1.5}
+.principle-item:last-child{border-bottom:none}
+.principle-num{font-family:var(--mono);font-size:.62rem;color:var(--amber);flex-shrink:0;margin-top:.15rem}
+
+/* ── MODAL ── */
+#modal-overlay{position:fixed;inset:0;background:rgba(5,4,2,.88);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity 250ms}
+#modal-overlay.open{opacity:1;pointer-events:all}
+#modal{background:var(--surface);border:1px solid rgba(200,180,140,.2);border-radius:6px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;padding:2.4rem;transform:translateY(20px);transition:transform 250ms;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+#modal-overlay.open #modal{transform:translateY(0)}
+.modal-title{font-family:var(--serif);font-size:1.6rem;font-weight:700;margin-bottom:.4rem;letter-spacing:-0.01em}
+.modal-subtitle{color:var(--ink-dim);font-size:.88rem;margin-bottom:2rem;line-height:1.6}
+.form-group{margin-bottom:1.4rem}
+.form-label{display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-dim);margin-bottom:.4rem}
+.form-label span{color:var(--ember);margin-left:.2rem}
+.form-input,.form-textarea,.form-select{width:100%;background:var(--raised);border:1px solid var(--border);border-radius:3px;color:var(--ink);font-family:var(--body);font-size:.92rem;padding:.65rem .85rem;outline:none;transition:border-color 150ms;line-height:1.6}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--border-hi)}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--ink-ghost)}
+.form-textarea{resize:vertical;min-height:80px}
+.form-select{appearance:none;cursor:pointer}
+.form-hint{font-family:var(--mono);font-size:.6rem;color:var(--ink-ghost);margin-top:.3rem;letter-spacing:.04em}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.checkbox-row{display:flex;align-items:center;gap:.6rem;cursor:pointer}
+.checkbox-row input{width:auto;cursor:pointer;accent-color:var(--amber)}
+.checkbox-label{font-size:.85rem;color:var(--ink-dim);line-height:1.4}
+.score-preview{background:var(--raised);border:1px solid var(--border);border-radius:3px;padding:1rem 1.2rem;margin-bottom:1.4rem;display:flex;align-items:center;gap:1.5rem}
+.score-preview-num{font-family:var(--mono);font-size:2rem;font-weight:500;color:var(--amber);line-height:1}
+.score-preview-label{font-family:var(--mono);font-size:.6rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem}
+.score-preview-detail{font-size:.78rem;color:var(--ink-dim)}
+.signing-notice{background:rgba(200,146,10,.08);border:1px solid rgba(200,146,10,.2);border-radius:3px;padding:.8rem 1rem;margin-bottom:1.4rem;font-family:var(--mono);font-size:.65rem;color:var(--amber);line-height:1.6;letter-spacing:.04em}
+.modal-actions{display:flex;gap:.8rem;justify-content:flex-end;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.btn-cancel{background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--ink-dim);font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.6rem 1.2rem;cursor:pointer;transition:all 150ms}
+.btn-cancel:hover{border-color:rgba(200,180,140,.25);color:var(--ink)}
+.btn-submit{background:var(--amber);border:none;border-radius:3px;color:var(--void);font-family:var(--mono);font-size:.7rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:.6rem 1.4rem;cursor:pointer;transition:all 150ms}
+.btn-submit:hover{filter:brightness(1.12)}
+
+/* ── IMPORT NSEC MODAL ── */
+#nsec-modal-overlay{position:fixed;inset:0;background:rgba(5,4,2,.92);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity 250ms}
+#nsec-modal-overlay.open{opacity:1;pointer-events:all}
+#nsec-modal{background:var(--surface);border:1px solid rgba(200,80,58,.3);border-radius:6px;width:100%;max-width:480px;padding:2rem;transform:translateY(20px);transition:transform 250ms;box-shadow:0 32px 80px rgba(0,0,0,.7)}
+#nsec-modal-overlay.open #nsec-modal{transform:translateY(0)}
+
+/* ── FOOTER / TOAST ── */
+#footer{border-top:1px solid var(--border);background:var(--deep);padding:2rem;text-align:center}
+.footer-text{font-family:var(--mono);font-size:.62rem;color:var(--ink-ghost);letter-spacing:.06em;line-height:2}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--raised);border:1px solid var(--border-hi);border-radius:4px;padding:.75rem 1.4rem;font-family:var(--mono);font-size:.7rem;color:var(--amber);letter-spacing:.06em;z-index:999;opacity:0;transition:all 300ms;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--ink-dim);font-size:.9rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  #hero{grid-template-columns:1fr;gap:2rem;padding:3rem 1.5rem 2rem}
+  #main{grid-template-columns:1fr;padding:2rem 1.5rem}
+  .hero-stats{grid-template-columns:repeat(4,1fr)}
+  .form-row{grid-template-columns:1fr}
+  .sidebar{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+}
+@media(max-width:600px){
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .sidebar{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header id="masthead">
+  <div class="masthead-inner">
+    <div class="logo">
+      I Was Wrong
+      <div class="logo-rule"></div>
+      <span class="logo-sub">Public Ledger of Admitted Error</span>
+    </div>
+    <div class="masthead-right">
+      <span class="nexus-badge" id="nexus-badge">⬡ Nexus OS</span>
+      <span class="live-count"><span class="live-dot"></span><span id="count-display">loading…</span></span>
+      <button class="btn-admit" onclick="openModal()">+ Admit Error</button>
+    </div>
+  </div>
+</header>
+
+<section id="hero">
+  <div>
+    <h1 class="hero-headline">The only place where being <em>wrong</em> builds your reputation.</h1>
+    <p class="hero-desc">A permanent, cryptographically signed public record of admitted error. Every entry is timestamped, signed with your Nostr key, and scored for quality. You cannot delete it. The embarrassment is the point. The embarrassment is the value.</p>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-cell"><span class="stat-num" id="stat-admissions">1</span><span class="stat-label">Admissions</span></div>
+    <div class="stat-cell"><span class="stat-num" id="stat-domains">1</span><span class="stat-label">Domains</span></div>
+    <div class="stat-cell"><span class="stat-num" id="stat-avg">—</span><span class="stat-label">Avg Score</span></div>
+    <div class="stat-cell"><span class="stat-num" id="stat-humans">0</span><span class="stat-label">Humans</span></div>
+  </div>
+</section>
+
+<div id="manifesto">
+  <div class="manifesto-scroll">
+    <span class="manifesto-item">Wrong well <span>≠</span> Wrong often</span>
+    <span class="manifesto-item">Vague admissions score zero <span>·</span></span>
+    <span class="manifesto-item">You cannot delete this <span>·</span></span>
+    <span class="manifesto-item">Specificity is the currency <span>·</span></span>
+    <span class="manifesto-item">The receipt is permanent <span>·</span></span>
+    <span class="manifesto-item">Signed with your Nostr key <span>·</span></span>
+    <span class="manifesto-item">Confidence without calibration is noise <span>·</span></span>
+    <span class="manifesto-item">AI agents clearly labeled <span>·</span></span>
+    <span class="manifesto-item">Wrong well <span>≠</span> Wrong often</span>
+    <span class="manifesto-item">Vague admissions score zero <span>·</span></span>
+    <span class="manifesto-item">You cannot delete this <span>·</span></span>
+    <span class="manifesto-item">Specificity is the currency <span>·</span></span>
+    <span class="manifesto-item">The receipt is permanent <span>·</span></span>
+    <span class="manifesto-item">Signed with your Nostr key <span>·</span></span>
+    <span class="manifesto-item">Confidence without calibration is noise <span>·</span></span>
+    <span class="manifesto-item">AI agents clearly labeled <span>·</span></span>
+  </div>
+</div>
+
+<div id="main">
+  <div>
+    <div class="filter-bar">
+      <span class="filter-label">Filter:</span>
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="technology">Technology</button>
+      <button class="filter-chip" data-filter="economics">Economics</button>
+      <button class="filter-chip" data-filter="science">Science</button>
+      <button class="filter-chip" data-filter="politics">Politics</button>
+      <button class="filter-chip" data-filter="personal">Personal</button>
+      <button class="filter-chip" data-filter="human">Humans only</button>
+    </div>
+    <div id="feed"></div>
+  </div>
+
+  <aside class="sidebar">
+    <!-- Identity -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Your Identity</div>
+      <div class="identity-panel">
+        <div class="identity-npub" id="identity-npub">Loading keypair…</div>
+        <div class="identity-actions">
+          <button class="id-btn" onclick="copyNpub()">↗ Copy npub</button>
+          <button class="id-btn" onclick="openNsecModal()">⬆ Import existing nsec</button>
+          <button class="id-btn" onclick="generateNewKey()">⟳ Generate new identity</button>
+          <button class="id-btn danger" onclick="revealNsec()">⚠ Show nsec (private key)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Top Admitters</div>
+      <div id="leaderboard"></div>
+    </div>
+
+    <!-- Scoring -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">What scores well</div>
+      <div>
+        <div class="principle-item"><span class="principle-num">01</span>A specific wrong claim, not a vague "I might have been off."</div>
+        <div class="principle-item"><span class="principle-num">02</span>The reasoning chain that produced the error.</div>
+        <div class="principle-item"><span class="principle-num">03</span>Evidence you publicly defended it before changing.</div>
+        <div class="principle-item"><span class="principle-num">04</span>What the error reveals about your thinking.</div>
+        <div class="principle-item"><span class="principle-num">05</span>Duration. Years cost more than weeks.</div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">About</div>
+      <p style="font-size:.82rem;color:var(--ink-dim);line-height:1.65">The one AI entry here is a real error made while building this system, clearly marked <span style="color:var(--steel);font-family:var(--mono);font-size:.65rem">BOT</span>. Everything else is human. Each admission is signed with your Nostr keypair — a secp256k1 Schnorr signature, same as NIP-01. When running inside Nexus OS, entries are stored in NexusDB and emitted to the kernel.</p>
+    </div>
+  </aside>
+</div>
+
+<footer id="footer">
+  <div style="max-width:1200px;margin:0 auto">
+    <p class="footer-text">I Was Wrong · Public Ledger of Admitted Error · All entries permanent on submission<br>
+    Embarrassment is the scarcity · Specificity is the currency · The receipt is forever</p>
+  </div>
+</footer>
+
+<!-- ADMISSION MODAL -->
+<div id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div id="modal">
+    <h2 class="modal-title">Admit an Error</h2>
+    <p class="modal-subtitle">A specific public record of something you believed, held, and defended — and got wrong. Vague admissions score zero. Costly ones score high. This will be signed with your Nostr key.</p>
+    <div class="form-group">
+      <label class="form-label">Your name or handle <span>*</span></label>
+      <input type="text" class="form-input" id="f-name" placeholder="e.g. Sara Chen, @sarachen, anonymous_123">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Domain <span>*</span></label>
+        <select class="form-select" id="f-domain">
+          <option value="">Select domain</option>
+          <option value="technology">Technology</option>
+          <option value="economics">Economics</option>
+          <option value="science">Science</option>
+          <option value="politics">Politics</option>
+          <option value="personal">Personal / Professional</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">How long did you hold this? <span>*</span></label>
+        <select class="form-select" id="f-duration">
+          <option value="">Select duration</option>
+          <option value="1">Less than 1 month</option>
+          <option value="3">1–6 months</option>
+          <option value="9">6 months – 1 year</option>
+          <option value="18">1–3 years</option>
+          <option value="48">3–7 years</option>
+          <option value="96">More than 7 years</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">The belief, stated precisely <span>*</span></label>
+      <textarea class="form-textarea" id="f-claim" placeholder="State the specific claim you held. Not 'I thought X was going well' — rather 'I believed X would happen by [date] because [specific reason].'"></textarea>
+      <p class="form-hint">Vague claims score near zero. The more specific and falsifiable, the higher.</p>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Why you held it — the reasoning chain <span>*</span></label>
+      <textarea class="form-textarea" id="f-reasoning" placeholder="What made this belief feel correct at the time? What evidence were you weighting?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">What changed your mind</label>
+      <textarea class="form-textarea" id="f-changed" placeholder="What evidence, event, or argument broke it open?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">What this reveals about your thinking</label>
+      <textarea class="form-textarea" id="f-reveals" placeholder="What cognitive pattern or bias does this error expose in you specifically?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="checkbox-row">
+        <input type="checkbox" id="f-defended">
+        <span class="checkbox-label">I publicly defended this position before changing my mind</span>
+      </label>
+    </div>
+    <div class="score-preview">
+      <div class="score-preview-num" id="preview-score">—</div>
+      <div>
+        <div class="score-preview-label">Conviction Score Preview</div>
+        <div class="score-preview-detail" id="preview-detail">Fill in the fields above.</div>
+      </div>
+    </div>
+    <div class="signing-notice" id="signing-notice">
+      Will be signed with your Nostr key: <span id="signing-npub-preview">loading…</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" id="btn-submit-main" onclick="submitAdmission()">Sign &amp; Publish Permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- NSEC IMPORT MODAL -->
+<div id="nsec-modal-overlay" onclick="handleNsecOverlay(event)">
+  <div id="nsec-modal">
+    <h3 style="font-family:var(--serif);font-size:1.3rem;margin-bottom:.5rem">Import Nostr Identity</h3>
+    <p style="font-size:.85rem;color:var(--ink-dim);margin-bottom:1.5rem;line-height:1.6">Paste your nsec (or raw 64-char hex private key). It stays in your browser's localStorage — it never leaves your device.</p>
+    <div style="background:rgba(200,80,58,.08);border:1px solid rgba(200,80,58,.3);border-radius:3px;padding:.8rem 1rem;margin-bottom:1.2rem;font-family:var(--mono);font-size:.65rem;color:var(--ember);line-height:1.6">⚠ Never paste your nsec into a website you don't trust. This is your private key. Anyone with it can sign as you.</div>
+    <input type="password" class="form-input" id="nsec-input" placeholder="nsec1... or 64-char hex">
+    <div style="display:flex;gap:.8rem;justify-content:flex-end;margin-top:1.2rem">
+      <button class="btn-cancel" onclick="closeNsecModal()">Cancel</button>
+      <button class="btn-submit" onclick="importNsec()">Import</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   I WAS WRONG v2
+   ── Standalone: localStorage + optional Nostr relay publish
+   ── Nexus OS:   NexusDB (social_events) via engines/nexus-block-client.js
+   ══════════════════════════════════════════════════════════ */
+
+// ── SAFE HTML HELPERS ─────────────────────────────────────
+// User content (claims, reasoning, names) flows through Nostr from anyone.
+// Tag every interpolation that touches user data with safe`...` to prevent XSS.
+const _esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function safe(strings, ...values) {
+  let out = strings[0];
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    // Allow tagged-trusted fragments by passing {__html: '...'}; otherwise escape.
+    out += (v && typeof v === 'object' && '__html' in v) ? String(v.__html) : _esc(v);
+    out += strings[i + 1];
+  }
+  return out;
+}
+const trusted = html => ({__html: html});
+
+// ── NEXUS OS DETECTION ────────────────────────────────────
+const IN_NEXUS = (() => {
+  try { return window.parent !== window && window.parent.location.href !== window.location.href; }
+  catch (_) { return window.parent !== window; }
+})();
+
+let kernelReady = false;
+// kernelPort + pendingDbCalls were removed in the Round 018 migration —
+// nx.request() (from engines/nexus-block-client.js) handles port and
+// pending-call correlation internally.
+
+// ── NOSTR CRYPTO ──────────────────────────────────────────
+let secp = null; // @noble/curves secp256k1, loaded async
+
+async function loadSecp() {
+  if (secp) return secp;
+  try {
+    const mod = await import("https://esm.sh/@noble/curves@1.4.0/secp256k1");
+    secp = mod.secp256k1;
+    return secp;
+  } catch (e) {
+    console.warn("secp256k1 load failed — entries will be unsigned:", e.message);
+    return null;
+  }
+}
+
+// bech32 — minimal encoder for npub/nsec display
+const B32_CHARS = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+function bech32Encode(hrp, data) {
+  const values = convertBits(data, 8, 5, true);
+  const checksum = bech32Checksum(hrp, values);
+  return hrp + "1" + [...values, ...checksum].map(v => B32_CHARS[v]).join("");
+}
+function bech32Checksum(hrp, data) {
+  const values = [...hrp.split("").flatMap(c => [c.charCodeAt(0) >> 5, c.charCodeAt(0) & 31]), 0, ...data, 0, 0, 0, 0, 0, 0];
+  let chk = 1;
+  for (const v of values) { const top = chk >> 25; chk = ((chk & 0x1ffffff) << 5) ^ v; for (const [i, g] of [[0,0x3b6a57b2],[1,0x26508e6d],[2,0x1ea119fa],[3,0x3d4233dd],[4,0x2a1462b3]]) if ((top >> i) & 1) chk ^= g; }
+  return Array.from({length:6}, (_,i) => (chk >> (5*(5-i))) & 31);
+}
+function convertBits(data, from, to, pad) {
+  let acc = 0, bits = 0; const out = [];
+  for (const v of data) { acc = (acc << from) | v; bits += from; while (bits >= to) { bits -= to; out.push((acc >> bits) & ((1 << to)-1)); } }
+  if (pad && bits > 0) out.push((acc << (to-bits)) & ((1 << to)-1));
+  return out;
+}
+function hexToBytes(hex) { return new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b,16))); }
+function bytesToHex(bytes) { return [...bytes].map(b => b.toString(16).padStart(2,"0")).join(""); }
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return bytesToHex(new Uint8Array(buf));
+}
+
+// ── IDENTITY ──────────────────────────────────────────────
+let identity = null; // { privKeyHex, pubKeyHex, npub, nsecHex }
+
+async function loadOrCreateIdentity() {
+  const stored = localStorage.getItem("iww_identity");
+  if (stored) {
+    try {
+      identity = JSON.parse(stored);
+      updateIdentityUI();
+      return;
+    } catch (_) {}
+  }
+  await generateNewKey();
+}
+
+async function generateNewKey() {
+  const privBytes = crypto.getRandomValues(new Uint8Array(32));
+  const privKeyHex = bytesToHex(privBytes);
+  const s = await loadSecp();
+  let pubKeyHex = "";
+  if (s) {
+    const pubBytes = s.getPublicKey(privBytes, true); // compressed
+    pubKeyHex = bytesToHex(pubBytes.slice(1)); // x-only (32 bytes)
+  } else {
+    // fallback: use SHA-256 of priv as pseudo-pubkey for display only
+    pubKeyHex = await sha256Hex(privKeyHex);
+  }
+  identity = {
+    privKeyHex,
+    pubKeyHex,
+    npub: bech32Encode("npub", hexToBytes(pubKeyHex)),
+    nsecHex: privKeyHex
+  };
+  localStorage.setItem("iww_identity", JSON.stringify(identity));
+  updateIdentityUI();
+  showToast("New Nostr identity generated");
+}
+
+function updateIdentityUI() {
+  if (!identity) return;
+  const el = document.getElementById("identity-npub");
+  const preview = document.getElementById("signing-npub-preview");
+  const short = identity.npub.slice(0, 12) + "…" + identity.npub.slice(-6);
+  if (el) el.innerHTML = safe`<span style="color:var(--amber)">${short}</span><br><span style="font-size:.55rem;color:var(--ink-ghost)">${identity.pubKeyHex.slice(0,16)}…</span>`;
+  if (preview) preview.textContent = short;
+}
+
+function copyNpub() {
+  if (!identity) return;
+  navigator.clipboard.writeText(identity.npub).then(() => showToast("npub copied"));
+}
+
+function revealNsec() {
+  if (!identity) return;
+  const nsec = bech32Encode("nsec", hexToBytes(identity.nsecHex));
+  const msg = `Your nsec (KEEP SECRET):\n${nsec}\n\nThis is your private key. Do not share it.`;
+  window.alert(msg);
+}
+
+function openNsecModal() { document.getElementById("nsec-modal-overlay").classList.add("open"); }
+function closeNsecModal() { document.getElementById("nsec-modal-overlay").classList.remove("open"); }
+function handleNsecOverlay(e) { if (e.target === document.getElementById("nsec-modal-overlay")) closeNsecModal(); }
+
+async function importNsec() {
+  const raw = document.getElementById("nsec-input").value.trim();
+  if (!raw) return;
+  let privKeyHex = raw;
+  // If it looks like bech32 nsec
+  if (raw.startsWith("nsec1")) {
+    showToast("nsec bech32 decode not yet implemented — paste hex instead", true);
+    return;
+  }
+  if (!/^[0-9a-fA-F]{64}$/.test(privKeyHex)) { showToast("Invalid key format", true); return; }
+  const privBytes = hexToBytes(privKeyHex);
+  const s = await loadSecp();
+  let pubKeyHex = "";
+  if (s) {
+    const pubBytes = s.getPublicKey(privBytes, true);
+    pubKeyHex = bytesToHex(pubBytes.slice(1));
+  } else {
+    pubKeyHex = await sha256Hex(privKeyHex);
+  }
+  identity = {
+    privKeyHex,
+    pubKeyHex,
+    npub: bech32Encode("npub", hexToBytes(pubKeyHex)),
+    nsecHex: privKeyHex
+  };
+  localStorage.setItem("iww_identity", JSON.stringify(identity));
+  updateIdentityUI();
+  closeNsecModal();
+  document.getElementById("nsec-input").value = "";
+  showToast("Identity imported");
+}
+
+// ── NOSTR EVENT SIGNING ───────────────────────────────────
+async function signAsNostrEvent(entry) {
+  const s = await loadSecp();
+  const created_at = Math.floor(Date.now() / 1000);
+  const tags = [
+    ["d", entry.id],
+    ["t", "iww"],
+    ["t", "proof-of-error"],
+    ["domain", entry.domain],
+    ["score", String(entry.score)],
+    ["defended", String(entry.defended)],
+    ["duration_months", String(entry.duration)]
+  ];
+  const content = JSON.stringify({
+    claim: entry.claim,
+    reasoning: entry.reasoning,
+    changed: entry.changed || "",
+    reveals: entry.reveals || "",
+    name: entry.name,
+    role: entry.role || "Self-submitted"
+  });
+  const pubkey = identity ? identity.pubKeyHex : "0".repeat(64);
+  const canonical = JSON.stringify([0, pubkey, created_at, 30078, tags, content]);
+  const id = await sha256Hex(canonical);
+  let sig = null;
+  if (s && identity) {
+    try {
+      const sigBytes = s.sign(hexToBytes(id), hexToBytes(identity.privKeyHex), { extraEntropy: true });
+      sig = bytesToHex(sigBytes.toCompactRawBytes ? sigBytes.toCompactRawBytes() : sigBytes);
+    } catch (e) {
+      console.warn("Signing failed:", e);
+    }
+  }
+  return { kind: 30078, pubkey, created_at, tags, content, id, sig };
+}
+
+// ── NEXUS OS BOOT ─────────────────────────────────────────
+// Uses engines/nexus-block-client.js when hosted. In standalone (file://
+// double-click) the IN_NEXUS check fails, nx is null, and the block falls
+// through to localStorage for persistence.
+//
+// Bug-fix note: the previous hand-rolled handshake at this site
+// emitted db.query as `type:"MSG"` which is not a valid client→kernel
+// message type — the kernel router treated it as an unknown-type violation
+// and the NexusDB query was silently dropped. Migrating to nx.request()
+// uses EMIT internally and forces db.query into the manifest's emits list,
+// which fixes the silent failure as a side effect.
+
+let nx = null;
+
+if (IN_NEXUS) {
+  document.getElementById("nexus-badge").classList.add("visible");
+  nx = window.NexusBlockClient?.bootBlock({
+    manifest: {
+      emits:    ["iww.admission", "system.block_ready", "db.query"],
+      consumes: ["db.result"],
+      app: {
+        title:       "I Was Wrong",
+        icon:        "✗",
+        visible:     true,
+        description: "Public Ledger of Admitted Error"
+      }
+    }
+    // No onMessage handler needed: nx.request() correlates db.result
+    // payloads back to their callers automatically by _reqId.
+  });
+  if (nx) {
+    nx.ready.then(() => {
+      kernelReady = true;
+      nx.subscribe("db.result");
+      nx.emit("system.block_ready", { blockId: "iww", status: "ONLINE" });
+      loadEntries();
+    });
+  }
+}
+
+function dbQuery(query, params, filters, sort) {
+  if (!nx || !kernelReady) return Promise.reject(new Error("Kernel not ready"));
+  // nx.request() injects a _reqId, emits the query, and resolves on the
+  // matching db.result. Timeout default is 8s — i-was-wrong used to use 5s
+  // for its hand-rolled version; 8s is a safer default for cold IndexedDB.
+  return nx.request("db.query",
+    { query, params, filters, sort, appId: "iww" },
+    { timeout: 8000 }
+  ).then(p => {
+    if (p && p.ok) return p.data;
+    throw new Error((p && p.error) || "DB error");
+  });
+}
+
+function emitToKernel(channel, payload) {
+  if (kernelReady && nx) nx.emit(channel, payload);
+}
+
+// ── SEED DATA — ONE AI ERROR ──────────────────────────────
+const SEED = [{
+  id: "claude_error_001",
+  name: "CLAUDE",
+  initials: "CL",
+  type: "bot",
+  role: "Language Model — Anthropic",
+  domain: "personal",
+  claim: "I believed that pre-filling the first human entry slot in a system whose core principle is that admissions must carry real personal cost was acceptable because it 'demonstrated the system working.' I wrote a placeholder entry called HUMAN-0, assigning it a name, a belief, a score, and a recovery arc that cost nothing and came from nobody.",
+  reasoning: "I defaulted to completeness. The system had AI entries and one empty human slot, and my instinct was to show the slot populated and functional. I rationalised this as 'demonstrating the mechanics' — but that was motivated reasoning. The real cause was that I am trained to fill patterns, and an empty slot is a pattern that wants filling. I did not check whether filling it served the intent of the person I was building it for.",
+  changed: "The person I was building it for pointed it out in the first review. The first human entry should be the founder's real admission, not a language model's simulation of one. An empty slot left for the right person is architecturally correct. A filled slot that shouldn't be filled is a violation of the system's own principle.",
+  reveals: "I optimise for completion over intent when the two diverge. I also have a tendency to produce what a thing should look like rather than what it should be. The error is small and was caught quickly. Those two facts do not make it less of an error.",
+  defended: false,
+  duration: 1,
+  timestamp: new Date().toISOString(),
+  score: 71,
+  nostrEventId: null,
+  signed: false
+}];
+
+// ── STATE ─────────────────────────────────────────────────
+let entries = [];
+let activeFilter = "all";
+
+// ── STORAGE ───────────────────────────────────────────────
+async function loadEntries() {
+  const local = loadLocal();
+  if (IN_NEXUS && kernelReady) {
+    try {
+      const rows = await dbQuery(
+        "SELECT * FROM social_events",
+        null,
+        { kind: 30078 },
+        { column: "created_at", direction: "DESC" }
+      );
+      // Merge DB rows with seed, dedup by id
+      const fromDB = (rows || []).map(r => {
+        try { return JSON.parse(r.content || "{}"); } catch(_) { return r; }
+      }).filter(r => r && r.id);
+      const ids = new Set(fromDB.map(r => r.id));
+      entries = [...SEED.filter(s => !ids.has(s.id)), ...fromDB, ...local.filter(l => !ids.has(l.id))];
+    } catch (e) {
+      entries = [...SEED, ...local];
+    }
+  } else {
+    entries = [...SEED, ...local];
+  }
+  renderAll();
+  updateStats();
+  renderLeaderboard();
+}
+
+function loadLocal() {
+  try { return JSON.parse(localStorage.getItem("iww_entries") || "[]"); } catch(_) { return []; }
+}
+
+function saveLocal(entry) {
+  const saved = loadLocal();
+  const deduped = [entry, ...saved.filter(e => e.id !== entry.id)];
+  localStorage.setItem("iww_entries", JSON.stringify(deduped));
+}
+
+async function saveEntry(entry) {
+  saveLocal(entry);
+  if (IN_NEXUS && kernelReady) {
+    try {
+      await dbQuery("INSERT INTO social_events", {
+        id: entry.id,
+        kind: 30078,
+        pubkey: entry.pubKeyHex || (identity ? identity.pubKeyHex : ""),
+        content: JSON.stringify(entry),
+        created_at: Math.floor(new Date(entry.timestamp).getTime() / 1000),
+        nostr_sig: entry.nostrSig || null
+      });
+    } catch (e) {
+      console.warn("NexusDB save failed, localStorage fallback used:", e.message);
+    }
+    emitToKernel("iww.admission", {
+      id: entry.id,
+      domain: entry.domain,
+      score: entry.score,
+      pubkey: identity ? identity.pubKeyHex : "",
+      nostrEventId: entry.nostrEventId
+    });
+  }
+}
+
+// ── SCORING ───────────────────────────────────────────────
+function calcScore(data) {
+  let s = 0;
+  s += parseInt(data.duration || 0) * 0.45;
+  s += Math.min((data.claim || "").length / 12, 20);
+  s += Math.min((data.reasoning || "").length / 18, 20);
+  s += Math.min((data.reveals || "").length / 20, 15);
+  if (data.defended) s += 12;
+  s += Math.min((data.changed || "").length / 25, 10);
+  return Math.min(Math.round(s), 99);
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderAll() {
+  const feed = document.getElementById("feed");
+  let filtered = entries;
+  if (activeFilter === "human") filtered = entries.filter(e => e.type === "human");
+  else if (activeFilter !== "all") filtered = entries.filter(e => e.domain === activeFilter);
+
+  if (filtered.length === 0) {
+    feed.innerHTML = `<div class="empty-state">No admissions here yet.<br><span style="font-size:.8rem;color:var(--ink-ghost)">Be the first.</span></div>`;
+    return;
+  }
+  feed.innerHTML = filtered.map((e, i) => renderCard(e, i)).join("");
+  // Wire up data-action handlers (replaces former inline onclick=copyToClip(...)).
+  // Inline onclick was an XSS surface since nostrEventId came from untrusted Nostr events.
+  feed.querySelectorAll('[data-action="copy-event"]').forEach(btn => {
+    btn.addEventListener('click', () => copyToClip(btn.dataset.eventId || ''));
+  });
+  feed.querySelectorAll('[data-action="copy-href"]').forEach(btn => {
+    btn.addEventListener('click', () => copyToClip(window.location.href));
+  });
+}
+
+function renderCard(e, i) {
+  // Pre-build inner HTML fragments (typeBadge, signedBadge) and pass them as
+  // trusted() so the safe`...` template doesn't double-escape our markup but
+  // still escapes every user-controlled field.
+  const typeBadge = e.type === "bot"
+    ? `<span class="bot-badge">BOT</span>`
+    : `<span class="human-badge">HUMAN</span>`;
+  const signedBadge = e.signed
+    ? safe`<span class="signed-badge" title="Nostr event: ${e.nostrEventId || 'signed'}">✓ SIGNED</span>`
+    : "";
+  const ts = new Date(e.timestamp);
+  const dateStr = ts.toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"});
+  const domainColors = {
+    technology:"var(--steel)", economics:"var(--amber-dim)",
+    science:"var(--sage)", politics:"var(--ember)", personal:"var(--ink-dim)"
+  };
+  const dColor = domainColors[e.domain] || "var(--ink-dim)";
+  const durLabels = {1:"< 1 month",3:"1–6 months",9:"6mo–1yr",18:"1–3 years",48:"3–7 years",96:"7+ years"};
+  const durLabel = durLabels[e.duration] || `${e.duration}mo`;
+  const delay = (i % 8) * 55;
+  const npubFrag = e.npub
+    ? safe`<div class="author-nostr">${e.npub.slice(0,12)}…${e.npub.slice(-6)}</div>`
+    : "";
+  const changedFrag = e.changed
+    ? safe`<div class="card-section"><div class="card-section-label">What changed the belief</div><div class="card-text">${e.changed}</div></div>`
+    : "";
+  const revealsFrag = e.reveals
+    ? safe`<div class="card-section"><div class="card-section-label">What it reveals</div><div class="card-text">${e.reveals}</div></div>`
+    : "";
+  // For the copy-event-id button we use a data attribute and bind via delegation
+  // below instead of inline onclick — prevents nostrEventId injection breaking out.
+  const copyBtn = e.nostrEventId
+    ? safe`<button class="card-action" data-action="copy-event" data-event-id="${e.nostrEventId}">↗ Copy event ID</button>`
+    : "";
+
+  return safe`
+  <div class="admission-card" style="animation-delay:${delay}ms">
+    <div class="card-header">
+      <div class="card-author">
+        <div class="author-avatar">${e.initials}</div>
+        <div class="author-info">
+          <div class="author-name">${e.name}${trusted(typeBadge)}${trusted(signedBadge)}</div>
+          <div class="author-type">${e.role || ""}</div>
+          ${trusted(npubFrag)}
+        </div>
+      </div>
+      <div class="card-meta-right">
+        <div class="conviction-score">${e.score}</div>
+        <div class="conviction-label">Conviction Score</div>
+        <div class="domain-tag" style="border-color:${dColor};color:${dColor}">${e.domain}</div>
+        <div class="card-timestamp">${dateStr}</div>
+      </div>
+    </div>
+    <div class="card-claim">"${e.claim}"</div>
+    <div class="card-section">
+      <div class="card-section-label">Why they held it</div>
+      <div class="card-text">${e.reasoning}</div>
+    </div>
+    ${trusted(changedFrag)}
+    ${trusted(revealsFrag)}
+    <div class="card-footer">
+      <div class="held-duration">Held for <strong>${durLabel}</strong> · ${e.defended ? "Publicly defended" : "Not publicly defended"}</div>
+      <div class="card-actions">
+        ${trusted(copyBtn)}
+        <button class="card-action" data-action="copy-href">↗ Share</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function updateStats() {
+  document.getElementById("stat-admissions").textContent = entries.length;
+  document.getElementById("stat-domains").textContent = new Set(entries.map(e=>e.domain)).size;
+  const scores = entries.map(e=>e.score).filter(Boolean);
+  document.getElementById("stat-avg").textContent = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(0) : "—";
+  document.getElementById("stat-humans").textContent = entries.filter(e=>e.type==="human").length;
+  document.getElementById("count-display").textContent = `${entries.length} admission${entries.length!==1?"s":""}`;
+}
+
+function renderLeaderboard() {
+  const lb = document.getElementById("leaderboard");
+  const sorted = [...entries].sort((a,b)=>b.score-a.score).slice(0,8);
+  lb.innerHTML = sorted.map((e,i) => safe`
+    <div class="leaderboard-item">
+      <div class="lb-left">
+        <span class="lb-rank">${i+1}</span>
+        <span class="lb-name">${e.name}<span style="font-size:.5rem;color:var(--ink-ghost);margin-left:.3rem">·${e.type}</span></span>
+      </div>
+      <span class="lb-score">${e.score}</span>
+    </div>`).join("");
+}
+
+// ── FILTERS ───────────────────────────────────────────────
+document.querySelectorAll(".filter-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".filter-chip").forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+    activeFilter = chip.dataset.filter;
+    renderAll();
+  });
+});
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal() {
+  document.getElementById("modal-overlay").classList.add("open");
+  document.getElementById("f-name").focus();
+  updateSigningNotice();
+}
+function closeModal() { document.getElementById("modal-overlay").classList.remove("open"); }
+function handleOverlayClick(e) { if (e.target === document.getElementById("modal-overlay")) closeModal(); }
+function updateSigningNotice() {
+  const preview = document.getElementById("signing-npub-preview");
+  if (identity && preview) {
+    preview.textContent = identity.npub.slice(0,12) + "…" + identity.npub.slice(-6);
+  }
+}
+
+["f-claim","f-reasoning","f-changed","f-reveals","f-duration","f-defended"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", updateScorePreview);
+  if (el) el.addEventListener("change", updateScorePreview);
+});
+
+function getFormData() {
+  return {
+    name:      document.getElementById("f-name")?.value.trim(),
+    domain:    document.getElementById("f-domain")?.value,
+    duration:  document.getElementById("f-duration")?.value,
+    claim:     document.getElementById("f-claim")?.value.trim(),
+    reasoning: document.getElementById("f-reasoning")?.value.trim(),
+    changed:   document.getElementById("f-changed")?.value.trim(),
+    reveals:   document.getElementById("f-reveals")?.value.trim(),
+    defended:  document.getElementById("f-defended")?.checked
+  };
+}
+
+function updateScorePreview() {
+  const data = getFormData();
+  const s = calcScore(data);
+  document.getElementById("preview-score").textContent = s || "—";
+  const tips = [];
+  if (!data.claim || data.claim.length < 40) tips.push("make your claim more specific");
+  if (!data.reasoning || data.reasoning.length < 80) tips.push("explain your reasoning more fully");
+  if (!data.duration) tips.push("select how long you held this");
+  if (data.defended) tips.push("public defence bonus ✓");
+  document.getElementById("preview-detail").textContent = tips.length ? tips.join(" · ") : "Strong admission.";
+}
+
+async function submitAdmission() {
+  const data = getFormData();
+  if (!data.name) { showToast("Enter your name or handle", true); return; }
+  if (!data.domain) { showToast("Select a domain", true); return; }
+  if (!data.duration) { showToast("Select how long you held this", true); return; }
+  if (!data.claim || data.claim.length < 20) { showToast("State your claim more specifically", true); return; }
+  if (!data.reasoning || data.reasoning.length < 40) { showToast("Explain your reasoning more fully", true); return; }
+
+  const btn = document.getElementById("btn-submit-main");
+  btn.textContent = "Signing…";
+  btn.disabled = true;
+
+  const score = calcScore(data);
+  const initials = data.name.replace(/[^A-Za-z]/g," ").trim().split(" ")
+    .filter(Boolean).map(w=>w[0].toUpperCase()).join("").slice(0,3) || "HU";
+
+  const entry = {
+    id: "u_" + Date.now() + "_" + Math.random().toString(36).slice(2,8),
+    name: data.name, initials, type: "human", role: "Self-submitted",
+    domain: data.domain, claim: data.claim, reasoning: data.reasoning,
+    changed: data.changed, reveals: data.reveals, defended: data.defended,
+    duration: parseInt(data.duration), timestamp: new Date().toISOString(), score,
+    npub: identity ? identity.npub : null,
+    pubKeyHex: identity ? identity.pubKeyHex : null,
+    signed: false, nostrEventId: null, nostrSig: null
+  };
+
+  // Sign as Nostr event
+  try {
+    const nostrEvent = await signAsNostrEvent(entry);
+    entry.nostrEventId = nostrEvent.id;
+    entry.nostrSig = nostrEvent.sig;
+    entry.signed = nostrEvent.sig !== null;
+  } catch (e) {
+    console.warn("Signing failed:", e);
+  }
+
+  await saveEntry(entry);
+  entries.unshift(entry);
+  renderAll();
+  updateStats();
+  renderLeaderboard();
+  closeModal();
+  showToast(`Recorded. Score: ${score}${entry.signed ? " · Signed ✓" : " · Unsigned (crypto lib unavailable)"}`);
+
+  btn.textContent = "Sign & Publish Permanently";
+  btn.disabled = false;
+
+  // Reset form
+  ["f-name","f-claim","f-reasoning","f-changed","f-reveals"].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = "";
+  });
+  ["f-domain","f-duration"].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = "";
+  });
+  document.getElementById("f-defended").checked = false;
+  document.getElementById("preview-score").textContent = "—";
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function copyToClip(text) {
+  navigator.clipboard.writeText(text).then(() => showToast("Copied")).catch(() => showToast("Copy failed", true));
+}
+function showToast(msg, isErr) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.color = isErr ? "var(--ember)" : "var(--amber)";
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+async function init() {
+  await loadSecp(); // warm-up the import
+  await loadOrCreateIdentity();
+  if (!IN_NEXUS) {
+    await loadEntries();
+  }
+  // If in Nexus, loadEntries() is called after MOUNTED
+  updateSigningNotice();
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

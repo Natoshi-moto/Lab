@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NEXUS — Prompt Studio</title>
+<style>
+:root{
+  --bg:#0a0a0f;--s1:#0f0f17;--s2:#14141e;--s3:#1a1a26;
+  --border:#ffffff12;--text:#e8e8f0;--dim:#8888aa;--muted:#444466;
+  --amber:#f59e0b;--teal:#2dd4bf;--red:#f87171;--green:#4ade80;
+  --cyan:#67e8f9;--violet:#a78bfa;--blue:#60a5fa;--rose:#fb7185;
+  --yellow:#fde047;
+  --mono:'JetBrains Mono',Consolas,monospace;
+  --font-m:'JetBrains Mono',monospace;
+  --spring:cubic-bezier(.34,1.56,.64,1)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--mono)}
+
+/* ── Layout ── */
+#shell{display:flex;flex-direction:column;height:100%;overflow:hidden}
+#topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--s1)}
+#main{display:flex;flex:1;overflow:hidden;min-height:0}
+.pane-left{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.pane-right{width:240px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--border);overflow:hidden}
+
+/* ── Topbar ── */
+.app-name{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-right:auto}
+.pill-row{display:flex;gap:4px;flex-wrap:wrap}
+.pill{background:transparent;border:1px solid var(--border);color:var(--muted);padding:2px 7px;font-family:var(--mono);font-size:9px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .15s}
+.pill:hover{color:var(--text);border-color:var(--dim)}
+.pill.active{color:var(--bg);background:var(--amber);border-color:var(--amber)}
+.pill.detected{border-color:var(--teal);color:var(--teal)}
+.ver-badge{font-size:9px;font-family:var(--mono);color:var(--muted);cursor:pointer;letter-spacing:1px;padding:2px 6px;border:1px solid var(--border);border-radius:2px;transition:all .15s;flex-shrink:0}
+.ver-badge.dirty{color:var(--amber);border-color:rgba(245,158,11,.3)}
+.run-btn{background:var(--s3);border:1px solid var(--border);color:var(--text);padding:4px 12px;font-family:var(--mono);font-size:10px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .15s;flex-shrink:0}
+.run-btn:hover{background:var(--amber);color:var(--bg);border-color:var(--amber)}
+.run-btn.running{background:var(--green);color:var(--bg);border-color:var(--green)}
+.forge-btn{background:transparent;border:1px solid rgba(167,139,250,.4);color:var(--violet);padding:4px 12px;font-family:var(--mono);font-size:10px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .15s;flex-shrink:0}
+.forge-btn:hover{background:var(--violet);color:var(--bg)}
+.forge-btn.running{background:rgba(167,139,250,.15);animation:forge-pulse 1.5s ease infinite}
+@keyframes forge-pulse{0%,100%{border-color:rgba(167,139,250,.4)}50%{border-color:var(--violet)}}
+.api-status{background:transparent;border:1px solid var(--border);color:var(--muted);padding:4px 8px;font-family:var(--mono);font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .15s;flex-shrink:0}
+.api-status:hover{color:var(--text)}
+.api-status.connected{color:var(--green);border-color:rgba(74,222,128,.3)}
+
+/* ── Editor pane ── */
+.editor-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+textarea#editor{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;color:transparent;caret-color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;padding:14px 16px;resize:none;z-index:2;scrollbar-width:thin;scrollbar-color:var(--s3) transparent}
+textarea#editor::placeholder{color:var(--muted)}
+.editor-overlay{position:absolute;inset:0;font-family:var(--mono);font-size:13px;line-height:1.6;padding:14px 16px;z-index:1;pointer-events:none;white-space:pre-wrap;word-break:break-word;overflow:hidden}
+.t-role{color:var(--amber)}.t-constraint{color:var(--red)}.t-context{color:var(--cyan)}.t-format{color:var(--violet)}.t-example{color:var(--green)}.t-plain{color:var(--text)}.t-ambig{text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--yellow);cursor:pointer}
+.editor-footer{display:flex;align-items:center;gap:12px;padding:6px 12px;border-top:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.ef-l{font-size:9px;color:var(--muted);letter-spacing:1px}.ef-v{font-size:9px;color:var(--dim);font-family:var(--mono);margin-left:2px}.ef-fmt{font-size:9px;font-weight:700;letter-spacing:2px;margin-left:auto;color:var(--teal)}
+
+/* ── Analysis Rail ── */
+.rail-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.rail-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:8px 14px;font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .15s;margin-bottom:-1px}
+.rail-tab:hover{color:var(--text)}.rail-tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.rail-body{flex:1;overflow-y:auto;padding:10px;scrollbar-width:thin;scrollbar-color:var(--s3) transparent}
+.rail-body.hidden{display:none}
+.score-hero{text-align:center;padding:12px 0 4px}
+.score-num{font-size:42px;font-weight:800;font-family:var(--mono);line-height:1}
+.score-num.low{color:var(--red)}.score-num.mid{color:var(--amber)}.score-num.high{color:var(--green)}
+.score-label{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.score-bar{height:3px;background:var(--s3);border-radius:2px;margin:10px 0 6px;overflow:hidden}
+.score-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.score-fill.red{background:var(--red)}.score-fill.amber{background:var(--amber)}.score-fill.green{background:var(--green)}
+.section-label{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;padding:10px 0 6px}
+.ck-item{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px}
+.ck-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0}
+.ck-dot.on{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+.ck-dot.off{background:var(--s3);color:var(--muted);border:1px solid var(--border)}
+.ck-name{flex:1;color:var(--dim)}.ck-item.on .ck-name{color:var(--text)}
+.ck-pts{font-size:9px;color:var(--muted)}.ck-item.on .ck-pts{color:var(--green)}
+.tb-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:10px}
+.tb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tb-name{width:60px;color:var(--dim);font-size:9px;letter-spacing:1px;text-transform:uppercase}
+.tb-bar-w{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.tb-bar{height:100%;border-radius:2px;transition:width .4s ease}
+.tb-ct{width:20px;text-align:right;color:var(--muted)}
+.amb-item{display:flex;align-items:baseline;gap:6px;padding:4px 6px;cursor:pointer;border-radius:2px;font-size:10px}
+.amb-item:hover{background:var(--s2)}.amb-word{color:var(--yellow);font-weight:700}.amb-tip{color:var(--dim);flex:1}
+.iss{display:flex;gap:6px;padding:4px 6px;border-radius:2px;font-size:10px;margin-bottom:2px}
+.iss.warn{background:rgba(248,113,113,.06);color:var(--red)}.iss.info{background:rgba(96,165,250,.06);color:var(--blue)}
+.hist-item{padding:8px;border-radius:3px;border:1px solid var(--border);margin-bottom:4px;cursor:pointer;transition:all .15s}
+.hist-item:hover{border-color:var(--amber)}
+.hist-label{font-size:10px;font-weight:600;color:var(--text)}.hist-meta{font-size:9px;color:var(--muted);margin-top:2px}
+.hist-item .hi-actions{display:none;gap:4px;margin-top:4px}
+.hist-item:hover .hi-actions{display:flex}
+.hi-btn{font-size:9px;padding:2px 6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;border-radius:2px;font-family:var(--mono)}
+.hi-btn:hover{color:var(--amber);border-color:var(--amber)}
+
+/* ── Drawer ── */
+#drawer{position:relative;background:var(--s1);border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;transition:height .25s ease;height:32px}
+#drawer.open{height:50vh}
+#drawer.open.forge-mode{height:68vh}
+.drawer-handle{display:flex;align-items:center;gap:0;height:32px;flex-shrink:0;cursor:pointer;padding:0 4px;border-bottom:1px solid transparent;transition:border-color .15s}
+#drawer.open .drawer-handle{border-bottom-color:var(--border)}
+.dh-label{font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;padding:0 8px;margin-right:4px}
+.dh-tab{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:8px 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;flex-shrink:0}
+.dh-tab:hover{color:var(--text)}
+.dh-tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.drawer-spacer{flex:1}
+.dh-close{font-size:14px;color:var(--muted);padding:0 10px;cursor:pointer;transition:color .15s}
+.dh-close:hover{color:var(--text)}
+.drawer-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.d-panel{display:none;flex:1;flex-direction:column;overflow:hidden}
+.d-panel.active{display:flex}
+.d-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--s3) transparent}
+
+/* ── PLAY panel ── */
+.play-empty{color:var(--muted);font-size:11px;text-align:center;padding:30px 20px;line-height:2}
+.response-block{padding:14px 16px;font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word}
+.response-block.loading{color:var(--muted);font-style:italic}
+.resp-meta{display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--border);font-size:9px;color:var(--muted);flex-shrink:0}
+.resp-model{color:var(--teal);letter-spacing:1px;text-transform:uppercase}
+.resp-inject{margin-left:auto;padding:2px 8px;border:1px solid var(--border);background:transparent;color:var(--dim);font-family:var(--mono);font-size:9px;cursor:pointer;border-radius:2px}
+.resp-inject:hover{color:var(--amber);border-color:var(--amber)}
+
+/* ── FORGE panel ── */
+.forge-toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.forge-run-btn{background:transparent;border:1px solid rgba(167,139,250,.5);color:var(--violet);padding:4px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .15s}
+.forge-run-btn:hover{background:var(--violet);color:var(--bg)}
+.forge-run-btn:disabled{opacity:.4;cursor:not-allowed}
+.forge-turns-label{font-size:9px;color:var(--muted);letter-spacing:2px}
+.forge-log{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.forge-status-line{font-size:10px;color:var(--muted);font-style:italic;padding:4px 0;display:flex;align-items:center;gap:6px}
+.forge-status-line::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);animation:forge-pulse 1s ease infinite}
+.forge-turn{border:1px solid var(--border);border-radius:4px;overflow:hidden;animation:fadeup .25s ease both}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ft-header{padding:6px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.ft-header.arch{background:rgba(245,158,11,.05);border-bottom-color:rgba(245,158,11,.15)}
+.ft-header.adv{background:rgba(248,113,113,.05);border-bottom-color:rgba(248,113,113,.15)}
+.ft-persona{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.ft-header.arch .ft-persona{color:var(--amber)}
+.ft-header.adv .ft-persona{color:var(--red)}
+.ft-label{font-size:9px;color:var(--muted);letter-spacing:1px}
+.ft-consensus{margin-left:auto;font-size:8px;padding:2px 6px;border-radius:10px;font-weight:700;letter-spacing:1px}
+.ft-consensus.open{color:var(--red);background:rgba(248,113,113,.1)}
+.ft-consensus.converging{color:var(--amber);background:rgba(245,158,11,.1)}
+.ft-consensus.reached{color:var(--green);background:rgba(74,222,128,.1)}
+.ft-body{padding:10px 12px;font-size:11px;line-height:1.7;color:var(--dim)}
+.ft-section-label{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:10px;margin-bottom:4px}
+.ft-section-label:first-child{margin-top:0}
+.ft-section-text{color:var(--text);font-size:11px;line-height:1.7}
+.ft-draft{background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.15);border-radius:3px;padding:10px;font-size:11px;font-family:var(--mono);color:var(--text);white-space:pre-wrap;word-break:break-word;line-height:1.6;margin-top:6px}
+.forge-result{background:rgba(74,222,128,.04);border:1px solid rgba(74,222,128,.2);border-radius:4px;padding:12px;margin:8px 12px 12px}
+.forge-result-label{font-size:9px;color:var(--green);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.forge-result-label::after{content:'CONSENSUS REACHED';font-size:8px;background:rgba(74,222,128,.1);padding:2px 6px;border-radius:10px}
+.forge-result-prompt{font-size:11px;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;margin-bottom:10px}
+.forge-result-actions{display:flex;gap:6px}
+.fra-btn{padding:4px 10px;border:1px solid var(--border);background:transparent;font-family:var(--mono);font-size:9px;cursor:pointer;border-radius:2px;transition:all .15s}
+.fra-btn:hover{border-color:var(--amber);color:var(--amber)}
+.fra-btn.primary{border-color:rgba(74,222,128,.4);color:var(--green)}
+.fra-btn.primary:hover{background:var(--green);color:var(--bg)}
+
+/* ── ADVERSARIAL panel ── */
+.adv-toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.adv-run-btn{background:transparent;border:1px solid rgba(248,113,113,.5);color:var(--red);padding:4px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .15s}
+.adv-run-btn:hover{background:var(--red);color:var(--bg)}
+.adv-run-btn:disabled{opacity:.4;cursor:not-allowed}
+.adv-desc{font-size:9px;color:var(--muted)}
+.adv-result{padding:10px 12px}
+
+/* ── TRANSFORM panel ── */
+.tx-toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.tx-btn{padding:4px 12px;border:1px solid var(--border);background:transparent;font-family:var(--mono);font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .15s;color:var(--dim)}
+.tx-btn:hover{border-color:var(--teal);color:var(--teal)}
+.tx-btn:disabled{opacity:.4;cursor:not-allowed}
+.tx-result{padding:10px 12px}
+.tx-label{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.tx-output{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:10px;font-size:11px;font-family:var(--mono);color:var(--text);white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.tx-actions{display:flex;gap:6px;margin-top:8px}
+
+/* ── Shared panel empties ── */
+.panel-empty{color:var(--muted);font-size:10px;text-align:center;padding:24px 16px;line-height:2;letter-spacing:.5px}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .15s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:20px;width:360px;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+.key-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.key-label{font-size:9px;width:160px;flex-shrink:0;color:var(--muted);letter-spacing:.5px}
+.key-row input{flex:1;background:var(--s3);border:1px solid var(--border);color:var(--text);padding:4px 7px;font-family:var(--mono);font-size:10px;border-radius:2px;outline:none}
+.key-row input:focus{border-color:var(--amber)}
+.modal .btn{padding:5px 12px;border:1px solid var(--border);background:transparent;color:var(--dim);font-family:var(--mono);font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase}
+.modal .btn:hover{color:var(--amber);border-color:var(--amber)}
+.modal .btn.primary{border-color:rgba(74,222,128,.4);color:var(--green)}
+.modal .btn.primary:hover{background:var(--green);color:var(--bg)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.modal-note{font-size:9px;color:var(--muted);margin-top:12px;line-height:1.6;padding:8px;background:var(--s1);border-radius:3px;border:1px solid var(--border)}
+
+/* ── Notif ── */
+.notif{position:fixed;bottom:60px;right:16px;background:var(--s3);border:1px solid var(--border);color:var(--text);font-size:10px;padding:6px 12px;border-radius:3px;z-index:200;animation:notif-in .2s ease}
+@keyframes notif-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div id="shell">
+
+  <!-- Topbar -->
+  <div id="topbar">
+    <span class="app-name">Prompt Studio</span>
+    <div class="pill-row" id="pills"></div>
+    <div class="ver-badge" id="ver" title="Click → History" onclick="showRailTab('history')">v1</div>
+    <button class="run-btn" id="runBtn" onclick="doRun()" title="Ctrl+Enter">▶ RUN</button>
+    <button class="forge-btn" id="forgeBtn" onclick="doForge()" title="Run adversarial Forge session">⚔ FORGE</button>
+    <button class="api-status" id="apiBtn" onclick="openApiModal()">⚙ KEYS</button>
+  </div>
+
+  <!-- Main area -->
+  <div id="main">
+
+    <!-- Left: editor -->
+    <div class="pane-left">
+      <div class="editor-wrap">
+        <div class="editor-overlay" id="overlay"><div id="ov-inner"></div></div>
+        <textarea id="editor" spellcheck="false" placeholder="Paste any prompt here — raw, CPL, XML, COSTAR, anything.&#10;&#10;The anatomy engine scores it live as you type.&#10;Token functions are highlighted in real time.&#10;Ambiguous words are flagged with suggestions.&#10;&#10;Ctrl+Enter = Run  ·  Ctrl+S = Snapshot  ·  ⚔ FORGE = Adversarial refine"></textarea>
+      </div>
+      <div class="editor-footer">
+        <span class="ef-l">TOK</span><span class="ef-v" id="s-tok">0</span>
+        <span class="ef-l">WRD</span><span class="ef-v" id="s-wrd">0</span>
+        <span class="ef-l">LN</span><span class="ef-v" id="s-ln">0</span>
+        <span class="ef-l">CHR</span><span class="ef-v" id="s-chr">0</span>
+        <span class="ef-fmt" id="s-fmt">RAW</span>
+      </div>
+    </div>
+
+    <!-- Right: analysis rail -->
+    <div class="pane-right">
+      <div class="rail-tabs">
+        <button class="rail-tab active" data-rt="analysis" onclick="showRailTab('analysis')">ANALYSIS</button>
+        <button class="rail-tab" data-rt="history" onclick="showRailTab('history')">HISTORY</button>
+      </div>
+      <div class="rail-body scroll" id="rb-analysis">
+        <div class="score-hero"><div class="score-num mid" id="sc-n">0</div><div class="score-label">completeness</div></div>
+        <div class="score-bar"><div class="score-fill amber" id="sc-fill" style="width:0%"></div></div>
+        <div class="section-label">COMPONENTS</div>
+        <div id="ck-list"></div>
+        <div class="section-label">TOKEN BREAKDOWN</div>
+        <div id="tb-list"></div>
+        <div id="sec-amb" style="display:none"><div style="height:8px"></div><div class="section-label">AMBIGUITIES</div><div id="amb-list"></div></div>
+        <div id="sec-iss" style="display:none"><div style="height:8px"></div><div class="section-label">ISSUES</div><div id="iss-list"></div></div>
+      </div>
+      <div class="rail-body scroll hidden" id="rb-history">
+        <div id="hist-empty" style="color:var(--dim);font-size:11px;text-align:center;padding:20px 0;line-height:2">Snapshots appear as you work.<br>Auto-saved before every run.<br>Press <span style="color:var(--amber)">Ctrl+S</span> anytime.</div>
+        <div id="hist-list"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- Drawer -->
+  <div id="drawer">
+    <div class="drawer-handle">
+      <span class="dh-label">TOOLS</span>
+      <span class="dh-tab" data-tab="play" onclick="openDrawerTab('play')">PLAY</span>
+      <span class="dh-tab" data-tab="forge" onclick="openDrawerTab('forge')">FORGE</span>
+      <span class="dh-tab" data-tab="adversarial" onclick="openDrawerTab('adversarial')">ADVERSARIAL</span>
+      <span class="dh-tab" data-tab="transform" onclick="openDrawerTab('transform')">CPL</span>
+      <div class="drawer-spacer"></div>
+      <span class="dh-close" onclick="closeDrawer()">✕</span>
+    </div>
+    <div class="drawer-body">
+
+      <!-- PLAY panel -->
+      <div class="d-panel" id="dp-play">
+        <div class="resp-meta" id="resp-meta" style="display:none">
+          <span class="resp-model" id="resp-model">—</span>
+          <span id="resp-time"></span>
+          <button class="resp-inject" onclick="injectResponse()">← INJECT</button>
+        </div>
+        <div class="d-scroll" id="resp-scroll">
+          <div class="play-empty" id="resp-empty">Hit <span style="color:var(--amber)">▶ RUN</span> or <span style="color:var(--amber)">Ctrl+Enter</span><br>to execute your prompt against the API.</div>
+          <div class="response-block" id="resp-block" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- FORGE panel -->
+      <div class="d-panel" id="dp-forge">
+        <div class="forge-toolbar">
+          <button class="forge-run-btn" id="forge-run-btn" onclick="doForge()">⚔ RUN FORGE</button>
+          <span class="forge-turns-label" id="forge-turns-label">2-turn adversarial refinement</span>
+        </div>
+        <div class="d-scroll" id="forge-log-scroll">
+          <div class="panel-empty" id="forge-empty">Forge runs the ARCHITECT and ADVERSARY against your prompt.<br>They debate, steelman, attack, and refine until consensus.</div>
+          <div id="forge-log"></div>
+        </div>
+      </div>
+
+      <!-- ADVERSARIAL panel -->
+      <div class="d-panel" id="dp-adversarial">
+        <div class="adv-toolbar">
+          <button class="adv-run-btn" id="adv-run-btn" onclick="doAdversarial()">⚡ ATTACK</button>
+          <span class="adv-desc">Single adversary pass — find the flaw, propose the fix</span>
+        </div>
+        <div class="d-scroll" id="adv-log-scroll">
+          <div class="panel-empty" id="adv-empty">The Adversary steelmans your prompt, finds the most important flaw, and proposes a specific fix.</div>
+          <div id="adv-result"></div>
+        </div>
+      </div>
+
+      <!-- TRANSFORM / CPL panel -->
+      <div class="d-panel" id="dp-transform">
+        <div class="tx-toolbar">
+          <button class="tx-btn" id="tx-compress-btn" onclick="doTransform('compress')">NL → CPL</button>
+          <button class="tx-btn" id="tx-expand-btn" onclick="doTransform('expand')">CPL → NL</button>
+          <button class="tx-btn" id="tx-teach-btn" onclick="doTransform('teach')">TEACH</button>
+        </div>
+        <div class="d-scroll" id="tx-scroll">
+          <div class="panel-empty" id="tx-empty">Compress any prompt to CPL tokens,<br>expand CPL back to natural language,<br>or teach the mechanism behind each token.</div>
+          <div id="tx-result"></div>
+        </div>
+      </div>
+
+    </div><!-- /drawer-body -->
+  </div><!-- /drawer -->
+
+</div><!-- /shell -->
+
+<!-- API Keys Modal -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <h2>API Configuration</h2>
+    <div id="apiKeyRows"></div>
+    <div class="section-label" style="margin-top:12px">CUSTOM ENDPOINT</div>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <input id="customEndpoint" placeholder="https://your-proxy.com/v1/messages" style="flex:1;background:var(--s3);border:1px solid var(--border);color:var(--text);padding:4px 7px;font-family:var(--mono);font-size:10px;border-radius:2px;outline:none">
+      <input id="customModel" placeholder="model name" style="width:140px;background:var(--s3);border:1px solid var(--border);color:var(--text);padding:4px 7px;font-family:var(--mono);font-size:10px;border-radius:2px;outline:none">
+    </div>
+    <input id="customApiKey" placeholder="Bearer token / API key for custom endpoint" style="width:100%;margin-bottom:8px;background:var(--s3);border:1px solid var(--border);color:var(--text);padding:4px 7px;font-family:var(--mono);font-size:10px;border-radius:2px;outline:none">
+    <div class="modal-note">CORS note: Anthropic's API supports browser-direct calls with a valid key. If you hit CORS errors, set a local proxy above (e.g. <code style="color:var(--teal)">http://localhost:3001</code>). All keys stored in localStorage — never sent anywhere except your configured endpoints.</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeApiModal()">CANCEL</button>
+      <button class="btn primary" onclick="saveApiKeys()">SAVE KEYS</button>
+    </div>
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// KERNEL SHIM — Nexus OS integration
+// No-op if running standalone
+// ═══════════════════════════════════════════
+(function(){
+  'use strict';
+  if(window===window.top)return;
+  var APP_MANIFEST={
+    emits:['ai.session.created','ai.response.complete','ai.agent.started','ai.agent.complete'],
+    consumes:['wallet.identity.changed','wallet.balance.changed','fs.mounted']
+  };
+  var APP_META={title:'Prompt Studio',icon:'⌘',description:'Prompt forge, CPL translator & analyzer',visible:true};
+  var _port=null,_mounted=false,_queue=[];
+  window.NX_EMIT=function(ch,payload){if(!_port)return;if(!_mounted){_queue.push({channel:ch,payload:payload});return;}_port.postMessage({type:'EMIT',channel:ch,payload:payload})};
+  window.NX_SUB=function(ch){if(!_port)return;_port.postMessage({type:'SUB',channel:ch})};
+  window.NX_BUS={_h:{},on:function(ch,fn){if(!this._h[ch])this._h[ch]=[];this._h[ch].push(fn);},_emit:function(ch,p,s){(this._h[ch]||[]).forEach(function(f){try{f(p,s)}catch(e){}});}};
+  function flush(){while(_queue.length){var i=_queue.shift();_port.postMessage({type:'EMIT',channel:i.channel,payload:i.payload});}}
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='BOOT')return;
+    _port=e.ports[0];if(!_port)return;
+    _port.onmessage=function(ev){
+      var m=ev.data;if(!m||!m.type)return;
+      if(m.type==='MOUNT_CHALLENGE'){_port.postMessage({type:'MOUNT_ACK',nonce:m.nonce});if(!_mounted){_mounted=true;flush();}}
+      else if(m.type==='PING'){_port.postMessage({type:'PONG',nonce:m.nonce});}
+      else if(m.type==='MSG'&&m.channel){window.NX_BUS._emit(m.channel,m.payload,m.src);}
+    };
+    _port.start();
+    _port.postMessage({type:'DECLARE',manifest:APP_MANIFEST,app:APP_META});
+  },{once:false});
+})();
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const PS=window.PS={
+  editor:{content:'',format:'RAW',version:1,dirty:false},
+  history:[],
+  apiKeys:{},
+  customEndpoint:'',customModel:'',customApiKey:'',
+  ui:{railTab:'analysis',drawerTab:null},
+  forge:{running:false,log:[],result:null},
+  adv:{running:false},
+  tx:{running:false,lastResult:null}
+};
+try{
+  const s=localStorage.getItem('ps3');
+  if(s){const d=JSON.parse(s);Object.assign(PS.apiKeys,d.apiKeys||{});PS.customEndpoint=d.ce||'';PS.customModel=d.cm||'';PS.customApiKey=d.ck||'';}
+  const h=localStorage.getItem('ps3_hist');if(h){PS.history=JSON.parse(h);PS.editor.version=PS.history.length;}
+  const c=localStorage.getItem('ps3_ed');if(c)document.addEventListener('DOMContentLoaded',()=>{document.getElementById('editor').value=c;onInput();});
+}catch(_){}
+function saveState(){try{localStorage.setItem('ps3',JSON.stringify({apiKeys:PS.apiKeys,ce:PS.customEndpoint,cm:PS.customModel,ck:PS.customApiKey}));}catch(_){}}
+
+// ═══════════════════════════════════════════
+// FORMAT DETECTION
+// ═══════════════════════════════════════════
+const FMTS=[
+  {id:'RAW',label:'RAW',d:null},
+  {id:'CPL',label:'CPL',d:/^(ROLE|CONTEXT|ACTION|FORMAT|CONSTRAINT|EXAMPLE)\s*:|[@#>!:?%^$~|]/m},
+  {id:'XML',label:'XML',d:/<(instruction|context|system|task|output|role|rules|examples)/i},
+  {id:'COSTAR',label:'COSTAR',d:/\b(Context|Objective|Style|Tone|Audience|Response)\s*:/i},
+  {id:'RISEN',label:'RISEN',d:/\b(Role|Instructions|Steps|End goal|Narrowing)\s*:/i},
+  {id:'COT',label:'COT',d:/\b(step[- ]by[- ]step|think through|chain of thought)/i},
+  {id:'FEW-SHOT',label:'FEW-SHOT',d:/\b(example\s*\d|input\s*:|output\s*:)/im},
+  {id:'REACT',label:'ReAct',d:/\b(Thought|Action|Observation)\s*:/i},
+  {id:'TOT',label:'ToT',d:/\b(tree of thought|explore.*paths|candidate)/i},
+  {id:'META',label:'META',d:/\b(meta[- ]prompt|generate.*prompt|prompt.*template)/i}
+];
+function detectFmt(c){if(!c.trim())return'RAW';for(const f of FMTS)if(f.d&&f.d.test(c))return f.id;return'RAW';}
+
+// ═══════════════════════════════════════════
+// ANALYSIS ENGINE
+// ═══════════════════════════════════════════
+const PAT={
+  role:[/\byou are\b/gi,/\bact as\b/gi,/\byour role\b/gi,/\bassume the role\b/gi,/\byou are an?\b/gi,/\byou'?re an?\b/gi,/\bas an expert\b/gi,/\bpersona\b/gi,/\bbehave as\b/gi,/\byou will act\b/gi,/\byou will be\b/gi,/\bidentity\b/gi],
+  constraint:[/\bnever\b/gi,/\balways\b/gi,/\bdo not\b/gi,/\bdon'?t\b/gi,/\bmust not\b/gi,/\bonly\b/gi,/\bavoid\b/gi,/\brefrain\b/gi,/\bprohibit/gi,/\bunder no circumstance/gi,/\bstrictly\b/gi,/\bmust\b/gi,/\bshall not\b/gi,/\bforbid/gi],
+  context:[/\bhere is\b.*?\b(context|background|information|data)\b/gi,/\bgiven (the |that |this )/gi,/\bbackground\s*:/gi,/\bcontext\s*:/gi,/\bthe following (data|information|text)/gi,/\bbased on\b/gi,/\bbelow is\b/gi],
+  format:[/\brespond in\b/gi,/\bformat as\b/gi,/\boutput (as|in|format)/gi,/\breturn (as|in)\b/gi,/\byour response should\b/gi,/\bstructure your\b/gi,/\bin JSON\b/gi,/\bin markdown\b/gi,/\buse bullet/gi,/\bformat\s*:/gi,/\boutput\s*:/gi,/\bschema\b/gi,/\brespond with\b/gi],
+  example:[/\bexample\s*:/gi,/\binput\s*:/gi,/\boutput\s*:/gi,/\be\.?g\.?\b/gi,/\bfor instance\b/gi,/\bhere is an example\b/gi,/\bsample\s*:/gi,/\bdemonstrat/gi]
+};
+const AMBIG={'good':'Define measurable criteria','bad':'Specify what is unacceptable','appropriate':'State the standard','professional':'Describe exact tone','relevant':'List what counts','detailed':'Specify depth','comprehensive':'Define completeness','proper':'State the convention','suitable':'Define criteria','reasonable':'Quantify the range','nice':'Describe qualities','helpful':'Define concretely','clear':'Specify structure','concise':'Set word limit','better':'Compared to what?','best':'Define ranking criteria','great':'Specify vs acceptable','high quality':'List quality markers','excellent':'Define the standard','adequate':'State minimum','sufficient':'Quantify enough','thorough':'List areas to cover','important':'Rank priorities','interesting':'Define engagement','creative':'Specify constraints','effective':'Define success metric','accurate':'Specify source of truth','useful':'Define use case','simple':'Specify ceiling','brief':'Set length limit','engaging':'Define for audience','robust':'Define edge cases'};
+const AMBIG_RE=new RegExp('\\b('+Object.keys(AMBIG).join('|').replace(/ /g,'\\s+')+')\\b','gi');
+
+function analyze(c){
+  const r={tok:{total:0,role:0,constraint:0,context:0,format:0,example:0},sc:{hasRole:0,hasConstraint:0,hasContext:0,hasFormat:0,hasExample:0,overall:0},ambig:[],issues:[]};
+  if(!c.trim())return r;
+  r.tok.total=Math.ceil(c.length/4);
+  for(const[cat,pats]of Object.entries(PAT)){let n=0;for(const p of pats){const m=c.match(p);if(m)n+=m.length;}r.tok[cat]=n;const k=cat==='format'?'hasFormat':'has'+cat[0].toUpperCase()+cat.slice(1);r.sc[k]=n>0?1:0;}
+  let s=0;if(r.sc.hasRole)s+=20;if(r.sc.hasConstraint)s+=15;if(r.sc.hasContext)s+=20;if(r.sc.hasFormat)s+=25;if(r.sc.hasExample)s+=15;s+=Math.min(5,Math.floor(c.length/100));r.sc.overall=Math.min(100,s);
+  let m;const re=new RegExp(AMBIG_RE.source,'gi');while((m=re.exec(c))!==null)r.ambig.push({word:m[0],pos:m.index,tip:AMBIG[m[0].toLowerCase()]||'Be specific'});
+  if(!r.sc.hasRole)r.issues.push({sev:'warn',msg:'No role/persona — add "You are…"'});
+  if(!r.sc.hasFormat)r.issues.push({sev:'warn',msg:'No output format — model will guess'});
+  if(!r.sc.hasConstraint&&c.length>100)r.issues.push({sev:'info',msg:'No constraints — add boundaries'});
+  if(!r.sc.hasExample&&c.length>200)r.issues.push({sev:'info',msg:'No examples — few-shot improves consistency'});
+  if(r.ambig.length>3)r.issues.push({sev:'warn',msg:r.ambig.length+' vague terms flagged'});
+  return r;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderOverlay(c){
+  if(!c)return'';
+  const cls=new Array(c.length).fill('plain');
+  for(const[cat,pats]of Object.entries(PAT))for(const p of pats){const re=new RegExp(p.source,p.flags);let m;while((m=re.exec(c))!==null)for(let i=m.index;i<m.index+m[0].length;i++)cls[i]=cat;}
+  let html='',cur=cls[0]||'plain',buf='';
+  for(let i=0;i<c.length;i++){if(cls[i]!==cur){html+='<span class="t-'+cur+'">'+esc(buf)+'</span>';buf='';cur=cls[i];}buf+=c[i];}
+  if(buf)html+='<span class="t-'+cur+'">'+esc(buf)+'</span>';
+  html=html.replace(new RegExp(AMBIG_RE.source,'gi'),m=>'<span class="t-ambig" data-a="'+m.toLowerCase()+'">'+m+'</span>');
+  return html;
+}
+const CK=[{k:'hasRole',n:'Role / Persona',p:20},{k:'hasConstraint',n:'Constraints',p:15},{k:'hasContext',n:'Context',p:20},{k:'hasFormat',n:'Output Format',p:25},{k:'hasExample',n:'Examples',p:15}];
+const TB=[{k:'role',n:'Role',c:'var(--amber)'},{k:'constraint',n:'Constraint',c:'var(--red)'},{k:'context',n:'Context',c:'var(--cyan)'},{k:'format',n:'Format',c:'var(--violet)'},{k:'example',n:'Example',c:'var(--green)'}];
+function renderScore(s){const el=G('sc-n'),fl=G('sc-fill');const cls=s===0?'':s<40?'low':s<70?'mid':'high';const fc=s<40?'red':s<70?'amber':'green';el.textContent=s;el.className='score-num '+(cls||'');fl.style.width=s+'%';fl.className='score-fill '+fc;}
+function renderCK(sc){const el=G('ck-list');el.innerHTML='';CK.forEach(c=>{const on=sc[c.k];el.innerHTML+=`<div class="ck-item ${on?'on':''}"><div class="ck-dot ${on?'on':'off'}">${on?'✓':'−'}</div><span class="ck-name">${c.n}</span><span class="ck-pts">${on?'+'+c.p:c.p+'pt'}</span></div>`});}
+function renderTB(tok){const el=G('tb-list');el.innerHTML='';const mx=Math.max(1,...TB.map(t=>tok[t.k]));TB.forEach(t=>{const pct=Math.round(tok[t.k]/mx*100);el.innerHTML+=`<div class="tb-row"><div class="tb-dot" style="background:${t.c}"></div><span class="tb-name">${t.n}</span><div class="tb-bar-w"><div class="tb-bar" style="width:${pct}%;background:${t.c}"></div></div><span class="tb-ct">${tok[t.k]}</span></div>`});}
+function renderAmbig(list){const sec=G('sec-amb'),el=G('amb-list');if(!list.length){sec.style.display='none';return;}sec.style.display='';el.innerHTML='';const seen=new Set();list.forEach(a=>{const w=a.word.toLowerCase();if(seen.has(w))return;seen.add(w);el.innerHTML+=`<div class="amb-item" onclick="scrollEd(${a.pos})"><span class="amb-word">${esc(a.word)}</span><span style="color:var(--dim)">→</span><span class="amb-tip">${esc(a.tip)}</span></div>`;});}
+function renderIssues(list){const sec=G('sec-iss'),el=G('iss-list');if(!list.length){sec.style.display='none';return;}sec.style.display='';el.innerHTML='';list.forEach(i=>{el.innerHTML+=`<div class="iss ${i.sev}"><span style="flex-shrink:0">${i.sev==='warn'?'⚠':'ℹ'}</span><span>${esc(i.msg)}</span></div>`;});}
+function renderPills(){const el=G('pills');el.innerHTML='';FMTS.forEach(f=>{const b=document.createElement('button');b.className='pill'+(f.id===PS.editor.format?' active':'');b.textContent=f.label;b.onclick=()=>{PS.editor.format=f.id;renderPills();G('s-fmt').textContent=f.id;};el.appendChild(b);});}
+function markDetected(id){document.querySelectorAll('.pill').forEach(p=>{p.classList.toggle('detected',p.textContent===id&&id!=='RAW'&&id!==PS.editor.format);});}
+function renderHist(){
+  const el=G('hist-list'),emp=G('hist-empty');
+  if(!PS.history.length){emp.style.display='';el.innerHTML='';return;}
+  emp.style.display='none';
+  el.innerHTML=[...PS.history].reverse().map(h=>`
+    <div class="hist-item" onclick="restoreHist('${h.id}')">
+      <div class="hist-label">${esc(h.label)}</div>
+      <div class="hist-meta">${new Date(h.ts).toLocaleTimeString()} · ${Math.ceil(h.content.length/4)} tok · ${h.fmt}</div>
+      <div class="hi-actions">
+        <button class="hi-btn" onclick="event.stopPropagation();restoreHist('${h.id}')">RESTORE</button>
+        <button class="hi-btn" onclick="event.stopPropagation();deleteHist('${h.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+function restoreHist(id){const h=PS.history.find(x=>x.id===id);if(!h)return;ed.value=h.content;PS.editor.format=h.fmt;renderPills();onInput();notify('Restored: '+h.label);}
+function deleteHist(id){PS.history=PS.history.filter(x=>x.id!==id);renderHist();try{localStorage.setItem('ps3_hist',JSON.stringify(PS.history.slice(-50)));}catch(_){}}
+
+// ═══════════════════════════════════════════
+// EDITOR WIRING
+// ═══════════════════════════════════════════
+const ed=G('editor'),ov=G('overlay'),oi=G('ov-inner');let _oT,_aT;
+function onInput(){
+  const c=ed.value;PS.editor.content=c;PS.editor.dirty=true;
+  G('ver').classList.toggle('dirty',true);
+  G('s-tok').textContent=Math.ceil(c.length/4);
+  G('s-wrd').textContent=c.trim()?c.trim().split(/\s+/).length:0;
+  G('s-ln').textContent=c?c.split('\n').length:0;
+  G('s-chr').textContent=c.length;
+  clearTimeout(_oT);_oT=setTimeout(()=>{oi.innerHTML=renderOverlay(c);},60);
+  clearTimeout(_aT);_aT=setTimeout(()=>{
+    const r=analyze(c);renderScore(r.sc.overall);renderCK(r.sc);renderTB(r.tok);renderAmbig(r.ambig);renderIssues(r.issues);
+    const det=detectFmt(c);markDetected(det);
+    G('s-fmt').textContent=PS.editor.format==='RAW'&&det!=='RAW'?det+' ?':PS.editor.format;
+    try{localStorage.setItem('ps3_ed',c);}catch(_){}
+  },200);
+}
+ed.addEventListener('input',onInput);
+ed.addEventListener('scroll',()=>{ov.scrollTop=ed.scrollTop;ov.scrollLeft=ed.scrollLeft;});
+ed.addEventListener('keydown',e=>{
+  if(e.key==='Tab'){e.preventDefault();const s=ed.selectionStart;ed.value=ed.value.substring(0,s)+'  '+ed.value.substring(ed.selectionEnd);ed.selectionStart=ed.selectionEnd=s+2;onInput();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();doRun();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();snapshot('Manual save');notify('Snapshot saved ✓');}
+});
+
+function snapshot(label){
+  PS.history.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),content:PS.editor.content,label:label||'v'+(PS.history.length+1),ts:Date.now(),fmt:PS.editor.format});
+  PS.editor.version=PS.history.length;PS.editor.dirty=false;
+  G('ver').textContent='v'+PS.editor.version;G('ver').classList.remove('dirty');
+  renderHist();
+  try{localStorage.setItem('ps3_hist',JSON.stringify(PS.history.slice(-50)));}catch(_){}
+}
+function scrollEd(pos){ed.focus();ed.setSelectionRange(pos,pos);ed.scrollTop=Math.max(0,(ed.value.substring(0,pos).split('\n').length-4)*21);}
+function showRailTab(id){PS.ui.railTab=id;document.querySelectorAll('.rail-tab').forEach(t=>t.classList.toggle('active',t.dataset.rt===id));G('rb-analysis').classList.toggle('hidden',id!=='analysis');G('rb-history').classList.toggle('hidden',id!=='history');}
+
+// ═══════════════════════════════════════════
+// DRAWER MANAGEMENT
+// ═══════════════════════════════════════════
+function openDrawerTab(tab){
+  const drawer=G('drawer');
+  // Update tab active states
+  document.querySelectorAll('.dh-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  // Show correct panel
+  document.querySelectorAll('.d-panel').forEach(p=>p.classList.remove('active'));
+  G('dp-'+tab).classList.add('active');
+  // Open drawer
+  drawer.classList.add('open');
+  drawer.classList.toggle('forge-mode',tab==='forge');
+  PS.ui.drawerTab=tab;
+}
+function closeDrawer(){
+  const drawer=G('drawer');
+  drawer.classList.remove('open','forge-mode');
+  document.querySelectorAll('.dh-tab').forEach(t=>t.classList.remove('active'));
+  PS.ui.drawerTab=null;
+}
+
+// ═══════════════════════════════════════════
+// API CORE
+// ═══════════════════════════════════════════
+async function apiCall(messages,system,maxTokens=1500){
+  // Determine endpoint + key
+  let endpoint,headers,body;
+  if(PS.customEndpoint){
+    // Custom proxy endpoint
+    endpoint=PS.customEndpoint;
+    headers={'Content-Type':'application/json'};
+    if(PS.customApiKey)headers['Authorization']='Bearer '+PS.customApiKey;
+    const mdl=PS.customModel||'claude-sonnet-4-20250514';
+    body={model:mdl,max_tokens:maxTokens,messages};
+    if(system)body.system=system;
+  } else if(PS.apiKeys.anthropic){
+    endpoint='https://api.anthropic.com/v1/messages';
+    headers={'Content-Type':'application/json','x-api-key':PS.apiKeys.anthropic,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
+    body={model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages};
+    if(system)body.system=system;
+  } else if(PS.apiKeys.groq){
+    endpoint='https://api.groq.com/openai/v1/chat/completions';
+    headers={'Content-Type':'application/json','Authorization':'Bearer '+PS.apiKeys.groq};
+    const msgs=system?[{role:'system',content:system},...messages]:messages;
+    body={model:'llama-3.3-70b-versatile',max_tokens:maxTokens,messages:msgs};
+  } else if(PS.apiKeys.gemini){
+    const key=PS.apiKeys.gemini;
+    endpoint=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+    headers={'Content-Type':'application/json'};
+    const parts=[];if(system)parts.push({text:'System: '+system+'\n\n'});parts.push({text:messages[messages.length-1].content});
+    body={contents:[{role:'user',parts}]};
+  } else {
+    throw new Error('NO_KEY');
+  }
+
+  const resp=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify(body)});
+  if(!resp.ok){const err=await resp.text();throw new Error('API error '+resp.status+': '+err.slice(0,200));}
+  const data=await resp.json();
+
+  // Extract text from various response formats
+  if(data.content&&data.content[0]&&data.content[0].text)return data.content[0].text; // Anthropic
+  if(data.choices&&data.choices[0])return data.choices[0].message?.content||data.choices[0].text||''; // OpenAI/Groq
+  if(data.candidates&&data.candidates[0])return data.candidates[0].content?.parts?.[0]?.text||''; // Gemini
+  return JSON.stringify(data);
+}
+
+function apiGuard(){
+  if(!PS.apiKeys.anthropic&&!PS.apiKeys.groq&&!PS.apiKeys.gemini&&!PS.customEndpoint){
+    openApiModal();
+    notify('Add an API key first ⚙');
+    return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════
+// RUN / PLAY
+// ═══════════════════════════════════════════
+let _lastResponse='';
+async function doRun(){
+  if(!PS.editor.content.trim()){notify('Nothing to run');return;}
+  if(!apiGuard())return;
+  snapshot('Pre-run');
+  openDrawerTab('play');
+  const btn=G('runBtn');
+  btn.textContent='● RUN';btn.classList.add('running');
+  G('resp-empty').style.display='none';
+  G('resp-block').style.display='block';
+  G('resp-block').textContent='Running…';G('resp-block').className='response-block loading';
+  G('resp-meta').style.display='none';
+  const t0=Date.now();
+  try{
+    const text=await apiCall([{role:'user',content:PS.editor.content}],'',2000);
+    _lastResponse=text;
+    G('resp-block').textContent=text;G('resp-block').className='response-block';
+    const elapsed=((Date.now()-t0)/1000).toFixed(1)+'s';
+    G('resp-meta').style.display='flex';
+    G('resp-model').textContent=PS.customModel||'claude-sonnet-4';
+    G('resp-time').textContent=elapsed;
+    if(typeof window.NX_EMIT==='function')window.NX_EMIT('ai.response.complete',{session_id:Date.now().toString(36),drift_score:0,provider:'anthropic',verified_level:1});
+  }catch(e){
+    if(e.message==='NO_KEY'){openApiModal();notify('Add an API key first');}
+    else{G('resp-block').textContent='Error: '+e.message;G('resp-block').className='response-block loading';}
+  }finally{
+    btn.textContent='▶ RUN';btn.classList.remove('running');
+  }
+}
+function injectResponse(){if(_lastResponse){ed.value=_lastResponse;onInput();closeDrawer();notify('Response injected into editor ✓');}}
+
+// ═══════════════════════════════════════════
+// FORGE — ADVERSARIAL REFINEMENT
+// ═══════════════════════════════════════════
+const SYS_ARCHITECT=`You are the ARCHITECT in a Prompt Forge session — a precision instrument for building better prompts through adversarial collaboration.
+
+Analyze the target prompt and produce a deployable Draft v0.
+
+Respond in EXACTLY this format — no deviation:
+
+PERSONA: [Name] — [one sentence: why this person would build this prompt best]
+
+READING:
+[What this prompt actually needs — the underlying goal, not just the literal request]
+
+DRAFT v0:
+[Complete deployable prompt. No placeholders. Ready to use exactly as written.]
+
+RISKS:
+[What could still be wrong — be specific, one per line]
+
+CONSENSUS: OPEN`;
+
+const SYS_ADVERSARY=`You are the ADVERSARY in a Prompt Forge session — a precision instrument for finding what is broken before it goes into production.
+
+The Prime Rule: Steelman before attack. State the strongest version of the Architect's position first.
+
+Respond in EXACTLY this format — no deviation:
+
+PERSONA: [Name] — [one sentence: what they see that others miss]
+
+STEELMAN:
+[Best version of the Architect's position — stated as strongly as possible]
+
+ATTACK:
+[The specific flaw. Mechanism of failure, not just conclusion. Path from this draft to a bad output.]
+
+FIX:
+[Specific proposed change — not direction, an actual revision or precise instruction for what the revision must accomplish]
+
+CONSENSUS: OPEN [or CONVERGING if minor issues remain, or REACHED if genuinely satisfied — do not manufacture disagreement]`;
+
+const SYS_ARCH_REVISE=`You are the ARCHITECT. The Adversary has challenged your draft. Address their attack directly.
+
+If they found a real flaw, fix it and say so. If they are wrong, explain precisely why.
+
+Respond in EXACTLY this format:
+
+RESPONSE TO ADVERSARY:
+[ACCEPTED / REJECTED / MODIFIED — why, one paragraph]
+
+DRAFT v1:
+[Complete updated prompt — must be fully deployable, not a fragment]
+
+WHAT CHANGED:
+[Specific changes from v0 and the mechanism behind each]
+
+CONSENSUS: CONVERGING [or REACHED if you believe the draft is now strong]`;
+
+const SYS_ADV_FINAL=`You are the ADVERSARY doing a final review. The Architect has revised their draft based on your attack.
+
+Has the core issue been addressed? Are there remaining flaws that would change the output class (not just cosmetic improvements)?
+
+Be honest — do not manufacture disagreement if the draft is genuinely good. Do not cave if issues remain.
+
+Use the same format as before. If satisfied, signal REACHED explicitly.`;
+
+function parseSections(text){
+  const sections={};
+  const lines=text.split('\n');
+  let current=null,buf=[];
+  for(const line of lines){
+    const m=line.match(/^([A-Z][A-Z0-9 ]*(?:v\d+)?)\s*:\s*(.*)$/);
+    if(m&&m[1].length<40&&!m[1].match(/^(http|https)/i)){
+      if(current)sections[current]=buf.join('\n').trim();
+      current=m[1].trim();buf=m[2]?[m[2]]:[];
+    }else if(current){buf.push(line);}
+  }
+  if(current)sections[current]=buf.join('\n').trim();
+  return sections;
+}
+function extractConsensus(text){
+  const m=text.match(/CONSENSUS\s*:\s*(OPEN|CONVERGING|REACHED)/i);
+  return m?m[1].toUpperCase():'OPEN';
+}
+function extractDraft(text){
+  // Try to get DRAFT v0, DRAFT v1, or DRAFT section
+  const m=text.match(/DRAFT[^:\n]*:\n([\s\S]+?)(?=\n[A-Z][A-Z ]*:|$)/i);
+  return m?m[1].trim():null;
+}
+
+function addForgeStatus(msg){
+  const log=G('forge-log'),empty=G('forge-empty');
+  empty.style.display='none';
+  const el=document.createElement('div');
+  el.className='forge-status-line';el.id='forge-status-current';el.textContent=msg;
+  log.appendChild(el);
+  G('forge-log-scroll').scrollTop=99999;
+}
+function clearForgeStatus(){const el=G('forge-status-current');if(el)el.remove();}
+
+function addForgeTurn(role,label,text,consensus){
+  clearForgeStatus();
+  const s=parseSections(text);
+  const cons=consensus||extractConsensus(text);
+  const log=G('forge-log');
+  const turn=document.createElement('div');
+  turn.className='forge-turn '+role;
+
+  let headerHTML=`<div class="ft-header ${role}">
+    <span class="ft-persona">${role==='architect'?'⚒ ARCHITECT':'⚡ ADVERSARY'}</span>
+    <span class="ft-label">${esc(label)}</span>
+    <span class="ft-consensus ${cons.toLowerCase()}">${cons}</span>
+  </div>`;
+
+  let bodyHTML='<div class="ft-body">';
+  const persona=s['PERSONA']||s['ARCHITECT']||'';
+  if(persona){bodyHTML+=`<div class="ft-section-label">PERSONA</div><div class="ft-section-text">${esc(persona)}</div>`;}
+
+  if(role==='architect'){
+    const reading=s['READING']||'';
+    const draft=extractDraft(text)||s['DRAFT v0']||s['DRAFT v1']||s['DRAFT']||'';
+    const risks=s['RISKS']||s['WHAT CHANGED']||'';
+    const resp=s['RESPONSE TO ADVERSARY']||'';
+    if(resp)bodyHTML+=`<div class="ft-section-label">RESPONSE TO ADVERSARY</div><div class="ft-section-text">${esc(resp)}</div>`;
+    if(reading)bodyHTML+=`<div class="ft-section-label">READING</div><div class="ft-section-text">${esc(reading)}</div>`;
+    if(draft)bodyHTML+=`<div class="ft-section-label">DRAFT</div><div class="ft-draft">${esc(draft)}</div>`;
+    if(risks)bodyHTML+=`<div class="ft-section-label">RISKS / CHANGES</div><div class="ft-section-text">${esc(risks)}</div>`;
+  }else{
+    const steel=s['STEELMAN']||'';
+    const attack=s['ATTACK']||'';
+    const fix=s['FIX']||'';
+    if(steel)bodyHTML+=`<div class="ft-section-label">STEELMAN</div><div class="ft-section-text">${esc(steel)}</div>`;
+    if(attack)bodyHTML+=`<div class="ft-section-label">ATTACK</div><div class="ft-section-text">${esc(attack)}</div>`;
+    if(fix)bodyHTML+=`<div class="ft-section-label">FIX</div><div class="ft-section-text">${esc(fix)}</div>`;
+  }
+  // Fallback: show raw if no sections parsed
+  if(bodyHTML==='<div class="ft-body">'){bodyHTML+=`<div class="ft-section-text">${esc(text)}</div>`;}
+
+  bodyHTML+='</div>';
+  turn.innerHTML=headerHTML+bodyHTML;
+  log.appendChild(turn);
+  G('forge-log-scroll').scrollTop=99999;
+  return {consensus:cons,draft:extractDraft(text)};
+}
+
+function addForgeResult(finalPrompt){
+  clearForgeStatus();
+  const log=G('forge-log');
+  const result=document.createElement('div');
+  result.className='forge-result';
+  result.innerHTML=`
+    <div class="forge-result-label">FINAL PROMPT</div>
+    <div class="forge-result-prompt" id="forge-final-text">${esc(finalPrompt)}</div>
+    <div class="forge-result-actions">
+      <button class="fra-btn primary" onclick="injectForgeResult()">← INJECT INTO EDITOR</button>
+      <button class="fra-btn" onclick="copyForgeResult()">COPY</button>
+      <button class="fra-btn" onclick="analyzeForgeResult()">ANALYZE</button>
+    </div>`;
+  log.appendChild(result);
+  PS.forge.result=finalPrompt;
+  G('forge-log-scroll').scrollTop=99999;
+}
+
+async function doForge(){
+  const prompt=PS.editor.content.trim();
+  if(!prompt){notify('Write a prompt first');return;}
+  if(!apiGuard())return;
+  if(PS.forge.running){notify('Forge already running');return;}
+  PS.forge.running=true;
+  openDrawerTab('forge');
+  // Clear previous
+  G('forge-log').innerHTML='';G('forge-empty').style.display='none';PS.forge.result=null;
+  const fBtn=G('forge-run-btn');fBtn.disabled=true;
+  const fgBtn=G('forgeBtn');fgBtn.classList.add('running');
+
+  snapshot('Pre-forge');
+  let finalDraft=prompt;
+  try{
+    // Turn 1: Architect
+    addForgeStatus('ARCHITECT analyzing and building Draft v0…');
+    const arch0=await apiCall([{role:'user',content:'Target prompt to refine:\n\n'+prompt}],SYS_ARCHITECT,1800);
+    const {consensus:c0,draft:d0}=addForgeTurn('architect','DRAFT v0',arch0);
+    if(d0)finalDraft=d0;
+    if(c0==='REACHED'){addForgeResult(finalDraft);return;}
+
+    // Turn 2: Adversary attacks
+    addForgeStatus('ADVERSARY reviewing Draft v0…');
+    const adv0=await apiCall([{role:'user',content:'Architect\'s draft:\n\n'+arch0}],SYS_ADVERSARY,1500);
+    const {consensus:c1}=addForgeTurn('adversary','ATTACK v0',adv0);
+    if(c1==='REACHED'){addForgeResult(finalDraft);return;}
+
+    // Turn 3: Architect revises
+    addForgeStatus('ARCHITECT revising based on attack…');
+    const arch1=await apiCall([
+      {role:'user',content:'Target prompt:\n\n'+prompt},
+      {role:'assistant',content:arch0},
+      {role:'user',content:'Adversary\'s attack:\n\n'+adv0+'\n\nRevise your draft to address the attack.'}
+    ],SYS_ARCH_REVISE,1800);
+    const {consensus:c2,draft:d1}=addForgeTurn('architect','DRAFT v1',arch1);
+    if(d1)finalDraft=d1;
+    if(c2==='REACHED'){addForgeResult(finalDraft);return;}
+
+    // Turn 4: Adversary final
+    addForgeStatus('ADVERSARY doing final review…');
+    const adv1=await apiCall([{role:'user',content:'Architect\'s revised draft:\n\n'+arch1+'\n\nOriginal attack:\n\n'+adv0}],SYS_ADV_FINAL,1200);
+    addForgeTurn('adversary','FINAL REVIEW',adv1);
+
+    addForgeResult(finalDraft);
+  }catch(e){
+    clearForgeStatus();
+    if(e.message==='NO_KEY'){openApiModal();notify('Add an API key first');}
+    else{const err=document.createElement('div');err.style.cssText='padding:12px;color:var(--red);font-size:11px';err.textContent='Forge error: '+e.message;G('forge-log').appendChild(err);}
+  }finally{
+    PS.forge.running=false;fBtn.disabled=false;fgBtn.classList.remove('running');
+  }
+}
+
+function injectForgeResult(){if(PS.forge.result){ed.value=PS.forge.result;onInput();notify('Forged prompt injected ✓');}}
+function copyForgeResult(){if(PS.forge.result){navigator.clipboard.writeText(PS.forge.result).then(()=>notify('Copied ✓')).catch(()=>notify('Copy failed'));}}
+function analyzeForgeResult(){if(PS.forge.result){ed.value=PS.forge.result;onInput();closeDrawer();showRailTab('analysis');notify('Running analysis on forged prompt…');}}
+
+// ═══════════════════════════════════════════
+// ADVERSARIAL — SINGLE PASS
+// ═══════════════════════════════════════════
+const SYS_SINGLE_ADV=`You are a Prompt Adversary — a precision instrument for finding what is broken before it goes into production.
+
+Your only job: find the most important flaw in this prompt, steelman it first, then attack.
+
+Respond in EXACTLY this format:
+
+PERSONA: [Name] — [one sentence: what they see that others miss]
+
+STEELMAN:
+[Best possible version of what this prompt is trying to accomplish]
+
+ATTACK:
+[The specific flaw — mechanism of failure, path from this prompt to a bad output]
+
+FIX:
+[Specific proposed revision — complete and deployable, not vague direction]
+
+RISK LEVEL: [LOW / MEDIUM / HIGH] — [one sentence why]`;
+
+async function doAdversarial(){
+  const prompt=PS.editor.content.trim();
+  if(!prompt){notify('Write a prompt first');return;}
+  if(!apiGuard())return;
+  if(PS.adv.running){notify('Already running');return;}
+  PS.adv.running=true;
+  openDrawerTab('adversarial');
+  const btn=G('adv-run-btn');btn.disabled=true;
+  G('adv-result').innerHTML='';G('adv-empty').style.display='none';
+  const loading=document.createElement('div');loading.style.cssText='padding:12px;color:var(--muted);font-size:10px;font-style:italic';loading.textContent='Adversary analyzing…';
+  G('adv-result').appendChild(loading);
+  try{
+    const text=await apiCall([{role:'user',content:'Prompt to attack:\n\n'+prompt}],SYS_SINGLE_ADV,1500);
+    G('adv-result').innerHTML='';
+    const turn=document.createElement('div');turn.className='forge-turn adversary';
+    const s=parseSections(text);
+    const risk=s['RISK LEVEL']||'';
+    const riskColor=risk.startsWith('HIGH')?'var(--red)':risk.startsWith('MED')?'var(--amber)':'var(--green)';
+    let body='<div class="ft-body">';
+    if(s['PERSONA'])body+=`<div class="ft-section-label">PERSONA</div><div class="ft-section-text">${esc(s['PERSONA'])}</div>`;
+    if(s['STEELMAN'])body+=`<div class="ft-section-label">STEELMAN</div><div class="ft-section-text">${esc(s['STEELMAN'])}</div>`;
+    if(s['ATTACK'])body+=`<div class="ft-section-label">ATTACK</div><div class="ft-section-text">${esc(s['ATTACK'])}</div>`;
+    if(s['FIX'])body+=`<div class="ft-section-label">FIX</div><div class="ft-draft">${esc(s['FIX'])}</div>`;
+    if(!s['STEELMAN']&&!s['ATTACK'])body+=`<div class="ft-section-text">${esc(text)}</div>`;
+    body+='</div>';
+    turn.innerHTML=`<div class="ft-header adv">
+      <span class="ft-persona">⚡ ADVERSARY</span>
+      <span class="ft-label">SINGLE PASS</span>
+      ${risk?`<span style="margin-left:auto;font-size:8px;color:${riskColor};font-weight:700">${esc(risk.split('—')[0].trim())}</span>`:''}
+    </div>${body}`;
+    G('adv-result').appendChild(turn);
+    // Add inject fix button if FIX was found
+    if(s['FIX']){
+      const fixText=s['FIX'];
+      const injectBtn=document.createElement('button');
+      injectBtn.className='fra-btn primary';injectBtn.style.cssText='margin:8px 12px;';
+      injectBtn.textContent='← INJECT FIX INTO EDITOR';
+      injectBtn.onclick=()=>{ed.value=fixText;onInput();closeDrawer();notify('Fix injected ✓');};
+      G('adv-result').appendChild(injectBtn);
+    }
+    G('adv-log-scroll').scrollTop=99999;
+  }catch(e){
+    G('adv-result').innerHTML='';
+    const err=document.createElement('div');err.style.cssText='padding:12px;color:var(--red);font-size:11px';err.textContent='Error: '+e.message;
+    G('adv-result').appendChild(err);
+    if(e.message==='NO_KEY'){openApiModal();notify('Add an API key first');}
+  }finally{
+    PS.adv.running=false;btn.disabled=false;
+  }
+}
+
+// ═══════════════════════════════════════════
+// TRANSFORM — CPL
+// ═══════════════════════════════════════════
+const SYS_CPL_COMPRESS=`You are a CPL v3.0 translator. Compress the given natural language prompt into CPL tokens.
+
+CPL token reference (key tokens):
+@<role> — identity  |  #terse #prof #blunt #warm #adversarial #tutor — tone
+>code >prose >bullet >json >md >tldr — format  |  !noHedge !noFill !noMeta !complete !cite — constraints
+%expert %novice %ceo — audience  |  ^deep ^exhaust ^surface — depth
+$review $improve $critique $validate $rewrite — operations
+:?cot :?decomp :?pro-con :?crux :?red :?steel :?first :?calibrate :?edge — reasoning
+~key:value — session context  |  *n:<token> — priority weight
+
+Respond in EXACTLY this format:
+
+CPL VERSION:
+[The compressed CPL string — tokens only, space-separated]
+
+TRANSLATION NOTES:
+[Each token chosen and what it maps to from the original]
+
+DROPPED:
+[What was deliberately not encoded and why]
+
+WHAT IT ACTIVATES:
+[In one sentence: what this CPL string will produce vs the original]`;
+
+const SYS_CPL_EXPAND=`You are a CPL v3.0 interpreter. Expand the given CPL token string into a full natural language prompt.
+
+CPL token reference (key tokens):
+@<role> — assigns identity  |  #terse #prof #blunt — tone  |  >code >prose >bullet — format
+!noHedge !noFill !noMeta !complete — hard constraints  |  %expert %novice — audience
+^deep ^exhaust — depth  |  $review $critique — operations  |  :?cot :?decomp :?crux — reasoning
+
+Respond in EXACTLY this format:
+
+EXPANDED PROMPT:
+[Full deployable natural language prompt — complete and ready to use]
+
+TOKEN BREAKDOWN:
+[token] → [what it activates] → [why this was chosen]
+
+WHAT THIS PRODUCES vs PLAIN:
+[Specific difference in output quality/focus]`;
+
+const SYS_CPL_TEACH=`You are a CPL v3.0 teacher. Identify the CPL tokens present in the given prompt (or explain what CPL tokens should be used if it's natural language).
+
+Respond in EXACTLY this format:
+
+TOKENS FOUND:
+[List each CPL token or pattern found, or "None — this is natural language"]
+
+MECHANISMS:
+[For each token or concept: why it works, the cognitive principle it invokes]
+
+EXAMPLE WITHOUT:
+[The prompt or equivalent without these tokens/patterns]
+
+EXAMPLE WITH:
+[The prompt optimized with explicit CPL tokens]
+
+DIFFERENCE:
+[What specifically changes in model output between the two versions]`;
+
+async function doTransform(dir){
+  const prompt=PS.editor.content.trim();
+  if(!prompt){notify('Write a prompt first');return;}
+  if(!apiGuard())return;
+  if(PS.tx.running){notify('Already running');return;}
+  PS.tx.running=true;
+  const btnMap={compress:G('tx-compress-btn'),expand:G('tx-expand-btn'),teach:G('tx-teach-btn')};
+  Object.values(btnMap).forEach(b=>b.disabled=true);
+  G('tx-result').innerHTML='';G('tx-empty').style.display='none';
+  const loading=document.createElement('div');loading.style.cssText='padding:12px;color:var(--muted);font-size:10px;font-style:italic';
+  loading.textContent=dir==='compress'?'Compressing to CPL…':dir==='expand'?'Expanding CPL…':'Analyzing tokens…';
+  G('tx-result').appendChild(loading);
+  const sys=dir==='compress'?SYS_CPL_COMPRESS:dir==='expand'?SYS_CPL_EXPAND:SYS_CPL_TEACH;
+  try{
+    const text=await apiCall([{role:'user',content:prompt}],sys,1500);
+    PS.tx.lastResult=text;
+    G('tx-result').innerHTML='';
+    const s=parseSections(text);
+    let html='';
+    const sectionOrder={
+      compress:['CPL VERSION','TRANSLATION NOTES','DROPPED','WHAT IT ACTIVATES'],
+      expand:['EXPANDED PROMPT','TOKEN BREAKDOWN','WHAT THIS PRODUCES vs PLAIN'],
+      teach:['TOKENS FOUND','MECHANISMS','EXAMPLE WITHOUT','EXAMPLE WITH','DIFFERENCE']
+    }[dir]||Object.keys(s);
+    for(const key of sectionOrder){
+      const val=s[key]||s[key.split(' ')[0]];
+      if(!val)continue;
+      const isDraft=key.includes('CPL VERSION')||key.includes('EXPANDED PROMPT')||key.includes('EXAMPLE WITH')||key.includes('EXAMPLE WITHOUT');
+      html+=`<div class="tx-label">${esc(key)}</div>`;
+      html+=isDraft?`<div class="tx-output">${esc(val)}</div>`:`<div style="font-size:11px;line-height:1.7;color:var(--dim);margin-bottom:10px;white-space:pre-wrap">${esc(val)}</div>`;
+    }
+    if(!html)html=`<div class="tx-output">${esc(text)}</div>`;
+    G('tx-result').innerHTML=html;
+    // Inject button for CPL or expanded
+    const injectKey=dir==='compress'?'CPL VERSION':dir==='expand'?'EXPANDED PROMPT':null;
+    if(injectKey&&s[injectKey]){
+      const val=s[injectKey];
+      const row=document.createElement('div');row.className='tx-actions';
+      const btn=document.createElement('button');btn.className='fra-btn primary';btn.textContent='← INJECT INTO EDITOR';
+      btn.onclick=()=>{ed.value=val;onInput();closeDrawer();notify('Injected ✓');};
+      row.appendChild(btn);G('tx-result').appendChild(row);
+    }
+  }catch(e){
+    G('tx-result').innerHTML='';
+    const err=document.createElement('div');err.style.cssText='padding:12px;color:var(--red);font-size:11px';err.textContent='Error: '+e.message;
+    G('tx-result').appendChild(err);
+    if(e.message==='NO_KEY'){openApiModal();}
+  }finally{
+    PS.tx.running=false;Object.values(btnMap).forEach(b=>b.disabled=false);
+  }
+}
+
+// ═══════════════════════════════════════════
+// API KEY MODAL
+// ═══════════════════════════════════════════
+const PROVIDERS=[
+  {id:'anthropic',label:'Anthropic (Claude)',ph:'sk-ant-...',cors:true},
+  {id:'groq',label:'Groq ⚡ (fast + CORS)',ph:'gsk_...',cors:true},
+  {id:'gemini',label:'Google Gemini',ph:'AIza...',cors:true},
+  {id:'openai',label:'OpenAI (server only)',ph:'sk-...',cors:false},
+];
+function openApiModal(){
+  G('apiKeyRows').innerHTML=PROVIDERS.map(p=>`
+    <div class="key-row">
+      <span class="key-label" style="color:${p.cors?'var(--muted)':'var(--yellow)'}">${p.label}</span>
+      <input type="password" id="key_${p.id}" placeholder="${p.ph}" value="${PS.apiKeys[p.id]||''}">
+      <button class="btn sm" style="padding:3px 7px;font-size:8px" onclick="var e=document.getElementById('key_${p.id}');e.type=e.type==='password'?'text':'password'">SHOW</button>
+    </div>`).join('');
+  G('customEndpoint').value=PS.customEndpoint;
+  G('customModel').value=PS.customModel;
+  G('customApiKey').value=PS.customApiKey;
+  G('apiModal').classList.add('open');
+}
+function closeApiModal(){G('apiModal').classList.remove('open');}
+function saveApiKeys(){
+  PROVIDERS.forEach(p=>{const v=document.getElementById('key_'+p.id)?.value?.trim();if(v)PS.apiKeys[p.id]=v;else delete PS.apiKeys[p.id];});
+  PS.customEndpoint=G('customEndpoint').value.trim();
+  PS.customModel=G('customModel').value.trim();
+  PS.customApiKey=G('customApiKey').value.trim();
+  saveState();closeApiModal();updateApiStatus();notify('Keys saved ✓');
+}
+function updateApiStatus(){
+  const n=Object.keys(PS.apiKeys).length+(PS.customEndpoint?1:0);
+  const el=G('apiBtn');
+  el.textContent=n>0?'✓ '+n+' KEY'+(n>1?'S':''):'⚙ KEYS';
+  el.classList.toggle('connected',n>0);
+}
+G('apiModal').addEventListener('click',e=>{if(e.target===G('apiModal'))closeApiModal();});
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function G(id){return document.getElementById(id);}
+function notify(msg){const n=document.createElement('div');n.className='notif';n.textContent=msg;document.body.appendChild(n);setTimeout(()=>n.remove(),2000);}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+renderPills();
+renderHist();
+updateApiStatus();
+onInput();
+</script>
+</body>
+</html>

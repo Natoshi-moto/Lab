@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nostr Social - Cosmos Edition</title>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   Nexus OS — Nostr Social Block (Cosmos Edition + Social Brain)
+   Round 1: Foundation — HTML structure, CSS, crypto stack
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: dark;
+  --bg:         #000000;
+  --surface:    rgba(17, 19, 24, 0.6);
+  --surface-2:  rgba(24, 27, 34, 0.8);
+  --surface-3:  rgba(31, 34, 43, 0.8);
+  --border:     rgba(0, 229, 255, 0.15);
+  --border-hi:  rgba(0, 229, 255, 0.3);
+  --text:       #e0e5f5;
+  --text-dim:   #8a94a6;
+  --text-muted: #535a6b;
+
+  --accent:     #00e5ff;
+  --accent-dim: rgba(0, 229, 255, 0.15);
+  --accent-glow: 0 0 10px rgba(0, 229, 255, 0.4);
+
+  --zap:        #fbbf24;
+  --repost:     #3b82f6;
+  --danger:     #ef4444;
+  --warn:       #f59e0b;
+
+  --font:       'JetBrains Mono','SF Mono','Cascadia Code',monospace;
+  --font-sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; overflow:hidden; font-family:var(--font-sans); font-size:14px; background: var(--bg); }
+body { color:var(--text); display:flex; flex-direction:column; position: relative; }
+
+/* ── Live Cosmos Background ── */
+#cosmos-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: -1; pointer-events: none;
+}
+
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-thumb { background:var(--border-hi); border-radius:3px; }
+
+/* ── App Shell ── */
+#nx-app { display:flex; width:100%; height:100%; flex-direction:column; overflow:hidden; position:relative; z-index: 1; }
+
+/* ── Cosmos Banner ── */
+.compact-banner {
+  position: relative; height: 80px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+}
+.nexus-title-centered {
+  font-size: 32px; font-weight: 800; letter-spacing: 16px; color: var(--accent);
+  text-shadow: 0 0 20px var(--accent-dim), 0 0 40px var(--accent-dim);
+  font-family: var(--font); pointer-events: none;
+}
+.header-controls {
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  z-index: 10;
+}
+
+/* ── UI Components ── */
+.soc-btn {
+  font-family:inherit; font-size:12px; font-weight: 600; padding:6px 16px;
+  background:var(--surface-3); border:1px solid var(--border-hi); border-radius:24px;
+  color:var(--text); cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px;
+  backdrop-filter: blur(5px);
+}
+.soc-btn.primary { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); box-shadow: var(--accent-glow); }
+.soc-btn.primary:hover { background:var(--accent); color:#000; box-shadow: 0 0 20px var(--accent); }
+.soc-btn.icon { padding: 6px; width: 36px; height: 36px; border-radius: 50%; }
+
+.soc-btn.danger-mode {
+  position: relative; overflow: hidden;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: var(--danger) !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3) !important;
+}
+.soc-btn.danger-mode .progress-bar {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: rgba(239, 68, 68, 0.5);
+  width: 100%; z-index: 0;
+}
+.soc-btn.danger-mode span { position: relative; z-index: 1; font-family: var(--font); font-size: 11px; font-weight: bold; }
+
+/* ── Compose ── */
+#soc-compose {
+  padding:20px; border-bottom:1px solid var(--border);
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+  backdrop-filter: blur(10px);
+  position: relative; z-index: 5;
+}
+#soc-textarea {
+  width: 100%; min-height:40px; font-family:var(--font); font-size:15px; line-height:1.6;
+  background:transparent; color:var(--accent); border:none; outline:none; resize: none;
+  text-shadow: 0 0 5px var(--accent-dim);
+}
+#soc-textarea::placeholder { color:var(--text-muted); text-shadow: none; font-family: var(--font-sans); }
+
+/* ── Filter Banner ── */
+#filter-banner {
+  background: var(--surface-2); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px; display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font); font-size: 13px; color: var(--accent);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 4;
+}
+#filter-banner.hidden { display: none; }
+
+/* ── Timeline & Floating Animations ── */
+#soc-timeline { flex:1; overflow-y:auto; padding: 20px; padding-bottom: 100px; position: relative; z-index: 2; }
+.thread-root { margin-bottom: 24px; }
+.thread-children { margin-left: 32px; border-left: 1px solid var(--border); padding-left: 16px; margin-top: 12px; }
+
+.soc-post {
+  padding:20px; display: flex; gap: 16px;
+  background: transparent; border: none;
+  animation: float 6s ease-in-out infinite;
+}
+.thread-root:nth-child(even) .soc-post { animation-duration: 7.5s; animation-delay: 0.5s; }
+.thread-root:nth-child(3n) .soc-post { animation-duration: 8s; animation-delay: 1.2s; }
+
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.post-avatar {
+  width:44px; height:44px; border-radius:50%; flex-shrink: 0;
+  background:var(--surface-3); border:1px solid var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:bold; color:var(--accent); font-size: 16px;
+  box-shadow: var(--accent-glow);
+}
+.post-right { flex: 1; min-width: 0; }
+.post-handle { font-weight:700; color:var(--accent); font-family:var(--font); text-shadow: 0 2px 4px rgba(0,0,0,1); }
+.post-time { font-size:11px; color:var(--text-muted); font-family:var(--font); text-shadow: 0 2px 4px rgba(0,0,0,1); }
+
+.post-body {
+  font-size:15px; line-height:1.6; color:var(--text);
+  font-family: var(--font); white-space: pre-wrap; margin-top: 8px;
+  text-shadow: 0 2px 5px rgba(0,0,0,1);
+  word-break: break-word;
+}
+.post-body.scramble-mode { color: var(--accent); text-shadow: 0 0 8px var(--accent-dim); }
+
+.hashtag { color: var(--accent); text-decoration: none; font-weight: bold; cursor: pointer; transition: text-shadow 0.2s; }
+.hashtag:hover { text-shadow: var(--accent-glow); text-decoration: underline; }
+
+.post-actions { display: flex; gap: 24px; margin-top: 16px; color: var(--text-muted); flex-wrap: wrap; }
+.action-btn {
+  background:none; border:none; color:inherit; display:flex; align-items:center; gap:6px;
+  font-size:12px; cursor:pointer; position: relative; font-family: var(--font);
+  text-shadow: 0 2px 4px rgba(0,0,0,1);
+}
+.action-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; transition: all 0.2s; }
+
+.action-btn:hover { color: var(--accent); text-shadow: var(--accent-glow); }
+.action-btn:hover svg { filter: drop-shadow(var(--accent-glow)); }
+
+.action-btn.liked  { color: var(--accent); text-shadow: var(--accent-glow); }
+.action-btn.liked svg { fill: var(--accent); stroke: var(--accent); filter: drop-shadow(var(--accent-glow)); }
+.action-btn.zapped { color: var(--zap); text-shadow: 0 0 10px var(--zap); }
+.action-btn.zapped svg { fill: var(--zap); stroke: var(--zap); filter: drop-shadow(0 0 10px var(--zap)); }
+.action-btn.reposted { color: var(--repost); text-shadow: 0 0 10px var(--repost); }
+.action-btn.reposted svg { stroke: var(--repost); stroke-width: 3; filter: drop-shadow(0 0 10px var(--repost)); }
+.action-btn.replied { color: var(--accent); text-shadow: var(--accent-glow); }
+.action-btn.replied svg { fill: var(--accent); stroke: var(--accent); filter: drop-shadow(var(--accent-glow)); }
+
+.anim-pop svg    { animation: pop    0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.anim-spin svg   { animation: spin   0.5s ease-in-out; }
+.anim-bounce svg { animation: bounce 0.4s ease; }
+.anim-zap svg    { animation: zap    0.5s ease-in-out; fill: var(--zap); stroke: var(--zap); filter: drop-shadow(0 0 5px var(--zap)); }
+
+@keyframes pop    { 0% { transform: scale(1); } 50% { transform: scale(1.6); } 100% { transform: scale(1); } }
+@keyframes spin   { 0% { transform: rotate(0); } 100% { transform: rotate(360deg); } }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes zap    { 0% { filter: brightness(1); } 50% { transform: scale(1.3); } 100% { filter: brightness(1); } }
+
+.floating-text {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  color: var(--zap); font-weight: bold; font-size: 12px; font-family: var(--font);
+  text-shadow: 0 0 8px var(--zap); animation: floatUp 1s forwards; pointer-events: none;
+}
+@keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -30px); } }
+
+/* Inline Reply */
+.inline-reply { margin-top: 12px; display:flex; flex-direction:column; gap:8px; }
+.inline-reply.hidden { display: none; }
+.inline-reply textarea {
+  background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--accent);
+  padding: 12px; border-radius: 12px; font-family: var(--font); font-size: 14px; outline: none;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5); resize: vertical; min-height: 60px;
+}
+.inline-reply textarea:focus { border-color: var(--accent); box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 10px var(--accent-dim); }
+
+/* ── Modals & Overlays ── */
+.modal-overlay {
+  position:absolute; inset:0; background:rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  z-index:100; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.modal-box {
+  background:var(--surface-2); border:1px solid var(--border-hi); border-top: 3px solid var(--accent);
+  border-radius:16px; padding:24px; width:100%; max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px var(--accent-dim);
+  transform: translateY(10px); transition: transform 0.2s;
+}
+.modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.modal-desc  { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.5; }
+
+.input-group  { margin-bottom: 20px; }
+.input-label  { display: block; font-size: 11px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.text-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  color: var(--accent); padding: 12px 14px; border-radius: 8px;
+  font-family: var(--font); font-size: 14px; outline: none; transition: all 0.2s;
+}
+.text-input:focus { border-color: var(--accent); box-shadow: var(--accent-glow); }
+
+.key-box {
+  background: var(--bg); border: 1px dashed var(--border-hi); border-radius: 8px;
+  padding: 12px; margin-bottom: 16px; position: relative;
+}
+.key-value { font-family: var(--font); font-size: 11px; color: var(--text-muted); word-break: break-all; line-height: 1.4; }
+.key-value.secret { filter: blur(4px); user-select: none; transition: filter 0.2s; }
+.key-value.secret.revealed { filter: blur(0); user-select: text; color: var(--danger); }
+.key-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+
+/* ── Cosmos Loading Overlay ── */
+#cosmos-overlay.loaded { opacity: 0; pointer-events: none; }
+
+/* ── Relay Status Dots ── */
+.hdr-rdot { width:6px; height:6px; border-radius:50%; background:var(--text-muted); transition:background .3s; flex-shrink:0; }
+.hdr-rdot.open { background:var(--accent); }
+.hdr-rdot.connecting { background:var(--warn); animation:blink 1.2s infinite; }
+.hdr-rdot.error, .hdr-rdot.closed { background:var(--danger); }
+@keyframes blink { 0%,100%{opacity:.25} 50%{opacity:1} }
+
+
+/* ═══════════ PHASE 1 — Social for People ═══════════ */
+#feed-tabs{display:flex;border-bottom:1px solid var(--border);background:rgba(0,0,0,.65);backdrop-filter:blur(12px);flex-shrink:0;z-index:3;}
+.feed-tab{flex:1;text-align:center;padding:9px 0;font-size:10px;font-weight:700;color:var(--text-muted);cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--font);transition:all .2s;border-bottom:2px solid transparent;}
+.feed-tab:hover{color:var(--text-dim);}
+.feed-tab.active{color:var(--accent);border-bottom-color:var(--accent);text-shadow:0 0 12px rgba(0,229,255,.3);}
+#modal-profile{position:absolute;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(14px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:50px 16px 16px;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;}
+#modal-profile.open{opacity:1;pointer-events:auto;}
+#profile-box{position:relative;width:100%;max-width:420px;background:var(--surface-2);border:1px solid var(--border-hi);border-top:3px solid var(--accent);border-radius:16px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.9),0 0 40px rgba(0,229,255,.07);max-height:80vh;display:flex;flex-direction:column;}
+.profile-header{padding:20px;display:flex;gap:14px;align-items:flex-start;border-bottom:1px solid var(--border);background:linear-gradient(150deg,rgba(0,229,255,.05) 0%,transparent 60%);}
+.profile-avatar-lg{width:58px;height:58px;border-radius:50%;background:var(--surface-3);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--accent);flex-shrink:0;box-shadow:0 0 16px rgba(0,229,255,.2);overflow:hidden;}
+.profile-avatar-lg img{width:100%;height:100%;object-fit:cover;}
+.profile-meta{flex:1;min-width:0;}
+.profile-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px;font-family:var(--font);}
+.profile-handle{font-size:9px;color:var(--text-muted);font-family:var(--font);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profile-bio{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:10px;word-break:break-word;}
+.profile-actions-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.profile-follow-btn{font-family:var(--font);font-size:11px;font-weight:700;padding:5px 16px;border-radius:20px;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+.btn-follow{background:var(--accent);border:1px solid var(--accent);color:#000;}
+.btn-follow:hover{box-shadow:0 0 16px rgba(0,229,255,.5);}
+.btn-unfollow{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);}
+.btn-unfollow:hover{background:rgba(239,68,68,.12);border-color:var(--danger);color:var(--danger);}
+.profile-stat-pill{font-size:9px;color:var(--text-muted);font-family:var(--font);padding:3px 8px;background:var(--surface-3);border-radius:8px;}
+.profile-stat-pill strong{color:var(--text-dim);}
+.profile-section-label{padding:8px 16px;font-size:8px;color:rgba(251,191,36,.7);letter-spacing:2px;text-transform:uppercase;font-family:var(--font);border-bottom:1px solid var(--border);background:var(--surface-3);flex-shrink:0;}
+.profile-posts-scroll{flex:1;overflow-y:auto;}
+.profile-post-item{padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.025);cursor:pointer;transition:background .1s;}
+.profile-post-item:hover{background:rgba(0,229,255,.03);}
+.profile-post-text{font-size:12px;color:var(--text-dim);line-height:1.5;word-break:break-word;white-space:pre-wrap;}
+.profile-post-meta{font-size:9px;color:var(--text-muted);font-family:var(--font);margin-top:4px;}
+.profile-close-btn{position:absolute;top:10px;right:10px;background:var(--surface-3);border:1px solid var(--border-hi);color:var(--text-muted);font-size:14px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-family:inherit;z-index:10;}
+.profile-close-btn:hover{color:var(--danger);border-color:var(--danger);}
+.follow-hint{font-size:9px;color:var(--text-muted);font-family:var(--font);padding:1px 7px;border:1px solid transparent;border-radius:10px;cursor:pointer;transition:all .15s;white-space:nowrap;margin-left:5px;line-height:1;}
+.follow-hint:hover{color:var(--accent);border-color:rgba(0,229,255,.3);}
+.follow-hint.is-following{color:var(--accent);opacity:.55;}
+.follow-hint.is-following:hover{color:var(--danger);border-color:rgba(239,68,68,.35);opacity:1;}
+.action-btn.disliked{color:var(--danger);text-shadow:0 0 8px rgba(239,68,68,.35);}
+.action-btn.disliked svg{fill:var(--danger);stroke:var(--danger);filter:drop-shadow(0 0 4px rgba(239,68,68,.45));}
+@keyframes salty{0%{transform:scale(1)}50%{transform:scale(1.55)rotate(-12deg)}100%{transform:scale(1)}}
+.anim-salty svg{animation:salty .4s cubic-bezier(.175,.885,.32,1.275);}
+.ss-ratio{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:9px;font-family:var(--font);color:var(--text-muted);}
+.ss-bar{height:2px;width:42px;background:rgba(239,68,68,.2);border-radius:2px;overflow:hidden;flex-shrink:0;}
+.ss-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .35s;}
+.ss-sweet{color:var(--accent);}
+.ss-salty{color:var(--danger);}
+.post-media{margin-top:10px;border-radius:10px;overflow:hidden;background:var(--surface-3);max-height:260px;}
+.post-media img{width:100%;max-height:260px;object-fit:cover;display:block;cursor:zoom-in;transition:opacity .15s;}
+.post-media img:hover{opacity:.88;}
+.empty-home{text-align:center;padding:48px 20px;font-family:var(--font);}
+.empty-home-glyph{font-size:30px;color:var(--accent);opacity:.25;margin-bottom:14px;}
+.empty-home-title{font-size:12px;color:var(--text-dim);margin-bottom:6px;font-weight:700;}
+.empty-home-sub{font-size:10px;color:var(--text-muted);line-height:1.7;}
+.post-pending{border-left:2px solid var(--warn)!important;opacity:.7;}
+.post-pending .post-handle::after{content:' ⏳';font-size:9px;color:var(--warn);}
+.post-sent .post-handle::after{content:' ✓';font-size:9px;color:var(--ok);animation:fadeIn .5s;}
+
+/* ── Stake indicators ── */
+.post-staked {
+  border-left: 2px solid rgba(129, 140, 248, 0.6) !important;
+  background: rgba(129, 140, 248, 0.03) !important;
+}
+.stake-indicator {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 10px; font-family: var(--font); font-size: 10px;
+  color: rgba(129,140,248,0.7); letter-spacing: .04em;
+  padding: 5px 8px; border-radius: 6px;
+  background: rgba(129,140,248,0.07);
+  border: 1px solid rgba(129,140,248,0.18);
+  width: fit-content;
+}
+.stake-indicator .si-amount {
+  font-weight: 700; color: #a5b4fc;
+  text-shadow: 0 0 8px rgba(129,140,248,0.5);
+}
+.stake-indicator .si-status {
+  font-size: 8px; text-transform: uppercase; letter-spacing: .1em;
+  padding: 1px 5px; border-radius: 3px;
+}
+.stake-indicator .si-status.ticking { background:rgba(251,191,36,.12);color:#fbbf24; }
+.stake-indicator .si-status.ready   { background:rgba(74,222,128,.1);color:#4ade80; animation: si-pulse 1.5s ease infinite; }
+@keyframes si-pulse { 0%,100%{opacity:1}50%{opacity:.5} }
+
+/* ── Stake action button state ── */
+.action-btn.staked { color: #818cf8; text-shadow: 0 0 8px rgba(129,140,248,.4); }
+.action-btn.staked svg { stroke: #818cf8; filter: drop-shadow(0 0 4px rgba(129,140,248,.5)); }
+
+/* ── Stake Intent Modal ── */
+#modal-stake { z-index: 110; }
+.stake-modal-event {
+  background: rgba(0,0,0,0.5); border: 1px solid rgba(129,140,248,0.3);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 16px;
+  font-family: var(--font); font-size: 10px; color: #a5b4fc;
+  word-break: break-all; line-height: 1.6; cursor: pointer;
+  transition: border-color .15s;
+}
+.stake-modal-event:hover { border-color: rgba(129,140,248,0.6); }
+.stake-modal-event .sme-label { font-size: 8px; color: rgba(129,140,248,0.5); text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; }
+.stake-modal-event .sme-preview { font-size: 11px; color: var(--text-dim); font-family: var(--font-sans); margin-top:6px; font-style:italic; }
+.stake-field { margin-bottom: 14px; }
+.stake-field label { display:block; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:5px; font-family:var(--font); }
+.stake-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.wallet-status-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 8px; margin-bottom: 16px;
+  font-size: 10px; font-family: var(--font);
+  background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.15);
+}
+.wallet-status-bar.disconnected { background:rgba(239,68,68,0.05); border-color:rgba(239,68,68,0.2); color:var(--danger); }
+.ws-dot { width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);flex-shrink:0; }
+.ws-dot.off { background:var(--text-muted);box-shadow:none; }
+</style>
+</head>
+<body>
+
+<!-- The Living Cosmos Background -->
+<canvas id="cosmos-bg"></canvas>
+
+<!-- Cosmos Loading Overlay — visible during dep loading, fades on .loaded -->
+<div id="cosmos-overlay" style="position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity 0.8s ease;">
+  <div style="font-size:36px;color:var(--accent);text-shadow:0 0 20px rgba(0,229,255,.4);">◈</div>
+  <div style="font-size:9px;letter-spacing:3px;color:var(--text-dim);font-family:var(--font);" id="cosmos-status">LOADING</div>
+  <div id="cosmos-relay-dots" style="display:flex;gap:8px;margin-top:4px;"></div>
+</div>
+
+<div id="nx-app">
+
+  <header class="compact-banner">
+    <!-- Relay status dots — left side of header -->
+    <div id="soc-relays-header" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center;"></div>
+
+    <div class="nexus-title-centered">NEXUS</div>
+
+    <div class="header-controls">
+      <button class="soc-btn icon" id="btn-settings" title="Identity & Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 5px var(--accent-dim));"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Feed Tabs: Global relay firehose vs personal Home timeline -->
+  <div id="feed-tabs">
+    <div class="feed-tab active" id="tab-global" onclick="window.switchTab('global')">Global</div>
+    <div class="feed-tab" id="tab-home" onclick="window.switchTab('home')">Home</div>
+  </div>
+
+  <!-- Dynamic Hashtag Filter Banner -->
+  <div id="filter-banner" class="hidden">
+    <div>Viewing signal: <strong id="filter-text"></strong></div>
+    <button class="soc-btn" onclick="clearFilter()">Clear</button>
+  </div>
+
+  <section id="soc-compose">
+    <div style="display:flex; gap:16px; align-items: flex-start;">
+      <div class="post-avatar" id="my-avatar" style="box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); border-color: var(--accent);">?</div>
+      <textarea id="soc-textarea" placeholder="Broadcast a signal to the cosmos... Use #hashtags to route it."></textarea>
+    </div>
+    <div style="display:flex; justify-content:flex-end; margin-top:10px">
+      <button class="soc-btn primary" id="btn-post"><span>Broadcast</span></button>
+    </div>
+  </section>
+
+  <main id="soc-timeline"></main>
+
+  <!-- Settings / Keys Modal -->
+  <div id="modal-settings" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">Node Configuration</div>
+      <div class="modal-desc">Configure your identity on the decentralized network.</div>
+
+      <div class="input-group">
+        <label class="input-label">Display Name (Handle)</label>
+        <input type="text" id="input-edit-handle" class="text-input" autocomplete="off" spellcheck="false" maxlength="24">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Public Key (npub)</label>
+        <div class="key-box">
+          <div class="key-value" id="val-npub">npub1...</div>
+          <div class="key-actions"><button class="soc-btn" onclick="copyText('val-npub')">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Private Key (nsec) — DANGER</label>
+        <div class="key-box" style="border-color: rgba(239, 68, 68, 0.3);">
+          <div class="key-value secret" id="val-nsec">nsec1...</div>
+          <div class="key-actions">
+            <button class="soc-btn" id="btn-reveal-nsec">Reveal</button>
+            <button class="soc-btn" onclick="copyText('val-nsec')">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Relays</label>
+        <div id="relay-list" style="margin-bottom:8px;max-height:120px;overflow-y:auto;"></div>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="input-relay-url" class="text-input"
+                 placeholder="wss://relay.example.com"
+                 style="font-size:11px;padding:8px 10px;">
+          <button class="soc-btn" onclick="window._relayAdd()">Add</button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 24px; gap: 12px;">
+        <button class="soc-btn" onclick="closeSettings()">Cancel</button>
+        <button class="soc-btn primary" onclick="saveSettings()">Save Configuration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Modal — content populated by _showOnboarding() -->
+  <div id="modal-onboard" class="modal-overlay">
+    <div class="modal-box" id="onboard-box"></div>
+  </div>
+
+  <!-- Profile Modal — populated by openProfile() -->
+  <div id="modal-profile">
+    <div id="profile-box"></div>
+  </div>
+
+  <!-- Stake Intent Modal -->
+  <div id="modal-stake" class="modal-overlay">
+    <div class="modal-box" style="border-top-color:#818cf8;">
+      <div class="modal-title" style="color:#a5b4fc;">⚡ Stake on Signal</div>
+      <div class="modal-desc">Lock funds as conviction behind this post. After the window expires, RELEASE to stand by your position, AWARD to concede, or SLASH to burn.</div>
+
+      <div class="wallet-status-bar" id="stake-wallet-bar">
+        <div class="ws-dot" id="stake-ws-dot"></div>
+        <span id="stake-wallet-info">Wallet not connected</span>
+      </div>
+
+      <div class="stake-modal-event" id="stake-event-box" onclick="copyStakeEventId()">
+        <div class="sme-label">Nostr Event ID — click to copy</div>
+        <div id="stake-event-id-display" style="word-break:break-all;"></div>
+        <div class="sme-preview" id="stake-post-preview"></div>
+      </div>
+
+      <div class="stake-row">
+        <div class="stake-field">
+          <label>Amount</label>
+          <input type="number" id="si-amount" class="text-input" value="100" min="1" step="1" style="font-size:13px;padding:9px 11px;">
+        </div>
+        <div class="stake-field">
+          <label>Window (hours)</label>
+          <input type="number" id="si-window" class="text-input" value="72" min="1" max="8760" style="font-size:13px;padding:9px 11px;">
+        </div>
+      </div>
+
+      <div class="stake-field">
+        <label>Counterparty NX4ADDR (from their wallet → Receive tab)</label>
+        <input type="text" id="si-counterparty" class="text-input" placeholder="NX4ADDR:SID:pubkey_x:pubkey_y" style="font-size:11px;">
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:4px;">
+        <button class="soc-btn" onclick="window.closeStakeModal()">Cancel</button>
+        <button class="soc-btn" id="btn-stake-copy" onclick="window.copyStakeEventId()" style="border-color:rgba(129,140,248,.4);color:#a5b4fc;">Copy Event ID</button>
+        <button class="soc-btn primary" id="btn-stake-send" onclick="window.sendStakeIntent()" style="background:rgba(129,140,248,.15);border-color:#818cf8;color:#a5b4fc;">⚡ Send to Wallet</button>
+      </div>
+      <div style="margin-top:10px;font-size:9px;color:var(--text-muted);font-family:var(--font);line-height:1.6;" id="stake-intent-status"></div>
+    </div>
+  </div>
+
+</div><!-- /#nx-app -->
+
+<script type="module">
+"use strict";
+
+/* ─── CONSTANTS ─────────────────────────────────────────────── */
+const CHAR_LIMIT = 500;
+const ID_KEY     = 'nx.soc.identity';
+const RELAY_KEY  = 'nx.soc.relays';
+const FEED_MAX   = 80;
+const NIP06_PATH = "m/44'/1237'/0'/0/0";
+let _reqId = 0;
+const nextReqId = () => 'soc-' + (++_reqId);
+
+const DEF_RELAYS = [
+  'wss://relay.damus.io',
+  'wss://nos.lol',
+  'wss://relay.nostr.band',
+];
+
+/* ─── LOCAL-FIRST DEP LOADER ────────────────────────────────── */
+let secp, bip39m, WL, HDKey;
+let depsLoaded = false;
+const _depErrors = [];
+
+const _SOURCES = [
+  { name:'secp',     local:'./libs/secp256k1.js',    remote:'https://esm.sh/@noble/curves@1.4.0/secp256k1?bundle' },
+  { name:'bip39m',   local:'./libs/bip39.js',        remote:'https://esm.sh/@scure/bip39@1.3.0?bundle' },
+  { name:'wordlist', local:'./libs/wordlist-en.js',  remote:'https://esm.sh/@scure/bip39@1.3.0/wordlists/english?bundle' },
+  { name:'hdkey',    local:'./libs/hdkey.js',        remote:'https://esm.sh/@scure/bip32@1.4.0?bundle' },
+];
+
+async function loadDeps() {
+  if (depsLoaded === true) return;
+  depsLoaded = false;
+  _depErrors.length = 0;
+
+  if (typeof crypto === 'undefined' || !crypto.subtle) {
+    const err = 'Web Crypto API unavailable. Access via localhost or HTTPS — not a bare IP address.';
+    _depErrors.push({ name:'crypto', msg: err });
+    throw new Error(err);
+  }
+
+  for (const s of _SOURCES) {
+    let loaded = false;
+    for (const src of [s.local, s.remote]) {
+      try {
+        const mod = await import(src);
+        _assignDep(s.name, mod);
+        loaded = true;
+        break;
+      } catch (e) {
+        console.warn(`[social] failed to load ${s.name} from ${src}:`, e?.message || e);
+      }
+    }
+    if (!loaded) _depErrors.push({ name: s.name, msg: `Could not load from local or esm.sh` });
+  }
+
+  const shapeErrors = [];
+  if (!secp?.schnorr?.sign)                          shapeErrors.push('secp256k1 (missing schnorr.sign)');
+  if (!bip39m?.generateMnemonic)                     shapeErrors.push('bip39 (missing generateMnemonic)');
+  if (!WL || !Array.isArray(WL))                     shapeErrors.push('wordlist (not an array)');
+  if (typeof HDKey?.fromMasterSeed !== 'function')   shapeErrors.push('bip32 HDKey (missing fromMasterSeed)');
+
+  if (shapeErrors.length) {
+    depsLoaded = 'failed';
+    throw new Error(`Libs loaded but exports are malformed: ${shapeErrors.join('; ')}. This usually means a module version mismatch or esm.sh wrapping issue.`);
+  }
+
+  const criticals = _depErrors.filter(e => ['secp','bip39m','wordlist','hdkey'].includes(e.name));
+  if (criticals.length) {
+    depsLoaded = 'failed';
+    throw new Error(`Missing libs: ${criticals.map(e=>e.name).join(', ')}. Run setup_libs.py or check network.`);
+  }
+  depsLoaded = true;
+}
+
+function _assignDep(name, mod) {
+  if (name === 'secp') {
+    secp = mod.schnorr ? mod : (mod.default?.schnorr ? mod.default : mod);
+  }
+  if (name === 'bip39m') {
+    bip39m = mod.generateMnemonic ? mod : (mod.default?.generateMnemonic ? mod.default : mod);
+  }
+  if (name === 'wordlist') {
+    WL = mod.wordlist ?? mod.default?.wordlist;
+  }
+  if (name === 'hdkey') {
+    HDKey = mod.HDKey ?? mod.default?.HDKey ?? mod.default;
+  }
+}
+
+function _resetDeps() {
+  depsLoaded = false;
+  secp = bip39m = WL = HDKey = null;
+  _depErrors.length = 0;
+}
+
+/* ─── HEX UTILS ─────────────────────────────────────────────── */
+const h2b = h => new Uint8Array(h.match(/.{1,2}/g).map(b => parseInt(b,16)));
+const b2h = b => Array.from(b).map(x => x.toString(16).padStart(2,'0')).join('');
+
+async function sha256h(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return b2h(new Uint8Array(buf));
+}
+
+/* ─── BECH32 — NIP-19 ───────────────────────────────────────── */
+const B32C = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+const B32G = [0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3];
+
+function b32poly(v) {
+  let c=1;
+  for(const d of v){const t=c>>25;c=(c&0x1ffffff)<<5^d;for(let i=0;i<5;i++)if((t>>i)&1)c^=B32G[i]}
+  return c;
+}
+function b32exp(s) {
+  const r=[];
+  for(let i=0;i<s.length;i++) r.push(s.charCodeAt(i)>>5);
+  r.push(0);
+  for(let i=0;i<s.length;i++) r.push(s.charCodeAt(i)&31);
+  return r;
+}
+function b32chk(hrp,d) {
+  const p=b32poly(b32exp(hrp).concat(d).concat([0,0,0,0,0,0]))^1;
+  return Array.from({length:6},(_,i)=>(p>>(5*(5-i)))&31);
+}
+function b32enc(hrp,d) {
+  return hrp+'1'+d.concat(b32chk(hrp,d)).map(x=>B32C[x]).join('');
+}
+function cvBits(data,fr,to,pad=true) {
+  let acc=0,bits=0; const r=[],mv=(1<<to)-1;
+  for(const v of data){acc=(acc<<fr)|v;bits+=fr;while(bits>=to){bits-=to;r.push((acc>>bits)&mv)}}
+  if(pad&&bits>0) r.push((acc<<(to-bits))&mv);
+  return r;
+}
+const npubEnc = hex => b32enc('npub', cvBits(Array.from(h2b(hex)),8,5));
+const nsecEnc = hex => b32enc('nsec', cvBits(Array.from(h2b(hex)),8,5));
+
+function b32dec(str) {
+  str = str.toLowerCase();
+  const sep = str.lastIndexOf('1');
+  if(sep<1) return null;
+  const hrp  = str.slice(0,sep);
+  const data = str.slice(sep+1).split('').map(c=>B32C.indexOf(c));
+  if(data.includes(-1)) return null;
+  return { hrp, bytes: new Uint8Array(cvBits(data.slice(0,-6),5,8,false)) };
+}
+
+/* ─── NOSTR EVENT CONSTRUCTION ──────────────────────────────── */
+async function buildEv(privHex, pubHex, kind, content, tags=[]) {
+  if (!secp) throw new Error("secp256k1 library not loaded");
+  const ev = {
+    pubkey: pubHex,
+    created_at: Math.floor(Date.now()/1000),
+    kind, tags, content,
+  };
+  ev.id  = await sha256h(JSON.stringify([0,ev.pubkey,ev.created_at,ev.kind,ev.tags,ev.content]));
+  ev.sig = b2h(secp.schnorr.sign(ev.id, privHex));
+  return ev;
+}
+
+/* ─── IDENTITY — BIP-39 / NIP-06 ───────────────────────────── */
+async function genIdentity() {
+  if (!bip39m) throw new Error("BIP-39 library not loaded. Check /libs/ folder.");
+  return deriveId(bip39m.generateMnemonic(WL));
+}
+
+async function deriveId(mnemonic) {
+  if (!HDKey || !secp) throw new Error("HDKey or secp library not loaded");
+  const seed  = await bip39m.mnemonicToSeed(mnemonic);
+  const child = HDKey.fromMasterSeed(seed).derive(NIP06_PATH);
+  if(!child.privateKey) throw new Error('key derivation failed');
+  const priv = b2h(child.privateKey);
+  const pub  = b2h(secp.schnorr.getPublicKey(child.privateKey));
+  return {
+    mnemonic,
+    privkey: priv, pubkey: pub,
+    npub: npubEnc(pub), nsec: nsecEnc(priv),
+    displayName: null, bio: null, createdAt: Date.now(),
+  };
+}
+
+/* ─── SCRAMBLE ANIMATION (Social version — textContent safe) ── */
+// Used for seed word reveal in onboarding. NOT used for post bodies.
+// Post bodies use the Cosmos runScramble() which sets innerHTML.
+function scramble(el, txt, ms=500) {
+  const CH = '█▓▒░◈◇◆@#$%&<>[]{}|~?';
+  const FT = Math.max(1, Math.floor(ms/40));
+  let f = 0;
+  const id = setInterval(()=>{
+    const p = f/FT;
+    el.textContent = txt.split('').map((c,i)=>{
+      if(c===' '||c==='\n') return c;
+      return i < Math.floor(txt.length*p) ? c : CH[Math.floor(Math.random()*CH.length)];
+    }).join('');
+    if(f++ >= FT){ clearInterval(id); el.textContent = txt; }
+  },40);
+}
+
+/* ─── WILSON SCORE ──────────────────────────────────────────── */
+function wilson(l,d) {
+  const n = l+d+20, p = (l+10)/n, z = 1.96;
+  const top = p+(z*z)/(2*n) - z*Math.sqrt((p*(1-p)/n)+(z*z)/(4*n*n));
+  return Math.round(top/(1+(z*z)/n)*100);
+}
+
+/* ─── RELAY POOL ────────────────────────────────────────────── */
+class RelayPool {
+  constructor() {
+    this._rs     = new Map();
+    this._ss     = new Map();
+    this._onEv   = null;
+    this._onSt   = null;
+    this._onEose = null;
+  }
+  onEvent(cb)  { this._onEv   = cb; }
+  onStatus(cb) { this._onSt   = cb; }
+  onEose(cb)   { this._onEose = cb; }
+
+  connect(urls) {
+    for(const u of urls) if(!this._rs.has(u)) this._open(u);
+    for(const u of this._rs.keys()) if(!urls.includes(u)) this._drop(u);
+  }
+  _open(url) {
+    const r = {url, ws:null, status:'connecting', retries:0};
+    this._rs.set(url, r); this._dial(r);
+  }
+  _dial(r) {
+    try {
+      const ws = new WebSocket(r.url);
+      r.ws = ws; r.status = 'connecting'; this._notify();
+      ws.onopen = () => {
+        r.status = 'open'; r.retries = 0; this._notify();
+        for(const [id,fs] of this._ss) ws.send(JSON.stringify(['REQ',id,...fs]));
+      };
+      ws.onclose = () => {
+        r.status = 'closed'; this._notify();
+        const delay = Math.min(30000, 1000 * Math.pow(2, r.retries++));
+        setTimeout(()=>{ if(this._rs.has(r.url)) this._dial(r); }, delay);
+      };
+      ws.onerror = () => { r.status = 'error'; this._notify(); };
+      ws.onmessage = ({data}) => {
+        try {
+          const m = JSON.parse(data);
+          if(!Array.isArray(m)) return;
+          if(m[0]==='EVENT' && m[2] && this._onEv)   this._onEv(m[2]);
+          if(m[0]==='EOSE'  && this._onEose)          this._onEose(m[1]);
+        } catch(e) {}
+      };
+    } catch(e) { r.status = 'error'; this._notify(); }
+  }
+  _drop(url) {
+    const r = this._rs.get(url);
+    if(r?.ws) try{r.ws.close()}catch(e){}
+    this._rs.delete(url);
+  }
+  subscribe(id, filters) {
+    this._ss.set(id, filters);
+    for(const [,r] of this._rs)
+      if(r.status==='open') r.ws.send(JSON.stringify(['REQ',id,...filters]));
+  }
+  unsubscribe(id) {
+    this._ss.delete(id);
+    for(const [,r] of this._rs)
+      if(r.status==='open') try{r.ws.send(JSON.stringify(['CLOSE',id]))}catch(e){}
+  }
+  publish(ev) {
+    const msg = JSON.stringify(['EVENT',ev]); let n=0;
+    for(const [,r] of this._rs)
+      if(r.status==='open') try{r.ws.send(msg);n++}catch(e){}
+    return n;
+  }
+  stat() {
+    let o=0,c=0,e=0;
+    for(const [,r] of this._rs){
+      if(r.status==='open')       o++;
+      else if(r.status==='connecting') c++;
+      else                        e++;
+    }
+    return {open:o, connecting:c, error:e, total:this._rs.size, relays:this._rs};
+  }
+  _notify() { if(this._onSt) this._onSt(this.stat()); }
+}
+
+/* ─── CORE INSTANCES ────────────────────────────────────────── */
+const pool = new RelayPool();
+
+const S = {
+  // Identity
+  id:            null,
+  // Network
+  relayUrls:     [...DEF_RELAYS],
+  events:        new Map(),
+  _pendingPosts: [],         // events queued to publish when relays reconnect
+  reactions:     new Map(),
+  myLikes:       new Set(),
+  profiles:      new Map(),   // pubkey → { name, display_name, about, picture, _ts }
+  following:     new Set(),   // pubkeys I follow (NIP-02 contact list)
+  dislikes:      new Set(),   // event IDs I've downvoted
+  currentTab:    'global',    // 'global' | 'home'
+  _viewingProfile: null,      // pubkey of currently open profile modal
+  // IPC
+  port:          null,
+  mounted:       false,
+  // UI state
+  cancelTimers:  {},
+  activeReplies: new Set(),
+  liked:         new Set(),
+  zapped:        new Set(),
+  reposted:      new Set(),
+  replied:       new Set(),
+  currentFilter: null,
+  _rendered:     new Set(),
+  // Wallet bridge state
+  walletState:   null,    // latest WALLET_STATE from wallet block
+  _stakeIntent:  null,    // pending stake intent { eventId, content }
+};
+
+const _eoseSubs = new Set();
+
+/* ─── HELPERS ───────────────────────────────────────────────── */
+function trunc(hex) { return (hex||'').slice(0,8)+'…'; }
+function slug(url)  { return url.replace(/[^a-z0-9]/gi,''); }
+
+/* ─── PROFILE CACHE ─────────────────────────────────────────── */
+function _cacheProfile(ev) {
+  try {
+    const meta     = JSON.parse(ev.content);
+    const existing = S.profiles.get(ev.pubkey);
+    if (!existing || ev.created_at > existing._ts) {
+      S.profiles.set(ev.pubkey, {
+        name:         meta.name         || null,
+        display_name: meta.display_name || null,
+        about:        meta.about        || null,
+        picture:      meta.picture      || null,
+        _ts:          ev.created_at,
+      });
+    }
+  } catch(_) {}
+}
+
+/* ─── normalizeEv ADAPTER ───────────────────────────────────── */
+// Converts a raw Nostr event from S.events into a render-ready object.
+function normalizeEv(ev) {
+  const isOwn   = S.id?.pubkey === ev.pubkey;
+  const profile = S.profiles.get(ev.pubkey);
+  const r       = S.reactions.get(ev.id) || { likes: new Set(), dislikes: new Set() };
+  return {
+    ...ev,
+    handle: isOwn
+      ? (S.id.displayName || trunc(ev.pubkey))
+      : (profile?.display_name || profile?.name || trunc(ev.pubkey)),
+    likes:    r.likes.size,
+    dislikes: r.dislikes.size,
+    zaps:     0,
+    reposts: 0,
+    replies: [...S.events.values()].filter(e =>
+      e.tags?.some(t => t[0]==='e' && t[1]===ev.id)
+    ).length,
+    isNew:  !S._rendered.has(ev.id),
+  };
+}
+
+/* ─── NX MANAGED BLOCK PROTOCOL ────────────────────────────── */
+const APP = {
+  title:       'Social',
+  icon:        '◈',
+  description: 'Nostr-native sovereign social feed',
+  emits:       ['social.post','social.like','nexus.notification','db.query','nexus.stake.intent'],
+  consumes:    ['db.notify','wallet.confirmed','nexus.identity','db.result','nexus.wallet.state'],
+};
+
+let _mountOnce = false;
+
+// Self-mount fallback: if no BOOT message arrives within 800ms, mount standalone.
+const _stimer = setTimeout(async () => {
+  if (!S.mounted && !_mountOnce) { S.mounted = true; _mountOnce = true; await _mount(); }
+}, 800);
+
+window.addEventListener('message', async evt => {
+  if (!evt.data || evt.data.type !== 'BOOT' || !evt.ports?.[0]) return;
+  clearTimeout(_stimer);
+  S.port = evt.ports[0];
+  S.port.onmessage = _kernel;
+  S.port.postMessage({
+    type:     'DECLARE',
+    manifest: { emits: APP.emits, consumes: APP.consumes },
+    app:      { title: APP.title, icon: APP.icon, description: APP.description, visible: true },
+  });
+  _bstate('DECLARED');
+});
+
+async function _kernel({ data: m }) {
+  if (!m || typeof m.type !== 'string') return;
+  switch (m.type) {
+    case 'MOUNT_CHALLENGE':
+      S.port.postMessage({ type: 'MOUNT_ACK', nonce: m.nonce });
+      _bstate('MOUNT_ACK');
+      break;
+    case 'MOUNTED':
+      S.mounted = true;
+      if (!_mountOnce) { _mountOnce = true; await _mount(); }
+      break;
+    case 'PING':
+      // Respond to kernel heartbeat — without this Social is evicted after 90s
+      S.port.postMessage({ type: 'PONG', nonce: m.nonce });
+      break;
+    case 'MSG':
+      if (m.channel === 'nexus.identity' && m.payload?.privkey) {
+        Object.assign(S.id ||= {}, m.payload); _saveId(); render();
+      }
+      if (m.channel === 'nexus.wallet.state') {
+        S.walletState = m.payload;
+        _updateAllStakeIndicators();
+        _refreshStakeModal();
+      }
+      if (m.channel === 'db.result') {
+        if (!m.payload?.ok) {
+          console.warn('[social] db error:', m.payload?.error, 'reqId:', m.payload?._reqId);
+        } else if (m.payload._reqId === 'soc-boot-seed') {
+          const rows = m.payload.data || [];
+          let hadEvents = false, hadContacts = false;
+          rows.forEach(row => {
+            if (row.kind === 0) {
+              _cacheProfile(row);
+            } else if (row.kind === 3 && row.pubkey === S.id?.pubkey) {
+              const follows = (row.tags||[]).filter(t=>t[0]==='p').map(t=>t[1]);
+              follows.forEach(pk => S.following.add(pk));
+              hadContacts = true;
+            } else if (row.kind === 1 && !S.events.has(row.id)) {
+              S.events.set(row.id, row);
+              hadEvents = true;
+            }
+          });
+          if (hadContacts) _syncHomeSubscription();
+          if (hadEvents) render(true);
+        }
+      }
+      if (m.channel === 'db.notify' && m.payload?.table === 'social_events') {
+        const row = m.payload.data;
+        if (row && row.kind === 1 && !S.events.has(row.id)) {
+          S.events.set(row.id, row);
+          render();
+        }
+      }
+      break;
+  }
+}
+
+function emit(ch, payload) {
+  if (S.mounted && S.port) S.port.postMessage({ type: 'EMIT', channel: ch, payload });
+}
+
+/* ─── STORAGE ────────────────────────────────────────────────── */
+const _saveId     = () => { try { localStorage.setItem(ID_KEY,    JSON.stringify(S.id));         } catch(e) {} };
+const _loadId     = () => { try { const r = localStorage.getItem(ID_KEY);    if (r) S.id        = JSON.parse(r); } catch(e) {} };
+const _saveRlys   = () => { try { localStorage.setItem(RELAY_KEY, JSON.stringify(S.relayUrls)); } catch(e) {} };
+const _loadRelays = () => { try { const r = localStorage.getItem(RELAY_KEY); if (r) S.relayUrls = JSON.parse(r); } catch(e) {} };
+
+/* ─── BOOT STATUS ───────────────────────────────────────────── */
+// Writes to the cosmos overlay status text element.
+function _bstate(s, isErr = false) {
+  const el = document.getElementById('cosmos-status');
+  if (!el) return;
+  el.style.color = isErr ? 'var(--danger)' : '';
+  if (typeof scramble === 'function') scramble(el, s, 200);
+  else el.textContent = s;
+}
+
+/* ─── LIFECYCLE: _mount ─────────────────────────────────────── */
+let _wireCryptoDone = false; // Guard: prevents double-wiring on retry (duplicate event listeners)
+
+async function _mount() {
+  _bstate('LOADING LIBRARIES');
+  try {
+    await loadDeps();
+  } catch(e) {
+    _bstate('ERROR — tap to dismiss', true);
+    // CRITICAL FIX: Remove the overlay even on failure.
+    // Without this, the z-index:50 overlay stays forever, blocking all clicks in the app.
+    const ov = document.getElementById('cosmos-overlay');
+    if (ov) ov.classList.add('loaded');
+    _showOnboarding('error', e.message || String(e));
+    return;
+  }
+
+  _loadId();
+  _loadRelays();
+  _bstate('ONLINE');
+
+  // Wire DOM event handlers that require crypto to be loaded first.
+  // Guard prevents double-wiring when _retryDeps() calls _mount() again after error.
+  if (!_wireCryptoDone) { _wireCrypto(); _wireCryptoDone = true; }
+
+  setTimeout(() => {
+    document.getElementById('cosmos-overlay').classList.add('loaded');
+    // Explicit SUBs required — kernel only routes to blocks that subscribed.
+    // DECLARE consumes is an allowlist, not a subscription.
+    if (S.port) {
+      S.port.postMessage({ type: 'SUB', channel: 'nexus.identity' });
+      S.port.postMessage({ type: 'SUB', channel: 'db.notify' });
+      S.port.postMessage({ type: 'SUB', channel: 'db.result' });
+      S.port.postMessage({ type: 'SUB', channel: 'nexus.wallet.state' });
+    }
+    if (!S.id) {
+      _showOnboarding('generate');
+    } else {
+      _startNostr();
+    }
+  }, 900);
+}
+
+/* ─── NOSTR STARTUP ─────────────────────────────────────────── */
+function _startNostr() {
+  // Seed feed from DB before relay connects — instant first paint from cache.
+  emit('db.query', {
+    query:  'SELECT * FROM social_events',
+    sort:   { column: 'created_at', direction: 'DESC' },
+    _reqId: 'soc-boot-seed',
+    appId:  'social',
+  });
+  pool.onEvent(_onEv);
+  pool.onStatus(_onStat);
+  pool.onEose(_onEose);
+  pool.connect(S.relayUrls);
+  const since = Math.floor(Date.now() / 1000) - 3600 * 12;
+  pool.subscribe('feed',      [{ kinds: [1], limit: FEED_MAX, since }]);
+  pool.subscribe('reactions', [{ kinds: [7], limit: 500,      since }]);
+  pool.subscribe('profiles',  [{ kinds: [0], limit: 200,
+                                  since: Math.floor(Date.now()/1000) - 3600*24*7 }]);
+  _loadFollowing();
+  render(true);
+}
+
+// Rebuild relay status dots in the header on every pool status change.
+// Also drains the pending post queue when a relay comes online.
+function _onStat(s) {
+  const relayEl = document.getElementById('soc-relays-header');
+  if (!relayEl) return;
+  relayEl.innerHTML = '';
+  for (const [url, r] of s.relays) {
+    const d = document.createElement('div');
+    d.className = 'hdr-rdot ' + r.status;
+    d.title = url + ' · ' + r.status;
+    relayEl.appendChild(d);
+  }
+  // Drain pending queue — try to publish any events that failed when relays were down
+  if (s.open > 0 && S._pendingPosts.length > 0) {
+    const toRetry = [...S._pendingPosts];
+    S._pendingPosts = [];
+    let sent = 0;
+    for (const ev of toRetry) {
+      const n = pool.publish(ev);
+      if (n > 0) {
+        sent++;
+        // Remove pending indicator from post element
+        const el = document.getElementById('post-' + ev.id);
+        if (el) { el.classList.remove('post-pending'); el.classList.add('post-sent'); }
+      } else {
+        S._pendingPosts.push(ev); // still no relay, re-queue
+      }
+    }
+    if (sent > 0) toast(`✓ ${sent} queued post${sent>1?'s':''} sent when relay reconnected`);
+  }
+}
+
+function _onEose(subId) {
+  _eoseSubs.add(subId);
+  if (subId === 'feed') render(true);
+}
+
+/* ─── EVENT HANDLER — with ID + sig verification ───────────── */
+async function _onEv(ev) {
+  // Basic shape check
+  if (!ev.id || !ev.pubkey || !ev.sig || typeof ev.kind !== 'number') return;
+
+  // ID verification — recompute and compare
+  const expectedId = await sha256h(
+    JSON.stringify([0, ev.pubkey, ev.created_at, ev.kind, ev.tags, ev.content])
+  );
+  if (ev.id !== expectedId) return;
+
+  // Signature verification — secp.schnorr.verify is synchronous in @noble/curves
+  try {
+    const valid = secp.schnorr.verify(ev.sig, ev.id, ev.pubkey);
+    if (!valid) return;
+  } catch(e) { return; }
+
+  if (ev.kind === 0) {
+    _cacheProfile(ev);
+    emit('db.query', {
+      query:  'INSERT INTO social_events',
+      params: { id: ev.id, pubkey: ev.pubkey, content: ev.content,
+                created_at: ev.created_at, kind: ev.kind, tags: ev.tags || [], sig: ev.sig },
+      _reqId: nextReqId(), appId: 'social',
+    });
+    if (S._viewingProfile === ev.pubkey) _renderProfileBox(ev.pubkey);
+    render();
+    return;
+  }
+
+  if (ev.kind === 3 && ev.pubkey === S.id?.pubkey) {
+    // Own contact list arriving from relay — sync S.following
+    const follows = (ev.tags || []).filter(t => t[0] === 'p').map(t => t[1]);
+    S.following = new Set(follows);
+    _syncHomeSubscription();
+    emit('db.query', {
+      query:  'INSERT INTO social_events',
+      params: { id:ev.id, pubkey:ev.pubkey, content:ev.content, created_at:ev.created_at, kind:ev.kind, tags:ev.tags||[], sig:ev.sig },
+      _reqId: nextReqId(), appId: 'social',
+    });
+    render();
+    return;
+  }
+
+  if (ev.kind === 1) {
+    if (S.events.has(ev.id)) return;
+    S.events.set(ev.id, ev);
+    emit('db.query', {
+      query:  'INSERT INTO social_events',
+      params: {
+        id: ev.id, pubkey: ev.pubkey, content: ev.content,
+        created_at: ev.created_at, kind: ev.kind, tags: ev.tags, sig: ev.sig,
+      },
+      _reqId: nextReqId(),
+      appId:  'social',
+    });
+    if (S.id) {
+      const mentionsMe =
+        ev.content?.includes(S.id.npub) ||
+        ev.tags?.some(t => t[0] === 'p' && t[1] === S.id.pubkey);
+      if (mentionsMe) {
+        emit('nexus.notification', {
+          type: 'mention', from: ev.pubkey,
+          eventId: ev.id, content: ev.content.slice(0, 80),
+        });
+      }
+    }
+    if (S._viewingProfile === ev.pubkey) _renderProfileBox(ev.pubkey);
+    _prependToTimeline(ev);
+    return;
+  }
+
+  if (ev.kind === 7) {
+    const et = ev.tags?.find(t => t[0] === 'e');
+    if (!et) return;
+    const tid = et[1];
+    if (!S.reactions.has(tid)) S.reactions.set(tid, { likes: new Set(), dislikes: new Set() });
+    const r = S.reactions.get(tid);
+    (ev.content === '-' ? r.dislikes : r.likes).add(ev.pubkey);
+    // Surgically update reaction count on an already-rendered post if visible.
+    const postEl = document.getElementById(`post-${tid}`);
+    if (postEl) _updateReactionCount(postEl, tid);
+  }
+}
+
+/* ─── DOM WIRING (called after deps are loaded) ─────────────── */
+function _wireCrypto() {
+  document.getElementById('btn-post').addEventListener('click', () => handlePost('root'));
+  document.getElementById('btn-settings').addEventListener('click', openSettings);
+
+  // nsec reveal/hide toggle
+  const nsecVal = document.getElementById('val-nsec');
+  document.getElementById('btn-reveal-nsec').addEventListener('click', (e) => {
+    const isRevealed = nsecVal.classList.contains('revealed');
+    if (isRevealed) {
+      nsecVal.classList.remove('revealed');
+      e.target.textContent = 'Reveal';
+    } else {
+      nsecVal.classList.add('revealed');
+      e.target.textContent = 'Hide';
+    }
+  });
+
+  // Close profile modal on backdrop click
+  document.getElementById('modal-profile')?.addEventListener('click', (e) => {
+    if (e.target.id === 'modal-profile') closeProfile();
+  });
+
+  // Keyboard shortcut: Ctrl/Cmd+Enter to post
+  document.getElementById('soc-textarea').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handlePost('root');
+    }
+  });
+
+  // Action button delegation — single listener replaces all inline onclick handlers.
+  // Buttons use data-action, data-anim, data-id attributes set in renderNode.
+  document.getElementById('soc-timeline').addEventListener('click', e => {
+    const btn = e.target.closest('.action-btn[data-action]');
+    if (!btn) return;
+    const id       = btn.dataset.id;
+    const action   = btn.dataset.action;
+    const animType = btn.dataset.anim;
+    if (animType) anim(btn, animType);
+    switch (action) {
+      case 'reply':   toggleReply(id);        break;
+      case 'repost':  repost(id);             break;
+      case 'like':    like(id);               break;
+      case 'dislike': dislike(id, btn);       break;
+      case 'zap':     zap(id, btn);           break;
+      case 'stake':   window.openStakeIntent(id); break;
+    }
+  });
+}
+
+/* ─── COSMOS BACKGROUND ─────────────────────────────────────── */
+// Verbatim from Cosmos Edition. The rAF loop runs forever — do not cancel on app load.
+function startCosmos() {
+  const canvas = document.getElementById('cosmos-bg');
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+
+  const stars = [];
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x:     Math.random() * w,
+      y:     Math.random() * h,
+      size:  Math.random() * 1.5,
+      speed: (Math.random() * 0.2) + 0.05,
+      color: Math.random() > 0.8 ? '#00e5ff' : '#ffffff'
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    stars.forEach(s => {
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = Math.random() * 0.5 + 0.5;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
+      s.y -= s.speed;
+      if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize', () => {
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  });
+}
+
+/* ─── TOAST (bridging utility) ──────────────────────────────── */
+// Neither Cosmos nor Social had a dynamic toast for module context.
+// Required by _doPost, _showOnboarding, _doImport.
+let _toastTimer = null;
+function toast(msg) {
+  let el = document.getElementById('nx-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'nx-toast';
+    el.style.cssText = [
+      'position:fixed;bottom:24px;left:50%;transform:translateX(-50%)',
+      'background:var(--surface-2);border:1px solid var(--border-hi)',
+      'border-radius:24px;padding:8px 18px;font-size:11px',
+      'font-family:var(--font);color:var(--accent);letter-spacing:.5px',
+      'z-index:200;pointer-events:none;transition:opacity .2s;white-space:nowrap',
+    ].join(';');
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2300);
+}
+
+/* ─── SVG ICON STRINGS ──────────────────────────────────────── */
+const SVGS = {
+  reply:  `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
+  repost: `<svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>`,
+  like:   `<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+  zap:    `<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,
+  dislike:`<svg viewBox="0 0 24 24"><path d="M10 9V5a3 3 0 0 0-3-3L4 11v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`,
+  stake:  `<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"></circle></svg>`,
+};
+
+/* ─── RENDER — feeds from S.events Map ──────────────────────── */
+function render(force = false) {
+  const tl = document.getElementById('soc-timeline');
+  const rootText = document.getElementById('soc-textarea')?.value.trim();
+  if (!force && (S.activeReplies.size > 0 || rootText?.length > 0)) return;
+
+  const snapshot = {
+    activeElementId: document.activeElement?.id,
+    texts: {},
+  };
+  document.querySelectorAll('textarea').forEach(ta => { snapshot.texts[ta.id] = ta.value; });
+
+  tl.innerHTML = '';
+
+  let evs = [...S.events.values()].map(normalizeEv);
+
+  // Tab filter
+  if (S.currentTab === 'home') {
+    evs = evs.filter(ev => S.following.has(ev.pubkey) || ev.pubkey === S.id?.pubkey);
+  }
+
+  if (S.currentFilter) {
+    const tag = S.currentFilter.toLowerCase();
+    evs = evs.filter(ev => {
+      const bodyTags  = (ev.content?.match(/#([a-zA-Z0-9_-]{1,32})/g) || []).map(t => t.slice(1).toLowerCase());
+      const nostrTags = (ev.tags || []).filter(t => t[0] === 't').map(t => t[1]?.toLowerCase());
+      return bodyTags.includes(tag) || nostrTags.includes(tag);
+    });
+  }
+
+  // Roots: events with no 'e' tag (top-level posts).
+  // Kids: events with an 'e' tag (replies).
+  const roots = evs.filter(e => !e.tags?.some(t => t[0]==='e')).sort((a,b) => b.created_at - a.created_at).slice(0, FEED_MAX);
+  const kids  = evs.filter(e =>  e.tags?.some(t => t[0]==='e'));
+
+  if (!roots.length) {
+    if (S.currentTab === 'home' && S.following.size === 0) {
+      tl.innerHTML = '<div class="empty-home"><div class="empty-home-glyph">◈</div><div class="empty-home-title">Your home feed is empty</div><div class="empty-home-sub">Follow people from the Global tab.<br>Click any name or avatar to view their profile.</div></div>';
+    } else {
+      tl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);font-family:var(--font);">No signals found.</div>';
+    }
+  } else {
+    const frag = document.createDocumentFragment();
+    roots.forEach(r => {
+      const wrap = document.createElement('div');
+      wrap.className = 'thread-root';
+      renderNode(r, kids, wrap);
+      frag.appendChild(wrap);
+    });
+    tl.appendChild(frag);
+  }
+
+  // Mark all currently known events as rendered (drives isNew → scramble for future events)
+  [...S.events.keys()].forEach(id => S._rendered.add(id));
+
+  // Restore textarea values and active-reply boxes from before the wipe
+  Object.keys(snapshot.texts).forEach(id => {
+    const ta = document.getElementById(id);
+    if (ta) ta.value = snapshot.texts[id];
+  });
+  S.activeReplies.forEach(id => {
+    const box = document.getElementById(`reply-box-${id}`);
+    if (box) box.classList.remove('hidden');
+  });
+  if (snapshot.activeElementId) {
+    const el = document.getElementById(snapshot.activeElementId);
+    if (el) { el.focus(); if (el.value) el.selectionStart = el.selectionEnd = el.value.length; }
+  }
+}
+
+/* ─── RENDER NODE (XSS hardened — DOM API throughout) ───────── */
+function renderNode(p, all, cont) {
+  const el = document.createElement('div');
+  const myStakes = _getPostStakes(p.id);
+  const isStaked = myStakes.length > 0;
+  el.className = 'soc-post' + (isStaked ? ' post-staked' : '');
+  el.id = `post-${p.id}`;
+  const isLiked    = S.liked.has(p.id)    ? 'liked'    : '';
+  const isZapped   = S.zapped.has(p.id)   ? 'zapped'   : '';
+  const isReposted = S.reposted.has(p.id) ? 'reposted' : '';
+  const isReplied  = S.replied.has(p.id)  ? 'replied'  : '';
+  const isDisliked = S.dislikes.has(p.id) ? 'disliked' : '';
+  const isOwnPost  = p.pubkey === S.id?.pubkey;
+
+  // ── Avatar ──
+  const postLeft = document.createElement('div');
+  postLeft.className = 'post-left';
+  const avatar = document.createElement('div');
+  avatar.className = 'post-avatar';
+  avatar.textContent = (p.handle[0] || '?').toUpperCase();
+  avatar.style.cursor = 'pointer';
+  avatar.addEventListener('click', (e) => { e.stopPropagation(); window.openProfile(p.pubkey); });
+  postLeft.appendChild(avatar);
+
+  // ── Right column ──
+  const postRight = document.createElement('div');
+  postRight.className = 'post-right';
+
+  // Handle + timestamp row
+  const metaRow = document.createElement('div');
+  metaRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+  const handleWrap = document.createElement('div');
+  handleWrap.style.cssText = 'display:flex;align-items:center;min-width:0;overflow:hidden;';
+  const handleEl = document.createElement('span');
+  handleEl.className = 'post-handle';
+  handleEl.textContent = '@' + p.handle;
+  handleEl.style.cursor = 'pointer';
+  handleEl.addEventListener('click', (e) => { e.stopPropagation(); window.openProfile(p.pubkey); });
+  handleWrap.appendChild(handleEl);
+  if (!isOwnPost && S.id) {
+    const fh = document.createElement('span');
+    const fw = S.following.has(p.pubkey);
+    fh.className = 'follow-hint' + (fw ? ' is-following' : '');
+    fh.textContent = fw ? '✓' : '+';
+    fh.title = fw ? 'Unfollow' : 'Follow';
+    fh.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (S.following.has(p.pubkey)) {
+        window.unfollow(p.pubkey); fh.className='follow-hint'; fh.textContent='+'; fh.title='Follow';
+      } else {
+        window.follow(p.pubkey); fh.className='follow-hint is-following'; fh.textContent='✓'; fh.title='Unfollow';
+      }
+    });
+    handleWrap.appendChild(fh);
+  }
+  const timeEl = document.createElement('span');
+  timeEl.className = 'post-time';
+  timeEl.textContent = getTimeString(p.created_at * 1000);
+  metaRow.append(handleWrap, timeEl);
+
+  // Post body (content set below after scramble check)
+  const bodyEl = document.createElement('div');
+  bodyEl.className = 'post-body';
+  bodyEl.id = `body-${p.id}`;
+
+  // Action buttons via data-* — delegation handler in _wireCrypto fires these
+  const actionsEl = document.createElement('div');
+  actionsEl.className = 'post-actions';
+
+  function makeAction(svgKey, count, action, animType, extraClass) {
+    const btn = document.createElement('div');
+    btn.className = 'action-btn' + (extraClass ? ' ' + extraClass : '');
+    btn.dataset.action = action;
+    btn.dataset.anim   = animType;
+    btn.dataset.id     = p.id;
+    btn.innerHTML = SVGS[svgKey]; // SVGS values are trusted hardcoded markup
+    const countSpan = document.createElement('span');
+    countSpan.textContent = String(count || 0);
+    btn.appendChild(countSpan);
+    return btn;
+  }
+
+  // Check if user has staked on this post
+  actionsEl.append(
+    makeAction('reply',   p.replies   || 0, 'reply',   'bounce', isReplied),
+    makeAction('repost',  p.reposts   || 0, 'repost',  'spin',   isReposted),
+    makeAction('like',    p.likes     || 0, 'like',    'pop',    isLiked),
+    makeAction('dislike', p.dislikes  || 0, 'dislike', 'salty',  isOwnPost ? '' : isDisliked),
+    makeAction('zap',     p.zaps      || 0, 'zap',     'zap',    isZapped),
+    makeAction('stake',   isStaked ? myStakes.length : 0, 'stake', 'pop', isStaked ? 'staked' : ''),
+  );
+
+  postRight.append(metaRow, bodyEl, actionsEl);
+
+  // Stake indicator — shows if user has active stakes on this post
+  if (isStaked) {
+    const si = document.createElement('div');
+    si.className = 'stake-indicator';
+    si.id = `stake-ind-${p.id}`;
+    _renderStakeIndicator(si, myStakes);
+    postRight.appendChild(si);
+  }
+
+  // Sweet:Salty ratio bar
+  const totalV = (p.likes||0) + (p.dislikes||0);
+  if (totalV > 0) {
+    const ratioEl = document.createElement('div'); ratioEl.className = 'ss-ratio';
+    const sweetPct = Math.round((p.likes||0)/totalV*100);
+    const sw = document.createElement('span'); sw.className='ss-sweet'; sw.textContent='↑'+(p.likes||0);
+    const bar = document.createElement('div'); bar.className='ss-bar';
+    const fill = document.createElement('div'); fill.className='ss-fill'; fill.style.width=sweetPct+'%';
+    bar.appendChild(fill);
+    const sa = document.createElement('span'); sa.className='ss-salty'; sa.textContent='↓'+(p.dislikes||0);
+    ratioEl.append(sw, bar, sa); postRight.appendChild(ratioEl);
+  }
+
+  // Image preview
+  const imgM = (p.content||'').match(/https?:\/\/[^\s<>"]+\.(?:jpg|jpeg|png|gif|webp)(?:[?#][^\s<>"]*)?/i);
+  if (imgM) {
+    const med = document.createElement('div'); med.className='post-media';
+    const im = document.createElement('img'); im.src=imgM[0]; im.alt=''; im.loading='lazy';
+    im.addEventListener('click', ()=>window.open(imgM[0],'_blank','noopener'));
+    im.addEventListener('error', ()=>med.remove());
+    med.appendChild(im); postRight.appendChild(med);
+  }
+
+  el.append(postLeft, postRight);
+  cont.appendChild(el);
+
+  // ── Inline reply box — DOM API, no inline handlers ──
+  const rb = document.createElement('div');
+  rb.id = `reply-box-${p.id}`;
+  rb.className = 'inline-reply hidden';
+
+  const replyTa = document.createElement('textarea');
+  replyTa.id = `reply-text-${p.id}`;
+  replyTa.placeholder = 'Transmit reply...';
+  replyTa.addEventListener('input', () => S.activeReplies.add(p.id));
+
+  const replyFoot = document.createElement('div');
+  replyFoot.style.cssText = 'display:flex;justify-content:flex-end;gap:8px;';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'soc-btn';
+  closeBtn.innerHTML = '<span>Close</span>';
+  closeBtn.addEventListener('click', () => toggleReply(p.id));
+
+  const replyBtn = document.createElement('button');
+  replyBtn.className = 'soc-btn primary';
+  replyBtn.id = `btn-reply-${p.id}`;
+  replyBtn.innerHTML = '<span>Reply</span>';
+  replyBtn.addEventListener('click', () => handlePost('reply', p.id));
+
+  replyFoot.append(closeBtn, replyBtn);
+  rb.append(replyTa, replyFoot);
+  postRight.appendChild(rb);
+
+  // ── Thread children (Nostr e-tag lookup) ──
+  const myKids = all.filter(k => k.tags?.some(t => t[0]==='e' && t[1]===p.id));
+  if (myKids.length && !S.currentFilter) {
+    const cb = document.createElement('div');
+    cb.className = 'thread-children';
+    myKids.sort((a,b) => a.created_at - b.created_at).forEach(k => renderNode(k, all, cb));
+    cont.appendChild(cb);
+  }
+
+  // ── Body content — scramble for new events, direct set for seen ones ──
+  const finalContent = parseHashtags(p.content);
+  if (p.isNew) {
+    p.isNew = false;
+    runScramble(bodyEl, p.content, finalContent);
+  } else {
+    bodyEl.innerHTML = finalContent; // parseHashtags escapes before inserting anchors
+  }
+}
+
+/* ─── PREPEND NEW EVENT TO TIMELINE ────────────────────────── */
+// Called by _onEv for incoming kind-1 events. Event is already in S.events.
+// Calls render() without force — respects the typing guard.
+function _prependToTimeline(ev) {
+  render();
+}
+
+/* ─── SURGICAL REACTION COUNT UPDATE ───────────────────────── */
+// Called by _onEv when a kind-7 reaction arrives for an already-rendered post.
+// Updates the like count span without a full re-render.
+function _updateReactionCount(postEl, tid) {
+  const likeBtn = postEl.querySelector('[data-action="like"]');
+  if (!likeBtn) return;
+  const countSpan = likeBtn.querySelector('span');
+  if (!countSpan) return;
+  const r = S.reactions.get(tid);
+  if (r) countSpan.textContent = String(r.likes.size);
+}
+
+/* ─── HASHTAG PARSING ───────────────────────────────────────── */
+function parseHashtags(text) {
+  const safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return safeText.replace(/(#\w+)/g, `<a class="hashtag" onclick="filterTag('$1', event)">$1</a>`);
+}
+
+/* ─── TIMESTAMP HELPERS ─────────────────────────────────────── */
+function getTimeString(timestamp) {
+  const diff = Math.floor((Date.now() - timestamp) / 1000);
+  if (diff < 5)     return 'now';
+  if (diff < 60)    return diff + 's';
+  if (diff < 3600)  return Math.floor(diff / 60) + 'm';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h';
+  return Math.floor(diff / 86400) + 'd';
+}
+
+function updateTimestamps() {
+  document.querySelectorAll('.soc-post').forEach(el => {
+    const id = el.id.replace('post-', '');
+    const ev = S.events.get(id);
+    if (ev) {
+      const timeEl = el.querySelector('.post-time');
+      if (timeEl) timeEl.textContent = getTimeString(ev.created_at * 1000);
+    }
+  });
+}
+setInterval(updateTimestamps, 30000);
+
+/* ─── POST BODY SCRAMBLE ANIMATION (Cosmos version) ────────── */
+// Uses innerText during scramble, then sets innerHTML = parseHashtags output.
+// Kept verbatim from Cosmos — post body path only, not seed words.
+function runScramble(el, rawText, finalHtml) {
+  const ch = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+';
+  el.classList.add('scramble-mode');
+  let it = 0; const max = 25;
+  const iv = setInterval(() => {
+    el.innerText = rawText.split('').map((c, i) => {
+      if (c === ' ' || c === '\n') return c;
+      return i < (it / max) * rawText.length ? rawText[i] : ch[Math.floor(Math.random() * ch.length)];
+    }).join('');
+    if (it++ >= max) {
+      clearInterval(iv);
+      el.classList.remove('scramble-mode');
+      el.innerHTML = finalHtml;
+    }
+  }, 40);
+}
+
+/* ─── HANDLE POST (cancel bar kept, inner wired to real crypto) */
+function handlePost(type, parentId = null) {
+  const ta  = document.getElementById(parentId ? `reply-text-${parentId}` : 'soc-textarea');
+  const btn = document.getElementById(parentId ? `btn-reply-${parentId}`  : 'btn-post');
+  const content = ta.value.trim();
+  if (!content) return;
+
+  const timerId = parentId || 'root';
+
+  // Second click during countdown = CANCEL
+  if (S.cancelTimers[timerId]) {
+    clearTimeout(S.cancelTimers[timerId]);
+    delete S.cancelTimers[timerId];
+    btn.innerHTML = `<span>${parentId ? 'Reply' : 'Broadcast'}</span>`;
+    btn.classList.remove('danger-mode');
+    ta.disabled = false;
+    return;
+  }
+
+  ta.disabled = true;
+  btn.classList.add('danger-mode');
+  btn.innerHTML = `<div class="progress-bar" style="width:100%;transition:none;"></div><span>CANCEL</span>`;
+  void btn.offsetWidth;
+  const bar = btn.querySelector('.progress-bar');
+  bar.style.transition = 'width 3s linear';
+  bar.style.width = '0%';
+
+  S.cancelTimers[timerId] = setTimeout(async () => {
+    delete S.cancelTimers[timerId];
+
+    const ev = await _doPost(content, parentId);
+
+    ta.value = '';
+    ta.disabled = false;
+    btn.innerHTML = `<span>${parentId ? 'Reply' : 'Broadcast'}</span>`;
+    btn.classList.remove('danger-mode');
+
+    // Emit to Nexus kernel if mounted in OS
+    if (ev) emit('social.post', ev);
+
+    if (parentId && ev) {
+      S.activeReplies.delete(parentId);
+      S.replied.add(parentId);
+      const replyBox = document.getElementById(`reply-box-${parentId}`);
+      if (replyBox) replyBox.classList.add('hidden');
+    }
+
+    render(true);
+  }, 3000);
+}
+
+/* ─── _doPost — honest publish feedback (Snippet 5 verbatim) ── */
+async function _doPost(content, parentId) {
+  if (!S.id) { toast('no identity — complete onboarding first'); return; }
+  if (content.length > CHAR_LIMIT) { toast(`${content.length - CHAR_LIMIT} chars over limit`); return; }
+  try {
+    const tags = _extractTags(content).map(t => ['t', t]);
+    if (parentId) tags.push(['e', parentId], ['p', S.id.pubkey]);
+    const ev = await buildEv(S.id.privkey, S.id.pubkey, parentId ? 1 : 1, content, tags);
+    const n = pool.publish(ev);
+    S.events.set(ev.id, ev);
+    emit('db.query', {
+      query:  'INSERT INTO social_events',
+      params: {
+        id: ev.id, pubkey: ev.pubkey, content: ev.content,
+        created_at: ev.created_at, kind: ev.kind, tags: ev.tags, sig: ev.sig,
+      },
+      _reqId: nextReqId(),
+      appId:  'social',
+    });
+    if (n > 0) {
+      toast(`✓ broadcast to ${n} relay${n>1?'s':''}`);
+    } else {
+      // No relays open right now — queue for retry when one reconnects
+      S._pendingPosts.push(ev);
+      toast('⏳ relays reconnecting — post queued, will send automatically');
+      // Mark the post visually as pending
+      setTimeout(() => {
+        const el = document.getElementById('post-' + ev.id);
+        if (el) el.classList.add('post-pending');
+      }, 100);
+    }
+    return ev;
+  } catch(e) {
+    // Provide specific error context for debugging
+    const msg = e?.message || String(e);
+    if (msg.includes('secp256k1') || msg.includes('not loaded')) {
+      toast('⚠ crypto library error — open DevTools console for details');
+    } else if (msg.includes('identity')) {
+      toast('⚠ identity error — try reloading');
+    } else {
+      toast('⚠ broadcast failed: ' + msg.slice(0, 40));
+    }
+    console.error('[social] post error:', e);
+    return null;
+  }
+}
+
+function _extractTags(body) {
+  const t = [], re = /#([a-zA-Z0-9_-]{1,32})/g; let m;
+  while ((m = re.exec(body)) !== null) { t.push(m[1].toLowerCase()); }
+  return t;
+}
+
+/* ─── WINDOW ACTIONS ────────────────────────────────────────── */
+
+// Like — toggle optimistic + fire kind-7 (Snippet 7)
+window.like = async (id) => {
+  const ev = S.events.get(id);
+  if (!ev) return;
+  if (S.liked.has(id)) {
+    S.liked.delete(id);
+    if (S.reactions.has(id)) S.reactions.get(id).likes.delete(S.id?.pubkey);
+  } else {
+    S.liked.add(id);
+    if (!S.reactions.has(id)) S.reactions.set(id, { likes: new Set(), dislikes: new Set() });
+    S.reactions.get(id).likes.add(S.id?.pubkey);
+    if (S.id) {
+      buildEv(S.id.privkey, S.id.pubkey, 7, '+', [['e', id], ['p', ev.pubkey]])
+        .then(r => pool.publish(r))
+        .catch(() => {});
+    }
+  }
+  render(true);
+};
+
+// Repost — toggle optimistic + fire kind-6 fire-and-forget
+window.repost = (id) => {
+  const ev = S.events.get(id);
+  if (!ev) return;
+  if (S.reposted.has(id)) {
+    S.reposted.delete(id);
+  } else {
+    S.reposted.add(id);
+    if (S.id) {
+      buildEv(S.id.privkey, S.id.pubkey, 6, JSON.stringify(ev), [['e', id], ['p', ev.pubkey]])
+        .then(r => pool.publish(r))
+        .catch(() => {});
+    }
+  }
+  render(true);
+};
+
+// Zap — cosmetic only (Lightning out of scope)
+window.zap = (id, el) => {
+  if (S.zapped.has(id)) return;
+  S.zapped.add(id);
+  el.classList.add('zapped');
+  const f = document.createElement('div');
+  f.className = 'floating-text';
+  f.textContent = '+21 sats';
+  el.appendChild(f);
+  setTimeout(() => f.remove(), 1000);
+  const countSpan = el.querySelector('span');
+  if (countSpan) countSpan.textContent = String((parseInt(countSpan.textContent) || 0) + 21);
+};
+
+window.toggleReply = (id) => {
+  const box = document.getElementById(`reply-box-${id}`);
+  if (box.classList.toggle('hidden')) {
+    S.activeReplies.delete(id);
+  } else {
+    S.activeReplies.add(id);
+    document.getElementById(`reply-text-${id}`)?.focus();
+  }
+};
+
+// filterTag receives the full match including '#' from parseHashtags.
+// S.currentFilter stores without '#' to match against extracted tag words.
+window.filterTag = function(tag, e) {
+  if (e) e.preventDefault();
+  S.currentFilter = tag.toLowerCase().replace(/^#/, '');
+  const banner = document.getElementById('filter-banner');
+  banner.classList.remove('hidden');
+  document.getElementById('filter-text').textContent = '#' + S.currentFilter;
+  render(true);
+};
+
+window.clearFilter = function() {
+  S.currentFilter = null;
+  document.getElementById('filter-banner').classList.add('hidden');
+  render(true);
+};
+
+window.anim = (el, type) => {
+  const svg = el.querySelector('svg');
+  svg.classList.remove(`anim-${type}`);
+  void svg.offsetWidth;
+  svg.classList.add(`anim-${type}`);
+};
+
+window.copyText = function(elementId) {
+  const text = document.getElementById(elementId).textContent;
+  navigator.clipboard.writeText(text).catch(() => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus(); textArea.select();
+    try { document.execCommand('copy'); } catch (err) {}
+    document.body.removeChild(textArea);
+  });
+};
+
+
+/* ─── FOLLOW SYSTEM (NIP-02) ────────────────────────────────── */
+function _loadFollowing() {
+  if (!S.id) return;
+  // Fetch own kind-3 from relay to restore follow list
+  pool.subscribe('own-contacts', [{ kinds:[3], authors:[S.id.pubkey], limit:1 }]);
+}
+
+async function _publishFollowing() {
+  if (!S.id) return;
+  const tags = [...S.following].map(pk => ['p', pk, '', '']);
+  try {
+    const ev = await buildEv(S.id.privkey, S.id.pubkey, 3, '', tags);
+    pool.publish(ev);
+    emit('db.query', {
+      query:'INSERT INTO social_events',
+      params:{id:ev.id,pubkey:ev.pubkey,content:ev.content,created_at:ev.created_at,kind:ev.kind,tags:ev.tags,sig:ev.sig},
+      _reqId:nextReqId(), appId:'social',
+    });
+  } catch(e) { console.error('[social] follow publish failed', e); }
+}
+
+function _syncHomeSubscription() {
+  if (!S.id || S.following.size === 0) return;
+  const authors = [...S.following, S.id.pubkey];
+  const since   = Math.floor(Date.now()/1000) - 3600*24*3;
+  pool.subscribe('home', [{ kinds:[1], authors, limit:100, since }]);
+}
+
+window.follow = async (pubkey) => {
+  if (!S.id || !pubkey || S.following.has(pubkey)) return;
+  S.following.add(pubkey);
+  await _publishFollowing();
+  _syncHomeSubscription();
+  render();
+  const n = S.profiles.get(pubkey)?.display_name || S.profiles.get(pubkey)?.name || trunc(pubkey);
+  toast('following ' + n);
+};
+
+window.unfollow = async (pubkey) => {
+  if (!S.id || !S.following.has(pubkey)) return;
+  S.following.delete(pubkey);
+  await _publishFollowing();
+  render();
+  const n = S.profiles.get(pubkey)?.display_name || S.profiles.get(pubkey)?.name || trunc(pubkey);
+  toast('unfollowed ' + n);
+};
+
+/* ─── FEED TABS ─────────────────────────────────────────────── */
+window.switchTab = (tab) => {
+  S.currentTab = tab;
+  document.getElementById('tab-global')?.classList.toggle('active', tab === 'global');
+  document.getElementById('tab-home')?.classList.toggle('active', tab === 'home');
+  render(true);
+};
+
+/* ─── DISLIKE (sweet:salty) ─────────────────────────────────── */
+window.dislike = async (id, btn) => {
+  const ev = S.events.get(id);
+  if (!ev) return;
+  if (ev.pubkey === S.id?.pubkey) { toast('cannot downvote your own signal'); return; }
+  if (!S.id) { toast('complete onboarding to vote'); return; }
+
+  if (S.dislikes.has(id)) {
+    S.dislikes.delete(id);
+    const r = S.reactions.get(id); if (r) r.dislikes.delete(S.id.pubkey);
+  } else {
+    S.dislikes.add(id);
+    if (!S.reactions.has(id)) S.reactions.set(id, { likes:new Set(), dislikes:new Set() });
+    S.reactions.get(id).dislikes.add(S.id.pubkey);
+    buildEv(S.id.privkey, S.id.pubkey, 7, '-', [['e',id],['p',ev.pubkey]])
+      .then(r => pool.publish(r)).catch(()=>{});
+    // Dislike nudges you to leave a public reason
+    const box = document.getElementById('reply-box-'+id);
+    const ta  = document.getElementById('reply-text-'+id);
+    if (box && !S.activeReplies.has(id)) {
+      box.classList.remove('hidden'); S.activeReplies.add(id);
+      if (ta) { ta.placeholder='Your reason will be public. What is your objection?'; setTimeout(()=>ta.focus(),60); }
+    }
+  }
+  render(true);
+};
+
+/* ─── PROFILE MODAL ─────────────────────────────────────────── */
+function openProfile(pubkey) {
+  if (!pubkey) return;
+  const modal = document.getElementById('modal-profile');
+  if (!modal) return;
+  _renderProfileBox(pubkey);
+  modal.classList.add('open');
+  S._viewingProfile = pubkey;
+  pool.subscribe('pview', [
+    { kinds:[0], authors:[pubkey], limit:1 },
+    { kinds:[1], authors:[pubkey], limit:20, since:Math.floor(Date.now()/1000)-3600*24*14 },
+  ]);
+}
+
+function closeProfile() {
+  const modal = document.getElementById('modal-profile');
+  if (modal) modal.classList.remove('open');
+  S._viewingProfile = null;
+  pool.unsubscribe('pview');
+}
+
+function _renderProfileBox(pubkey) {
+  const box = document.getElementById('profile-box');
+  if (!box) return;
+  box.textContent = '';
+  const profile    = S.profiles.get(pubkey) || {};
+  const isOwn      = pubkey === S.id?.pubkey;
+  const isFollowing= S.following.has(pubkey);
+  const displayName= profile.display_name || profile.name || trunc(pubkey);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'profile-close-btn'; closeBtn.textContent = '×';
+  closeBtn.addEventListener('click', closeProfile);
+  box.appendChild(closeBtn);
+
+  const header = document.createElement('div'); header.className = 'profile-header';
+
+  const av = document.createElement('div'); av.className = 'profile-avatar-lg';
+  if (profile.picture) {
+    const pimg = document.createElement('img'); pimg.src = profile.picture;
+    pimg.onerror = () => { av.textContent = displayName[0]?.toUpperCase()||'?'; };
+    av.appendChild(pimg);
+  } else { av.textContent = displayName[0]?.toUpperCase()||'?'; }
+
+  const meta = document.createElement('div'); meta.className = 'profile-meta';
+  const nameEl = document.createElement('div'); nameEl.className='profile-name'; nameEl.textContent=displayName;
+  const hdl = document.createElement('div'); hdl.className='profile-handle';
+  hdl.textContent = (profile.name?'@'+profile.name+'  ·  ':'')+trunc(pubkey);
+  const bioEl = document.createElement('div'); bioEl.className='profile-bio'; bioEl.textContent=profile.about||'';
+  const actRow = document.createElement('div'); actRow.className='profile-actions-row';
+
+  if (!isOwn) {
+    const fb = document.createElement('button');
+    fb.className = 'profile-follow-btn '+(isFollowing?'btn-unfollow':'btn-follow');
+    fb.textContent = isFollowing ? '✓ Following' : '+ Follow';
+    fb.addEventListener('click', () => {
+      if (S.following.has(pubkey)) {
+        window.unfollow(pubkey); fb.className='profile-follow-btn btn-follow'; fb.textContent='+ Follow';
+      } else {
+        window.follow(pubkey); fb.className='profile-follow-btn btn-unfollow'; fb.textContent='✓ Following';
+      }
+    });
+    actRow.appendChild(fb);
+  }
+
+  const pc = [...S.events.values()].filter(e=>e.pubkey===pubkey&&e.kind===1).length;
+  if (pc > 0) {
+    const pill = document.createElement('span'); pill.className='profile-stat-pill';
+    const s2 = document.createElement('strong'); s2.textContent=String(pc);
+    pill.appendChild(s2); pill.appendChild(document.createTextNode(' posts in feed'));
+    actRow.appendChild(pill);
+  }
+
+  meta.append(nameEl, hdl, bioEl, actRow);
+  header.append(av, meta); box.appendChild(header);
+
+  const lbl = document.createElement('div'); lbl.className='profile-section-label'; lbl.textContent='Recent Posts';
+  box.appendChild(lbl);
+  const scroll = document.createElement('div'); scroll.className='profile-posts-scroll';
+  const posts = [...S.events.values()].filter(e=>e.pubkey===pubkey&&e.kind===1).sort((a,b)=>b.created_at-a.created_at).slice(0,20);
+
+  if (!posts.length) {
+    const emp = document.createElement('div');
+    emp.style.cssText='text-align:center;padding:24px;color:var(--text-muted);font-size:10px;font-family:var(--font);';
+    emp.textContent='Fetching posts from relay…'; scroll.appendChild(emp);
+  } else {
+    posts.forEach(ev => {
+      const item = document.createElement('div'); item.className='profile-post-item';
+      const txt = document.createElement('div'); txt.className='profile-post-text';
+      txt.textContent=ev.content.slice(0,240)+(ev.content.length>240?'…':'');
+      const m2 = document.createElement('div'); m2.className='profile-post-meta'; m2.textContent=getTimeString(ev.created_at*1000);
+      item.append(txt,m2); scroll.appendChild(item);
+    });
+  }
+  box.appendChild(scroll);
+}
+
+/* ─── SETTINGS (Snippet 8) ──────────────────────────────────── */
+function openSettings() {
+  if (!S.id) { _showOnboarding('generate'); return; }
+  document.getElementById('input-edit-handle').value = S.id.displayName || '';
+  document.getElementById('val-npub').textContent = S.id.npub;
+  document.getElementById('val-nsec').textContent = S.id.nsec;
+  document.getElementById('val-nsec').classList.remove('revealed');
+  document.getElementById('btn-reveal-nsec').textContent = 'Reveal';
+  _renderRelayList();
+  document.getElementById('modal-settings').classList.add('open');
+  setTimeout(() => document.getElementById('input-edit-handle').focus(), 100);
+}
+
+function _renderRelayList() {
+  const list = document.getElementById('relay-list');
+  if (!list) return;
+  list.textContent = '';
+  const stat = pool.stat();
+  S.relayUrls.forEach(url => {
+    const relay  = stat.relays.get(url);
+    const status = relay ? relay.status : 'connecting';
+    const row    = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+    const dot = document.createElement('div');
+    dot.className = 'hdr-rdot ' + status;
+    const label = document.createElement('span');
+    label.style.cssText = 'flex:1;font-size:10px;color:var(--text-dim);font-family:var(--font);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    label.textContent = url.replace('wss://','');
+    label.title = url;
+    const rmBtn = document.createElement('button');
+    rmBtn.className = 'soc-btn';
+    rmBtn.style.cssText = 'font-size:10px;padding:2px 8px;flex-shrink:0;';
+    rmBtn.textContent = '×';
+    rmBtn.addEventListener('click', () => window._relayRemove(url));
+    row.append(dot, label, rmBtn);
+    list.appendChild(row);
+  });
+}
+
+window._relayAdd = () => {
+  const input = document.getElementById('input-relay-url');
+  const url   = (input?.value || '').trim();
+  if (!url.startsWith('wss://') && !url.startsWith('ws://')) {
+    toast('relay URL must start with wss://'); return;
+  }
+  if (S.relayUrls.includes(url)) { toast('relay already added'); return; }
+  S.relayUrls.push(url);
+  _saveRlys();
+  pool.connect(S.relayUrls);
+  if (input) input.value = '';
+  _renderRelayList();
+  toast('relay added');
+};
+
+window._relayRemove = (url) => {
+  if (S.relayUrls.length <= 1) { toast('need at least one relay'); return; }
+  S.relayUrls = S.relayUrls.filter(u => u !== url);
+  _saveRlys();
+  pool.connect(S.relayUrls);
+  _renderRelayList();
+  toast('relay removed');
+};
+
+function saveSettings() {
+  const newHandle = document.getElementById('input-edit-handle').value.trim().replace(/^@/, '').slice(0, 24);
+  if (newHandle && S.id) {
+    S.id.displayName = newHandle;
+    _saveId();
+    updateAvatar();
+    _pubProfile().catch(() => {});
+  }
+  closeSettings();
+}
+
+function closeSettings() {
+  document.getElementById('modal-settings').classList.remove('open');
+}
+
+async function _pubProfile() {
+  if (!S.id) return;
+  try {
+    const meta = JSON.stringify({ name: S.id.displayName || '', about: S.id.bio || '' });
+    pool.publish(await buildEv(S.id.privkey, S.id.pubkey, 0, meta));
+  } catch(e) {}
+}
+
+/* ─── ONBOARDING MODAL (Snippet 9) ─────────────────────────── */
+function _showOnboarding(state, errorMsg) {
+  const overlay = document.getElementById('modal-onboard');
+  const box     = document.getElementById('onboard-box');
+  overlay.classList.add('open');
+
+  if (state === 'generate') {
+    box.innerHTML = `
+      <div class="modal-title">Initializing Node Identity</div>
+      <div class="modal-desc">Deriving keypair from the cosmos. This only happens once.</div>
+      <div style="display:flex;align-items:center;justify-content:center;padding:32px 0;font-size:28px;color:var(--accent);">◈</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-muted);font-family:var(--font);letter-spacing:2px;" id="ob-gen-status">GENERATING...</div>
+    `;
+    const _giveUp = setTimeout(() => {
+      _showOnboarding('error', 'Key generation timed out. Check /libs/ or network.');
+    }, 12000);
+    genIdentity()
+      .then(id => {
+        clearTimeout(_giveUp);
+        S.id = id;
+        _showOnboarding('seed', null);
+      })
+      .catch(err => {
+        clearTimeout(_giveUp);
+        _showOnboarding('error', err.message || String(err));
+      });
+
+  } else if (state === 'seed') {
+    const words    = S.id.mnemonic.split(' ');
+    const wordGrid = words.map((w, i) => `
+      <div style="display:flex;align-items:baseline;gap:5px;font-size:11px;">
+        <span style="color:var(--text-muted);font-size:8px;width:14px;text-align:right;flex-shrink:0;">${i+1}.</span>
+        <span class="seed-word" style="color:var(--text);">${w}</span>
+      </div>
+    `).join('');
+    box.innerHTML = `
+      <div class="modal-title">Your Cosmic Seed Phrase</div>
+      <div class="modal-desc">These 12 words ARE your identity. Write them offline. Lose them = lose access forever.</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px 12px;background:var(--bg);border-radius:8px;padding:14px;margin-bottom:16px;">
+        ${wordGrid}
+      </div>
+      <div style="background:rgba(251,191,36,.07);border-radius:4px;padding:8px 12px;font-size:10px;color:var(--zap);margin-bottom:16px;line-height:1.55;">
+        ⚠ Never share this phrase. Anyone with these words controls your node.
+      </div>
+      <div style="background:var(--bg);border-radius:4px;padding:8px;margin-bottom:20px;cursor:pointer;font-size:9px;color:var(--text-muted);word-break:break-all;line-height:1.5;"
+           onclick="navigator.clipboard?.writeText('${S.id.npub}');toast('npub copied')" title="Click to copy">
+        PUBLIC KEY: <span style="color:var(--accent);">${S.id.npub}</span>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:space-between;">
+        <button class="soc-btn" onclick="_showOnboarding('import')">Import existing key</button>
+        <button class="soc-btn primary" onclick="_onboardComplete()">▶ Saved — Enter the cosmos</button>
+      </div>
+    `;
+
+  } else if (state === 'import') {
+    box.innerHTML = `
+      <div class="modal-title">Import Existing Identity</div>
+      <div class="modal-desc">Enter your nsec1 private key or 12-word seed phrase.</div>
+      <div class="input-group">
+        <label class="input-label">nsec1... or 12-word mnemonic</label>
+        <input type="text" id="ob-import-in" class="text-input" autocomplete="off" spellcheck="false"
+               placeholder="nsec1... or word1 word2 word3...">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+        <button class="soc-btn" onclick="_showOnboarding('seed')">Back</button>
+        <button class="soc-btn primary" onclick="_doImport()">Import</button>
+      </div>
+    `;
+    setTimeout(() => document.getElementById('ob-import-in')?.focus(), 100);
+
+  } else if (state === 'error') {
+    const safeMsg = (errorMsg || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    box.innerHTML = `
+      <div class="modal-title" style="color:var(--danger);">Node Error</div>
+      <div class="modal-desc" style="color:var(--text-dim);">${safeMsg}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:20px;">(Secure context required: use localhost or HTTPS, not a bare IP address)</div>
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="soc-btn primary" onclick="_retryDeps()">↻ Retry</button>
+      </div>
+    `;
+  }
+}
+
+function _onboardComplete() {
+  _saveId();
+  document.getElementById('modal-onboard').classList.remove('open');
+  updateAvatar();
+  _startNostr();
+}
+
+async function _doImport() {
+  const raw = document.getElementById('ob-import-in')?.value.trim();
+  if (!raw) return;
+  try {
+    const words = raw.split(/\s+/);
+    let id;
+    if (words.length === 12 || words.length === 24) {
+      id = await deriveId(raw);
+    } else if (raw.startsWith('nsec1')) {
+      const d = b32dec(raw);
+      if (!d || d.hrp !== 'nsec') throw new Error('invalid nsec');
+      const priv = b2h(d.bytes);
+      const pub  = b2h(secp.schnorr.getPublicKey(h2b(priv)));
+      id = { mnemonic: null, privkey: priv, pubkey: pub, npub: npubEnc(pub), nsec: raw, displayName: null, bio: null, createdAt: Date.now() };
+    } else {
+      throw new Error('unrecognized format');
+    }
+    S.id = id;
+    _onboardComplete();
+  } catch(e) {
+    toast('could not parse key — check format');
+  }
+}
+
+// Fixed: just reset dep state and re-run _mount. Avoids double genIdentity bug.
+async function _retryDeps() {
+  _resetDeps();
+  await _mount();
+}
+
+/* ─── AVATAR ────────────────────────────────────────────────── */
+function updateAvatar() {
+  const av = document.getElementById('my-avatar');
+  if (!av) return;
+  av.textContent = S.id
+    ? (S.id.displayName || trunc(S.id.pubkey)).charAt(0).toUpperCase()
+    : '?';
+}
+
+/* ─── WALLET BRIDGE ─────────────────────────────────────────── */
+// Returns active locks from wallet state that reference this Nostr event ID.
+// terms_raw format: 'nostr:event:{eventId}'
+function _getPostStakes(eventId) {
+  if (!S.walletState?.activeLocks) return [];
+  return S.walletState.activeLocks.filter(l =>
+    l.terms_raw === `nostr:event:${eventId}`
+  );
+}
+
+function _renderStakeIndicator(el, stakes) {
+  const totalUnits = stakes.reduce((s, l) => s + l.amount, 0);
+  // amount is in integer units — display as-is divided by 1e8
+  const totalTokens = (totalUnits / 100000000).toFixed(totalUnits % 100000000 === 0 ? 0 : 4);
+  const sym = S.walletState?.symbol || '';
+  const anyResolvable = stakes.some(l => l.resolvable);
+  const statusClass = anyResolvable ? 'ready' : 'ticking';
+  const statusLabel = anyResolvable ? 'RESOLVABLE' : 'LOCKED';
+  el.innerHTML = '';
+  el.innerHTML = `⚡ <span class="si-amount">${totalTokens} ${sym}</span> staked · ${stakes.length} lock${stakes.length>1?'s':''} <span class="si-status ${statusClass}">${statusLabel}</span>`;
+}
+
+// Surgically update all stake indicators without full re-render.
+// Called when wallet state arrives via IPC.
+function _updateAllStakeIndicators() {
+  // Update existing indicators
+  document.querySelectorAll('.stake-indicator').forEach(el => {
+    const id = el.id.replace('stake-ind-','');
+    const stakes = _getPostStakes(id);
+    if (stakes.length) {
+      _renderStakeIndicator(el, stakes);
+    } else {
+      el.remove();
+    }
+  });
+  // Also update stake action button states
+  document.querySelectorAll('[data-action="stake"]').forEach(btn => {
+    const id = btn.dataset.id;
+    const stakes = _getPostStakes(id);
+    if (stakes.length) {
+      btn.classList.add('staked');
+      const sp = btn.querySelector('span');
+      if (sp) sp.textContent = String(stakes.length);
+      // Add indicator if not already present
+      const postEl = document.getElementById(`post-${id}`);
+      if (postEl) {
+        postEl.classList.add('post-staked');
+        if (!document.getElementById(`stake-ind-${id}`)) {
+          const postRight = postEl.querySelector('.post-right');
+          if (postRight) {
+            const si = document.createElement('div');
+            si.className = 'stake-indicator';
+            si.id = `stake-ind-${id}`;
+            _renderStakeIndicator(si, stakes);
+            postRight.appendChild(si);
+          }
+        }
+      }
+    } else {
+      btn.classList.remove('staked');
+      const sp = btn.querySelector('span');
+      if (sp) sp.textContent = '0';
+    }
+  });
+}
+
+/* ─── STAKE INTENT MODAL ────────────────────────────────────── */
+window.openStakeIntent = function(eventId) {
+  const ev = S.events.get(eventId);
+  S._stakeIntent = { eventId, content: ev?.content || '' };
+
+  // Populate modal
+  const evDisp = document.getElementById('stake-event-id-display');
+  if (evDisp) evDisp.textContent = eventId;
+  const preview = document.getElementById('stake-post-preview');
+  if (preview) preview.textContent = ev ? '"' + ev.content.slice(0, 80) + (ev.content.length > 80 ? '…' : '') + '"' : '';
+
+  _refreshStakeModal();
+  document.getElementById('modal-stake').classList.add('open');
+};
+
+function _refreshStakeModal() {
+  const bar = document.getElementById('stake-wallet-bar');
+  const dot = document.getElementById('stake-ws-dot');
+  const info = document.getElementById('stake-wallet-info');
+  if (!bar) return;
+  if (S.walletState) {
+    bar.className = 'wallet-status-bar';
+    dot.className = 'ws-dot';
+    const bal = (S.walletState.balance / 100000000).toFixed(S.walletState.balance % 100000000 === 0 ? 0 : 4);
+    info.textContent = `Wallet: ${S.walletState.sid} · ${bal} ${S.walletState.symbol} available · ${S.walletState.unspentCount} outputs`;
+  } else {
+    bar.className = 'wallet-status-bar disconnected';
+    dot.className = 'ws-dot off';
+    info.textContent = 'Wallet not connected — open Wallet block in Nexus OS';
+  }
+}
+
+window.closeStakeModal = function() {
+  document.getElementById('modal-stake').classList.remove('open');
+  S._stakeIntent = null;
+  const status = document.getElementById('stake-intent-status');
+  if (status) status.textContent = '';
+};
+
+window.copyStakeEventId = function() {
+  if (!S._stakeIntent?.eventId) return;
+  navigator.clipboard?.writeText(S._stakeIntent.eventId).then(() => toast('event ID copied'));
+};
+
+window.sendStakeIntent = function() {
+  if (!S._stakeIntent?.eventId) return;
+  const amount = parseFloat(document.getElementById('si-amount').value) || 100;
+  const windowHours = parseInt(document.getElementById('si-window').value) || 72;
+  const counterparty = document.getElementById('si-counterparty').value.trim();
+  const status = document.getElementById('stake-intent-status');
+
+  // Emit intent to wallet via kernel IPC
+  emit('nexus.stake.intent', {
+    eventId:     S._stakeIntent.eventId,
+    postContent: S._stakeIntent.content.slice(0, 80),
+    amount,
+    windowHours,
+    counterparty: counterparty || null,
+  });
+
+  if (status) {
+    status.textContent = S.mounted
+      ? '✓ Stake intent sent — switch to the Wallet block and check the ⚡ Stake tab. The form is pre-filled.'
+      : '⚠ Not connected to Nexus OS kernel. Open Wallet → ⚡ Stake tab and paste the event ID manually.';
+    status.style.color = S.mounted ? '#4ade80' : '#fbbf24';
+  }
+  toast('⚡ stake intent sent to wallet');
+};
+
+/* ─── MODULE-SCOPE FUNCTIONS EXPOSED TO window ──────────────── */
+// Required: these are called from inline onclick in dynamically-generated HTML
+// (onboarding modal) and from static HTML (settings modal). Module scope is not
+// global scope, so they must be explicitly assigned to window.
+window._showOnboarding  = _showOnboarding;
+window._onboardComplete = _onboardComplete;
+window._doImport        = _doImport;
+window._retryDeps       = _retryDeps;
+window.saveSettings     = saveSettings;
+window.closeSettings    = closeSettings;
+window.openSettings     = openSettings;
+window.openProfile      = openProfile;
+window.closeProfile     = closeProfile;
+window.toast            = toast;
+// Stake modal (already assigned as window.X in definitions above)
+// follow, unfollow, dislike, switchTab assigned to window in their definitions above.
+
+/* ─── ENTRY POINT ───────────────────────────────────────────── */
+startCosmos(); // Canvas animates immediately — no crypto dependency
+_mount();      // Loads deps → wires UI → shows onboarding or connects to relays
+
+</script>
+</body>
+</html>

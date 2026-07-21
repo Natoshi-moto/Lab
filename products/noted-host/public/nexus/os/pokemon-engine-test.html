@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pokémon Engine — Test Harness</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0b0c10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font: 13px/1.4 "Courier New", Courier, monospace;
+    color: #94a3b8;
+    overflow: hidden;
+  }
+  #wrap {
+    position: relative;
+    display: inline-block;
+  }
+  canvas {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    border: 2px solid #273044;
+  }
+  #hud {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: rgba(11,12,16,0.82);
+    border: 1px solid #273044;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 10px;
+    line-height: 1.7;
+    color: #94a3b8;
+    pointer-events: none;
+    min-width: 110px;
+  }
+  #hud b { color: #9b8cff; }
+  #log {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #4ade80;
+    height: 18px;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  #controls {
+    margin-top: 6px;
+    font-size: 10px;
+    color: #273044;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <b>TEST WORLD</b><br>
+    Pos: <span id="pos">10,10</span><br>
+    Flags: <span id="flags">none</span><br>
+    Terrain: <span id="terrain">—</span>
+  </div>
+</div>
+<div id="log">Loading…</div>
+<div id="controls">WASD / Arrow keys to move · Z/Enter to interact · X/Esc to cancel</div>
+
+<script src="../../engines/pokemon-engine.js"></script>
+<script>
+'use strict';
+
+// ══════════════════════════════════════════
+// ASSET GENERATION
+// All assets generated procedurally — no external files needed.
+// Open this file by double-clicking and it works immediately.
+// ══════════════════════════════════════════
+
+// Tileset: 8 tiles × 16px each = 128×16 px image
+// Tile IDs (1-indexed):
+//   1 = grass (light green)
+//   2 = wall  (dark grey, border)
+//   3 = path  (sandy tan)
+//   4 = tall grass (dark green with texture)
+//   5 = water (blue, animated-style)
+//   6 = tree  (very dark green, blocked)
+//   7 = ledge (brownish with ↓ mark)
+//   8 = flower (grass + pink dot)
+
+function generateTileset(tileSize) {
+  var numTiles = 8;
+  var oc = document.createElement('canvas');
+  oc.width  = tileSize * numTiles;
+  oc.height = tileSize;
+  var c = oc.getContext('2d');
+
+  function tile(i, fn) {
+    c.save();
+    c.translate(i * tileSize, 0);
+    fn(c, tileSize);
+    c.restore();
+  }
+
+  // 1: grass
+  tile(0, function(c, s) {
+    c.fillStyle = '#4ade80';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#22c55e';
+    // slight texture dots
+    for (var d = 0; d < 6; d++) {
+      var px = (d * 37 + 3) % (s - 2);
+      var py = (d * 19 + 5) % (s - 2);
+      c.fillRect(px, py, 1, 1);
+    }
+  });
+
+  // 2: wall
+  tile(1, function(c, s) {
+    c.fillStyle = '#1e293b';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#273044';
+    c.fillRect(1, 1, s-2, s-2);
+    c.fillStyle = '#334155';
+    // brick pattern
+    c.fillRect(0, 4, s, 1);
+    c.fillRect(0, 10, s, 1);
+    c.fillRect(4, 0, 1, 4);
+    c.fillRect(10, 5, 1, 5);
+    c.fillRect(4, 11, 1, 5);
+  });
+
+  // 3: path
+  tile(2, function(c, s) {
+    c.fillStyle = '#c9a86c';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#b8965a';
+    // pebble marks
+    c.fillRect(3, 3, 2, 1);
+    c.fillRect(10, 8, 2, 1);
+    c.fillRect(6, 12, 1, 1);
+  });
+
+  // 4: tall grass
+  tile(3, function(c, s) {
+    c.fillStyle = '#16a34a';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#4ade80';
+    // vertical stripes
+    for (var x = 1; x < s; x += 3) {
+      c.fillRect(x, 0, 1, s - 4);
+    }
+    c.fillStyle = '#15803d';
+    c.fillRect(0, s-3, s, 3);
+  });
+
+  // 5: water
+  tile(4, function(c, s) {
+    c.fillStyle = '#1d4ed8';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#2563eb';
+    c.fillRect(0, 0, s, 4);
+    c.fillRect(0, 9, s, 4);
+    c.fillStyle = '#3b82f6';
+    c.fillRect(2, 2, s-4, 2);
+    c.fillRect(1, 10, s-3, 2);
+    c.fillStyle = '#60a5fa';
+    c.fillRect(4, 1, 3, 1);
+    c.fillRect(9, 11, 3, 1);
+  });
+
+  // 6: tree (blocked)
+  tile(5, function(c, s) {
+    c.fillStyle = '#14532d';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#166534';
+    c.fillRect(2, 2, s-4, s-4);
+    c.fillStyle = '#15803d';
+    c.fillRect(4, 4, 4, 4);
+    c.fillRect(8, 8, 3, 3);
+  });
+
+  // 7: ledge (jump south only)
+  tile(6, function(c, s) {
+    c.fillStyle = '#a16207';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#ca8a04';
+    c.fillRect(1, 1, s-2, s-2);
+    // down arrow
+    c.fillStyle = '#78350f';
+    var mx = Math.floor(s/2);
+    c.fillRect(mx-1, 3, 3, 5);
+    c.fillRect(mx-2, 6, 5, 1);
+    c.fillRect(mx-1, 7, 3, 1);
+    c.fillRect(mx,   8, 1, 1);
+  });
+
+  // 8: flower
+  tile(7, function(c, s) {
+    c.fillStyle = '#4ade80';
+    c.fillRect(0, 0, s, s);
+    c.fillStyle = '#22c55e';
+    for (var d = 0; d < 4; d++) {
+      c.fillRect((d*37+3) % (s-2), (d*19+5) % (s-2), 1, 1);
+    }
+    // flower dot
+    c.fillStyle = '#f472b6';
+    c.fillRect(7, 6, 3, 3);
+    c.fillStyle = '#fde68a';
+    c.fillRect(8, 7, 1, 1);
+  });
+
+  return oc;
+}
+
+// Player sprite: 12 frames (3 per direction: stand, step-l, step-r)
+// Directions: down(0-2), up(3-5), left(6-8), right(9-11)
+// Each frame is 16×16. Sheet is 192×16.
+function generatePlayerSprite(tileSize) {
+  var frames = 12;
+  var oc = document.createElement('canvas');
+  oc.width  = tileSize * frames;
+  oc.height = tileSize;
+  var c = oc.getContext('2d');
+
+  function drawPlayer(c, x, dir, step) {
+    var s = tileSize;
+    // Body
+    c.fillStyle = '#9b8cff';
+    c.fillRect(x+4, 4, 8, 8);
+    // Head
+    c.fillStyle = '#fde68a';
+    c.fillRect(x+5, 1, 6, 5);
+    // Eyes
+    c.fillStyle = '#0b0c10';
+    if (dir === 'down') {
+      c.fillRect(x+6, 2, 1, 1);
+      c.fillRect(x+9, 2, 1, 1);
+    } else if (dir === 'up') {
+      // No eyes visible (back)
+      c.fillStyle = '#9b8cff';
+      c.fillRect(x+5, 1, 6, 5);
+    } else if (dir === 'left') {
+      c.fillRect(x+5, 2, 1, 1);
+    } else {
+      c.fillRect(x+9, 2, 1, 1);
+    }
+    // Legs (animated)
+    c.fillStyle = '#4b5563';
+    if (step === 0) {
+      // Stand
+      c.fillRect(x+5, 12, 2, 3);
+      c.fillRect(x+9, 12, 2, 3);
+    } else if (step === 1) {
+      // Left step
+      c.fillRect(x+4, 11, 2, 4);
+      c.fillRect(x+9, 12, 2, 3);
+    } else {
+      // Right step
+      c.fillRect(x+5, 12, 2, 3);
+      c.fillRect(x+10, 11, 2, 4);
+    }
+    // Hat
+    c.fillStyle = '#7c3aed';
+    c.fillRect(x+4, 0, 8, 2);
+    c.fillRect(x+3, 1, 1, 1);
+    c.fillRect(x+12, 1, 1, 1);
+  }
+
+  var dirs = ['down','down','down','up','up','up','left','left','left','right','right','right'];
+  var steps = [0,1,2,0,1,2,0,1,2,0,1,2];
+  for (var i = 0; i < frames; i++) {
+    drawPlayer(c, i * tileSize, dirs[i], steps[i]);
+  }
+  return oc;
+}
+
+// ══════════════════════════════════════════
+// MAP GENERATION
+// 20×20 map with varied terrain
+// ══════════════════════════════════════════
+
+var MAP_W = 20, MAP_H = 20;
+
+function buildMap() {
+  var ground  = new Array(MAP_W * MAP_H).fill(1);  // default: grass (tile 1)
+  var detail  = new Array(MAP_W * MAP_H).fill(0);
+  var terrain = new Array(MAP_W * MAP_H).fill(0);  // default: passable
+  var overhead= new Array(MAP_W * MAP_H).fill(0);
+
+  function set(x, y, groundTile, terrainType) {
+    if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) return;
+    var i = y * MAP_W + x;
+    if (groundTile  !== undefined) ground[i]  = groundTile;
+    if (terrainType !== undefined) terrain[i] = terrainType;
+  }
+
+  // Border walls (tile 2 = wall, terrain 1 = blocked)
+  for (var x = 0; x < MAP_W; x++) {
+    set(x, 0,       2, 1);
+    set(x, MAP_H-1, 2, 1);
+  }
+  for (var y = 0; y < MAP_H; y++) {
+    set(0,       y, 2, 1);
+    set(MAP_W-1, y, 2, 1);
+  }
+
+  // Path through the middle (tile 3 = path)
+  for (var py = 1; py < MAP_H-1; py++) {
+    set(10, py, 3, 0);
+  }
+  for (var px = 1; px < MAP_W-1; px++) {
+    set(px, 10, 3, 0);
+  }
+
+  // Tall grass patches (tile 4 = tall grass, terrain 2 = encounters)
+  var tg = [[3,3],[4,3],[3,4],[4,4],[3,5],[15,3],[16,3],[15,4],[16,4]];
+  for (var ti = 0; ti < tg.length; ti++) {
+    set(tg[ti][0], tg[ti][1], 4, 2);
+  }
+
+  // Flower patches (tile 8 = flower, terrain 0 = passable)
+  var fl = [[7,7],[8,7],[7,8],[14,14],[15,14]];
+  for (var fi = 0; fi < fl.length; fi++) {
+    set(fl[fi][0], fl[fi][1], 8, 0);
+  }
+
+  // Water lake (tile 5 = water, terrain 3 = water/blocked)
+  for (var wy = 13; wy <= 16; wy++) {
+    for (var wx = 3; wx <= 7; wx++) {
+      set(wx, wy, 5, 3);
+    }
+  }
+
+  // Wall obstacle (tile 2, terrain 1 = blocked)
+  var walls = [[13,3],[14,3],[13,4],[14,4],[13,5]];
+  for (var wi = 0; wi < walls.length; wi++) {
+    set(walls[wi][0], walls[wi][1], 2, 1);
+  }
+
+  // Trees (tile 6 = tree, terrain 1 = blocked)
+  var trees = [[2,2],[17,2],[2,17],[17,17],[5,7],[6,7],[5,8]];
+  for (var tri = 0; tri < trees.length; tri++) {
+    set(trees[tri][0], trees[tri][1], 6, 1);
+    overhead[trees[tri][1] * MAP_W + trees[tri][0]] = 6; // overhead too
+  }
+
+  // Ledge running east-west (tile 7, terrain 4 = ledge_s — jump south only)
+  for (var lx = 3; lx <= 8; lx++) {
+    set(lx, 7, 7, 4);
+  }
+
+  return { ground: ground, detail: detail, terrain: terrain, overhead: overhead };
+}
+
+// ══════════════════════════════════════════
+// EVENTS
+// ══════════════════════════════════════════
+
+var EVENTS = [
+  {
+    id: 'welcome',
+    x: 5, y: 5,
+    trigger: 'onEnterOnce',
+    commands: [
+      { cmd: 'dialogue', lines: ['Welcome to the Pokémon Engine test world!',
+                                 'This engine is part of the Nexus OS project.'] },
+      { cmd: 'dialogue', lines: ['Walk into the tall grass to trigger encounters.',
+                                 'Try crossing the ledge going south…'] }
+    ]
+  },
+  {
+    id: 'sign1',
+    x: 10, y: 5,
+    trigger: 'onInteract',
+    commands: [
+      { cmd: 'dialogue', lines: ['[ NEXUS ENGINE SIGN ]',
+                                 'You built this engine.',
+                                 'The architecture survived five review rounds.'], choices: ['Nice.', 'I know.'] },
+      { cmd: 'branch', on: 'lastResult', cases: {
+          '0': [{ cmd: 'dialogue', lines: ['You are very polite.'] },
+                { cmd: 'setFlag',  flag: 'was_polite', value: true }],
+          '1': [{ cmd: 'dialogue', lines: ['Confidence. Noted.'] }]
+        },
+        default: []
+      }
+    ]
+  },
+  {
+    id: 'sign2',
+    x: 10, y: 15,
+    trigger: 'onInteract',
+    commands: [
+      { cmd: 'dialogue', lines: ['[ WATER SIGN ]', 'You need SURF to cross.', 'Nobody has SURF yet.'] }
+    ]
+  },
+  {
+    id: 'center',
+    x: 10, y: 10,
+    trigger: 'onEnterOnce',
+    commands: [
+      { cmd: 'dialogue', lines: ['This is the town center.',
+                                 'Tile ID 0 is always transparent.',
+                                 'The engine never draws it.'] }
+    ]
+  }
+];
+
+// ══════════════════════════════════════════
+// MAIN — boot the engine
+// ══════════════════════════════════════════
+
+window.addEventListener('DOMContentLoaded', function () {
+  var logEl     = document.getElementById('log');
+  var posEl     = document.getElementById('pos');
+  var flagsEl   = document.getElementById('flags');
+  var terrainEl = document.getElementById('terrain');
+
+  // Size canvas to fit viewport (maintaining a playable size)
+  var canvas = document.getElementById('game');
+  var maxW   = Math.min(window.innerWidth - 24, 480);
+  var maxH   = Math.min(window.innerHeight - 80, 360);
+  // Keep it a nice aspect ratio
+  canvas.width  = maxW;
+  canvas.height = maxH;
+
+  var TILE_SIZE = 16;
+
+  // Generate assets
+  logEl.textContent = 'Generating assets…';
+  var tilesetCanvas = generateTileset(TILE_SIZE);
+  var spriteCanvas  = generatePlayerSprite(TILE_SIZE);
+
+  // Load as Images (so we can drawImage from them)
+  var tilesetImg = new Image();
+  var spriteImg  = new Image();
+  var loaded     = 0;
+
+  function onLoaded() {
+    loaded++;
+    if (loaded < 2) return;
+    logEl.textContent = 'Engine ready. WASD to move, Z/Enter to interact.';
+    startGame(tilesetImg, spriteImg);
+  }
+
+  tilesetImg.onload = onLoaded;
+  spriteImg.onload  = onLoaded;
+  tilesetImg.src    = tilesetCanvas.toDataURL();
+  spriteImg.src     = spriteCanvas.toDataURL();
+
+  function startGame(tilesetImage, spriteImage) {
+
+    // Build engine instances
+    var PE       = window.PokemonEngine;
+    var camera   = new PE.TileCamera(TILE_SIZE);
+    var renderer = new PE.TileRenderer(canvas, TILE_SIZE);
+    var input    = new PE.InputManager(canvas);
+    var audio    = new PE.AudioEngine();
+    var dialogue = new PE.DialogueEngine(canvas);
+
+    // Load assets into renderer
+    renderer.loadTileset('ts_main', tilesetImage);
+
+    // Player sprite atlas: 12 frames, 16×16 each
+    var playerAtlas = new PE.SpriteAtlas(spriteImage, TILE_SIZE, TILE_SIZE);
+
+    // Player animation sets
+    var ANIMS = {
+      down:  [0, 1, 0, 2],
+      up:    [3, 4, 3, 5],
+      left:  [6, 7, 6, 8],
+      right: [9, 10, 9, 11]
+    };
+
+    // Build map
+    var mapData  = buildMap();
+    var terrain  = new PE.CollisionMap(mapData.terrain, MAP_W, MAP_H, [
+      { id: 0, name: 'passable',   passable: true,  jumpDir: null,    encounters: false, requiresCap: null },
+      { id: 1, name: 'blocked',    passable: false, jumpDir: null,    encounters: false, requiresCap: null },
+      { id: 2, name: 'tall_grass', passable: true,  jumpDir: null,    encounters: true,  requiresCap: null },
+      { id: 3, name: 'water',      passable: false, jumpDir: null,    encounters: false, requiresCap: 'surf' },
+      { id: 4, name: 'ledge_s',    passable: true,  jumpDir: 'south', encounters: false, requiresCap: null }
+    ]);
+
+    // Game state
+    var playerX     = 10, playerY = 10;
+    var playerFacing= 'down';
+    var animTick    = 0;
+    var walkTimer   = 0;
+    var lastDir     = null;
+    var flags       = {};
+    var triggeredOnce = {};
+
+    // Tone buffers
+    var stepTone    = audio.generateTone(220, 0.04, 'square');
+    var dialogTone  = audio.generateTone(440, 0.06, 'square');
+    var bumpTone    = audio.generateTone(110, 0.05, 'square');
+
+    // Event executor
+    var executor = new PE.EventExecutor({
+      onDialogue: function (lines, choices, resolve) {
+        audio.playEffect(dialogTone);
+        dialogue.show(lines, choices, resolve);
+      },
+      getFlagValue: function (flag) { return flags[flag]; },
+      onSetFlag: function (flag, value) {
+        flags[flag] = value;
+        updateHUD();
+      },
+      onBattle: function (creatureId, resolve) {
+        logEl.textContent = 'Battle with ' + creatureId + '! (stub — auto-win)';
+        setTimeout(function () { resolve('win'); }, 1000);
+      },
+      onWarp: function (toMap, toX, toY) {
+        logEl.textContent = 'Warp to ' + toMap + ' (' + toX + ',' + toY + ') — stub';
+        playerX = toX || playerX;
+        playerY = toY || playerY;
+        camera.centerOn(playerX, playerY, canvas.width, canvas.height);
+      },
+      onGiveItem: function (itemId) {
+        logEl.textContent = 'Received item: ' + itemId;
+      },
+      onGiveCreature: function (creatureId) {
+        logEl.textContent = 'Received creature: ' + creatureId;
+      }
+    });
+
+    // Center camera on player start
+    camera.centerOn(playerX, playerY, canvas.width, canvas.height);
+
+    function updateHUD() {
+      posEl.textContent     = playerX + ',' + playerY;
+      var flagKeys = Object.keys(flags).filter(function (k) { return flags[k]; });
+      flagsEl.textContent   = flagKeys.length ? flagKeys.join(', ') : 'none';
+      var t = terrain.getTerrainAt(playerX, playerY);
+      terrainEl.textContent = t ? t.name : '—';
+    }
+
+    function checkEvents(x, y, trigger) {
+      for (var i = 0; i < EVENTS.length; i++) {
+        var evt = EVENTS[i];
+        if (evt.x !== x || evt.y !== y || evt.trigger !== trigger) continue;
+        if (trigger === 'onEnterOnce' && triggeredOnce[evt.id]) continue;
+        if (evt.condition) {
+          if (flags[evt.condition.flag] !== evt.condition.is) continue;
+        }
+        if (trigger === 'onEnterOnce') triggeredOnce[evt.id] = true;
+        executor.run(evt.commands).catch(function (e) {
+          console.warn('[event executor error]', e);
+        });
+        return;
+      }
+    }
+
+    function tryMove(dir) {
+      if (!terrain.canMove(playerX, playerY, dir, [])) {
+        audio.playEffect(bumpTone);
+        playerFacing = dir;
+        return;
+      }
+      playerFacing = dir;
+      var dx = dir === 'right' ? 1 : dir === 'left' ? -1 : 0;
+      var dy = dir === 'down'  ? 1 : dir === 'up'   ? -1 : 0;
+      playerX += dx;
+      playerY += dy;
+      animTick++;
+      audio.playEffect(stepTone);
+
+      // Smooth camera follow
+      camera.centerOn(playerX, playerY, canvas.width, canvas.height);
+
+      updateHUD();
+      checkEvents(playerX, playerY, 'onEnter');
+      checkEvents(playerX, playerY, 'onEnterOnce');
+
+      // Wild encounter in tall grass (10% chance)
+      if (terrain.hasEncounters(playerX, playerY)) {
+        if (Math.random() < 0.10) {
+          logEl.textContent = '★ Wild encounter in the tall grass! (battle stub)';
+        }
+      }
+    }
+
+    var prevInput  = input.getState();
+    var WALK_INIT  = 10;   // frames before repeating when held
+    var WALK_REP   = 5;    // frames per step while held
+
+    // ── Main game loop ──────────────────────────────
+    function frame() {
+      requestAnimationFrame(frame);
+
+      var now  = input.getState();
+
+      // Dialogue gets input priority
+      if (dialogue.isActive) {
+        dialogue.handleInput(now, prevInput);
+        dialogue.update();
+      } else {
+        // Movement
+        var dir = now.up ? 'up' : now.down ? 'down' : now.left ? 'left' : now.right ? 'right' : null;
+
+        if (dir) {
+          audio.resume();  // unlock AudioContext on first input
+          if (dir !== lastDir) {
+            lastDir   = dir;
+            walkTimer = 0;
+            tryMove(dir);
+          } else {
+            walkTimer++;
+            if (walkTimer === WALK_INIT ||
+                (walkTimer > WALK_INIT && (walkTimer - WALK_INIT) % WALK_REP === 0)) {
+              tryMove(dir);
+            }
+          }
+        } else {
+          lastDir   = null;
+          walkTimer = 0;
+        }
+
+        // Interact
+        if (now.interact && !prevInput.interact) {
+          audio.resume();
+          checkEvents(playerX, playerY, 'onInteract');
+        }
+      }
+
+      // ── Render ──────────────────────────────────
+      renderer.clear('#1a2030');
+
+      renderer.drawLayer(mapData.ground,  MAP_W, MAP_H, 'ts_main', camera);
+      renderer.drawLayer(mapData.detail,  MAP_W, MAP_H, 'ts_main', camera);
+
+      // Draw player (below overhead layer)
+      var pScreen = camera.worldToScreen(playerX, playerY);
+      var anim    = ANIMS[playerFacing] || ANIMS.down;
+      var frameIdx= anim[Math.floor(animTick / 2) % anim.length];
+
+      // Draw player shadow
+      var ctx = renderer.ctx;
+      ctx.save();
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.ellipse(pScreen.x + TILE_SIZE/2, pScreen.y + TILE_SIZE - 2, 4, 2, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      playerAtlas.drawFrame(renderer.ctx, frameIdx, pScreen.x, pScreen.y);
+
+      // Draw NPC objects from map
+      // (none in test map — objects layer is empty)
+
+      // Overhead layer (trees, roofs, etc.)
+      renderer.drawLayer(mapData.overhead, MAP_W, MAP_H, 'ts_main', camera);
+
+      // Touch overlay + dialogue on top of everything
+      input.drawOverlay(renderer.ctx, canvas.width, canvas.height);
+      dialogue.draw();
+
+      // Draw a subtle tile-position grid hint for the interaction tile
+      for (var i = 0; i < EVENTS.length; i++) {
+        var evt = EVENTS[i];
+        if (evt.trigger === 'onInteract') {
+          var ep = camera.worldToScreen(evt.x, evt.y);
+          var ec = renderer.ctx;
+          ec.save();
+          ec.strokeStyle = 'rgba(155,140,255,0.35)';
+          ec.lineWidth   = 1;
+          ec.strokeRect(ep.x + 0.5, ep.y + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
+          ec.restore();
+        }
+      }
+
+      prevInput = now;
+    }
+
+    updateHUD();
+    checkEvents(playerX, playerY, 'onEnterOnce');  // check start tile events
+    requestAnimationFrame(frame);
+  }
+});
+</script>
+</body>
+</html>

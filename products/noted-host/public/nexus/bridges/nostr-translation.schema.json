@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nostr-translation.schema.json",
+  "type": "object",
+  "required": [
+    "id",
+    "sourceEnvelopeId",
+    "translationKind",
+    "nostrKind",
+    "tags",
+    "content",
+    "requiresSigning",
+    "requiresApproval"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "sourceEnvelopeId": {
+      "type": "string"
+    },
+    "translationKind": {
+      "type": "string"
+    },
+    "nostrKind": {
+      "type": "number"
+    },
+    "tags": {
+      "type": "array"
+    },
+    "content": {
+      "type": "string"
+    },
+    "requiresSigning": {
+      "type": "boolean"
+    },
+    "requiresApproval": {
+      "type": "boolean"
+    }
+  }
+}

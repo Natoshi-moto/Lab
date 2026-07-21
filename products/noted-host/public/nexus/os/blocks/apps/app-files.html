@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Files</title>
+<style>
+:root { color-scheme: dark; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 13px; }
+body { background: #111318; color: #d2d5de; display: flex; flex-direction: column; }
+#nx-boot-screen {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px;
+}
+#nx-boot-icon  { font-size: 40px; }
+#nx-boot-title { font-size: 15px; font-weight: 600; }
+#nx-boot-state { font-size: 10px; color: #6b7089; letter-spacing: 1px; margin-top: 4px; }
+#nx-app { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; }
+body.nx-mounted #nx-boot-screen { display: none; }
+body.nx-mounted #nx-app         { display: flex; }
+/* Scrollbars */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #262a35; border-radius: 3px; }
+/* Shared surface tokens */
+:root {
+  --bg: #08090c; --surface: #111318; --surface-2: #181b22; --surface-3: #1f222b;
+  --border: #262a35; --border-hi: #363b4a; --text: #d2d5de; --text-dim: #6b7089;
+  --text-muted: #3e4255; --accent: #4dbb7a; --accent-dim: rgba(77,187,122,.10);
+  --danger: #ef4444; --warn: #f59e0b; --info: #3b82f6; --radius: 6px;
+}
+
+#fb-toolbar {
+  padding: 6px 10px; border-bottom: 1px solid var(--border); display: flex;
+  gap: 6px; align-items: center; background: var(--surface-2); flex-shrink: 0; flex-wrap: wrap;
+}
+#fb-path { font-size: 11px; color: var(--text-dim); flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fb-btn {
+  font-size: 10px; padding: 3px 8px; border-radius: var(--radius); cursor: pointer;
+  background: var(--surface-3); border: 1px solid var(--border); color: var(--text-dim);
+  font-family: inherit; transition: all .12s; white-space: nowrap;
+}
+.fb-btn:hover { color: var(--accent); border-color: var(--accent); }
+#fb-list { flex: 1; overflow-y: auto; padding: 6px; }
+.fb-row {
+  display: flex; align-items: center; gap: 10px; padding: 7px 10px;
+  border-radius: var(--radius); cursor: pointer; transition: background .1s;
+  border: 1px solid transparent;
+}
+.fb-row:hover { background: var(--surface-2); border-color: var(--border); }
+.fb-row-icon { font-size: 16px; flex-shrink: 0; width: 24px; text-align: center; }
+.fb-row-name { flex: 1; font-size: 12px; color: var(--text); overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; }
+.fb-row-meta { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+.fb-row-launch { font-size: 10px; padding: 2px 7px; border-radius: 4px; cursor: pointer;
+  background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent);
+  font-family: inherit; display: none; transition: all .12s; }
+.fb-row:hover .fb-row-launch { display: block; }
+.fb-row-launch:hover { background: var(--accent); color: var(--bg); }
+#fb-status { padding: 6px 10px; border-top: 1px solid var(--border); font-size: 10px;
+  color: var(--text-muted); background: var(--surface-2); flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- Shown during protocol handshake -->
+<div id="nx-boot-screen">
+  <div id="nx-boot-icon">📂</div>
+  <div id="nx-boot-title">Files</div>
+  <div id="nx-boot-state">WAITING</div>
+</div>
+
+<!-- App UI — revealed on MOUNTED -->
+<div id="nx-app">
+  <div id="fb-toolbar">
+    <span id="fb-path">/ no folder mounted</span>
+    <button class="fb-btn" id="fb-up">↩ Up</button>
+    <button class="fb-btn" id="fb-refresh">⟳ Refresh</button>
+  </div>
+  <div id="fb-list"></div>
+  <div id="fb-status">0 items</div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+"use strict";
+// ══════════════════════════════════════════════════════════════
+//  Nexus OS — Managed Block  |  Files
+//  Uses engines/nexus-block-client.js for the kernel handshake.
+// ══════════════════════════════════════════════════════════════
+
+document.addEventListener("keydown", e => {
+  if ((e.key === "Delete" || e.key === "Backspace") && (e.target && (e.target.matches?.("input, textarea, [contenteditable=\"true\"]") || e.target.isContentEditable))) {
+    e.stopPropagation();
+  }
+}, true);
+
+const fbList   = document.getElementById("fb-list");
+const fbPath   = document.getElementById("fb-path");
+const fbStatus = document.getElementById("fb-status");
+let   currentPath = "";
+let   folderName  = "";
+let   _reqId = 0;
+
+function nextId() { return "fb-" + (++_reqId); }
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ["fs.list","fs.delete","fs.mkdir","fs.status","nexus.launch"],
+    consumes: ["fs.result","fs.mounted"],
+    app: {
+      title:       "Files",
+      icon:        "📂",
+      description: "Browse and manage local files",
+      visible:     true
+    }
+  },
+  onMessage({ channel, payload }) {
+    if (channel === "fs.mounted") {
+      folderName = payload.name || "folder";
+      loadPath("");
+      return;
+    }
+    if (channel !== "fs.result") return;
+    if (payload.requestChannel === "fs.status") {
+      if (payload.mounted) { folderName = payload.folderName || "folder"; loadPath(""); }
+      else fbPath.textContent = "/ no folder mounted";
+    }
+    if (payload.requestChannel === "fs.list") {
+      if (!payload.ok) { fbStatus.textContent = "error: " + payload.error; return; }
+      renderEntries(payload.path, payload.entries || []);
+    }
+    if (payload.requestChannel === "fs.delete") {
+      loadPath(currentPath);
+    }
+  }
+});
+
+if (nx) {
+  nx.ready.then(() => {
+    document.body.classList.add("nx-mounted");
+    nx.subscribe("fs.result");
+    nx.subscribe("fs.mounted");
+    nx.emit("fs.status", { _reqId: "init" });
+  });
+}
+
+function loadPath(path) {
+  currentPath = path;
+  fbPath.textContent = "/ " + (path ? folderName + "/" + path : folderName);
+  fbList.textContent = "";
+  fbStatus.textContent = "loading…";
+  if (nx) nx.emit("fs.list", { path, _reqId: nextId() });
+}
+
+function renderEntries(path, entries) {
+  fbList.textContent = "";
+  fbStatus.textContent = entries.length + " items";
+
+  if (path) {
+    const back = document.createElement("div");
+    back.className = "fb-row";
+    const ic = document.createElement("span"); ic.className = "fb-row-icon"; ic.textContent = "↩";
+    const nm = document.createElement("span"); nm.className = "fb-row-name"; nm.textContent = "..";
+    back.appendChild(ic); back.appendChild(nm);
+    back.onclick = () => {
+      const parts = path.split("/").filter(Boolean); parts.pop();
+      loadPath(parts.join("/"));
+    };
+    fbList.appendChild(back);
+  }
+
+  for (const entry of entries) {
+    const row  = document.createElement("div");
+    row.className = "fb-row";
+    const ic   = document.createElement("span"); ic.className = "fb-row-icon";
+    const nm   = document.createElement("span"); nm.className = "fb-row-name";
+    const meta = document.createElement("span"); meta.className = "fb-row-meta";
+    const isHtml = entry.kind === "file" && entry.name.toLowerCase().endsWith(".html");
+    ic.textContent   = entry.kind === "directory" ? "📂" : isHtml ? "◈" : "📄";
+    nm.textContent   = entry.name;
+    meta.textContent = entry.kind === "directory" ? "folder" :
+      entry.size ? (entry.size / 1024).toFixed(1) + " KB" : "";
+    row.appendChild(ic); row.appendChild(nm); row.appendChild(meta);
+
+    if (entry.kind === "directory") {
+      row.ondblclick = row.onclick = () => loadPath((path ? path + "/" : "") + entry.name);
+    } else if (isHtml) {
+      const launchBtn = document.createElement("button");
+      launchBtn.className = "fb-row-launch";
+      launchBtn.textContent = "Launch";
+      launchBtn.onclick = (e) => {
+        e.stopPropagation();
+        const fullPath = (path ? path + "/" : "") + entry.name;
+        if (nx) nx.emit("nexus.launch", { path: fullPath, title: entry.name.replace(".html",""), icon:"◈", legacy: true });
+      };
+      row.appendChild(launchBtn);
+    }
+    fbList.appendChild(row);
+  }
+}
+
+document.getElementById("fb-up").onclick = () => {
+  const parts = currentPath.split("/").filter(Boolean); parts.pop();
+  loadPath(parts.join("/"));
+};
+document.getElementById("fb-refresh").onclick = () => loadPath(currentPath);
+
+
+</script>
+</body>
+</html>

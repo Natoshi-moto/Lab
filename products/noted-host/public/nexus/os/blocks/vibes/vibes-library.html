@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibes Library</title>
+<style>
+:root {
+  --void:#09090c; --s1:#111116; --s2:#18181f; --s3:#222230;
+  --border:#2a2a3a; --border-hi:#3d3d58;
+  --ink:#f2eadb; --ink-2:#c8bda8; --ink-3:#8b8173;
+  --amber:#c9920a; --amber-glow:rgba(201,146,10,.12);
+  --green:#4dbb7a; --rose:#9b2335; --purple:#7c3aed; --teal:#0d7377;
+  --t-creature:#7c3aed; --t-environment:#0d7377; --t-attack:#c9920a;
+  --t-kin:#9b2335; --t-battle:#4dbb7a;
+  --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+  --display:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--void);color:var(--ink);font-family:var(--mono);font-size:13px;overflow:hidden}
+body{display:flex;flex-direction:column}
+
+/* ── Topbar ── */
+#top{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0}
+#title{font-family:var(--display);font-weight:700;letter-spacing:3px;font-size:13px;color:var(--amber)}
+#title-sub{color:var(--ink-3);letter-spacing:1px;font-size:10px}
+#count{margin-left:auto;color:var(--ink-2);font-size:10px;letter-spacing:1px}
+.tb-btn{background:var(--s2);border:1px solid var(--border);color:var(--ink);padding:5px 10px;font-family:var(--mono);font-size:10px;letter-spacing:.5px;cursor:pointer;border-radius:3px}
+.tb-btn:hover{border-color:var(--border-hi);background:var(--s3)}
+.tb-btn.primary{border-color:var(--amber);color:var(--amber);background:var(--amber-glow)}
+.tb-btn.primary:hover{background:rgba(201,146,10,.22)}
+
+/* ── Layout ── */
+#main{flex:1;display:grid;grid-template-columns:200px 1fr;min-height:0;overflow:hidden}
+#side{background:var(--s1);border-right:1px solid var(--border);overflow-y:auto;padding:12px 0}
+#side h4{font-family:var(--display);font-size:9px;letter-spacing:2px;color:var(--ink-3);padding:0 12px;margin:14px 0 6px;font-weight:600}
+#side h4:first-child{margin-top:0}
+.side-row{display:flex;align-items:center;gap:8px;padding:5px 12px;cursor:pointer;font-size:11px;color:var(--ink-2);border-left:2px solid transparent}
+.side-row:hover{color:var(--ink);background:rgba(255,255,255,.02)}
+.side-row.active{color:var(--ink);background:var(--s2);border-left-color:var(--amber)}
+.side-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--ink-3)}
+.side-dot.t-creature{background:var(--t-creature)} .side-dot.t-environment{background:var(--t-environment)}
+.side-dot.t-attack{background:var(--t-attack)} .side-dot.t-kin{background:var(--t-kin)}
+.side-dot.t-battle{background:var(--t-battle)}
+.side-count{margin-left:auto;color:var(--ink-3);font-size:9px}
+
+/* ── Body ── */
+#body{display:flex;flex-direction:column;overflow:hidden}
+#search-row{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--s1);align-items:center;flex-shrink:0}
+#search{flex:1;background:#050508;border:1px solid var(--border-hi);color:var(--ink);padding:7px 10px;font-family:var(--mono);font-size:12px;border-radius:3px;outline:none}
+#search:focus{border-color:var(--amber)}
+#sort{background:var(--s2);border:1px solid var(--border);color:var(--ink);padding:5px 8px;font-family:var(--mono);font-size:10px;border-radius:3px;cursor:pointer}
+
+#grid-wrap{flex:1;overflow-y:auto;padding:14px;background:var(--void)}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:border-color .12s,transform .12s}
+.card:hover{border-color:var(--border-hi);transform:translateY(-1px)}
+.card.selected{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber-glow)}
+.card-head{display:flex;align-items:center;gap:6px}
+.type-chip{font-size:8px;letter-spacing:1.2px;text-transform:uppercase;padding:2px 5px;border-radius:2px;font-weight:700}
+.type-chip.t-creature{background:rgba(124,58,237,.18);color:var(--t-creature);border:1px solid rgba(124,58,237,.35)}
+.type-chip.t-environment{background:rgba(13,115,119,.20);color:#3aa5a8;border:1px solid rgba(13,115,119,.40)}
+.type-chip.t-attack{background:rgba(201,146,10,.18);color:var(--amber);border:1px solid rgba(201,146,10,.35)}
+.type-chip.t-kin{background:rgba(155,35,53,.18);color:#d6526a;border:1px solid rgba(155,35,53,.35)}
+.type-chip.t-battle{background:rgba(77,187,122,.18);color:var(--green);border:1px solid rgba(77,187,122,.35)}
+.type-chip.t-world{background:rgba(77,187,122,.12);color:#8fd9aa;border:1px solid rgba(77,187,122,.25)}
+.type-chip.t-realm-charter{background:rgba(201,146,10,.12);color:var(--amber);border:1px solid rgba(201,146,10,.25)}
+.card-name{font-family:var(--display);font-weight:700;font-size:14px;color:var(--ink);letter-spacing:.5px;line-height:1.35;word-break:break-word;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+.card-meta{display:flex;flex-wrap:wrap;gap:4px;font-size:9px;color:var(--ink-3);margin-top:auto}
+.tag{background:var(--s3);border:1px solid var(--border);padding:1px 5px;border-radius:2px;font-size:8px;color:var(--ink-2)}
+.card-foot{font-size:9px;color:var(--ink-3);display:flex;justify-content:space-between;letter-spacing:.5px}
+
+/* ── Empty state ── */
+#empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--ink-2);height:100%}
+#empty.hidden{display:none}
+#empty-title{font-family:var(--display);font-size:18px;letter-spacing:2px;color:var(--ink);margin-bottom:8px}
+#empty-glyph{font-family:var(--display);font-size:38px;color:var(--amber);opacity:.75;margin-bottom:12px;text-shadow:0 0 24px var(--amber-glow)}
+#empty-sub{font-size:11px;color:var(--ink-3);margin-bottom:24px;max-width:420px;line-height:1.6}
+.empty-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+/* ── Detail panel (right slide-out) ── */
+#detail{position:absolute;top:0;right:0;bottom:0;width:340px;background:var(--s1);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .2s ease;display:flex;flex-direction:column;z-index:10}
+#detail.open{transform:translateX(0)}
+#detail-head{padding:14px;border-bottom:1px solid var(--border);background:var(--s2)}
+#detail-name{font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);letter-spacing:1px;margin-bottom:6px}
+#detail-meta{font-size:9px;color:var(--ink-3);letter-spacing:1px;line-height:1.5}
+#detail-body{flex:1;overflow-y:auto;padding:14px}
+#detail-close{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--ink-3);font-size:18px;cursor:pointer;line-height:1}
+#detail-close:hover{color:var(--ink)}
+.kv{display:grid;grid-template-columns:80px 1fr;gap:6px 12px;font-size:10px;margin-bottom:14px}
+.kv .k{color:var(--ink-3);letter-spacing:1px;text-transform:uppercase;font-size:9px}
+.kv .v{color:var(--ink-2);word-break:break-all}
+.kv .v code{font-family:var(--mono);background:var(--void);padding:1px 4px;border-radius:2px;color:var(--ink)}
+#detail-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+#tag-input{background:var(--void);border:1px solid var(--border);color:var(--ink);padding:4px 8px;font-family:var(--mono);font-size:10px;border-radius:2px;width:100%;outline:none;margin-bottom:14px}
+#tag-input:focus{border-color:var(--amber)}
+.detail-section h5{font-family:var(--display);font-size:9px;letter-spacing:2px;color:var(--ink-3);margin:14px 0 8px;font-weight:600}
+.lineage-row{font-size:10px;color:var(--ink-2);padding:4px 8px;background:var(--void);border:1px solid var(--border);border-radius:2px;margin-bottom:4px;cursor:pointer}
+.lineage-row:hover{border-color:var(--border-hi)}
+#detail-actions{padding:12px;border-top:1px solid var(--border);background:var(--s2);display:flex;gap:6px;flex-wrap:wrap}
+
+/* ── Drop zone overlay ── */
+#drop-overlay{position:fixed;inset:0;background:rgba(9,9,12,.92);display:none;align-items:center;justify-content:center;z-index:1000;border:3px dashed var(--amber);pointer-events:none}
+#drop-overlay.show{display:flex}
+#drop-overlay-text{font-family:var(--display);font-size:24px;color:var(--amber);letter-spacing:3px}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border-hi);color:var(--ink);padding:8px 16px;border-radius:3px;font-size:11px;z-index:500;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.show{opacity:1}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-hi)}
+</style>
+</head>
+<body>
+
+<div id="top">
+  <div id="title">VIBES LIBRARY</div>
+  <div id="title-sub">v1 · local · content-addressed</div>
+  <div id="count">— vibes</div>
+  <button class="tb-btn" id="btn-mount" style="display:none">⬢ Mount Folder</button>
+  <button class="tb-btn primary" id="btn-rescan">↻ Sync Folder</button>
+</div>
+
+<div id="main">
+  <aside id="side"></aside>
+  <div id="body">
+    <div id="search-row">
+      <input id="search" placeholder="search name, tag, type…" autocomplete="off">
+      <select id="sort">
+        <option value="recent">most recent</option>
+        <option value="name">name a–z</option>
+        <option value="type">type</option>
+        <option value="parents">most descendants</option>
+      </select>
+    </div>
+    <div id="grid-wrap">
+      <div id="grid"></div>
+      <div id="empty" class="hidden">
+        <div id="empty-glyph">▱</div>
+        <div id="empty-title">NO MOOTS COLLECTED</div>
+        <div id="empty-sub">
+          Walk a planet to encounter the creatures that have always been there.<br>
+          <span id="empty-instructions">Checking folder mount…</span>
+        </div>
+        <div class="empty-actions">
+          <button class="tb-btn primary" id="empty-mount">↻ Sync Folder</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="detail">
+  <button id="detail-close" title="close">×</button>
+  <div id="detail-head">
+    <div id="detail-name">—</div>
+    <div id="detail-meta">—</div>
+  </div>
+  <div id="detail-body">
+    <div class="detail-section">
+      <h5>METADATA</h5>
+      <div class="kv" id="detail-kv"></div>
+    </div>
+    <div class="detail-section">
+      <h5>TAGS</h5>
+      <div id="detail-tags"></div>
+      <input id="tag-input" placeholder="add tag, press enter">
+    </div>
+    <div class="detail-section">
+      <h5>LINEAGE</h5>
+      <div id="detail-lineage"></div>
+    </div>
+  </div>
+  <div id="detail-actions">
+    <button class="tb-btn" id="d-export">↓ Export</button>
+    <button class="tb-btn" id="d-copy-id">📋 Copy ID</button>
+    <button class="tb-btn" id="d-delete" style="color:#d6526a;border-color:rgba(155,35,53,.4)">⌫ Delete</button>
+  </div>
+</div>
+
+<div id="drop-overlay"><div id="drop-overlay-text">DROP TO IMPORT</div></div>
+<div id="toast"></div>
+
+<script src="../../engines/breed-engine.js"></script>
+<script src="../../engines/battle-engine.js"></script>
+<script src="../../engines/nexus-block-client.js"></script>
+<script src="../../engines/battle-protocol.js"></script>
+<script src="../../engines/witness-selection.js"></script>
+<script src="../../engines/eidolon-generator.js"></script>
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════════
+   VIBES LIBRARY — managed Nexus block
+   Owns: IndexedDB store, in-memory cache, FS bidi, vibe.* channel handlers
+   ════════════════════════════════════════════════════════════════════ */
+
+// ── Constants ──────────────────────────────────────────────────────
+const DB_NAME = 'VibesLibrary';
+const DB_VERSION = 3;
+const TYPE_FAMILIES = ['creature', 'creature-stub', 'environment', 'attack', 'kin', 'battle', 'battle-result', 'world', 'realm-charter'];
+const TYPES = TYPE_FAMILIES;
+const TYPE_LABELS = { creature:'Creatures', 'creature-stub':'Foreign Stubs', environment:'Environments', attack:'Attacks', kin:'Kin', battle:'Battles', 'battle-result':'Battle Results', world:'Worlds', 'realm-charter':'Realms' };
+const REALM_META_IMPORTED = 'realm_genesis_0_imported';
+const REALM_META_CURRENT = 'current_realm_id';
+const ATTESTATION_KIND = 30420;
+const BREED_OFFER_KIND = 30421;
+const BREED_COMMIT_KIND = 30422;
+const BREED_REVEAL_KIND = 30423;
+const BREED_RECEIPT_KIND = 30424;
+const BATTLE_INTENT_KIND = 30431;
+const BATTLE_COMMIT_KIND = 30432;
+const BATTLE_REVEAL_KIND = 30433;
+const BATTLE_RESULT_KIND = 30434;
+const WITNESS_AD_KIND = 30450;
+const BUILTIN_REALM_GENESIS_0 = {"format":"vibe/1","id":"v_realm_c85fe8b5cb6941eb","type":"realm-charter/1","name":"Genesis Realm","tags":["realm","genesis","season:s0","ruleset:eidolon-core@1.2"],"parents":[],"birthHash":"sha256:c85fe8b5cb6941eba828ae7b633207fa788c97770594d529da6d032e7a426ee9","createdAt":"2026-05-04T00:00:00.000Z","source":"builtin","payload":{"realm_id":"realm_genesis_0","season":"s0","ruleset":{"id":"eidolon-core","version":"1.2"},"ruleset_hash":"sha256:d2d9728ead1542f1b216b988bd93a8dc4e678b0e3ea6350661b8674cd212ec39","engine_hash":"sha256:79cd0f7ce56120d4aee1aa6616e94c1adbda58d164ffd444e4201e2215ef65a9","substrate_epoch":1,"gen1_policy":{"method":"open","notes":"open Gen-1 admission for genesis season"},"created_at":"2026-05-04T00:00:00.000Z","notes":"Canonical genesis realm. Open admission. Ruleset: eidolon-core v1.2 with PHANTIVEX-verified platform battle engine."}};
+
+// ── State ──────────────────────────────────────────────────────────
+let db = null;
+let port = null; // legacy standalone sentinel; IPC now uses NexusBlockClient.
+let mounted = false;
+let nx = null;
+let currentRealmId = null;
+const cache = new Map();         // id -> envelope
+const subs = [];                 // array of {filter, blockId} from external blocks
+let filterType = null;           // null = all
+let filterTag = null;
+let searchQ = '';
+let sortBy = 'recent';
+let selectedId = null;
+let fsAvailable = false;
+let folderName = null;
+const attRelay = { active:false, sockets:new Map(), timers:new Map(), subId:null, realm:null, reconnects:new Map(), secp:null };
+const breedState = { offers:new Map(), messages:[], receipts:new Map(), waiters:[] };
+const battleState = { intents:new Map(), messages:[], results:new Map(), waiters:[], witnessPool:new Map() };
+
+// ── Logging ────────────────────────────────────────────────────────
+function log(m, lvl='info') { console.log(`[vibes-library:${lvl}]`, m); }
+
+// ── Canonical hash (matches adapter) ───────────────────────────────
+function canonical(v) {
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';
+  return '{' + Object.keys(v).sort().map(k => JSON.stringify(k)+':'+canonical(v[k])).join(',') + '}';
+}
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function typeFamily(type) {
+  const raw = String(type || '').trim();
+  if (!raw) return 'creature';
+  if (raw.startsWith('realm-charter')) return 'realm-charter';
+  if (raw.startsWith('creature-stub')) return 'creature-stub';
+  if (raw.startsWith('battle-result')) return 'battle-result';
+  return raw.split('/')[0];
+}
+function matchesType(env, queryType) {
+  if (!queryType) return true;
+  const q = String(queryType).trim();
+  const fam = typeFamily(env.type);
+  if (q === 'creature/*') return fam === 'creature' || fam === 'creature-stub' || String(env.type||'').startsWith('creature/');
+  if (q.endsWith('/*')) {
+    const prefix = q.slice(0, -1);
+    return String(env.type || '').startsWith(prefix);
+  }
+  return env.type === q || fam === q;
+}
+function isRealmRequiredType(type) {
+  const fam = typeFamily(type);
+  return fam === 'creature' || fam === 'creature-stub' || fam === 'world';
+}
+function getRealmIdFromCharter(env) {
+  return env && env.payload && typeof env.payload.realm_id === 'string' ? env.payload.realm_id : null;
+}
+function realmCharters() {
+  return Array.from(cache.values()).filter(e => e.type === 'realm-charter/1' && getRealmIdFromCharter(e));
+}
+function findCharterByRealmId(realmId) {
+  return realmCharters().find(e => getRealmIdFromCharter(e) === realmId) || null;
+}
+async function normalizeRealmForSave(env) {
+  if (!env || !env.type) return { ok:false, error:'invalid envelope' };
+  if (isRealmRequiredType(env.type)) {
+    env.realm = String(env.realm || currentRealmId || '').trim();
+    if (!env.realm) return { ok:false, error:'realm required' };
+  } else if (env.realm !== undefined && env.realm !== null) {
+    env.realm = String(env.realm).trim() || undefined;
+  }
+  return { ok:true, envelope: env };
+}
+async function contentAddressForEnvelopeBody(env) {
+  const body = {
+    format: env.format || 'vibe/1',
+    type: env.type,
+    subFormat: env.subFormat || null,
+    name: env.name || null,
+    tags: Array.isArray(env.tags) ? env.tags : [],
+    parents: Array.isArray(env.parents) ? env.parents : [],
+    birthHash: env.birthHash || null,
+    payload: env.payload
+  };
+  return 'sha256:' + await sha256Hex(canonical(body));
+}
+function stripExternalRef(ref) {
+  const s = String(ref || '').trim();
+  return s.startsWith('external:') ? s.slice(9) : s;
+}
+function refCandidates(ref) {
+  const raw = stripExternalRef(ref);
+  const out = new Set([raw, String(ref || '').trim()]);
+  if (raw.startsWith('sha256:')) out.add(raw.slice(7));
+  else if (/^[0-9a-f]{32,}$/i.test(raw)) out.add('sha256:' + raw);
+  return Array.from(out).filter(Boolean);
+}
+function getCreatureHash(env) {
+  if (!env) return null;
+  return env.content_hash || env.content_addr || (env.payload && env.payload.creature_hash) || null;
+}
+function getAttestations(env) {
+  const a = Array.isArray(env && env.attestations) ? env.attestations : [];
+  const b = Array.isArray(env && env.payload && env.payload.attestations) ? env.payload.attestations : [];
+  const seen = new Set(), out = [];
+  for (const x of [...a, ...b]) {
+    if (!x) continue;
+    const key = x.event_id || `${x.pubkey}:${x.ts}`;
+    if (seen.has(key)) continue;
+    seen.add(key); out.push(x);
+  }
+  return out;
+}
+
+function ensureSlots(env) {
+  if (!env || typeFamily(env.type) !== 'creature') return env;
+  env.payload = env.payload || {};
+  const slots = env.payload.slots && typeof env.payload.slots === 'object' ? env.payload.slots : { total: 3, consumed: [] };
+  slots.total = Number.isFinite(Number(slots.total)) ? Number(slots.total) : 3;
+  const consumed = Array.isArray(slots.consumed) ? slots.consumed : [];
+  slots.consumed = consumed.map(x => typeof x === 'string' ? { id:x, type:'unknown', ts:null } : x).filter(Boolean).slice(0, slots.total);
+  env.payload.slots = slots;
+  return env;
+}
+function slotsRemaining(env) {
+  ensureSlots(env);
+  const slots = env && env.payload && env.payload.slots;
+  return slots ? Math.max(0, Number(slots.total||0) - (slots.consumed||[]).length) : 0;
+}
+function slotSpent(env) { return slotsRemaining(env) <= 0; }
+function consumeSlot(env, ref) {
+  ensureSlots(env);
+  const slots = env.payload.slots;
+  if (slotSpent(env)) return {ok:false, error:'creature spent'};
+  const id = String(ref && (ref.id || ref.battle_id || ref.imprint_id) || ref || '').trim();
+  if (!id) return {ok:false, error:'slot consumption id required'};
+  if (!slots.consumed.some(x => (x.id || x.battle_id || x.imprint_id) === id)) {
+    const ts = finiteNumber(ref && ref.ts);
+    if (ts == null) return {ok:false, error:'slot_ts_required'};
+    slots.consumed.push({id, type:(ref&&ref.type)||'unknown', ts});
+  }
+  return {ok:true, remaining: slotsRemaining(env)};
+}
+function creatureSlotReport(env) {
+  ensureSlots(env);
+  const slots = env.payload.slots;
+  return {ok:true, total:slots.total, remaining:slotsRemaining(env), consumed_for:(slots.consumed||[]).map(x => ({battle_id:x.battle_id || (x.type==='battle'?x.id:null), imprint_id:x.imprint_id || (x.type==='imprint'?x.id:null), id:x.id, type:x.type||'unknown', ts:x.ts||null}))};
+}
+function normalizeHashRefMaybe(x){ return x ? normalizeHashRef(x) : null; }
+function stubMatchesRef(stub, ref) {
+  if (!stub || typeFamily(stub.type) !== 'creature-stub') return false;
+  const candidates = new Set(refCandidates(ref));
+  const vals = [stub.id, stub.birthHash, stub.content_hash, stub.content_addr, getCreatureHash(stub), stub.payload && stub.payload.creature_hash];
+  for (const v of vals) for (const c of refCandidates(v)) if (candidates.has(c)) return true;
+  return false;
+}
+function findStubByRef(ref) {
+  for (const env of cache.values()) if (stubMatchesRef(env, ref)) return env;
+  return null;
+}
+function findVibeByCreatureHash(hash) {
+  if (!hash) return null;
+  const candidates = new Set(refCandidates(hash));
+  for (const env of cache.values()) {
+    const vals = [env.content_hash, env.content_addr, getCreatureHash(env), env.birthHash, env.id];
+    for (const v of vals) for (const c of refCandidates(v)) if (candidates.has(c)) return env;
+  }
+  return null;
+}
+function findStubByCreatureHash(hash) {
+  if (!hash) return null;
+  const candidates = new Set(refCandidates(hash));
+  for (const env of cache.values()) {
+    if (typeFamily(env.type) !== 'creature-stub') continue;
+    const vals = [env.content_hash, env.content_addr, getCreatureHash(env), env.birthHash, env.id];
+    for (const v of vals) for (const c of refCandidates(v)) if (candidates.has(c)) return env;
+  }
+  return null;
+}
+function resolveParentRef(ref) {
+  if (!ref) return null;
+  if (typeof ref === 'object') ref = ref.id || ref.birthHash || ref.nonce || ref.hash || ref.creature_hash;
+  const raw = stripExternalRef(ref);
+  if (!raw) return null;
+  if (cache.has(raw)) return raw;
+  const stub = findStubByRef(raw);
+  if (stub) return stub.id;
+  return `external:${raw}`;
+}
+function resolveParentRefs(refs) {
+  const out = [];
+  for (const r of (Array.isArray(refs) ? refs : [])) {
+    const id = resolveParentRef(r);
+    if (id && !out.includes(id)) out.push(id);
+    if (out.length >= 16) break;
+  }
+  return out;
+}
+function deriveParentsFromPayload(payload) {
+  if (!payload || typeof payload !== 'object') return [];
+  const raw = Array.isArray(payload.lineage) ? payload.lineage
+            : Array.isArray(payload.parents) ? payload.parents
+            : [];
+  return resolveParentRefs(raw);
+}
+async function forwardResolveExternalRefs(resolverEnv) {
+  const resolverId = resolverEnv && resolverEnv.id;
+  if (!resolverId) return 0;
+  let changed = 0;
+  for (const env of Array.from(cache.values())) {
+    if (!Array.isArray(env.parents) || env.id === resolverId) continue;
+    let dirty = false;
+    const next = env.parents.map(p => {
+      if (String(p || '').startsWith('external:') && stubMatchesRef(resolverEnv, p)) { dirty = true; return resolverId; }
+      return p;
+    });
+    if (!dirty) continue;
+    env.parents = Array.from(new Set(next));
+    if (env.payload && Array.isArray(env.payload.parents)) env.payload.parents = env.parents.slice();
+    cache.set(env.id, env);
+    await putVibe(env).catch(e => log(`parent forward-resolve failed: ${e.message}`, 'warn'));
+    await writeLineageEdges(env).catch(()=>{});
+    changed++;
+  }
+  if (changed) notify('tag', resolverEnv);
+  return changed;
+}
+async function verifyCreatureIntegrity(payload) {
+  if (!payload || typeof payload !== 'object') return { ok:true };
+  const claimed = payload.birthHash || payload.birth_hash || payload.id || null;
+  if (!claimed || !payload.nonce || !Array.isArray(payload.dna)) return { ok:true };
+  const expected = await sha256Hex(canonical({ nonce: payload.nonce, dna: payload.dna }));
+  const normalized = String(claimed).replace(/^sha256:/, '');
+  if (normalized !== expected) return { ok:false, error:'birthHash mismatch' };
+  return { ok:true };
+}
+function extractJsonScript(text, id) {
+  const re = new RegExp(`<script[^>]+id=["']${id}["'][^>]*>([\\s\\S]*?)<\\/script>`, 'i');
+  const m = String(text).match(re);
+  if (!m) return null;
+  try { return JSON.parse(m[1]); } catch (_) { return null; }
+}
+function parseEidolonHtml(text, fname) {
+  const dnaBlock = extractJsonScript(text, 'creature-dna');
+  if (dnaBlock && typeof dnaBlock === 'object') return dnaBlock;
+  const str = String(text);
+  const pick = (...patterns) => {
+    for (const pat of patterns) {
+      const m = str.match(pat);
+      if (m) return m[1];
+    }
+    return null;
+  };
+  const nonce = pick(/GENESIS_NONCE\s*=\s*['"]([^'"]+)['"]/i, /nonce['"]?\s*[:=]\s*['"]([^'"]+)['"]/i);
+  const birthHash = pick(/GENESIS_BIRTH_HASH\s*=\s*['"]([^'"]+)['"]/i, /birthHash['"]?\s*[:=]\s*['"]([^'"]+)['"]/i);
+  const dnaRaw = pick(/GENESIS_DNA\s*=\s*\[([^\]]+)\]/i, /GENESIS_DNA\s*=\s*['"]([^'"]+)['"]/i, /dna['"]?\s*[:=]\s*\[([^\]]+)\]/i);
+  if (!nonce || !dnaRaw) return null;
+  const dna = dnaRaw.split(',').map(x => parseInt(String(x).trim(), 10)).filter(n => Number.isFinite(n));
+  if (!dna.length) return null;
+  const huesRaw = pick(/GENESIS_HUES\s*=\s*\[([^\]]+)\]/i, /GENESIS_HUES\s*=\s*['"]([^'"]+)['"]/i, /hues['"]?\s*[:=]\s*\[([^\]]+)\]/i);
+  const hues = huesRaw ? huesRaw.split(',').map(x => Number(String(x).trim())).filter(n => Number.isFinite(n)) : [];
+  return {
+    name: fname.replace(/\.html$/i, ''),
+    nonce,
+    birthHash: birthHash || null,
+    dna,
+    hues,
+    lineage: []
+  };
+}
+async function prepareImportedCreatureEnvelope(input, fname, subtype) {
+  const payload = input && input.format && input.payload ? input.payload : input;
+  const integrity = await verifyCreatureIntegrity(payload);
+  if (!integrity.ok) throw new Error(integrity.error);
+  const parents = deriveParentsFromPayload(payload);
+  const base = {
+    format: 'vibe/1',
+    type: 'creature/eidolon-1',
+    subFormat: subtype || 'eidolon-creature/1',
+    name: String((input && input.name) || payload.name || fname.replace(/\.[^.]+$/, '')).slice(0, 96),
+    tags: Array.isArray(input && input.tags) ? input.tags.slice(0, 32).map(String)
+          : Array.isArray(payload.tags) ? payload.tags.slice(0, 32).map(String)
+          : [],
+    parents,
+    birthHash: payload.birthHash || payload.birth_hash || (input && input.birthHash) || null,
+    createdAt: (input && input.createdAt) || payload.createdAt || payload.timestamp || new Date().toISOString(), // METADATA: display only, not content-addressed
+    source: 'import',
+    realm: currentRealmId || null,
+    payload
+  };
+  ensureSlots(base);
+  const contentAddr = await contentAddressForEnvelopeBody(base);
+  base.id = `v_creature_${contentAddr.slice(7, 23)}`;
+  base.content_addr = contentAddr;
+  base.content_hash = contentAddr;
+  const matchingStub = findStubByCreatureHash(contentAddr);
+  if (matchingStub) {
+    base.id = matchingStub.id;
+    base.attestations = getAttestations(matchingStub);
+    base._promoteStub = matchingStub.id;
+  }
+  const norm = await normalizeRealmForSave(base);
+  if (!norm.ok) throw new Error(norm.error);
+  if (!base.birthHash) base.birthHash = contentAddr;
+  base.attestation = 'deferred';
+  return base;
+}
+
+async function loadSecpForNostr() {
+  if (attRelay.secp) return attRelay.secp;
+  for (const src of ['./libs/secp256k1.js','https://esm.sh/@noble/curves@1.4.0/secp256k1?bundle']) {
+    try {
+      const mod = await import(src);
+      const raw = mod.schnorr ? mod : (mod.default && mod.default.schnorr ? mod.default : mod);
+      if (raw && raw.schnorr && raw.schnorr.sign && raw.schnorr.verify) return raw;
+    } catch (_) {}
+  }
+  throw new Error('nostr signer unavailable');
+}
+function hexToBytes(h) {
+  return new Uint8Array(String(h).match(/.{1,2}/g).map(b => parseInt(b, 16)));
+}
+function bytesToHex(b) {
+  return Array.from(b).map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function loadNostrIdentity() {
+  const keys = ['nx.soc.identity', 'nx.forum.identity', 'nx.channels.identity', 'nx.iww.identity'];
+  for (const key of keys) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const id = JSON.parse(raw);
+      const priv = id.privkey || id.priv || id.secret || null;
+      const pub = id.pubkey || id.pub || null;
+      if (priv && pub && /^[0-9a-f]{64}$/i.test(priv) && /^[0-9a-f]{64}$/i.test(pub)) return { privkey: priv, pubkey: pub, source: key };
+    } catch (_) {}
+  }
+  return null;
+}
+function loadNostrRelays() {
+  const defaults = ['wss://relay.damus.io','wss://nos.lol','wss://relay.nostr.band'];
+  try {
+    const raw = localStorage.getItem('nx.soc.relays') || localStorage.getItem('nx.channels.relays');
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (Array.isArray(parsed) && parsed.length) return parsed.map(String).slice(0, 8);
+  } catch (_) {}
+  return defaults;
+}
+async function signNostrEvent(kind, tags, contentObj, ident, opts = {}) {
+  const secp = await loadSecpForNostr();
+  const createdAt = finiteNumber(opts.created_at);
+  if (createdAt == null) throw new Error('created_at_required');
+  const ev = {
+    pubkey: ident.pubkey,
+    created_at: Math.floor(createdAt),
+    kind,
+    tags,
+    content: typeof contentObj === 'string' ? contentObj : JSON.stringify(contentObj || {})
+  };
+  ev.id = await sha256Hex(JSON.stringify([0, ev.pubkey, ev.created_at, ev.kind, ev.tags, ev.content]));
+  ev.sig = bytesToHex(secp.schnorr.sign(ev.id, ident.privkey));
+  return ev;
+}
+async function signProtocolMessage(unsigned, ident) {
+  const secp = await loadSecpForNostr();
+  const body = Object.assign({}, unsigned, {pubkey: ident.pubkey});
+  const msgHash = await sha256Hex(canonical(body));
+  body.sig = bytesToHex(secp.schnorr.sign(msgHash, ident.privkey));
+  return body;
+}
+async function verifyProtocolMessage(msg, pubkey) {
+  if (!msg || !msg.sig || !pubkey || msg.pubkey !== pubkey) return false;
+  const secp = await loadSecpForNostr();
+  const body = Object.assign({}, msg);
+  delete body.sig;
+  const msgHash = await sha256Hex(canonical(body));
+  return !!secp.schnorr.verify(msg.sig, msgHash, pubkey);
+}
+async function buildBirthAttestationEvent(env, ident) {
+  const contentAddr = env.content_addr || await contentAddressForEnvelopeBody(env);
+  const generation = Math.max(1, (env.parents || []).length + 1);
+  const attestationTs = msFromCreatedAt(env.createdAt) || await stampFromCanonical({contentAddr, generation, parents:env.parents || []});
+  const content = {
+    creature_hash: contentAddr,
+    realm_id: env.realm || currentRealmId || null,
+    generation,
+    parents: env.parents || [],
+    ts: attestationTs
+  };
+  const tags = [
+    ['d', contentAddr],
+    ['realm', content.realm_id || ''],
+    ['gen', String(generation)],
+    ['parents', ...(env.parents || [])]
+  ];
+  if (Array.isArray(env.ancestor_event_ids) && env.ancestor_event_ids.length) tags.push(['e', ...env.ancestor_event_ids]);
+  return signNostrEvent(ATTESTATION_KIND, tags, content, ident, {created_at: Math.floor(content.ts / 1000)});
+}
+function publishNostrEvent(ev, relays) {
+  return new Promise(resolve => {
+    if (typeof WebSocket === 'undefined') return resolve({published:0, event:ev, reason:'websocket unavailable'});
+    let published = 0;
+    let remaining = relays.length;
+    if (!remaining) return resolve({published:0, event:ev});
+    const finish = () => { if (--remaining <= 0) resolve({published, event:ev}); };
+    for (const url of relays) {
+      let ws;
+      try {
+        ws = new WebSocket(url);
+        const done = () => { try { ws.close(); } catch (_) {} finish(); };
+        const timer = setTimeout(done, 2500);
+        ws.onopen = () => { try { ws.send(JSON.stringify(['EVENT', ev])); published++; } catch (_) {} clearTimeout(timer); done(); };
+        ws.onerror = () => { clearTimeout(timer); done(); };
+        ws.onclose = () => { clearTimeout(timer); };
+      } catch (_) { finish(); }
+    }
+  });
+}
+async function attestVibe(env) {
+  if (!env || typeFamily(env.type) !== 'creature') return {ok:false, error:'not a creature'};
+  const ident = loadNostrIdentity();
+  if (!ident) {
+    env.attestation = 'deferred';
+    return {ok:false, error:'nostr identity unavailable'};
+  }
+  const ev = await buildBirthAttestationEvent(env, ident);
+  const pub = await publishNostrEvent(ev, loadNostrRelays());
+  env.attestation = pub.published > 0 ? 'published' : 'deferred';
+  env.attestation_event = ev;
+  env.attestation_event_id = ev.id;
+  env.attestation_published = pub.published;
+  cache.set(env.id, env);
+  await putVibe(env);
+  return {ok:true, event:ev, published:pub.published};
+}
+
+function tagValues(ev, name) {
+  const out = [];
+  for (const t of ev && Array.isArray(ev.tags) ? ev.tags : []) {
+    if (Array.isArray(t) && t[0] === name) out.push(...t.slice(1));
+  }
+  return out;
+}
+function tagValue(ev, name) { return tagValues(ev, name)[0] || null; }
+function finiteNumber(v) { if (v === null || v === undefined || v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : null; }
+function eventCreatedAtMs(ev) { const n = finiteNumber(ev && ev.created_at); return n == null ? null : n * 1000; }
+function isoFromMs(ms) { const n = finiteNumber(ms); return n == null ? null : new Date(n).toISOString(); }
+function msFromCreatedAt(value) { if (!value) return null; const n = Date.parse(String(value)); return Number.isFinite(n) ? n : null; }
+function stampFromHexRef(ref) {
+  const hex = String(ref || '').replace(/^sha256:/, '').replace(/[^0-9a-f]/gi, '').slice(0, 12);
+  return hex.length ? parseInt(hex.padEnd(12, '0'), 16) : null;
+}
+async function stampFromCanonical(input) { return parseInt((await sha256Hex(canonical(input))).slice(0, 12), 16); }
+function requiredNonce(req) { const nonce = String(req && (req.nonce || req.intent_nonce || req.offer_nonce) || '').trim(); return nonce || null; }
+function requiredMs(value, code) { const n = finiteNumber(value); if (n == null) throw new Error(code || 'timestamp_required'); return n; }
+async function verifyNostrEvent(ev) {
+  const allowedKinds = new Set([ATTESTATION_KIND, BREED_OFFER_KIND, BREED_COMMIT_KIND, BREED_REVEAL_KIND, BREED_RECEIPT_KIND, BATTLE_INTENT_KIND, BATTLE_COMMIT_KIND, BATTLE_REVEAL_KIND, BATTLE_RESULT_KIND]);
+  if (!ev || !allowedKinds.has(ev.kind) || !ev.id || !ev.pubkey || !ev.sig) return false;
+  const computed = await sha256Hex(JSON.stringify([0, ev.pubkey, ev.created_at, ev.kind, ev.tags || [], ev.content || '']));
+  if (computed !== ev.id) return false;
+  const secp = attRelay.secp || await loadSecpForNostr();
+  attRelay.secp = secp;
+  return !!secp.schnorr.verify(ev.sig, ev.id, ev.pubkey);
+}
+function parseAttestationContent(ev) {
+  let content = {};
+  try { content = ev.content ? JSON.parse(ev.content) : {}; } catch (_) { return null; }
+  const creatureHash = content.creature_hash || content.content_hash || tagValue(ev, 'd');
+  const realmId = content.realm_id || tagValue(ev, 'realm') || null;
+  const genRaw = content.generation ?? tagValue(ev, 'gen') ?? 1;
+  const parents = Array.isArray(content.parents) ? content.parents : tagValues(ev, 'parents');
+  return {
+    creature_hash: creatureHash,
+    realm_id: realmId,
+    generation: Math.max(0, parseInt(genRaw, 10) || 0),
+    parents,
+    ts: finiteNumber(content.ts) ?? eventCreatedAtMs(ev)
+  };
+}
+async function augmentAttestation(env, ev, ts) {
+  const list = getAttestations(env);
+  if (!list.some(a => a.event_id === ev.id)) {
+    const attTs = finiteNumber(ts) ?? eventCreatedAtMs(ev);
+    if (attTs == null) throw new Error('created_at_required');
+    list.push({ pubkey: ev.pubkey, event_id: ev.id, ts: attTs });
+  }
+  env.attestations = list;
+  if (env.payload && typeof env.payload === 'object' && typeFamily(env.type) === 'creature-stub') env.payload.attestations = list;
+  cache.set(env.id, env);
+  await putVibe(env);
+  notify('tag', env);
+  if (selectedId === env.id) renderDetail();
+  render();
+  return env;
+}
+async function createForeignCreatureStub(data, ev) {
+  const stem = await sha256Hex(canonical({ creature_hash:data.creature_hash, first_attester:ev.pubkey }));
+  const parents = resolveParentRefs(data.parents || []);
+  const attTs = finiteNumber(data.ts) ?? eventCreatedAtMs(ev);
+  if (attTs == null) throw new Error('created_at_required');
+  const att = [{ pubkey: ev.pubkey, event_id: ev.id, ts: attTs }];
+  const env = {
+    format: 'vibe/1',
+    type: 'creature-stub/1',
+    id: `v_stub_${stem.slice(0, 18)}`,
+    name: `Foreign creature ${String(data.creature_hash || stem).replace(/^sha256:/,'').slice(0, 10)}`,
+    tags: ['foreign', 'attested'],
+    parents,
+    birthHash: data.creature_hash,
+    createdAt: isoFromMs(data.ts) || isoFromMs(eventCreatedAtMs(ev)) || '1970-01-01T00:00:00.000Z',
+    source: 'nostr',
+    realm: data.realm_id || currentRealmId || null,
+    content_hash: data.creature_hash,
+    content_addr: data.creature_hash,
+    attestations: att,
+    payload: {
+      creature_hash: data.creature_hash,
+      generation: data.generation || Math.max(1, parents.length + 1),
+      parents,
+      attestations: att,
+      discovered_at: new Date().toISOString(), // METADATA: display only, not content-addressed
+      full_artifact: false
+    }
+  };
+  const norm = await normalizeRealmForSave(env);
+  if (!norm.ok) throw new Error(norm.error);
+  cache.set(env.id, env);
+  await putVibe(env);
+  await writeLineageEdges(env);
+  await forwardResolveExternalRefs(env);
+  notify('save', env);
+  render();
+  return env;
+}
+async function handleNostrAttestationEvent(ev, relayUrl) {
+  try {
+    if (!(await verifyNostrEvent(ev))) return false;
+    const data = parseAttestationContent(ev);
+    if (!data || !data.creature_hash) return false;
+    if (currentRealmId && data.realm_id && data.realm_id !== currentRealmId) return false;
+    let local = findVibeByCreatureHash(data.creature_hash);
+    if (local) {
+      await augmentAttestation(local, ev, data.ts);
+      return true;
+    }
+    await createForeignCreatureStub(data, ev);
+    log(`foreign attestation imported from ${relayUrl || 'relay'}: ${data.creature_hash}`);
+    return true;
+  } catch (e) {
+    log(`attestation receive failed: ${e.message}`, 'warn');
+    return false;
+  }
+}
+
+function parseBreedContent(ev) {
+  try { return ev.content ? JSON.parse(ev.content) : {}; } catch (_) { return {}; }
+}
+function normalizeHashRef(v) {
+  const s = String(v || '').trim();
+  if (!s) return null;
+  if (s.startsWith('sha256:')) return s;
+  if (/^[0-9a-f]{32,}$/i.test(s)) return 'sha256:' + s;
+  return s;
+}
+function findCreatureByIdOrHash(ref) {
+  if (!ref) return null;
+  const s = String(ref).trim();
+  if (cache.has(s)) return cache.get(s);
+  return findVibeByCreatureHash(s);
+}
+function extractDnaAndHues(env) {
+  const p = env && env.payload ? env.payload : {};
+  const dna = Array.isArray(p.dna) ? p.dna : Array.isArray(p.genes) ? p.genes : Array.isArray(p.genome) ? p.genome : null;
+  const hues = Array.isArray(p.hues) ? p.hues : Array.isArray(p.palette) ? p.palette : [];
+  if (!dna || dna.length < 16) return null;
+  return { dna: dna.slice(0, 16), hues: hues.slice ? hues.slice(0, 4) : [] };
+}
+async function twinHash(twin) { return 'sha256:' + await sha256Hex(canonical(twin)); }
+function ownNostrPubkey() { const id = loadNostrIdentity(); return id && id.pubkey; }
+function upsertBreedOffer(ev) {
+  const content = parseBreedContent(ev);
+  const offerId = tagValue(ev, 'd') || content.offer_id || ev.id;
+  const offer = {
+    id: offerId,
+    event_id: ev.id,
+    pubkey: ev.pubkey,
+    parent_a: tagValue(ev, 'parent_a') || content.parent_a,
+    parent_b: tagValue(ev, 'parent_b') || content.parent_b,
+    partner: tagValue(ev, 'partner') || content.partner,
+    realm: tagValue(ev, 'realm') || content.realm_id || null,
+    expires: Number(tagValue(ev, 'expires') || content.expires || 0),
+    ts: ev.created_at * 1000,
+    status: 'offered'
+  };
+  breedState.offers.set(offerId, offer);
+  return offer;
+}
+async function handleNostrBreedOfferEvent(ev, relayUrl) {
+  try {
+    if (!(await verifyNostrEvent(ev))) return false;
+    const offer = upsertBreedOffer(ev);
+    const me = ownNostrPubkey();
+    if (offer.partner && me && offer.partner !== me) { breedState.offers.delete(offer.id); return false; }
+    if (currentRealmId && offer.realm && offer.realm !== currentRealmId) { breedState.offers.delete(offer.id); return false; }
+    log(`breed offer seen ${offer.id} from ${relayUrl || 'relay'}`);
+    return true;
+  } catch (e) { log(`breed offer failed: ${e.message}`, 'warn'); return false; }
+}
+function pushBreedProtocolMessage(ev) {
+  const msg = parseBreedContent(ev);
+  msg.event_id = ev.id;
+  msg.event_pubkey = ev.pubkey;
+  if (!msg.pubkey) msg.pubkey = ev.pubkey;
+  breedState.messages.push(msg);
+  const waiters = breedState.waiters.slice();
+  for (const w of waiters) {
+    try {
+      if (w.predicate(msg)) { clearTimeout(w.timer); breedState.waiters = breedState.waiters.filter(x => x !== w); w.resolve(msg); }
+    } catch (_) {}
+  }
+  return msg;
+}
+async function handleNostrBreedProtocolEvent(ev) {
+  try {
+    if (!(await verifyNostrEvent(ev))) return false;
+    pushBreedProtocolMessage(ev);
+    return true;
+  } catch (e) { log(`breed protocol event failed: ${e.message}`, 'warn'); return false; }
+}
+function awaitBreedMessage(predicate, opts = {}) {
+  for (const m of breedState.messages) if (predicate(m)) return Promise.resolve(m);
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      breedState.waiters = breedState.waiters.filter(w => w.resolve !== resolve);
+      reject(new Error(`timeout:${opts.phase || 'message'}`));
+    }, opts.timeout || 15000);
+    breedState.waiters.push({predicate, resolve, reject, timer});
+  });
+}
+async function publishBreedProtocolMessage(msg, kind) {
+  const ident = loadNostrIdentity();
+  if (!ident) throw new Error('nostr identity unavailable');
+  const ev = await signNostrEvent(kind, [['d', msg.contextTag], ['partner', msg.partnerPubkey || ''], ['realm', currentRealmId || '']], msg, ident, {created_at: Math.floor(requiredMs(msg.ts, 'message_ts_required') / 1000)});
+  await publishNostrEvent(ev, loadNostrRelays());
+  pushBreedProtocolMessage(Object.assign({}, ev, {content: JSON.stringify(msg)}));
+  return ev;
+}
+async function handleBreedOffer(req) {
+  const ident = loadNostrIdentity();
+  if (!ident) return {ok:false, error:'nostr identity unavailable'};
+  const parentA = findCreatureByIdOrHash(req.parent_a || req.parentA || req.parent_a_hash);
+  const parentAHash = normalizeHashRef(req.parent_a_hash || (parentA && getCreatureHash(parentA)) || req.parent_a);
+  const parentBHash = normalizeHashRef(req.parent_b_hash || req.parent_b || req.parentB);
+  const partner = String(req.partner_pubkey || req.partner || '').trim();
+  if (!parentAHash || !parentBHash || !partner) return {ok:false, error:'parent_a, parent_b, partner required'};
+  const nonce = requiredNonce(req);
+  if (!nonce) return {ok:false, error:'nonce_required'};
+  const parents = [parentAHash, parentBHash];
+  const offerId = 'breed_' + (await sha256Hex(canonical({parents, partner, realm: currentRealmId || null, nonce}))).slice(0, 18);
+  const ts = finiteNumber(req.ts);
+  const expires = finiteNumber(req.expires);
+  if (ts == null || expires == null) return {ok:false, error:'ts_and_expires_required'};
+  const content = {offer_id: offerId, parent_a: parentAHash, parent_b: parentBHash, partner, realm_id: currentRealmId || null, expires, ts, nonce};
+  const ev = await signNostrEvent(BREED_OFFER_KIND, [['d', offerId], ['parent_a', parentAHash], ['parent_b', parentBHash], ['partner', partner], ['realm', currentRealmId || ''], ['expires', String(expires)]], content, ident, {created_at: Math.floor(ts / 1000)});
+  const pub = await publishNostrEvent(ev, loadNostrRelays());
+  const offer = upsertBreedOffer(ev);
+  offer.status = pub.published > 0 ? 'published' : 'deferred';
+  return {ok:true, data:{offer, published:pub.published, event_id:ev.id}};
+}
+function handleBreedInbox(req) {
+  const me = ownNostrPubkey();
+  let data = Array.from(breedState.offers.values());
+  if (req.mine && me) data = data.filter(o => o.pubkey === me || o.partner === me);
+  if (req.incoming && me) data = data.filter(o => o.partner === me);
+  data.sort((a,b) => (b.ts || 0) - (a.ts || 0));
+  return {ok:true, data};
+}
+function breedReceiptUnsigned(content) {
+  return {
+    breed_id: content.breed_id,
+    parent_a: content.parent_a,
+    parent_b: content.parent_b,
+    joint_seed: content.joint_seed,
+    twin1_hash: content.twin1_hash,
+    twin2_hash: content.twin2_hash,
+    breeder_a: content.breeder_a || null,
+    breeder_b: content.breeder_b || null,
+    ts: content.ts
+  };
+}
+async function signBreedReceiptContent(content, ident) {
+  const secp = await loadSecpForNostr();
+  const receiptHash = await sha256Hex(canonical(breedReceiptUnsigned(content)));
+  return bytesToHex(secp.schnorr.sign(receiptHash, ident.privkey));
+}
+async function verifyBreedReceiptSignatures(content) {
+  if (!content || !content.breeder_a || !content.breeder_b || !content.sig_a || !content.sig_b) return false;
+  const secp = attRelay.secp || await loadSecpForNostr();
+  const receiptHash = await sha256Hex(canonical(breedReceiptUnsigned(content)));
+  return !!(secp.schnorr.verify(content.sig_a, receiptHash, content.breeder_a) && secp.schnorr.verify(content.sig_b, receiptHash, content.breeder_b));
+}
+async function maybeCompleteBreedReceipt(content) {
+  const ident = loadNostrIdentity();
+  if (!ident || !content || !content.breeder_a || !content.breeder_b) return null;
+  let changed = false;
+  if (!content.sig_a && ident.pubkey === content.breeder_a) { content.sig_a = await signBreedReceiptContent(content, ident); changed = true; }
+  if (!content.sig_b && ident.pubkey === content.breeder_b) { content.sig_b = await signBreedReceiptContent(content, ident); changed = true; }
+  if (!changed) return null;
+  const ev = await signNostrEvent(BREED_RECEIPT_KIND, [['d', content.breed_id], ['parent_a', content.parent_a], ['parent_b', content.parent_b], ['realm', currentRealmId || '']], content, ident, {created_at: Math.floor(requiredMs(content.ts, 'receipt_ts_required') / 1000)});
+  await publishNostrEvent(ev, loadNostrRelays());
+  return ev;
+}
+async function createBreedReceiptEvent({breed_id, parentAHash, parentBHash, partnerPubkey, jointSeed, twin1Hash, twin2Hash, transcript, ts}, ident) {
+  const receiptTs = requiredMs(ts, 'receipt_ts_required');
+  const content = {breed_id, parent_a:parentAHash, parent_b:parentBHash, joint_seed:jointSeed, twin1_hash:twin1Hash, twin2_hash:twin2Hash, breeder_a: ident.pubkey, breeder_b: partnerPubkey || null, sig_a:null, sig_b:null, ts: receiptTs, transcript};
+  if (ident.pubkey === content.breeder_a) content.sig_a = await signBreedReceiptContent(content, ident);
+  if (ident.pubkey === content.breeder_b) content.sig_b = await signBreedReceiptContent(content, ident);
+  return signNostrEvent(BREED_RECEIPT_KIND, [['d', breed_id], ['parent_a', parentAHash], ['parent_b', parentBHash], ['realm', currentRealmId || '']], content, ident, {created_at: Math.floor(content.ts / 1000)});
+}
+async function saveTwinFromReceipt(content, twin, idx, parents, attestations) {
+  const hash = idx === 1 ? content.twin1_hash : content.twin2_hash;
+  const env = {
+    format:'vibe/1', type:'creature/eidolon-1', subFormat:'eidolon-bred/1',
+    id:`v_creature_${String(hash || '').replace(/^sha256:/,'').slice(0,16)}_${idx}`,
+    name:`Bred Twin ${idx} ${String(hash || '').replace(/^sha256:/,'').slice(0,8)}`,
+    tags:['bred','sexual','twin'], parents, birthHash:hash,
+    createdAt:new Date(requiredMs(content.ts, 'receipt_ts_required')).toISOString(), source:'breed-receipt', realm: currentRealmId || null,
+    content_hash:hash, content_addr:hash, attestations,
+    payload:{ dna:twin.dna, hues:twin.hues, generation:Math.max(1, parents.length + 1), breed_id:content.breed_id, twin_index:idx, parents_hashes:[content.parent_a, content.parent_b], full_artifact:true, receipt:content }
+  };
+  const norm = await normalizeRealmForSave(env); if (!norm.ok) throw new Error(norm.error);
+  cache.set(env.id, env); await putVibe(env); await writeLineageEdges(env); notify('save', env);
+  await attestVibe(env).catch(e => log(`twin attestation deferred: ${e.message}`, 'warn'));
+  return env;
+}
+async function createStubFromBreedReceipt(content, idx, att) {
+  const hash = idx === 1 ? content.twin1_hash : content.twin2_hash;
+  const env = {
+    format:'vibe/1', type:'creature-stub/1', id:`v_stub_${String(hash || '').replace(/^sha256:/,'').slice(0,18)}`,
+    name:`Foreign bred twin ${idx} ${String(hash || '').replace(/^sha256:/,'').slice(0,8)}`,
+    tags:['foreign','bred','receipt'], parents:resolveParentRefs([content.parent_a, content.parent_b]), birthHash:hash,
+    createdAt:new Date(requiredMs(content.ts, 'receipt_ts_required')).toISOString(), source:'breed-receipt', realm: currentRealmId || null,
+    content_hash:hash, content_addr:hash, attestations:att,
+    payload:{creature_hash:hash, generation:2, parents:resolveParentRefs([content.parent_a, content.parent_b]), attestations:att, discovered_at:new Date().toISOString(), /* METADATA: display only, not content-addressed */ full_artifact:false, receipt:content}
+  };
+  const norm = await normalizeRealmForSave(env); if (!norm.ok) throw new Error(norm.error);
+  cache.set(env.id, env); await putVibe(env); await writeLineageEdges(env); await forwardResolveExternalRefs(env); notify('save', env);
+  return env;
+}
+async function handleBreedReceiptContent(content, ev) {
+  if (!content || !content.breed_id || !content.parent_a || !content.parent_b || !content.joint_seed || !content.twin1_hash || !content.twin2_hash) return false;
+  if (finiteNumber(content.ts) == null) return false;
+  if (!(await verifyBreedReceiptSignatures(content))) {
+    await maybeCompleteBreedReceipt(content).catch(e => log(`receipt completion failed: ${e.message}`, 'warn'));
+    return false;
+  }
+  const pA = findCreatureByIdOrHash(content.parent_a);
+  const pB = findCreatureByIdOrHash(content.parent_b);
+  const evTs = eventCreatedAtMs(ev);
+  if (evTs == null) return false;
+  const attestations = [{pubkey: ev.pubkey, event_id: ev.id, ts: evTs}];
+  breedState.receipts.set(content.breed_id, {event_id:ev.id, content});
+  if (pA && pB && window.NexusBreedEngine) {
+    const a = extractDnaAndHues(pA), b = extractDnaAndHues(pB);
+    if (a && b) {
+      const twins = window.NexusBreedEngine.sexualBreed({dnaA:a.dna, dnaB:b.dna, huesA:a.hues, huesB:b.hues, jointSeed:content.joint_seed});
+      const h1 = await twinHash(twins.twin1), h2 = await twinHash(twins.twin2);
+      if (h1 !== content.twin1_hash || h2 !== content.twin2_hash) return false;
+      const parents = [pA.id, pB.id];
+      await saveTwinFromReceipt(content, twins.twin1, 1, parents, attestations);
+      await saveTwinFromReceipt(content, twins.twin2, 2, parents, attestations);
+      render(); return true;
+    }
+  }
+  await createStubFromBreedReceipt(content, 1, attestations);
+  await createStubFromBreedReceipt(content, 2, attestations);
+  render(); return true;
+}
+async function handleNostrBreedReceiptEvent(ev) {
+  try {
+    if (!(await verifyNostrEvent(ev))) return false;
+    const content = parseBreedContent(ev);
+    return await handleBreedReceiptContent(content, ev);
+  } catch (e) { log(`breed receipt failed: ${e.message}`, 'warn'); return false; }
+}
+async function handleBreedAccept(req) {
+  const ident = loadNostrIdentity();
+  if (!ident) return {ok:false, error:'nostr identity unavailable'};
+  const offer = breedState.offers.get(req.offer_id || req.id);
+  if (!offer) return {ok:false, error:'offer not found'};
+  const pA = findCreatureByIdOrHash(offer.parent_a), pB = findCreatureByIdOrHash(offer.parent_b);
+  const a = extractDnaAndHues(pA), b = extractDnaAndHues(pB);
+  if (!a || !b) return {ok:false, error:'both parent DNAs required locally'};
+  const partnerPubkey = offer.pubkey === ident.pubkey ? offer.partner : offer.pubkey;
+  const breed_id = offer.id;
+  const receiptTs = finiteNumber(req.ts);
+  if (receiptTs == null) return {ok:false, error:'receipt_ts_required'};
+  try {
+    const cr = await window.NexusBlockClient.commitReveal({
+      contextTag: breed_id, partnerPubkey, timeout: Number(req.timeout || 15000),
+      timestampProvider: () => receiptTs,
+      sign: msg => signProtocolMessage(msg, ident),
+      verify: verifyProtocolMessage,
+      broadcast: msg => publishBreedProtocolMessage(msg, msg.type === 'breed_commit' ? BREED_COMMIT_KIND : BREED_REVEAL_KIND),
+      awaitMessages: awaitBreedMessage
+    });
+    const twins = window.NexusBreedEngine.sexualBreed({dnaA:a.dna, dnaB:b.dna, huesA:a.hues, huesB:b.hues, jointSeed:cr.jointSeed});
+    const twin1Hash = await twinHash(twins.twin1), twin2Hash = await twinHash(twins.twin2);
+    const receiptEv = await createBreedReceiptEvent({breed_id, parentAHash:offer.parent_a, parentBHash:offer.parent_b, partnerPubkey, jointSeed:cr.jointSeed, twin1Hash, twin2Hash, transcript:cr.transcript, ts:receiptTs}, ident);
+    await publishNostrEvent(receiptEv, loadNostrRelays());
+    await handleBreedReceiptContent(parseBreedContent(receiptEv), receiptEv);
+    offer.status = 'done'; breedState.offers.set(offer.id, offer);
+    return {ok:true, data:{breed_id, jointSeed:cr.jointSeed, twin1_hash:twin1Hash, twin2_hash:twin2Hash, receipt_event_id:receiptEv.id}};
+  } catch (e) {
+    offer.status = 'forfeit'; offer.reason = e.reason || e.message; breedState.offers.set(offer.id, offer);
+    return {ok:false, error:e.reason || e.message, evidence:e.evidence || null};
+  }
+}
+function handleBreedReceipts(req) { return {ok:true, data:Array.from(breedState.receipts.values())}; }
+
+function parseBattleContent(ev) { try { return ev.content ? JSON.parse(ev.content) : {}; } catch (_) { return {}; } }
+function upsertBattleIntent(ev) {
+  const content = parseBattleContent(ev);
+  const intentId = tagValue(ev, 'd') || content.battle_id || ev.id;
+  const intent = {
+    id: intentId, event_id: ev.id, pubkey: ev.pubkey,
+    partner: tagValue(ev, 'partner') || content.partner || content.partner_pubkey,
+    realm: tagValue(ev, 'realm') || content.realm_id || null,
+    eidolon_a: tagValue(ev, 'eidolon_a') || content.eidolon_a || content.my_eidolon,
+    eidolon_b: tagValue(ev, 'eidolon_b') || content.eidolon_b || content.partner_eidolon,
+    charter: content.charter || tagValue(ev, 'charter') || null,
+    engine_hash: content.engine_hash || tagValue(ev, 'engine_hash') || null,
+    expires: Number(tagValue(ev, 'expires') || content.expires || 0),
+    ts: ev.created_at * 1000,
+    ranked: !!content.ranked,
+    lock_a: content.lock_a || tagValue(ev, 'lock_a') || null,
+    lock_b: content.lock_b || tagValue(ev, 'lock_b') || null,
+    selected_witnesses: Array.isArray(content.selected_witnesses) ? content.selected_witnesses : [],
+    status: 'intent'
+  };
+  battleState.intents.set(intent.id, intent);
+  return intent;
+}
+async function handleNostrBattleIntentEvent(ev, relayUrl) {
+  try {
+    if (!(await verifyNostrEvent(ev))) return false;
+    const intent = upsertBattleIntent(ev);
+    const me = ownNostrPubkey();
+    if (intent.partner && me && intent.partner !== me) { battleState.intents.delete(intent.id); return false; }
+    if (currentRealmId && intent.realm && intent.realm !== currentRealmId) { battleState.intents.delete(intent.id); return false; }
+    log(`battle intent seen ${intent.id} from ${relayUrl || 'relay'}`);
+    return true;
+  } catch (e) { log(`battle intent failed: ${e.message}`, 'warn'); return false; }
+}
+function pushBattleProtocolMessage(ev) {
+  const msg = parseBattleContent(ev);
+  msg.event_id = ev.id; msg.event_pubkey = ev.pubkey;
+  if (!msg.pubkey) msg.pubkey = ev.pubkey;
+  battleState.messages.push(msg);
+  const waiters = battleState.waiters.slice();
+  for (const w of waiters) {
+    try {
+      if (w.predicate(msg)) { clearTimeout(w.timer); battleState.waiters = battleState.waiters.filter(x => x !== w); w.resolve(msg); }
+    } catch (_) {}
+  }
+  return msg;
+}
+async function handleNostrBattleProtocolEvent(ev) {
+  try { if (!(await verifyNostrEvent(ev))) return false; pushBattleProtocolMessage(ev); return true; }
+  catch (e) { log(`battle protocol event failed: ${e.message}`, 'warn'); return false; }
+}
+function awaitBattleMessage(predicate, opts = {}) {
+  for (const m of battleState.messages) if (predicate(m)) return Promise.resolve(m);
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { battleState.waiters = battleState.waiters.filter(w => w.resolve !== resolve); reject(new Error(`timeout:${opts.phase || 'battle_message'}`)); }, opts.timeout || 15000);
+    battleState.waiters.push({predicate, resolve, reject, timer});
+  });
+}
+async function publishBattleProtocolMessage(msg, kind) {
+  const ident = loadNostrIdentity();
+  if (!ident) throw new Error('nostr identity unavailable');
+  const ev = await signNostrEvent(kind, [['d', msg.battle_id || msg.contextTag || ''], ['partner', msg.partnerPubkey || ''], ['realm', currentRealmId || '']], msg, ident, {created_at: Math.floor(requiredMs(msg.ts, 'message_ts_required') / 1000)});
+  await publishNostrEvent(ev, loadNostrRelays());
+  pushBattleProtocolMessage(Object.assign({}, ev, {content: JSON.stringify(msg)}));
+  return ev;
+}
+function battleReceiptUnsigned(content) {
+  return {
+    battle_id:content.battle_id,
+    charter:content.charter || null,
+    realm:content.realm || content.realm_id || null,
+    eidolon_a_hash:content.eidolon_a_hash || content.eidolon_a || null,
+    eidolon_b_hash:content.eidolon_b_hash || content.eidolon_b || null,
+    ranked:!!content.ranked,
+    lock_a:content.lock_a || null,
+    lock_b:content.lock_b || null,
+    transcript_hash:content.transcript_hash,
+    winner:content.winner || null,
+    ts:content.ts
+  };
+}
+async function verifyBattleResultSignatures(content) {
+  if (!content || !content.sig_a || !content.sig_b || !content.pubkey_a || !content.pubkey_b) return false;
+  const secp = attRelay.secp || await loadSecpForNostr();
+  const receiptHash = await sha256Hex(canonical(battleReceiptUnsigned(content)));
+  const partiesOk = !!(secp.schnorr.verify(content.sig_a, receiptHash, content.pubkey_a) && secp.schnorr.verify(content.sig_b, receiptHash, content.pubkey_b));
+  if (!partiesOk) return false;
+  const witnesses = Array.isArray(content.witnesses) ? content.witnesses : [];
+  if (witnesses.length) {
+    const verifyOne = (sig, body, pubkey) => secp.schnorr.verify(sig, receiptHash, pubkey);
+    return !!(window.NexusWitnessSelection && window.NexusWitnessSelection.verifyWitnessQuorum(content, 3, verifyOne));
+  }
+  return true;
+}
+async function saveBattleResult(content, ev) {
+  const resultTs = finiteNumber(content && content.ts);
+  if (resultTs == null) throw new Error('battle_result_ts_required');
+  const id = `v_battle_result_${String(content.battle_id || ev.id).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40)}`;
+  const env = {
+    format:'vibe/1', type:'battle-result/1', id,
+    name:`Battle result ${String(content.battle_id || ev.id).slice(0,12)}`,
+    tags:['battle','result','ranked'], parents:[],
+    birthHash:'sha256:' + await sha256Hex(canonical(content)), createdAt:new Date(resultTs).toISOString(),
+    source:'nostr', realm: content.realm_id || tagValue(ev, 'realm') || currentRealmId || null,
+    payload:{ battle_id:content.battle_id, charter:content.charter || null, realm:content.realm || content.realm_id || null, eidolon_a_hash:content.eidolon_a_hash || content.eidolon_a, eidolon_b_hash:content.eidolon_b_hash || content.eidolon_b, ranked:!!content.ranked, lock_a:content.lock_a || null, lock_b:content.lock_b || null, winner:content.winner || null, transcript_hash:content.transcript_hash, sig_a:content.sig_a, sig_b:content.sig_b, witnesses:Array.isArray(content.witnesses)?content.witnesses:[], ts:resultTs, event_id:ev.id }
+  };
+  cache.set(env.id, env); await putVibe(env); notify('save', env); battleState.results.set(env.id, envSummary(env));
+  if (content.ranked) await applyBattleSlotResult(content).catch(e => log(`slot result apply failed: ${e.message}`, 'warn'));
+  render(); return env;
+}
+async function handleNostrBattleResultEvent(ev) {
+  try {
+    if (!(await verifyNostrEvent(ev))) return false;
+    const content = parseBattleContent(ev);
+    if (currentRealmId && (content.realm_id || tagValue(ev,'realm')) && (content.realm_id || tagValue(ev,'realm')) !== currentRealmId) return false;
+    if (!(await verifyBattleResultSignatures(content))) return false;
+    await saveBattleResult(content, ev);
+    return true;
+  } catch (e) { log(`battle result failed: ${e.message}`, 'warn'); return false; }
+}
+
+function handleNostrWitnessAdEvent(ev, relayUrl) {
+  try {
+    const content = parseBattleContent(ev);
+    const pubkey = ev.pubkey || tagValue(ev, 'd');
+    const realm = tagValue(ev, 'realm') || content.realm || null;
+    if (!pubkey) return false;
+    if (currentRealmId && realm && realm !== currentRealmId) return false;
+    battleState.witnessPool.set(pubkey, {pubkey, realm, capacity:Number(content.capacity||0), since:content.since||ev.created_at, event_id:ev.id, relay:relayUrl||null});
+    return true;
+  } catch (_) { return false; }
+}
+async function requestWalletLock({battle_id, eidolon_id, terms_raw}) {
+  if (!nx) throw new Error('wallet unavailable');
+  const r = await nx.request('wallet.lock.create', {battle_id, eidolon_id, terms_raw, amount:1}, {timeout:8000});
+  return r;
+}
+async function requestWalletResolve({lock_id, resolution}) {
+  if (!nx) throw new Error('wallet unavailable');
+  return nx.request('wallet.lock.resolve', {lock_id, resolution}, {timeout:8000});
+}
+async function applyBattleSlotResult(content) {
+  const winner = content.winner;
+  if (!content.ranked || !winner || winner === 'draw') return {ok:true, skipped:true};
+  const loserHash = winner === 'A' ? (content.eidolon_b_hash || content.eidolon_b) : (content.eidolon_a_hash || content.eidolon_a);
+  const loser = findCreatureByIdOrHash(loserHash);
+  if (!loser) return {ok:false, error:'loser creature not local'};
+  const resultTs = finiteNumber(content.ts);
+  if (resultTs == null) return {ok:false, error:'battle_result_ts_required'};
+  const r = consumeSlot(loser, {id:content.battle_id, battle_id:content.battle_id, type:'battle', ts:resultTs});
+  if (!r.ok) return r;
+  await putVibe(loser); notify('tag', loser); return {ok:true, remaining:r.remaining};
+}
+async function handleBattleStartRanked(req) {
+  req = Object.assign({}, req, {ranked:true});
+  return handleBattleIntent(req);
+}
+function handleCreatureSlots(req) {
+  const env = cache.get(req.id) || findCreatureByIdOrHash(req.id);
+  if (!env) return {ok:false, error:'not found'};
+  return creatureSlotReport(env);
+}
+function handleCreatureSpent(req) {
+  const env = cache.get(req.id) || findCreatureByIdOrHash(req.id);
+  if (!env) return {ok:false, error:'not found'};
+  return {ok:true, spent:slotSpent(env)};
+}
+async function handleImprintCreate(req) {
+  const battleId = String(req.battle_id || '').trim();
+  const source = cache.get(req.source_eidolon_id) || findCreatureByIdOrHash(req.source_eidolon_id);
+  if (!battleId || !source) return {ok:false, error:'battle_id and source_eidolon_id required'};
+  if (slotSpent(source)) return {ok:false, error:'creature spent'};
+  const result = Array.from(cache.values()).find(e => e.type === 'battle-result/1' && e.payload && e.payload.battle_id === battleId);
+  if (!result) return {ok:false, error:'battle result not found'};
+  const h = getCreatureHash(source) || source.id;
+  const win = result.payload && result.payload.winner;
+  const isWinner = (win === 'A' && (result.payload.eidolon_a_hash === h || result.payload.eidolon_a_hash === source.id)) || (win === 'B' && (result.payload.eidolon_b_hash === h || result.payload.eidolon_b_hash === source.id));
+  if (!isWinner) return {ok:false, error:'source is not winner of battle'};
+  const payload = await window.NexusEidolonGenerator.descendantPayload({source, battle_id:battleId, name:(source.name || 'Eidolon') + ' · scarred', createdAt: result.createdAt || (result.payload && result.payload.ts ? new Date(result.payload.ts).toISOString() : undefined)});
+  const html = await window.NexusEidolonGenerator.generateEidolonHtml(payload);
+  const env = await prepareImportedCreatureEnvelope(payload, payload.name + '.html', 'eidolon-creature/1');
+  env.source = 'imprint'; env.parents = [source.id]; env.payload = Object.assign({}, payload, {html, slots:{total:3, consumed:[]}});
+  env.content_hash = await contentAddressForEnvelopeBody(env); env.content_addr = env.content_hash; env.id = `v_creature_${env.content_hash.slice(7,23)}`;
+  const imprintId = 'imprint_' + battleId;
+  const imprintTs = await stampFromCanonical({imprint_id:imprintId});
+  const consumed = consumeSlot(source, {id:imprintId, imprint_id:imprintId, type:'imprint', ts:imprintTs});
+  if (!consumed.ok) return consumed;
+  await putVibe(source); notify('tag', source);
+  await saveImportedEnvelope(env);
+  return {ok:true, envelope:env, html};
+}
+async function handleBattleIntent(req) {
+  const partner = String(req.partner_pubkey || req.partner || '').trim();
+  const eidolonA = normalizeHashRef(req.eidolon_a_hash || req.eidolon_a || req.my_eidolon);
+  const eidolonB = normalizeHashRef(req.eidolon_b_hash || req.eidolon_b || req.partner_eidolon);
+  if (!partner || !eidolonA || !eidolonB) return {ok:false, error:'partner, eidolon_a, eidolon_b required'};
+  const charter = req.charter || currentRealmId || 'realm_genesis_0';
+  const localCreature = findCreatureByIdOrHash(req.my_eidolon || req.eidolon_a || req.eidolon_a_hash);
+  if (req.ranked && localCreature && slotSpent(localCreature)) return {ok:false, error:'creature spent'};
+  const nonce = requiredNonce(req);
+  if (!nonce) return {ok:false, error:'nonce_required'};
+  const ts = finiteNumber(req.ts);
+  const expires = finiteNumber(req.expires);
+  if (ts == null || expires == null) return {ok:false, error:'ts_and_expires_required'};
+  const battleId = 'battle_' + (await sha256Hex(canonical({partner,eidolonA,eidolonB,charter,ranked:!!req.ranked,nonce}))).slice(0,18);
+  let lock_a = req.lock_a || null, lock_b = req.lock_b || null;
+  if (req.ranked && !lock_a) {
+    const lock = await requestWalletLock({battle_id:battleId, eidolon_id: localCreature ? localCreature.id : eidolonA, terms_raw:`eidolon:slot:${localCreature ? localCreature.id : eidolonA}:battle:${battleId}`}).catch(e => ({ok:false, error:e.message}));
+    if (!lock || lock.ok === false) return {ok:false, error:lock.error || 'wallet LOCK failed'};
+    lock_a = lock.output_id || lock.lock_id || lock.id || (lock.lock && lock.lock.id) || null;
+  }
+  const ident = loadNostrIdentity();
+  if (!ident) return {ok:false, error:'nostr identity unavailable'};
+  const candidates = Array.from(battleState.witnessPool.values()).filter(w => !currentRealmId || !w.realm || w.realm === currentRealmId).map(w => w.pubkey);
+  const selected_witnesses = req.request_witnesses && window.NexusWitnessSelection ? window.NexusWitnessSelection.selectWitnesses({battle_id:battleId, candidate_pubkeys:candidates, n:5, m:3}) : [];
+  const content = {battle_id:battleId, partner, eidolon_a:eidolonA, eidolon_b:eidolonB, charter, realm_id:currentRealmId || null, engine_hash: window.NexusBattleEngine && window.NexusBattleEngine.ENGINE_HASH, ranked:!!req.ranked, lock_a, lock_b, selected_witnesses, expires, ts, nonce};
+  const ev = await signNostrEvent(BATTLE_INTENT_KIND, [['d', battleId], ['partner', partner], ['realm', currentRealmId || ''], ['eidolon_a', eidolonA], ['eidolon_b', eidolonB], ['engine_hash', content.engine_hash || ''], ['lock_a', lock_a || ''], ['lock_b', lock_b || ''], ['expires', String(expires)]], content, ident, {created_at: Math.floor(ts / 1000)});
+  const pub = await publishNostrEvent(ev, loadNostrRelays());
+  const intent = upsertBattleIntent(ev); intent.status = pub.published > 0 ? 'published' : 'deferred';
+  return {ok:true, data:{intent, published:pub.published, event_id:ev.id}};
+}
+function handleBattleInbox(req) {
+  const me = ownNostrPubkey();
+  let data = Array.from(battleState.intents.values());
+  if (req.incoming && me) data = data.filter(o => o.partner === me);
+  data.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  return {ok:true, data};
+}
+async function handleBattleAccept(req) {
+  const intent = battleState.intents.get(req.intent_id || req.id || req.battle_id);
+  if (!intent) return {ok:false, error:'intent not found'};
+  intent.status = 'accepted'; battleState.intents.set(intent.id, intent);
+  return {ok:true, data:intent};
+}
+function handleBattleResults(req) {
+  const merged = new Map(battleState.results);
+  for (const env of cache.values()) if (env.type === 'battle-result/1') merged.set(env.id, envSummary(env));
+  return {ok:true, data:Array.from(merged.values()).sort(sortFn('recent'))};
+}
+
+function stopAttestationRelaySubscription() {
+  attRelay.active = false;
+  for (const timer of attRelay.timers.values()) clearTimeout(timer);
+  attRelay.timers.clear();
+  for (const ws of attRelay.sockets.values()) { try { ws.close(); } catch (_) {} }
+  attRelay.sockets.clear();
+}
+function startAttestationRelaySubscription() {
+  stopAttestationRelaySubscription();
+  if (typeof WebSocket === 'undefined') { log('nostr attestation subscribe skipped: websocket unavailable', 'warn'); return; }
+  const relays = loadNostrRelays();
+  if (!relays.length) { log('nostr attestation subscribe skipped: no relays', 'warn'); return; }
+  const realm = currentRealmId || null;
+  attRelay.active = true;
+  attRelay.realm = realm;
+  attRelay.subId = `nx-attest-${Math.random().toString(36).slice(2, 10)}`; // METADATA: display only, not content-addressed
+  const since = Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 30; // METADATA: display only, not content-addressed
+  const kinds = [ATTESTATION_KIND, BREED_OFFER_KIND, BREED_COMMIT_KIND, BREED_REVEAL_KIND, BREED_RECEIPT_KIND, BATTLE_INTENT_KIND, BATTLE_COMMIT_KIND, BATTLE_REVEAL_KIND, BATTLE_RESULT_KIND, WITNESS_AD_KIND];
+  const me = ownNostrPubkey();
+  const offerFilter = me ? { kinds:[BREED_OFFER_KIND, BATTLE_INTENT_KIND], '#partner':[me], since, limit:200 } : null;
+  const filter = realm ? { kinds, '#realm':[realm], since, limit:200 } : { kinds, since, limit:200 };
+  const connect = (url) => {
+    if (!attRelay.active) return;
+    let ws;
+    try { ws = new WebSocket(url); } catch (e) { scheduleReconnect(url); return; }
+    attRelay.sockets.set(url, ws);
+    ws.onopen = () => { try { ws.send(JSON.stringify(offerFilter ? ['REQ', attRelay.subId, filter, offerFilter] : ['REQ', attRelay.subId, filter])); } catch (_) {} };
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (Array.isArray(msg) && msg[0] === 'EVENT' && msg[2]) {
+          const ev = msg[2];
+          if (ev.kind === ATTESTATION_KIND) handleNostrAttestationEvent(ev, url);
+          else if (ev.kind === BREED_OFFER_KIND) handleNostrBreedOfferEvent(ev, url);
+          else if (ev.kind === BREED_COMMIT_KIND || ev.kind === BREED_REVEAL_KIND) handleNostrBreedProtocolEvent(ev, url);
+          else if (ev.kind === BREED_RECEIPT_KIND) handleNostrBreedReceiptEvent(ev, url);
+          else if (ev.kind === BATTLE_INTENT_KIND) handleNostrBattleIntentEvent(ev, url);
+          else if (ev.kind === BATTLE_COMMIT_KIND || ev.kind === BATTLE_REVEAL_KIND) handleNostrBattleProtocolEvent(ev, url);
+          else if (ev.kind === BATTLE_RESULT_KIND) handleNostrBattleResultEvent(ev, url);
+          else if (ev.kind === WITNESS_AD_KIND) handleNostrWitnessAdEvent(ev, url);
+        }
+      } catch (_) {}
+    };
+    ws.onerror = () => { try { ws.close(); } catch (_) {} };
+    ws.onclose = () => { attRelay.sockets.delete(url); if (attRelay.active) scheduleReconnect(url); };
+  };
+  const scheduleReconnect = (url) => {
+    const n = (attRelay.reconnects.get(url) || 0) + 1;
+    attRelay.reconnects.set(url, n);
+    const delay = Math.min(10000, 1000 + n * 1000);
+    clearTimeout(attRelay.timers.get(url));
+    attRelay.timers.set(url, setTimeout(() => connect(url), delay));
+  };
+  for (const url of relays) connect(url);
+  log(`nostr subscribe: kinds ${kinds.join(',')} realm ${realm || '*'}${me ? ' partner '+me.slice(0,8) : ''}`);
+}
+function restartAttestationRelaySubscription() { startAttestationRelaySubscription(); }
+window.addEventListener('beforeunload', stopAttestationRelaySubscription);
+
+// ── IndexedDB ──────────────────────────────────────────────────────
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const inst = e.target.result;
+      for (const t of TYPE_FAMILIES) {
+        if (!inst.objectStoreNames.contains(`vibes_${t}`)) {
+          const store = inst.createObjectStore(`vibes_${t}`, { keyPath: 'id' });
+          store.createIndex('createdAt', 'createdAt', { unique: false });
+          store.createIndex('name', 'name', { unique: false });
+        }
+      }
+      if (!inst.objectStoreNames.contains('vibes_lineage')) {
+        const ls = inst.createObjectStore('vibes_lineage', { keyPath: 'edgeId' });
+        ls.createIndex('child', 'childId', { unique: false });
+        ls.createIndex('parent', 'parentId', { unique: false });
+      }
+      if (!inst.objectStoreNames.contains('vibes_meta')) {
+        inst.createObjectStore('vibes_meta', { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+function txStore(type, mode='readonly') {
+  const family = typeFamily(type);
+  return db.transaction(`vibes_${family}`, mode).objectStore(`vibes_${family}`);
+}
+function metaStore(mode='readonly') {
+  return db.transaction('vibes_meta', mode).objectStore('vibes_meta');
+}
+function getMeta(key) {
+  return new Promise((res, rej) => {
+    const r = metaStore().get(key);
+    r.onsuccess = () => res(r.result ? r.result.value : undefined);
+    r.onerror = (e) => rej(e.target.error);
+  });
+}
+function setMeta(key, value) {
+  return new Promise((res, rej) => {
+    const r = metaStore('readwrite').put({key, value});
+    r.onsuccess = () => res(value);
+    r.onerror = (e) => rej(e.target.error);
+  });
+}
+async function loadAllToCache() {
+  cache.clear();
+  for (const t of TYPE_FAMILIES) {
+    await new Promise((res, rej) => {
+      const r = txStore(t).getAll();
+      r.onsuccess = () => { for (const env of r.result || []) cache.set(env.id, env); res(); };
+      r.onerror = (e) => rej(e.target.error);
+    });
+  }
+  log(`cache loaded: ${cache.size} vibes`);
+}
+function putVibe(env) {
+  return new Promise((res, rej) => {
+    const r = txStore(env.type, 'readwrite').put(env);
+    r.onsuccess = () => res();
+    r.onerror = (e) => rej(e.target.error);
+  });
+}
+function deleteVibe(env) {
+  return new Promise((res, rej) => {
+    const r = txStore(env.type, 'readwrite').delete(env.id);
+    r.onsuccess = () => res();
+    r.onerror = (e) => rej(e.target.error);
+  });
+}
+async function writeLineageEdges(env) {
+  if (!Array.isArray(env.parents) || !env.parents.length) return;
+  let edgeTs = msFromCreatedAt(env.createdAt);
+  if (edgeTs == null) edgeTs = stampFromHexRef(env.content_hash || env.content_addr || env.birthHash);
+  if (edgeTs == null) throw new Error('lineage_ts_required');
+  const tx = db.transaction('vibes_lineage', 'readwrite');
+  const store = tx.objectStore('vibes_lineage');
+  for (const parentId of env.parents) {
+    const edgeId = `${parentId}>${env.id}`;
+    store.put({ edgeId, parentId, childId: env.id, ts: edgeTs });
+  }
+}
+
+
+async function migrateGenesisRealmCharter() {
+  const existing = findCharterByRealmId('realm_genesis_0');
+  if (!existing || !existing.payload) return false;
+  const want = JSON.parse(JSON.stringify(BUILTIN_REALM_GENESIS_0));
+  const oldVersion = existing.payload.ruleset && String(existing.payload.ruleset.version || '');
+  const needs = oldVersion !== String(want.payload.ruleset.version) || !existing.payload.engine_hash || existing.payload.engine_hash !== want.payload.engine_hash;
+  if (!needs) return false;
+  const migrated = Object.assign({}, want, { id: existing.id, createdAt: existing.createdAt || want.createdAt, source: existing.source || 'builtin-migrated' });
+  migrated.payload = Object.assign({}, want.payload);
+  cache.set(migrated.id, migrated);
+  await putVibe(migrated);
+  log(`migrated realm_genesis_0 charter ${oldVersion || 'unknown'} → ${want.payload.ruleset.version}`);
+  return true;
+}
+
+async function ensureBuiltInRealm() {
+  const imported = await getMeta(REALM_META_IMPORTED).catch(() => false);
+  const existing = realmCharters();
+  if (!existing.length && !imported) {
+    const env = JSON.parse(JSON.stringify(BUILTIN_REALM_GENESIS_0));
+    cache.set(env.id, env);
+    await putVibe(env);
+    await setMeta(REALM_META_IMPORTED, true);
+    log('imported built-in realm_genesis_0');
+  }
+  await migrateGenesisRealmCharter();
+  let active = await getMeta(REALM_META_CURRENT).catch(() => null);
+  if (!active || !findCharterByRealmId(active)) {
+    const charter = findCharterByRealmId('realm_genesis_0') || realmCharters()[0] || null;
+    active = charter ? getRealmIdFromCharter(charter) : null;
+    if (active) await setMeta(REALM_META_CURRENT, active);
+  }
+  currentRealmId = active || null;
+}
+function currentCharterSummary() {
+  const charter = currentRealmId ? findCharterByRealmId(currentRealmId) : null;
+  return charter ? envSummary(charter) : null;
+}
+async function setCurrentRealm(realmId) {
+  const id = String(realmId || '').trim();
+  if (!id) return {ok:false, error:'realm_id required'};
+  const charter = findCharterByRealmId(id);
+  if (!charter) return {ok:false, error:'unknown realm'};
+  currentRealmId = id;
+  await setMeta(REALM_META_CURRENT, id);
+  restartAttestationRelaySubscription();
+  render();
+  return {ok:true};
+}
+
+// ── FS sync via kernel syscalls ────────────────────────────────────
+function fsCall(channel, payload) {
+  if (!nx) return Promise.reject(new Error('not connected to Nexus'));
+  return nx.request(channel, payload || {}, { timeout: 8000 });
+}
+const fsPending = new Map(); // retained for legacy diagnostics; NexusBlockClient owns live FS requests.
+
+// Re-query fs.status from the kernel and update local state. Idempotent and safe to
+// call any time. Returns true iff a folder is currently mounted at the kernel level.
+// Use this on every user-initiated mount/rescan action — never trust cached state.
+async function refreshFsState() {
+  if (!mounted) return false;
+  try {
+    const st = await fsCall('fs.status', {});
+    if (st && st.ok && st.mounted) {
+      fsAvailable = true;
+      folderName  = st.folderName || null;
+      return true;
+    }
+    fsAvailable = false; folderName = null;
+    return false;
+  } catch (err) {
+    log(`fs.status check failed: ${err.message}`, 'warn');
+    return false;
+  }
+}
+
+async function importFromFolder() {
+  // Always re-query the kernel — never trust cached fsAvailable. The kernel is
+  // the source of truth for mount state; cached state can drift if the user
+  // mounted *after* this block booted and the broadcast was missed.
+  const live = await refreshFsState();
+  if (!live) {
+    showToast('No folder mounted yet — click 📁 in the Nexus taskbar.');
+    render();
+    return { added: 0, skipped: 0, scanned: 0 };
+  }
+  let added = 0, skipped = 0, scanned = 0;
+  async function walk(path) {
+    let res;
+    try { res = await fsCall('fs.list', path ? {path} : {}); }
+    catch (e) { log(`fs.list failed: ${e.message}`, 'err'); return; }
+    if (!res.ok) { log(`fs.list error: ${res.error}`, 'err'); return; }
+    for (const entry of res.entries || []) {
+      const childPath = path ? `${path}/${entry.name}` : entry.name;
+      if (entry.kind === 'directory') {
+        // Only descend one level by default to avoid runaway scans
+        if (!path) await walk(childPath);
+        continue;
+      }
+      scanned++;
+      const lname = entry.name.toLowerCase();
+      const looksLike = lname.endsWith('.vibe.json')   ? 'vibe'
+                      : lname.endsWith('.environment.json') ? 'env'
+                      : lname.endsWith('.kin.json')    ? 'kin'
+                      : lname.endsWith('.creature.json') ? 'creature'
+                      : lname.endsWith('.attack.json') ? 'attack'
+                      : lname.endsWith('.battle.json') ? 'battle'
+                      : lname.endsWith('.json')        ? 'json'
+                      : (lname.endsWith('.html') && lname.includes('battle')) ? 'battle-html'
+                      : null;
+      if (!looksLike) continue;
+      try {
+        const r = await fsCall('fs.read', { path: childPath });
+        if (!r.ok) { skipped++; continue; }
+        const env = await ingestText(r.content, entry.name, looksLike);
+        if (env) { added++; } else { skipped++; }
+      } catch (e) { skipped++; log(`ingest failed: ${entry.name} — ${e.message}`, 'warn'); }
+    }
+  }
+  await walk('');
+  await loadAllToCache();
+  render();
+  return { added, skipped, scanned };
+}
+
+async function saveImportedEnvelope(env, { attest = true } = {}) {
+  const promoted = env._promoteStub ? cache.get(env._promoteStub) : null;
+  delete env._promoteStub;
+  if (promoted && promoted.type !== env.type) await deleteVibe(promoted).catch(e => log(`stub promotion cleanup failed: ${e.message}`, 'warn'));
+  cache.set(env.id, env);
+  await putVibe(env);
+  await writeLineageEdges(env);
+  await forwardResolveExternalRefs(env);
+  if (attest && typeFamily(env.type) === 'creature') await attestVibe(env).catch(e => log(`attestation deferred: ${e.message}`, 'warn'));
+  return env;
+}
+
+async function ingestText(text, fname, hint) {
+  let parsed = null, type = null, payload = null, name = null, subFormat = null;
+  const lname = String(fname || '').toLowerCase();
+
+  if (lname.endsWith('.html')) {
+    const creature = parseEidolonHtml(text, fname);
+    if (creature) {
+      const env = await prepareImportedCreatureEnvelope(creature, fname, 'eidolon-creature/1');
+      if (cache.has(env.id) && typeFamily(cache.get(env.id).type) !== 'creature-stub') return cache.get(env.id);
+      return saveImportedEnvelope(env);
+    }
+  }
+
+  if (hint === 'battle-html') {
+    // Pull #creature-dna out of an exported battle HTML
+    try {
+      const m = text.match(/<script[^>]+id=["']creature-dna["'][^>]*>([\s\S]*?)<\/script>/i);
+      if (!m) return null;
+      const dna = JSON.parse(m[1]);
+      type = 'creature/eidolon-1';
+      payload = dna;
+      name = dna.name || fname.replace(/\.html$/i, '');
+      subFormat = 'eidolon-creature/1';
+    } catch (_) { return null; }
+  } else {
+    try { parsed = JSON.parse(text); } catch (_) { return null; }
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    // Already a Vibe envelope? Store it, with realm/default/import handling.
+    if (parsed.format && parsed.format.startsWith('vibe/')) {
+      if (!parsed.id || !parsed.payload || !parsed.type) return null;
+      let env = parsed;
+      if (typeFamily(env.type) === 'creature') {
+        env = await prepareImportedCreatureEnvelope(env, fname, env.subFormat || 'eidolon-creature/1');
+      } else {
+        const norm = await normalizeRealmForSave(env);
+        if (!norm.ok) throw new Error(norm.error);
+      }
+      return saveImportedEnvelope(env, { attest: typeFamily(env.type) === 'creature' });
+    }
+
+    // Otherwise: detect by content shape
+    const fmt = parsed.format || '';
+    if (fmt.includes('environment') || (Array.isArray(parsed.axes) && parsed.axes.some(a => a.id && a.id.startsWith('sky_')))) {
+      type = 'environment'; subFormat = 'eidolon-environment/1';
+    } else if (fmt.includes('kin')) {
+      type = 'kin'; subFormat = 'eidolon-kin/1';
+    } else if (Array.isArray(parsed.dna) && parsed.dna.length === 16) {
+      const env = await prepareImportedCreatureEnvelope(parsed, fname, 'eidolon-creature/1');
+      if (cache.has(env.id) && typeFamily(cache.get(env.id).type) !== 'creature-stub') return cache.get(env.id);
+      return saveImportedEnvelope(env);
+    } else if (fmt.includes('attack')) {
+      type = 'attack'; subFormat = 'eidolon-attack/1';
+    } else if (fmt.includes('battle') || parsed.participants) {
+      type = 'battle'; subFormat = 'eidolon-battle/1';
+    } else {
+      return null;
+    }
+    payload = parsed;
+    name = parsed.name || fname.replace(/\.[^.]+$/, '').slice(0, 64);
+  }
+
+  // Build envelope
+  const payloadStr = canonical(payload);
+  const birthHash = 'sha256:' + await sha256Hex(payloadStr);
+  const idStem = birthHash.slice(7, 23);
+  const id = `v_${typeFamily(type)}_${idStem}`;
+  if (cache.has(id)) return cache.get(id); // dedupe
+
+  const env = {
+    format: 'vibe/1', id, type, subFormat,
+    name: String(name).slice(0, 96),
+    tags: Array.isArray(payload.tags) ? payload.tags.slice(0, 32).map(String) : [],
+    parents: resolveParentRefs(Array.isArray(payload.parents) ? payload.parents.slice(0, 16) : []),
+    birthHash,
+    createdAt: payload.createdAt || new Date().toISOString(), // METADATA: display only, not content-addressed
+    source: 'import',
+    payload
+  };
+  const norm = await normalizeRealmForSave(env);
+  if (!norm.ok) throw new Error(norm.error);
+  if (typeFamily(env.type) === 'creature') {
+    env.content_hash = birthHash;
+    env.content_addr = birthHash;
+    return saveImportedEnvelope(env);
+  }
+  cache.set(id, env);
+  await putVibe(env);
+  await writeLineageEdges(env);
+  return env;
+}
+
+async function exportToFolder(ids) {
+  const live = await refreshFsState();
+  if (!live) { showToast('No folder mounted yet — click 📁 in the Nexus taskbar.'); return { written: 0 }; }
+  const targets = ids && ids.length ? ids.map(id => cache.get(id)).filter(Boolean) : Array.from(cache.values());
+  let written = 0;
+  for (const env of targets) {
+    const safe = (env.name || env.id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'untitled';
+    const path = `vibes/${env.type}/${safe}.${env.id.slice(2,15)}.vibe.json`;
+    try {
+      await fsCall('fs.write', { path, content: JSON.stringify(env, null, 2) });
+      written++;
+    } catch (e) { log(`export failed: ${env.id} — ${e.message}`, 'warn'); }
+  }
+  showToast(`Exported ${written} vibe${written===1?'':'s'} to /vibes/`);
+  return { written };
+}
+
+// ── Vibe operation handlers (the protocol surface) ─────────────────
+async function handleSave(req, srcId) {
+  const env = req.envelope;
+  if (!env || !env.id || !env.type || !env.payload) return { ok:false, error:'invalid envelope' };
+  if (Array.isArray(env.parents)) env.parents = resolveParentRefs(env.parents);
+  ensureSlots(env);
+  if ((typeFamily(env.type) === 'creature' || typeFamily(env.type) === 'creature-stub') && !env.content_hash) env.content_hash = env.content_addr || await contentAddressForEnvelopeBody(env).catch(() => null);
+  const norm = await normalizeRealmForSave(env);
+  if (!norm.ok) return { ok:false, error:norm.error };
+  cache.set(env.id, env);
+  try { await putVibe(env); await writeLineageEdges(env); await forwardResolveExternalRefs(env); }
+  catch (e) { return { ok:false, error:e.message }; }
+  notify('save', env);
+  if (fsAvailable) {
+    // Best-effort FS mirror — don't block the reply on it
+    const safe = (env.name || env.id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'untitled';
+    const path = `vibes/${env.type}/${safe}.${env.id.slice(2,15)}.vibe.json`;
+    fsCall('fs.write', { path, content: JSON.stringify(env, null, 2) }).catch(()=>{});
+  }
+  render();
+  return {ok:true, envelope: env};
+}
+
+function handleLoad(req, srcId) {
+  const env = cache.get(req.id);
+  if (!env) return { ok:false, error:'not found' };
+  return { ok:true, envelope: env };
+}
+
+function handleList(req, srcId) {
+  let arr = Array.from(cache.values());
+  if (req.type) arr = arr.filter(e => matchesType(e, req.type));
+  if (req.realm) arr = arr.filter(e => e.realm === req.realm);
+  if (req.tags && req.tags.length) arr = arr.filter(e => req.tags.every(t => (e.tags||[]).includes(t)));
+  // Return summaries (no payload) to keep messages small
+  const data = arr.map(envSummary);
+  data.sort(sortFn(req.sort || 'recent'));
+  return { ok:true, data };
+}
+
+function handleSearch(req, srcId) {
+  const q = String(req.q || '').toLowerCase().trim();
+  let arr = Array.from(cache.values());
+  if (req.type) arr = arr.filter(e => matchesType(e, req.type));
+  if (req.realm) arr = arr.filter(e => e.realm === req.realm);
+  if (q) arr = arr.filter(e =>
+    (e.name||'').toLowerCase().includes(q) ||
+    (e.tags||[]).some(t => t.toLowerCase().includes(q)) ||
+    e.type.includes(q) ||
+    String(e.realm || '').toLowerCase().includes(q)
+  );
+  return { ok:true, data: arr.map(envSummary) };
+}
+
+async function handleDelete(req, srcId) {
+  const env = cache.get(req.id);
+  if (!env) return { ok:false, error:'not found' };
+  cache.delete(req.id);
+  try { await deleteVibe(env); }
+  catch (e) { return { ok:false, error:e.message }; }
+  notify('delete', env);
+  render();
+  return { ok:true };
+}
+
+async function handleTag(req, srcId) {
+  const env = cache.get(req.id);
+  if (!env) return { ok:false, error:'not found' };
+  const tags = new Set(env.tags || []);
+  if (Array.isArray(req.add)) for (const t of req.add) tags.add(String(t).slice(0,32));
+  if (Array.isArray(req.remove)) for (const t of req.remove) tags.delete(String(t));
+  env.tags = Array.from(tags).slice(0, 32);
+  cache.set(env.id, env);
+  try { await putVibe(env); }
+  catch (e) { return { ok:false, error:e.message }; }
+  notify('tag', env);
+  if (selectedId === env.id) renderDetail();
+  render();
+  return { ok:true, envelope: env };
+}
+
+async function handleLineage(req, srcId) {
+  const seedId = req.id;
+  if (!cache.has(seedId)) return { ok:false, error:'not found' };
+  const depth = Math.min(8, Math.max(1, req.depth || 3));
+  const ancestors = new Set(), descendants = new Set();
+  // Walk parents
+  function walkUp(id, d) {
+    if (d <= 0) return;
+    const env = cache.get(id);
+    if (!env) return;
+    for (const p of env.parents || []) {
+      if (ancestors.has(p)) continue;
+      ancestors.add(p); walkUp(p, d-1);
+    }
+  }
+  // Walk children — scan cache for who has this as a parent
+  function walkDown(id, d) {
+    if (d <= 0) return;
+    for (const e of cache.values()) {
+      if ((e.parents||[]).includes(id) && !descendants.has(e.id)) {
+        descendants.add(e.id); walkDown(e.id, d-1);
+      }
+    }
+  }
+  walkUp(seedId, depth); walkDown(seedId, depth);
+  return { ok:true, data: {
+    seed: envSummary(cache.get(seedId)),
+    ancestors: Array.from(ancestors).map(id => envSummary(cache.get(id))).filter(Boolean),
+    descendants: Array.from(descendants).map(id => envSummary(cache.get(id))).filter(Boolean)
+  }};
+}
+
+function handleSubscribe(req, srcId) {
+  subs.push({ blockId: srcId, filter: { type: req.type, tag: req.tag, realm: req.realm } });
+  return { ok:true };
+}
+
+async function handleImportFolder(req, srcId) {
+  try {
+    const r = await importFromFolder();
+    showToast(`Imported ${r.added} · skipped ${r.skipped}`);
+    return { ok:true, data: r };
+  } catch (e) { return { ok:false, error:e.message }; }
+}
+async function handleExportFolder(req, srcId) {
+  try {
+    const r = await exportToFolder(req.ids || null);
+    return { ok:true, data: r };
+  } catch (e) { return { ok:false, error:e.message }; }
+}
+function handleRealmCurrent(req, srcId) {
+  return { ok:true, realm_id: currentRealmId, charter_summary: currentCharterSummary() };
+}
+function handleRealmList(req, srcId) {
+  return { ok:true, data: realmCharters().map(envSummary).sort(sortFn('name')) };
+}
+async function handleRealmSet(req, srcId) {
+  return setCurrentRealm(req.realm_id);
+}
+async function handleAttest(req, srcId) {
+  const env = cache.get(req.id);
+  if (!env) return { ok:false, error:'not found' };
+  if (typeFamily(env.type) !== 'creature') return { ok:false, error:'not a creature' };
+  try {
+    const r = await attestVibe(env);
+    return { ok:true, data: { id: env.id, attestation: env.attestation, event_id: env.attestation_event_id || null, published: r.published || 0 } };
+  } catch (e) {
+    env.attestation = 'deferred';
+    await putVibe(env).catch(()=>{});
+    return { ok:false, error:e.message };
+  }
+}
+
+function envSummary(env) {
+  if (!env) return null;
+  return {
+    id: env.id, type: env.type, name: env.name, tags: env.tags || [],
+    parents: env.parents || [], createdAt: env.createdAt, source: env.source,
+    birthHash: env.birthHash, subFormat: env.subFormat, realm: env.realm || null,
+    content_addr: env.content_addr || null, content_hash: env.content_hash || null, attestation: env.attestation || null,
+    attestations: getAttestations(env).length, generation: env.payload && Number.isFinite(Number(env.payload.generation)) ? Number(env.payload.generation) : null,
+    foreign_stub: typeFamily(env.type) === 'creature-stub', full_artifact: !(env.payload && env.payload.full_artifact === false),
+    slots: typeFamily(env.type)==='creature' ? {total:(ensureSlots(env).payload.slots.total), remaining:slotsRemaining(env)} : null
+  };
+}
+function sortFn(key) {
+  if (key === 'name') return (a,b) => (a.name||'').localeCompare(b.name||'');
+  if (key === 'type') return (a,b) => typeFamily(a.type).localeCompare(typeFamily(b.type)) || a.type.localeCompare(b.type) || (a.name||'').localeCompare(b.name||'');
+  if (key === 'parents') {
+    const childCount = new Map();
+    for (const e of cache.values()) for (const p of e.parents||[]) childCount.set(p, (childCount.get(p)||0)+1);
+    return (a,b) => (childCount.get(b.id)||0) - (childCount.get(a.id)||0);
+  }
+  return (a,b) => (b.createdAt||'').localeCompare(a.createdAt||''); // recent
+}
+
+// ── Kernel I/O ─────────────────────────────────────────────────────
+function kernelEmit(channel, payload) {
+  if (nx) nx.emit(channel, payload);
+}
+function notify(op, env) {
+  kernelEmit('vibe.notify', { op, envelope: envSummary(env) });
+}
+
+const VIBE_RESULT_CHANNEL = 'vibe.result';
+const LIB_MANIFEST = {
+  emits: [
+    'vibe.result', 'vibe.notify',
+    'fs.list', 'fs.read', 'fs.write', 'fs.status', 'fs.mkdir', 'wallet.lock.create', 'wallet.lock.resolve',
+    'system.block_ready'
+  ],
+  consumes: [
+    'vibe.save', 'vibe.load', 'vibe.list', 'vibe.search',
+    'vibe.delete', 'vibe.tag', 'vibe.lineage', 'vibe.subscribe',
+    'vibe.import-folder', 'vibe.export-folder',
+    'vibe.realm.current', 'vibe.realm.set', 'vibe.realm.list', 'vibe.attest',
+    'vibe.breed.offer', 'vibe.breed.inbox', 'vibe.breed.accept', 'vibe.breed.receipts',
+    'vibe.battle.intent', 'vibe.battle.inbox', 'vibe.battle.accept', 'vibe.battle.results', 'vibe.battle.start_ranked',
+    'vibe.creature.slots', 'vibe.creature.spent', 'vibe.imprint.create', 'wallet.lock.result',
+    'fs.result', 'fs.mounted'
+  ],
+  app: { title: 'Vibes Library', icon: '◈', description: 'Asset library & lineage', visible: true }
+};
+
+window.addEventListener('message', e => { if (e.data && e.data.type === 'BOOT') port = {}; });
+
+nx = window.NexusBlockClient?.bootBlock({
+  manifest: LIB_MANIFEST,
+  onMessage({ channel, payload }) {
+    const p = payload || {};
+    if (channel === 'fs.mounted') {
+      fsAvailable = true;
+      folderName = p && p.name;
+      render();
+    }
+  }
+});
+
+if (nx) {
+  const route = (channel, fn) => nx.handle(channel, fn, { resultChannel: VIBE_RESULT_CHANNEL });
+  route('vibe.save', handleSave);
+  route('vibe.load', handleLoad);
+  route('vibe.list', handleList);
+  route('vibe.search', handleSearch);
+  route('vibe.delete', handleDelete);
+  route('vibe.tag', handleTag);
+  route('vibe.lineage', handleLineage);
+  route('vibe.subscribe', handleSubscribe);
+  route('vibe.import-folder', handleImportFolder);
+  route('vibe.export-folder', handleExportFolder);
+  route('vibe.realm.current', handleRealmCurrent);
+  route('vibe.realm.set', handleRealmSet);
+  route('vibe.realm.list', handleRealmList);
+  route('vibe.attest', handleAttest);
+  route('vibe.breed.offer', handleBreedOffer);
+  route('vibe.breed.inbox', handleBreedInbox);
+  route('vibe.breed.accept', handleBreedAccept);
+  route('vibe.breed.receipts', handleBreedReceipts);
+  route('vibe.battle.intent', handleBattleIntent);
+  route('vibe.battle.inbox', handleBattleInbox);
+  route('vibe.battle.accept', handleBattleAccept);
+  route('vibe.battle.results', handleBattleResults);
+  route('vibe.battle.start_ranked', handleBattleStartRanked);
+  route('vibe.creature.slots', handleCreatureSlots);
+  route('vibe.creature.spent', handleCreatureSpent);
+  route('vibe.imprint.create', handleImprintCreate);
+
+  nx.ready.then(async () => {
+    mounted = true;
+    try {
+      await openDB();
+      await loadAllToCache();
+      await ensureBuiltInRealm();
+      await loadAllToCache();
+      await refreshFsState();
+      kernelEmit('system.block_ready', { blockId: 'vibes_library', status: 'ONLINE' });
+      startAttestationRelaySubscription();
+      render();
+    } catch (err) { log(`fatal: ${err.message}`, 'err'); }
+  });
+}
+
+
+window.__vibesTestHooks = {
+  cache,
+  breedState,
+      battleState,
+  handleNostrAttestationEvent,
+  handleNostrBreedOfferEvent,
+  handleNostrBreedProtocolEvent,
+  handleNostrBreedReceiptEvent,
+      handleNostrBattleIntentEvent,
+      handleNostrBattleProtocolEvent,
+      handleNostrBattleResultEvent,
+  handleBreedReceiptContent,
+  handleBreedOffer,
+  handleBattleIntent,
+  saveBattleResult,
+  parseAttestationContent,
+  consumeSlot,
+  verifyBreedReceiptSignatures,
+  createForeignCreatureStub,
+  augmentAttestation,
+  resolveParentRefs,
+  forwardResolveExternalRefs,
+  findVibeByCreatureHash,
+  getAttestations,
+  envSummary,
+  handleSave,
+  handleList,
+  handleLineage,
+  migrateGenesisRealmCharter,
+  handleBattleResults,
+  handleCreatureSlots,
+  handleCreatureSpent,
+  handleImprintCreate,
+  applyBattleSlotResult,
+  handleBattleStartRanked,
+  handleNostrWitnessAdEvent,
+  _setCurrentRealmForTest(id){ currentRealmId = id; },
+  _setSecpForTest(secp){ attRelay.secp = secp; },
+  _put(env){ cache.set(env.id, env); return putVibe(env).catch(()=>{}); },
+  _parseBreedContent: parseBreedContent
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   UI
+   ════════════════════════════════════════════════════════════════════ */
+function $(id) { return document.getElementById(id); }
+function escHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let toastTm = 0;
+function showToast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTm); toastTm = setTimeout(() => t.classList.remove('show'), 2400); // METADATA: display only, not content-addressed
+}
+
+function render() {
+  // Sidebar
+  const counts = { all: cache.size };
+  for (const t of TYPES) counts[t] = 0;
+  const tagCounts = new Map();
+  for (const e of cache.values()) {
+    counts[typeFamily(e.type)] = (counts[typeFamily(e.type)] || 0) + 1;
+    for (const tag of e.tags || []) tagCounts.set(tag, (tagCounts.get(tag)||0)+1);
+  }
+  const side = $('side');
+  let html = '<h4>TYPES</h4>';
+  html += `<div class="side-row ${filterType===null?'active':''}" data-type="">
+    <div class="side-dot"></div><div>All</div><div class="side-count">${counts.all}</div></div>`;
+  for (const t of TYPES) {
+    html += `<div class="side-row ${filterType===t?'active':''}" data-type="${t}">
+      <div class="side-dot t-${t}"></div><div>${TYPE_LABELS[t]}</div>
+      <div class="side-count">${counts[t]}</div></div>`;
+  }
+  if (tagCounts.size) {
+    html += '<h4>TAGS</h4>';
+    const sorted = Array.from(tagCounts.entries()).sort((a,b) => b[1]-a[1]).slice(0,40);
+    html += `<div class="side-row ${filterTag===null?'active':''}" data-tag="">
+      <div class="side-dot"></div><div>(any)</div></div>`;
+    for (const [tag, n] of sorted) {
+      html += `<div class="side-row ${filterTag===tag?'active':''}" data-tag="${escHtml(tag)}">
+        <div class="side-dot"></div><div>${escHtml(tag)}</div>
+        <div class="side-count">${n}</div></div>`;
+    }
+  }
+  if (fsAvailable) html += `<h4>FOLDER</h4><div class="side-row" style="cursor:default"><div>📁 ${escHtml(folderName||'mounted')}</div></div>`;
+  side.innerHTML = html;
+  side.querySelectorAll('.side-row[data-type]').forEach(el => {
+    el.onclick = () => { filterType = el.dataset.type || null; render(); };
+  });
+  side.querySelectorAll('.side-row[data-tag]').forEach(el => {
+    el.onclick = () => { filterTag = el.dataset.tag || null; render(); };
+  });
+
+  // Grid
+  let arr = Array.from(cache.values()).map(envSummary);
+  if (filterType) arr = arr.filter(e => matchesType(e, filterType));
+  if (filterTag) arr = arr.filter(e => (e.tags||[]).includes(filterTag));
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    arr = arr.filter(e => (e.name||'').toLowerCase().includes(q) ||
+                          (e.tags||[]).some(t => t.toLowerCase().includes(q)) ||
+                          e.type.includes(q));
+  }
+  arr.sort(sortFn(sortBy));
+
+  $('count').textContent = `${arr.length} of ${cache.size} vibe${cache.size===1?'':'s'}${currentRealmId ? ` · realm ${currentRealmId}` : ''}${fsAvailable && folderName ? ` · 📁 ${folderName}` : ''}`;
+
+  // Mount-state-aware UI: button label and empty-state instructions
+  const syncBtn = $('btn-rescan');
+  if (syncBtn) syncBtn.textContent = fsAvailable ? '↻ Rescan Folder' : '↻ Sync Folder';
+
+  const instr = $('empty-instructions');
+  if (instr) {
+    if (fsAvailable) {
+      instr.innerHTML = `Folder <strong>${escHtml(folderName||'(mounted)')}</strong> is mounted but the shelf is empty. Walk Atlas, sync exported creatures, or open a forge to wake the first specimen.`;
+    } else {
+      instr.innerHTML = `No folder mounted. Click 📁 in the Nexus taskbar, then come back and hit <strong>Sync Folder</strong>. You can also walk Atlas to find creatures before importing files.`;
+    }
+  }
+
+  const grid = $('grid'); const empty = $('empty');
+  if (cache.size === 0) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  grid.innerHTML = arr.map(e => `
+    <div class="card ${selectedId===e.id?'selected':''}" data-id="${e.id}">
+      <div class="card-head">
+        <span class="type-chip t-${typeFamily(e.type)}">${e.type}</span>
+      </div>
+      <div class="card-name">${escHtml(e.name)}</div>
+      <div class="card-meta">${(e.tags||[]).slice(0,4).map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>
+      <div class="card-foot">
+        <span>${e.realm ? escHtml(e.realm) : (e.parents && e.parents.length ? `${e.parents.length} parent${e.parents.length>1?'s':''}` : 'origin')}</span>
+        <span>${e.id.slice(2,12)}</span>
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('.card').forEach(c => {
+    c.onclick = () => { selectedId = c.dataset.id; renderDetail(); render(); };
+  });
+}
+
+function renderDetail() {
+  const env = cache.get(selectedId);
+  const panel = $('detail');
+  if (!env) { panel.classList.remove('open'); return; }
+  panel.classList.add('open');
+  $('detail-name').textContent = env.name;
+  $('detail-meta').innerHTML = `${env.type.toUpperCase()} · gen <span style="color:var(--ink-2)">${(env.parents||[]).length === 0 ? '01' : '0' + ((env.parents||[]).length+1)}</span>`;
+
+  const kv = $('detail-kv');
+  kv.innerHTML = `
+    <div class="k">id</div><div class="v"><code>${escHtml(env.id)}</code></div>
+    <div class="k">type</div><div class="v">${env.type}</div>
+    <div class="k">format</div><div class="v">${escHtml(env.subFormat||'')}</div>
+    <div class="k">hash</div><div class="v"><code style="font-size:9px">${escHtml(env.birthHash||'').slice(0,30)}…</code></div>
+    <div class="k">created</div><div class="v">${escHtml((env.createdAt||'').slice(0,19).replace('T',' '))}</div>
+    <div class="k">source</div><div class="v">${escHtml(env.source||'—')}</div>
+    <div class="k">realm</div><div class="v">${escHtml(env.realm||'—')}</div>
+    <div class="k">attest</div><div class="v">${escHtml(env.attestation||'—')}</div>`;
+
+  const tagsEl = $('detail-tags');
+  tagsEl.innerHTML = (env.tags||[]).map(t =>
+    `<span class="tag" data-tag="${escHtml(t)}" style="cursor:pointer" title="click to remove">${escHtml(t)} ×</span>`
+  ).join('') || '<span style="color:var(--ink-3);font-size:10px">no tags</span>';
+  tagsEl.querySelectorAll('[data-tag]').forEach(el => {
+    el.onclick = async () => {
+      handleTag({ id: env.id, remove: [el.dataset.tag] }, '_local');
+    };
+  });
+
+  $('search').addEventListener('keydown', (e) => { if (e.key === 'Delete' || e.key === 'Backspace') e.stopPropagation(); });
+$('tag-input').onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      const v = e.target.value.trim();
+      if (!v) return;
+      handleTag({ id: env.id, add: [v] }, '_local');
+      e.target.value = '';
+    }
+  };
+
+  // Lineage
+  const lin = $('detail-lineage');
+  const parents = (env.parents||[]).map(id => cache.get(id)).filter(Boolean);
+  const children = Array.from(cache.values()).filter(e => (e.parents||[]).includes(env.id));
+  let lhtml = '';
+  if (parents.length) lhtml += '<div style="font-size:9px;color:var(--ink-3);margin-bottom:4px">PARENTS</div>';
+  for (const p of parents) lhtml += `<div class="lineage-row" data-id="${p.id}">↑ ${escHtml(p.name)} <span style="color:var(--ink-3)">${p.type}</span></div>`;
+  if (children.length) lhtml += '<div style="font-size:9px;color:var(--ink-3);margin:8px 0 4px">DESCENDANTS (' + children.length + ')</div>';
+  for (const c of children.slice(0, 10)) lhtml += `<div class="lineage-row" data-id="${c.id}">↓ ${escHtml(c.name)} <span style="color:var(--ink-3)">${c.type}</span></div>`;
+  if (!parents.length && !children.length) lhtml = '<div style="color:var(--ink-3);font-size:10px">origin · no descendants yet</div>';
+  lin.innerHTML = lhtml;
+  lin.querySelectorAll('[data-id]').forEach(el => {
+    el.onclick = () => { selectedId = el.dataset.id; renderDetail(); render(); };
+  });
+}
+
+// ── Top bar wiring ─────────────────────────────────────────────────
+// Both "Mount Folder" buttons and the Rescan button do the same smart thing:
+// re-query the kernel for current mount state, then either scan or instruct.
+// This is robust against missed fs.mounted broadcasts and stale cached state.
+async function syncFolder() {
+  if (!mounted) { showToast('Library not connected to kernel yet'); return; }
+  const live = await refreshFsState();
+  if (!live) {
+    showToast('No folder mounted — click 📁 in the Nexus taskbar.');
+    render();
+    return;
+  }
+  showToast(`Scanning ${folderName || 'folder'}…`);
+  const r = await importFromFolder();
+  if (r.scanned === 0) {
+    showToast(`Folder is empty (${folderName || ''})`);
+  } else {
+    showToast(`Found ${r.added} new vibe${r.added===1?'':'s'} · ${r.skipped} skipped of ${r.scanned}`);
+  }
+}
+$('btn-mount').onclick = $('empty-mount').onclick = $('btn-rescan').onclick = syncFolder;
+$('search').oninput = (e) => { searchQ = e.target.value; render(); };
+$('sort').onchange = (e) => { sortBy = e.target.value; render(); };
+$('detail-close').onclick = () => { selectedId = null; renderDetail(); render(); };
+$('d-copy-id').onclick = () => {
+  if (!selectedId) return;
+  navigator.clipboard.writeText(selectedId).then(() => showToast('Copied ID'));
+};
+$('d-export').onclick = async () => {
+  if (!selectedId) return;
+  const env = cache.get(selectedId);
+  const json = JSON.stringify(env, null, 2);
+  const safe = (env.name||'untitled').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `${safe}.vibe.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1200);
+};
+$('d-delete').onclick = () => {
+  if (!selectedId) return;
+  if (!confirm('Delete this vibe? Lineage references from descendants will become broken.')) return;
+  handleDelete({ id: selectedId, _reqId: '_local' }, '_local');
+  selectedId = null;
+  renderDetail();
+};
+
+// ── Drop import ────────────────────────────────────────────────────
+let dragDepth = 0;
+window.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; $('drop-overlay').classList.add('show'); });
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('dragleave', e => { dragDepth = Math.max(0, dragDepth-1); if (!dragDepth) $('drop-overlay').classList.remove('show'); });
+window.addEventListener('drop', async e => {
+  e.preventDefault(); dragDepth = 0; $('drop-overlay').classList.remove('show');
+  const files = Array.from(e.dataTransfer.files || []);
+  let added = 0, skipped = 0;
+  for (const f of files) {
+    try {
+      const text = await f.text();
+      const lname = f.name.toLowerCase();
+      const hint = lname.endsWith('.html') ? 'battle-html' : 'json';
+      const env = await ingestText(text, f.name, hint);
+      if (env) added++; else skipped++;
+    } catch (_) { skipped++; }
+  }
+  showToast(`Imported ${added}${skipped?` · skipped ${skipped}`:''}`);
+  render();
+});
+
+// Standalone fallback if not running inside Nexus
+setTimeout(async () => {
+  if (!mounted && !port) {
+    log('standalone mode — no kernel BOOT received');
+    try { await openDB(); await loadAllToCache(); render(); }
+    catch (e) { log(`standalone init failed: ${e.message}`, 'err'); }
+  }
+}, 1000);
+
+// Initial render in case data is already loaded
+render();
+</script>
+</body>
+</html>

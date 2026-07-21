@@ -1,0 +1,49 @@
+{
+  "version": "0.03",
+  "host": "Noted",
+  "router": "Nexus OS",
+  "routerPath": "nexus/os/Nexus_OS.html",
+  "principle": "Noted hosts the archive. Nexus routes blocks. Each app remains a sovereign block until a deeper data bridge is explicitly built.",
+  "blocks": [
+    {
+      "id": "nexus-os",
+      "title": "Nexus Router",
+      "kind": "kernel",
+      "path": "nexus/os/Nexus_OS.html",
+      "notedRoute": "/nexus-router",
+      "role": "Router/kernel/desktop for all embedded blocks"
+    },
+    {
+      "id": "nexus-agent-v012",
+      "title": "Nexus Agent v0.12",
+      "kind": "managed-block",
+      "path": "nexus/os/blocks/apps/nexus-agent-v0.12.html",
+      "legacyPath": "nexus/nexus-agent-v0.12.html",
+      "notedRoute": "/nexus-agent",
+      "role": "Agent chat, sessions, modules, and AI workspace"
+    },
+    {
+      "id": "prompt-studio-v3",
+      "title": "Prompt Studio v3",
+      "kind": "managed-block",
+      "path": "nexus/os/blocks/apps/prompt-studio-v3.html",
+      "legacyPath": "nexus/prompt-studio-v3.html",
+      "notedRoute": "/prompt-studio-v3",
+      "role": "Prompt analyzer, Forge, adversarial review, and CPL tools"
+    },
+    {
+      "id": "pokemon-engine-test",
+      "title": "Pokemon Engine Test",
+      "kind": "legacy-block",
+      "path": "nexus/os/pokemon-engine-test.html",
+      "role": "Deterministic creature engine test harness"
+    },
+    {
+      "id": "eidolon-vibes-stack",
+      "title": "Eidolon / Vibes Stack",
+      "kind": "managed-block-suite",
+      "path": "nexus/os/blocks/",
+      "role": "Creature, world, battle, forge, wallet, and system blocks"
+    }
+  ]
+}

@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus Channels</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#000;--sf:#07070f;--sf2:#0c0c1a;--sf3:#111128;
+  --text:#e0e5f5;--dim:#8a94a6;--muted:#535a6b;
+  --accent:#00e5ff;--adim:rgba(0,229,255,.08);--border:rgba(0,229,255,.12);--border-hi:rgba(0,229,255,.28);
+  --gold:#fbbf24;--gdim:rgba(251,191,36,.08);
+  --danger:#ef4444;--warn:#f59e0b;--ok:#22c55e;
+  --font:'JetBrains Mono','SF Mono','Cascadia Code',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--font);font-size:12px;background:var(--bg);color:var(--text)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* Boot */
+#nx-boot{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#boot-glyph{font-size:26px;color:var(--gold);text-shadow:0 0 16px var(--gdim)}
+#boot-title{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--dim)}
+#boot-status{font-size:8px;color:var(--muted);letter-spacing:1px;min-height:12px}
+
+/* App */
+#nx-app{height:100%;display:none;flex-direction:column}
+body.nx-on #nx-boot{display:none}
+body.nx-on #nx-app{display:flex}
+
+/* Header */
+#ch-hdr{
+  padding:8px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+  border-bottom:1px solid rgba(251,191,36,.15);
+  background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
+}
+.hdr-title{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.relay-dots{display:flex;gap:4px;align-items:center}
+.rdot{width:5px;height:5px;border-radius:50%;background:var(--muted);transition:background .3s}
+.rdot.open{background:var(--ok)}.rdot.connecting{background:var(--warn);animation:blink 1.2s infinite}
+.rdot.error,.rdot.closed{background:var(--danger)}
+.hdr-flex{flex:1}
+.pill{
+  font-family:inherit;font-size:10px;padding:3px 11px;cursor:pointer;
+  border-radius:12px;border:1px solid;transition:all .15s;
+}
+.pill-accent{color:var(--accent);border-color:var(--border-hi);background:var(--adim)}
+.pill-accent:hover{background:var(--accent);color:#000;border-color:var(--accent)}
+.pill-gold{color:var(--gold);border-color:rgba(251,191,36,.3);background:var(--gdim)}
+.pill-gold:hover{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* Layout */
+#ch-body{flex:1;display:flex;overflow:hidden}
+
+/* Channel list panel */
+#ch-panel{width:210px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(251,191,36,.1)}
+#ch-list-hdr{
+  padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.ch-list-label{font-size:8px;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+#ch-scroll{flex:1;overflow-y:auto}
+.ch-empty{padding:20px 14px;font-size:9px;color:var(--muted);text-align:center;line-height:1.9}
+
+.ch-item{
+  padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.025);
+  transition:background .1s;border-left:2px solid transparent;
+}
+.ch-item:hover{background:var(--gdim)}
+.ch-item.active{background:var(--gdim);border-left-color:var(--gold)}
+.ch-item-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-item-meta{font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-badge{
+  display:inline-block;background:var(--gold);color:#000;
+  font-size:8px;font-weight:700;border-radius:8px;padding:1px 5px;margin-left:4px;
+}
+.ch-lock{font-size:9px;margin-right:4px;opacity:.6}
+#ch-actions{padding:8px 10px;border-top:1px solid rgba(255,255,255,.03);display:flex;gap:6px;flex-shrink:0}
+
+/* Chat panel */
+#chat-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#chat-hdr{
+  padding:8px 14px;border-bottom:1px solid rgba(251,191,36,.1);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  background:rgba(0,0,0,.6);
+}
+#chat-name{font-size:11px;font-weight:700;color:var(--gold)}
+#chat-about{font-size:9px;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis}
+.ch-id-btn{font-size:8px}
+.ch-privacy{font-size:9px;padding:2px 8px;border-radius:8px;margin-left:6px;flex-shrink:0}
+.ch-privacy.pub{background:rgba(34,197,94,.1);color:var(--ok);border:1px solid rgba(34,197,94,.2)}
+.ch-privacy.prv{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.2)}
+
+#chat-scroll{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:4px}
+#chat-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+}
+.ce-glyph{font-size:32px;color:var(--gold);opacity:.12}
+.ce-text{font-size:9px;color:var(--muted);text-align:center;line-height:1.9}
+
+/* Channel messages */
+.ch-msg{padding:5px 0;border-bottom:1px solid rgba(255,255,255,.02);animation:pop .15s}
+.ch-msg-meta{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.ch-msg-handle{font-size:10px;font-weight:700;color:var(--accent);cursor:pointer}
+.ch-msg-handle:hover{text-decoration:underline}
+.ch-msg-mine .ch-msg-handle{color:var(--gold)}
+.ch-msg-time{font-size:8px;color:var(--muted)}
+.ch-msg-body{font-size:11px;color:var(--text);line-height:1.65;word-break:break-word;white-space:pre-wrap;padding-left:2px}
+.ch-msg-mine .ch-msg-body{color:rgba(251,191,36,.85)}
+
+/* Compose */
+#ch-compose{
+  padding:10px 12px;border-top:1px solid rgba(251,191,36,.1);
+  display:flex;gap:8px;flex-shrink:0;align-items:flex-end;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(10px);
+}
+#ch-ta{
+  flex:1;background:var(--sf);border:1px solid rgba(251,191,36,.15);
+  color:var(--gold);padding:8px 12px;border-radius:18px;
+  font-family:var(--font);font-size:11px;outline:none;resize:none;
+  max-height:84px;line-height:1.55;transition:border-color .15s;min-height:36px;
+}
+#ch-ta:focus{border-color:var(--gold)}
+#ch-ta::placeholder{color:var(--muted)}
+#ch-send{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:var(--gold);color:#000;cursor:pointer;font-size:14px;
+  flex-shrink:0;transition:opacity .15s;display:flex;align-items:center;justify-content:center;
+}
+#ch-send:hover{opacity:.8}
+#ch-send:disabled{opacity:.3;cursor:default}
+
+/* Modals */
+.modal-bg{
+  position:absolute;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-bg.open{opacity:1;pointer-events:auto}
+.modal-card{
+  background:var(--sf2);border:1px solid var(--border-hi);
+  border-radius:14px;padding:22px;width:100%;max-width:380px;
+  box-shadow:0 20px 60px rgba(0,0,0,.95);
+}
+.modal-card.gold-top{border-top:2px solid var(--gold)}
+.modal-card.accent-top{border-top:2px solid var(--accent)}
+.mc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.mc-sub{font-size:9px;color:var(--muted);margin-bottom:18px;line-height:1.8}
+.mc-label{font-size:9px;color:var(--dim);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase}
+.mc-input{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  color:var(--text);padding:10px 13px;border-radius:8px;
+  font-family:var(--font);font-size:11px;outline:none;margin-bottom:14px;
+  transition:border-color .15s;
+}
+.mc-input:focus{border-color:var(--accent)}
+.mc-row{display:flex;gap:8px;justify-content:flex-end}
+.mc-btn{
+  font-family:inherit;font-size:10px;padding:5px 14px;cursor:pointer;
+  border-radius:10px;border:1px solid var(--border-hi);
+  background:var(--sf3);color:var(--dim);transition:all .15s;
+}
+.mc-btn.gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.mc-btn.accent{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700}
+
+/* Privacy toggle */
+.privacy-toggle{display:flex;gap:6px;margin-bottom:14px}
+.pt-opt{
+  flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);
+  cursor:pointer;text-align:center;font-size:9px;color:var(--muted);transition:all .15s;
+}
+.pt-opt.sel-pub{border-color:var(--ok);color:var(--ok);background:rgba(34,197,94,.08)}
+.pt-opt.sel-prv{border-color:var(--warn);color:var(--warn);background:rgba(245,158,11,.08)}
+.pt-icon{font-size:16px;margin-bottom:3px}
+.pt-label{font-weight:700}
+.pt-desc{font-size:8px;opacity:.7;margin-top:2px}
+
+/* Channel ID display */
+.ch-id-box{
+  background:var(--bg);border:1px dashed var(--border-hi);border-radius:8px;
+  padding:10px;margin-bottom:14px;cursor:pointer;transition:border-color .15s;
+}
+.ch-id-box:hover{border-color:var(--gold)}
+.ch-id-text{font-family:var(--font);font-size:9px;color:var(--dim);word-break:break-all;line-height:1.6}
+.ch-id-hint{font-size:8px;color:var(--muted);margin-top:6px}
+
+/* Toast */
+.nx-toast{
+  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+  background:var(--sf2);border:1px solid var(--border-hi);border-radius:12px;
+  padding:6px 16px;font-size:10px;color:var(--accent);z-index:100;
+  opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;
+}
+.nx-toast.show{opacity:1}
+.hidden{display:none!important}
+
+/* ── Wallet chip ── */
+.wallet-chip {
+  font-size:9px;letter-spacing:1px;color:var(--muted);
+  border:1px solid var(--border);padding:2px 9px;border-radius:10px;transition:all .15s;
+}
+.wallet-chip.live{color:var(--gold);border-color:rgba(251,191,36,.3);text-shadow:0 0 6px rgba(251,191,36,.2);}
+
+/* ── Message stake hover action ── */
+.ch-msg{position:relative;}
+.ch-msg:hover .msg-stake-btn{opacity:1;}
+.msg-stake-btn{
+  position:absolute;right:0;top:3px;
+  opacity:0;transition:opacity .15s;
+  background:none;border:none;cursor:pointer;
+  font-size:10px;color:var(--muted);padding:2px 7px;
+  font-family:var(--font);letter-spacing:.3px;
+}
+.msg-stake-btn:hover{color:var(--gold);}
+.msg-stake-btn.staked{opacity:1;color:var(--gold);}
+
+/* ── Message stake indicator chip ── */
+.msg-stake-ind{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:5px;font-size:8px;letter-spacing:.5px;
+  padding:2px 8px;border-radius:6px;
+  border:1px solid rgba(251,191,36,.2);
+  background:rgba(251,191,36,.05);color:var(--gold);
+}
+.msi-status{font-size:7px;letter-spacing:1px;}
+.msi-status.ready{animation:blink 1.5s infinite;}
+
+/* ── Staked messages filter toggle ── */
+.stake-filter-btn{
+  font-size:8px;padding:2px 9px;border-radius:8px;cursor:pointer;
+  border:1px solid rgba(251,191,36,.25);color:var(--muted);background:transparent;
+  font-family:var(--font);letter-spacing:.5px;transition:all .15s;flex-shrink:0;
+}
+.stake-filter-btn.active{color:var(--gold);border-color:var(--gold);background:rgba(251,191,36,.07);box-shadow:0 0 8px rgba(251,191,36,.1);}
+
+/* ── Stake modal ── */
+#modal-stake{z-index:80;}
+.stake-ev-disp{
+  background:var(--bg);border:1px dashed var(--border-hi);border-radius:8px;
+  padding:9px 11px;margin-bottom:12px;cursor:pointer;transition:border-color .15s;
+  font-size:9px;color:var(--dim);word-break:break-all;line-height:1.6;
+}
+.stake-ev-disp:hover{border-color:var(--gold);}
+.sed-label{font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px;text-transform:uppercase;}
+.sed-preview{font-size:10px;color:var(--text);margin-top:5px;font-style:italic;}
+.ws-sbar{
+  display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:8px;
+  border:1px solid var(--border);margin-bottom:12px;font-size:9px;
+  background:rgba(0,229,255,.03);color:var(--dim);
+}
+.ws-sbar.nc{border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.03);color:var(--danger);}
+.wsdot{width:5px;height:5px;border-radius:50%;background:var(--ok);flex-shrink:0;}
+.wsdot.off{background:var(--muted);}
+.si-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.si-field label{display:block;font-size:8px;letter-spacing:1px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<div id="nx-boot">
+  <div id="boot-glyph">◈</div>
+  <div id="boot-title">Nexus Channels</div>
+  <div id="boot-status">LOADING</div>
+</div>
+
+<div id="nx-app">
+  <div id="ch-hdr">
+    <span class="hdr-title">◈ CHANNELS</span>
+    <div class="relay-dots" id="relay-dots"></div>
+    <div class="hdr-flex"></div>
+    <div class="wallet-chip" id="wallet-chip" title="Wallet state">NO WALLET</div>
+    <button class="pill pill-accent" id="btn-join" style="margin-right:4px">Join</button>
+    <button class="pill pill-gold" id="btn-create">+ Create</button>
+  </div>
+
+  <div id="ch-body">
+    <!-- Channel list -->
+    <div id="ch-panel">
+      <div id="ch-list-hdr">
+        <span class="ch-list-label">Your Channels</span>
+      </div>
+      <div id="ch-scroll">
+        <div class="ch-empty" id="ch-empty">
+          No channels yet.<br>
+          <strong style="color:var(--gold)">Create</strong> a new one<br>or <strong style="color:var(--accent)">Join</strong> by ID.
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat area -->
+    <div id="chat-panel">
+      <div id="chat-hdr" class="hidden">
+        <div>
+          <div id="chat-name">—</div>
+          <div id="chat-about">—</div>
+        </div>
+        <span id="chat-privacy" class="ch-privacy"></span>
+        <button class="stake-filter-btn" id="btn-stake-filter" title="Show only staked messages">⚡ Staked</button>
+        <button class="pill pill-accent ch-id-btn" id="btn-share-id" style="font-size:8px;padding:2px 8px">Share ID</button>
+      </div>
+
+      <div id="chat-scroll">
+        <div id="chat-empty">
+          <div class="ce-glyph">◈</div>
+          <div class="ce-text">
+            Select a channel or create one.<br>
+            <strong style="color:var(--gold)">Public</strong> channels anyone can join.<br>
+            <strong style="color:var(--warn)">Private</strong> channels stay invite-only<br>by keeping the ID secret.
+          </div>
+        </div>
+      </div>
+
+      <div id="ch-compose" class="hidden">
+        <textarea id="ch-ta" placeholder="Send to channel… (Ctrl+Enter)" rows="1"></textarea>
+        <button id="ch-send">▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create channel modal -->
+<div class="modal-bg" id="modal-create">
+  <div class="modal-card gold-top">
+    <div class="mc-title">Create Channel</div>
+    <div class="mc-sub">Channels are hosted on public Nostr relays.<br>Private = invite-only via secret ID. Public = open to all.</div>
+
+    <div class="mc-label">Privacy</div>
+    <div class="privacy-toggle">
+      <div class="pt-opt sel-pub" id="opt-public" onclick="window._selPrivacy('public')">
+        <div class="pt-icon">🌐</div>
+        <div class="pt-label">Public</div>
+        <div class="pt-desc">Anyone can join</div>
+      </div>
+      <div class="pt-opt" id="opt-private" onclick="window._selPrivacy('private')">
+        <div class="pt-icon">🔒</div>
+        <div class="pt-label">Private</div>
+        <div class="pt-desc">Invite by ID only</div>
+      </div>
+    </div>
+
+    <div class="mc-label">Channel Name</div>
+    <input class="mc-input" id="new-ch-name" placeholder="e.g. nexus-builders" maxlength="40" autocomplete="off">
+    <div class="mc-label">Description (optional)</div>
+    <input class="mc-input" id="new-ch-about" placeholder="What's this channel about?" maxlength="120" autocomplete="off">
+    <div class="mc-row">
+      <button class="mc-btn" id="btn-cancel-create">Cancel</button>
+      <button class="mc-btn gold" id="btn-do-create">Create Channel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Join channel modal -->
+<div class="modal-bg" id="modal-join">
+  <div class="modal-card accent-top">
+    <div class="mc-title">Join Channel</div>
+    <div class="mc-sub">Enter a channel ID (the 64-char event ID of the kind-40 creation event).<br>Get this from whoever created the channel.</div>
+    <div class="mc-label">Channel ID</div>
+    <input class="mc-input" id="join-id" placeholder="64-char hex channel ID" autocomplete="off" spellcheck="false">
+    <div class="mc-row">
+      <button class="mc-btn" id="btn-cancel-join">Cancel</button>
+      <button class="mc-btn accent" id="btn-do-join">Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share channel ID modal -->
+<div class="modal-bg" id="modal-share">
+  <div class="modal-card gold-top">
+    <div class="mc-title">Share Channel</div>
+    <div class="mc-sub" id="share-sub">Send this ID to people you want to invite.</div>
+    <div class="ch-id-box" id="share-id-box" title="Click to copy">
+      <div class="ch-id-text" id="share-id-text">—</div>
+      <div class="ch-id-hint">Click to copy channel ID</div>
+    </div>
+    <div class="mc-row">
+      <button class="mc-btn gold" id="btn-close-share">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stake Intent Modal -->
+<div class="modal-bg" id="modal-stake">
+  <div class="modal-card gold-top" style="max-width:360px">
+    <div class="mc-title">⚡ Stake on Message</div>
+    <div class="mc-sub">Lock funds behind this message. RELEASE to stand firm. AWARD to concede. SLASH to burn rather than yield.</div>
+    <div class="ws-sbar" id="stake-ws-bar">
+      <div class="wsdot" id="stake-wsdot"></div>
+      <span id="stake-ws-info">WALLET NOT CONNECTED</span>
+    </div>
+    <div class="stake-ev-disp" id="stake-ev-disp" onclick="window.copyStakeId()">
+      <div class="sed-label">Message Event ID — click to copy</div>
+      <div id="stake-ev-id-text" style="color:var(--text)"></div>
+      <div class="sed-preview" id="stake-ev-prev"></div>
+    </div>
+    <div class="si-row">
+      <div class="si-field"><label>Amount</label><input type="number" class="mc-input" id="si-amt" value="100" min="1" style="margin-bottom:0;padding:7px 10px;font-size:11px"></div>
+      <div class="si-field"><label>Window (hrs)</label><input type="number" class="mc-input" id="si-win" value="72" min="1" max="8760" style="margin-bottom:0;padding:7px 10px;font-size:11px"></div>
+    </div>
+    <div class="mc-label">Counterparty NX4ADDR</div>
+    <input type="text" class="mc-input" id="si-cp" placeholder="NX4ADDR:SID:pubkey_x:pubkey_y" style="font-size:10px">
+    <div class="mc-row">
+      <button class="mc-btn" onclick="window.closeStakeModal()">Cancel</button>
+      <button class="mc-btn" onclick="window.copyStakeId()" style="color:var(--gold);border-color:rgba(251,191,36,.3)">Copy ID</button>
+      <button class="mc-btn gold" onclick="window.sendStakeIntent()">⚡ Send to Wallet</button>
+    </div>
+    <div style="font-size:9px;color:var(--muted);margin-top:8px;line-height:1.6" id="stake-msg-status"></div>
+  </div>
+</div>
+
+<div class="nx-toast" id="toast"></div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script type="module">
+"use strict";
+
+/* ─── CONSTANTS ─────────────────────────────────────────────── */
+const ID_KEY     = 'nx.soc.identity';
+const RELAY_KEY  = 'nx.soc.relays';
+const CH_KEY     = 'nx.channels';
+const DEF_RELAYS = ['wss://relay.damus.io','wss://nos.lol','wss://relay.nostr.band'];
+
+/* ─── DEP LOADER ────────────────────────────────────────────── */
+let secp;
+async function loadSecp() {
+  if (secp) return;
+  if (!crypto?.subtle) throw new Error('Web Crypto unavailable — use localhost or HTTPS');
+  for (const src of ['./libs/secp256k1.js','https://esm.sh/@noble/curves@1.4.0/secp256k1?bundle']) {
+    try {
+      const mod = await import(src);
+      const raw = mod.schnorr ? mod : (mod.default?.schnorr ? mod.default : mod);
+      if (raw?.schnorr?.sign) { secp = raw; return; }
+    } catch(e) { console.warn('[ch] secp from', src, ':', e?.message); }
+  }
+  throw new Error('secp256k1 failed to load.');
+}
+
+/* ─── UTILS ─────────────────────────────────────────────────── */
+const h2b = h => new Uint8Array(h.match(/.{1,2}/g).map(b=>parseInt(b,16)));
+const b2h = b => Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+const rnd = n => b2h(crypto.getRandomValues(new Uint8Array(n)));
+async function sha256h(s){
+  return b2h(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s))));
+}
+const _TS = ts=>{const d=Math.floor(Date.now()/1000-ts);return d<60?'now':d<3600?Math.floor(d/60)+'m':d<86400?Math.floor(d/3600)+'h':Math.floor(d/86400)+'d'};
+
+/* ─── BECH32 (npub display) ─────────────────────────────────── */
+const B32C='qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+const B32G=[0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3];
+function _p(v){let c=1;for(const d of v){const t=c>>25;c=(c&0x1ffffff)<<5^d;for(let i=0;i<5;i++)if((t>>i)&1)c^=B32G[i]}return c}
+function _e(s){const r=[];for(let i=0;i<s.length;i++)r.push(s.charCodeAt(i)>>5);r.push(0);for(let i=0;i<s.length;i++)r.push(s.charCodeAt(i)&31);return r}
+function _cv(d,f,t,p=true){let a=0,b=0;const r=[],m=(1<<t)-1;for(const v of d){a=(a<<f)|v;b+=f;while(b>=t){b-=t;r.push((a>>b)&m)}}if(p&&b>0)r.push((a<<(t-b))&m);return r}
+function _npub(hex){const d=_cv(Array.from(h2b(hex)),8,5);function _c(h,d){const p=_p(_e(h).concat(d).concat([0,0,0,0,0,0]))^1;return Array.from({length:6},(_,i)=>(p>>(5*(5-i)))&31)}return 'npub1'+d.concat(_c('npub',d)).map(x=>B32C[x]).join('')}
+
+/* ─── RELAY POOL ────────────────────────────────────────────── */
+class RelayPool {
+  constructor(){this._rs=new Map();this._ss=new Map();this._onEv=null;this._onSt=null}
+  onEvent(cb){this._onEv=cb} onStatus(cb){this._onSt=cb}
+  connect(urls){for(const u of urls)if(!this._rs.has(u))this._open(u);for(const u of this._rs.keys())if(!urls.includes(u))this._drop(u)}
+  _open(url){const r={url,ws:null,status:'connecting',retries:0};this._rs.set(url,r);this._dial(r)}
+  _dial(r){try{const ws=new WebSocket(r.url);r.ws=ws;r.status='connecting';this._nfy();
+    ws.onopen=()=>{r.status='open';r.retries=0;this._nfy();for(const[id,fs]of this._ss)ws.send(JSON.stringify(['REQ',id,...fs]))};
+    ws.onclose=()=>{r.status='closed';this._nfy();const d=Math.min(30000,1000*Math.pow(2,r.retries++));setTimeout(()=>{if(this._rs.has(r.url))this._dial(r)},d)};
+    ws.onerror=()=>{r.status='error';this._nfy()};
+    ws.onmessage=({data})=>{try{const m=JSON.parse(data);if(Array.isArray(m)&&m[0]==='EVENT'&&m[2]&&this._onEv)this._onEv(m[2])}catch(e){}}}catch(e){r.status='error';this._nfy()}}
+  _drop(url){const r=this._rs.get(url);if(r?.ws)try{r.ws.close()}catch(e){}this._rs.delete(url)}
+  subscribe(id,filters){this._ss.set(id,filters);for(const[,r]of this._rs)if(r.status==='open')r.ws.send(JSON.stringify(['REQ',id,...filters]))}
+  publish(ev){const msg=JSON.stringify(['EVENT',ev]);let n=0;for(const[,r]of this._rs)if(r.status==='open')try{r.ws.send(msg);n++}catch(e){}return n}
+  stat(){let o=0,c=0,e=0;for(const[,r]of this._rs){if(r.status==='open')o++;else if(r.status==='connecting')c++;else e++}return{open:o,connecting:c,error:e,relays:this._rs}}
+  _nfy(){if(this._onSt)this._onSt(this.stat())}
+}
+
+/* ─── STATE ─────────────────────────────────────────────────── */
+const pool = new RelayPool();
+const C = {
+  id:          null,
+  relayUrls:   [...DEF_RELAYS],
+  channels:    new Map(),
+  active:      null,
+  profiles:    new Map(),
+  privacy:     'public',
+  port:        null,
+  mounted:     false,
+  walletState: null,
+  _stakeIntent: null,
+  stakeFilter: false,   // show only staked messages when true
+};
+
+/* ─── PERSISTENCE ───────────────────────────────────────────── */
+function _saveChannels() {
+  try {
+    const data = [...C.channels.entries()].map(([id,ch])=>({id,name:ch.name,about:ch.about,isPublic:ch.isPublic}));
+    localStorage.setItem(CH_KEY, JSON.stringify(data));
+  } catch(e){}
+}
+function _loadChannels() {
+  try {
+    const raw = localStorage.getItem(CH_KEY);
+    if (!raw) return;
+    JSON.parse(raw).forEach(ch=>{
+      C.channels.set(ch.id,{...ch,msgs:new Map(),unread:0});
+    });
+  } catch(e){}
+}
+
+/* ─── NX PROTOCOL ───────────────────────────────────────────── */
+// Migrated to engines/nexus-block-client.js in Round 018.
+// Standalone fallback preserved: if no BOOT arrives in 800ms, _boot()
+// runs anyway against localStorage so the block is usable outside Nexus.
+const APP={title:'Channels',icon:'◈',description:'NIP-28 community channels',emits:['nexus.notification','nexus.stake.intent'],consumes:['nexus.identity','nexus.wallet.state']};
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    APP.emits,
+    consumes: APP.consumes,
+    app: { title: APP.title, icon: APP.icon, description: APP.description, visible: true }
+  },
+  onMessage({ channel, payload }) {
+    if (channel === 'nexus.identity' && payload?.privkey) {
+      Object.assign(C.id ||= {}, payload);
+      try { localStorage.setItem(ID_KEY, JSON.stringify(C.id)); } catch (e) {}
+    }
+    if (channel === 'nexus.wallet.state' && payload) {
+      C.walletState = payload;
+      _refreshWalletChip();
+      _updateAllMsgStakeIndicators();
+      _refreshStakeModal();
+    }
+  }
+});
+
+let _once = false;
+function _bootOnce() { if (_once) return; _once = true; C.mounted = true; _boot(); }
+
+if (nx) {
+  // Hosted: boot when MOUNTED, OR after 800ms fallback (standalone-shaped boot
+  // even when hosted, in case BOOT-port-transfer is silently dropped — see
+  // SETTINGS.firstPongGraceMs note in Nexus_OS.html).
+  nx.ready.then(() => {
+    nx.subscribe('nexus.identity');
+    nx.subscribe('nexus.wallet.state');
+    _bootOnce();
+  });
+  setTimeout(_bootOnce, 800);
+} else {
+  // Standalone (no client available): boot immediately.
+  setTimeout(_bootOnce, 0);
+}
+
+function _bs(s){const e=document.getElementById('boot-status');if(e)e.textContent=s}
+
+async function _boot() {
+  _bs('LOADING CRYPTO...');
+  try { await loadSecp(); } catch(e) {
+    _bs('ERROR: '+e.message);
+    setTimeout(()=>{document.body.classList.add('nx-on');_wire()},600);
+    return;
+  }
+  try{const r=localStorage.getItem(ID_KEY);if(r)C.id=JSON.parse(r)}catch(e){}
+  try{const r=localStorage.getItem(RELAY_KEY);if(r)C.relayUrls=JSON.parse(r)}catch(e){}
+  _loadChannels();
+  pool.onEvent(_onEv);
+  pool.onStatus(_onSt);
+  pool.connect(C.relayUrls);
+  // Subscribe to all saved channels
+  for(const[id]of C.channels) _subChannel(id);
+  setTimeout(()=>{document.body.classList.add('nx-on');_wire();_renderChList();_bs('ONLINE')},700);
+}
+
+/* ─── CHANNEL SUBSCRIBE ─────────────────────────────────────── */
+function _subChannel(channelId) {
+  const since = Math.floor(Date.now()/1000) - 3600*24*7; // last 7 days
+  pool.subscribe('ch-'+channelId.slice(0,8), [
+    {kinds:[42],'#e':[channelId], limit:100, since},
+    {kinds:[0],  '#e':[channelId], limit:50},  // profiles of channel members
+  ]);
+}
+
+/* ─── EVENT HANDLER ─────────────────────────────────────────── */
+function _onEv(ev) {
+  if(ev.kind===0){
+    // Cache profile
+    try{const m=JSON.parse(ev.content);C.profiles.set(ev.pubkey,m.display_name||m.name||null)}catch(e){}
+    return;
+  }
+  if(ev.kind!==42) return;
+  // Find which channel this belongs to
+  const eTag = ev.tags?.find(t=>t[0]==='e');
+  if(!eTag) return;
+  const channelId = eTag[1];
+  if(!C.channels.has(channelId)) return; // not a channel we joined
+  const ch = C.channels.get(channelId);
+  if(ch.msgs.has(ev.id)) return; // dedup
+  ch.msgs.set(ev.id, ev);
+  if(channelId !== C.active) ch.unread++;
+  _renderChList();
+  if(channelId===C.active) _renderChat(channelId);
+}
+
+function _onSt(s) {
+  const el=document.getElementById('relay-dots');if(!el)return;
+  el.textContent='';
+  for(const[url,r]of s.relays){
+    const d=document.createElement('div');d.className='rdot '+r.status;d.title=url+' · '+r.status;el.appendChild(d);
+  }
+}
+
+/* ─── RENDER ────────────────────────────────────────────────── */
+function _renderChList() {
+  const scroll = document.getElementById('ch-scroll');
+  const empty  = document.getElementById('ch-empty');
+  if(!scroll) return;
+  scroll.querySelectorAll('.ch-item').forEach(e=>e.remove());
+  if(!C.channels.size){if(empty)empty.style.display='';return}
+  if(empty) empty.style.display='none';
+  for(const[id,ch]of C.channels){
+    const el=document.createElement('div');
+    el.className='ch-item'+(id===C.active?' active':''); el.dataset.id=id;
+    const nm=document.createElement('div');nm.className='ch-item-name';
+    // Count staked messages in this channel
+    const stakedMsgCount=C.walletState?[...ch.msgs.keys()].filter(mid=>_getMsgStakes(mid).length).length:0;
+    nm.textContent=(ch.isPublic?'🌐 ':'🔒 ')+ch.name;
+    if(ch.unread>0){const b=document.createElement('span');b.className='ch-badge';b.textContent=String(ch.unread);nm.appendChild(b)}
+    if(stakedMsgCount>0){const s=document.createElement('span');s.className='ch-badge';s.style.cssText='background:transparent;color:var(--gold);border:1px solid rgba(251,191,36,.3);margin-left:4px';s.textContent='⚡'+stakedMsgCount;nm.appendChild(s)}
+    const mt=document.createElement('div');mt.className='ch-item-meta';
+    mt.textContent=ch.msgs.size+' messages'+(ch.about?' · '+ch.about.slice(0,24):'');
+    el.append(nm,mt);
+    el.addEventListener('click',()=>_openChannel(id));
+    scroll.appendChild(el);
+  }
+}
+
+function _openChannel(id) {
+  C.active=id;
+  const ch=C.channels.get(id);if(!ch)return;
+  ch.unread=0;
+  document.getElementById('chat-hdr').classList.remove('hidden');
+  document.getElementById('ch-compose').classList.remove('hidden');
+  document.getElementById('chat-empty').style.display='none';
+  document.getElementById('chat-name').textContent=ch.name;
+  document.getElementById('chat-about').textContent=ch.about||'No description';
+  const prv=document.getElementById('chat-privacy');
+  prv.textContent=ch.isPublic?'Public':'Private';
+  prv.className='ch-privacy '+(ch.isPublic?'pub':'prv');
+  _renderChList();
+  _renderChat(id);
+  document.getElementById('ch-ta').focus();
+}
+
+function _renderChat(channelId) {
+  const scroll=document.getElementById('chat-scroll');
+  if(!scroll)return;
+  scroll.querySelectorAll('.ch-msg').forEach(e=>e.remove());
+  const ch=C.channels.get(channelId);
+  if(!ch||!ch.msgs.size)return;
+  let msgs=[...ch.msgs.values()].sort((a,b)=>a.created_at-b.created_at);
+  // Staked filter — only show messages with active stakes
+  if(C.stakeFilter&&C.walletState){
+    msgs=msgs.filter(ev=>_getMsgStakes(ev.id).length>0);
+    if(!msgs.length){
+      const empty=document.createElement('div');
+      empty.style.cssText='text-align:center;padding:40px 20px;font-size:9px;color:var(--muted);letter-spacing:1px;';
+      empty.textContent='NO STAKED MESSAGES IN THIS CHANNEL YET';
+      scroll.appendChild(empty);
+      return;
+    }
+  }
+  const frag=document.createDocumentFragment();
+  for(const ev of msgs){
+    const isMine=ev.pubkey===C.id?.pubkey;
+    const handle=C.profiles.get(ev.pubkey)||ev.pubkey.slice(0,8)+'…';
+    const stakes=_getMsgStakes(ev.id);
+    const hasStake=stakes.length>0;
+
+    const el=document.createElement('div');
+    el.className='ch-msg'+(isMine?' ch-msg-mine':'');
+    el.id='msg-'+ev.id;
+
+    // Stake button (hover reveal)
+    const stakeBtn=document.createElement('button');
+    stakeBtn.className='msg-stake-btn'+(hasStake?' staked':'');
+    stakeBtn.textContent=hasStake?'⚡ staked':'⚡ stake';
+    stakeBtn.addEventListener('click',()=>window.openMsgStake(ev.id,ev.content));
+
+    const meta=document.createElement('div');meta.className='ch-msg-meta';
+    const hEl=document.createElement('span');hEl.className='ch-msg-handle';hEl.textContent='@'+handle;
+    hEl.addEventListener('click',()=>{try{navigator.clipboard?.writeText(_npub(ev.pubkey))}catch(e){}; _toast('npub copied');});
+    const tEl=document.createElement('span');tEl.className='ch-msg-time';tEl.textContent=_TS(ev.created_at);
+    const body=document.createElement('div');body.className='ch-msg-body';body.textContent=ev.content;
+
+    meta.append(hEl,tEl);
+    el.append(stakeBtn,meta,body);
+
+    // Stake indicator chip
+    if(hasStake){
+      const ind=document.createElement('div');
+      ind.className='msg-stake-ind';ind.id='msi-'+ev.id;
+      _renderMsgStakeChip(ind,stakes);
+      el.appendChild(ind);
+    }
+
+    frag.appendChild(el);
+  }
+  scroll.appendChild(frag);
+  scroll.scrollTop=scroll.scrollHeight;
+}
+
+/* ─── CREATE CHANNEL ────────────────────────────────────────── */
+window._selPrivacy = (v) => {
+  C.privacy=v;
+  document.getElementById('opt-public').className='pt-opt'+(v==='public'?' sel-pub':'');
+  document.getElementById('opt-private').className='pt-opt'+(v==='private'?' sel-prv':'');
+};
+
+async function _createChannel() {
+  const name  = document.getElementById('new-ch-name')?.value.trim();
+  const about = document.getElementById('new-ch-about')?.value.trim();
+  if(!name){_toast('Name required');return}
+  if(!C.id?.privkey){_toast('No identity — open Social first');return}
+  const btn=document.getElementById('btn-do-create');btn.disabled=true;
+  try {
+    const content=JSON.stringify({name,about:about||'',picture:'',relays:C.relayUrls});
+    const ev={pubkey:C.id.pubkey,created_at:Math.floor(Date.now()/1000),kind:40,tags:[],content};
+    ev.id  = await sha256h(JSON.stringify([0,ev.pubkey,ev.created_at,ev.kind,ev.tags,ev.content]));
+    ev.sig = b2h(secp.schnorr.sign(ev.id,C.id.privkey));
+    const n=pool.publish(ev);
+    // Save channel locally
+    const ch={id:ev.id,name,about:about||'',isPublic:C.privacy==='public',msgs:new Map(),unread:0};
+    C.channels.set(ev.id,ch);
+    _saveChannels();
+    _subChannel(ev.id);
+    _modal('create',false);
+    _renderChList();
+    _openChannel(ev.id);
+    _toast(n>0?`✓ Channel created (${n} relays)`:'⏳ Channel created (queued)');
+    // Auto-show share modal for private channels
+    if(C.privacy==='private') setTimeout(()=>_showShare(ev.id),400);
+  } catch(e){
+    _toast('⚠ '+e.message.slice(0,50));
+    console.error('[ch] create error:',e);
+  } finally{btn.disabled=false}
+}
+
+/* ─── JOIN CHANNEL ──────────────────────────────────────────── */
+async function _joinChannel() {
+  const raw=document.getElementById('join-id')?.value.trim();
+  if(!raw||raw.length!==64||!/^[0-9a-f]+$/i.test(raw)){_toast('Enter a valid 64-char hex channel ID');return}
+  const id=raw.toLowerCase();
+  if(C.channels.has(id)){_openChannel(id);_modal('join',false);return}
+  const btn=document.getElementById('btn-do-join');btn.disabled=true;
+  try {
+    // Fetch channel metadata from relay
+    _toast('Fetching channel info...');
+    C.channels.set(id,{id,name:'Loading…',about:'',isPublic:true,msgs:new Map(),unread:0});
+    _subChannel(id);
+    // Fetch kind-40 for this channel ID to get name/about
+    pool.subscribe('ch-meta-'+id.slice(0,8),[{ids:[id],kinds:[40],limit:1}]);
+    _saveChannels();
+    _modal('join',false);
+    _renderChList();
+    _openChannel(id);
+    // Fetch kind-40 to get real name
+    setTimeout(()=>{
+      // If we got the metadata via subscription, it would have been a kind-40 with this ID
+      // We'll update via _onEv when it arrives
+    },2000);
+    _toast('Joined! Fetching messages...');
+  } catch(e){
+    C.channels.delete(id);
+    _toast('⚠ '+e.message.slice(0,50));
+  } finally{btn.disabled=false}
+}
+
+/* Also handle kind-40 for channel metadata on join */
+const _origOnEv = _onEv;
+function _onEvFull(ev) {
+  if(ev.kind===40 && C.channels.has(ev.id)) {
+    // Update channel name/about from kind-40
+    try{
+      const meta=JSON.parse(ev.content);
+      const ch=C.channels.get(ev.id);
+      if(meta.name){ch.name=meta.name;ch.about=meta.about||''}
+      _saveChannels();
+      _renderChList();
+      if(ev.id===C.active){
+        document.getElementById('chat-name').textContent=ch.name;
+        document.getElementById('chat-about').textContent=ch.about||'No description';
+      }
+    }catch(e){}
+    return;
+  }
+  _onEv(ev);
+}
+
+/* ─── SEND MESSAGE ──────────────────────────────────────────── */
+async function _send() {
+  const ta=document.getElementById('ch-ta');
+  const text=ta.value.trim();
+  if(!text||!C.active||!C.id?.privkey){return}
+  const btn=document.getElementById('ch-send');btn.disabled=true;ta.disabled=true;
+  try{
+    const ev={
+      pubkey:C.id.pubkey,created_at:Math.floor(Date.now()/1000),
+      kind:42,tags:[['e',C.active,'','root']],content:text,
+    };
+    ev.id  = await sha256h(JSON.stringify([0,ev.pubkey,ev.created_at,ev.kind,ev.tags,ev.content]));
+    ev.sig = b2h(secp.schnorr.sign(ev.id,C.id.privkey));
+    const n=pool.publish(ev);
+    // Optimistic add
+    const ch=C.channels.get(C.active);
+    if(ch&&!ch.msgs.has(ev.id)){ch.msgs.set(ev.id,ev)}
+    _renderChat(C.active);
+    _toast(n>0?`✓ sent to ${n} relay${n>1?'s':''}`:'⏳ queued');
+    ta.value='';ta.style.height='';
+  }catch(e){
+    _toast('⚠ '+e.message.slice(0,50));
+    console.error('[ch] send error:',e);
+  }finally{btn.disabled=false;ta.disabled=false;ta.focus()}
+}
+
+/* ─── SHARE MODAL ───────────────────────────────────────────── */
+function _showShare(id) {
+  const ch=C.channels.get(id);if(!ch)return;
+  const sub=document.getElementById('share-sub');
+  const txt=document.getElementById('share-id-text');
+  if(sub) sub.textContent=ch.isPublic?'Share this ID so others can join your public channel.':'This is your PRIVATE channel ID. Only share with invited members.';
+  if(txt) txt.textContent=id;
+  document.getElementById('share-id-box').onclick=()=>{
+    navigator.clipboard?.writeText(id).catch(()=>{});
+    _toast('Channel ID copied ✓');
+  };
+  _modal('share',true);
+}
+
+/* ─── WIRE ───────────────────────────────────────────────────── */
+function _wire() {
+  pool.onEvent(_onEvFull);
+  document.getElementById('btn-create').addEventListener('click',()=>_modal('create',true));
+  document.getElementById('btn-join').addEventListener('click',()=>_modal('join',true));
+  document.getElementById('btn-cancel-create').addEventListener('click',()=>_modal('create',false));
+  document.getElementById('btn-cancel-join').addEventListener('click',()=>_modal('join',false));
+  document.getElementById('btn-do-create').addEventListener('click',_createChannel);
+  document.getElementById('btn-do-join').addEventListener('click',_joinChannel);
+  document.getElementById('btn-share-id').addEventListener('click',()=>{if(C.active)_showShare(C.active)});
+  document.getElementById('btn-close-share').addEventListener('click',()=>_modal('share',false));
+  document.getElementById('ch-send').addEventListener('click',_send);
+  document.getElementById('ch-ta').addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();_send()}
+  });
+  document.getElementById('ch-ta').addEventListener('input',function(){
+    this.style.height='';this.style.height=Math.min(this.scrollHeight,84)+'px';
+  });
+  document.getElementById('new-ch-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('new-ch-about')?.focus()});
+  document.getElementById('btn-stake-filter').addEventListener('click',()=>{
+    C.stakeFilter=!C.stakeFilter;
+    document.getElementById('btn-stake-filter').classList.toggle('active',C.stakeFilter);
+    if(C.active)_renderChat(C.active);
+  });
+  // Close modals on backdrop
+  ['modal-create','modal-join','modal-share','modal-stake'].forEach(id=>{
+    document.getElementById(id).addEventListener('click',e=>{
+      if(e.target.id===id){
+        if(id==='modal-stake')window.closeStakeModal();
+        else _modal(id.replace('modal-',''),false);
+      }
+    });
+  });
+}
+
+/* ─── WALLET BRIDGE ─────────────────────────────────────────── */
+function _getMsgStakes(evId){
+  if(!C.walletState?.activeLocks)return[];
+  return C.walletState.activeLocks.filter(l=>l.terms_raw===`nostr:event:${evId}`);
+}
+
+function _renderMsgStakeChip(el,stakes){
+  const total=stakes.reduce((s,l)=>s+l.amount,0);
+  const tokens=(total/100000000).toFixed(0);
+  const sym=C.walletState?.symbol||'';
+  const anyReady=stakes.some(l=>l.resolvable);
+  el.innerHTML=`⚡ <strong>${tokens} ${sym}</strong> staked <span class="msi-status ${anyReady?'ready':''}">[${anyReady?'RESOLVABLE':'LOCKED'}]</span>`;
+}
+
+function _updateAllMsgStakeIndicators(){
+  // Update existing chips
+  document.querySelectorAll('.msg-stake-ind').forEach(el=>{
+    const id=el.id.replace('msi-','');
+    const stakes=_getMsgStakes(id);
+    if(stakes.length){_renderMsgStakeChip(el,stakes);}
+    else el.remove();
+  });
+  // Update stake buttons
+  document.querySelectorAll('.msg-stake-btn').forEach(btn=>{
+    const msg=btn.closest('.ch-msg');if(!msg)return;
+    const id=msg.id.replace('msg-','');
+    const stakes=_getMsgStakes(id);
+    btn.className='msg-stake-btn'+(stakes.length?' staked':'');
+    btn.textContent=stakes.length?'⚡ staked':'⚡ stake';
+    // Add indicator if newly staked
+    if(stakes.length&&!document.getElementById('msi-'+id)){
+      const ind=document.createElement('div');
+      ind.className='msg-stake-ind';ind.id='msi-'+id;
+      _renderMsgStakeChip(ind,stakes);
+      msg.appendChild(ind);
+    }
+  });
+  // Refresh channel list stake badges
+  _renderChList();
+}
+
+function _refreshWalletChip(){
+  const chip=document.getElementById('wallet-chip');if(!chip)return;
+  if(C.walletState){
+    const bal=(C.walletState.balance/100000000).toFixed(0);
+    chip.className='wallet-chip live';
+    chip.textContent=`⚡ ${bal} ${C.walletState.symbol||''}`;
+    chip.title=`Wallet: ${C.walletState.sid}`;
+  } else {
+    chip.className='wallet-chip';
+    chip.textContent='NO WALLET';
+    chip.title='Wallet block not connected';
+  }
+}
+
+function _refreshStakeModal(){
+  const bar=document.getElementById('stake-ws-bar');
+  const dot=document.getElementById('stake-wsdot');
+  const info=document.getElementById('stake-ws-info');
+  if(!bar)return;
+  if(C.walletState){
+    bar.className='ws-sbar';dot.className='wsdot';
+    const bal=(C.walletState.balance/100000000).toFixed(0);
+    info.textContent=`${C.walletState.sid} · ${bal} ${C.walletState.symbol||''} available`;
+  } else {
+    bar.className='ws-sbar nc';dot.className='wsdot off';
+    info.textContent='Wallet not connected — open Wallet block in Nexus OS';
+  }
+}
+
+/* ─── STAKE INTENT MODAL ────────────────────────────────────── */
+window.openMsgStake=function(evId,content){
+  C._stakeIntent={evId,content:content||''};
+  const d=document.getElementById('stake-ev-id-text');if(d)d.textContent=evId;
+  const p=document.getElementById('stake-ev-prev');if(p)p.textContent=content?'"'+(content.slice(0,80))+(content.length>80?'…':'')+'"':'';
+  const st=document.getElementById('stake-msg-status');if(st)st.textContent='';
+  _refreshStakeModal();
+  document.getElementById('modal-stake').classList.add('open');
+};
+
+window.closeStakeModal=function(){
+  document.getElementById('modal-stake').classList.remove('open');
+  C._stakeIntent=null;
+};
+
+window.copyStakeId=function(){
+  if(!C._stakeIntent?.evId)return;
+  navigator.clipboard?.writeText(C._stakeIntent.evId).then(()=>_toast('Event ID copied ✓'));
+};
+
+window.sendStakeIntent=function(){
+  if(!C._stakeIntent?.evId)return;
+  const amt=parseFloat(document.getElementById('si-amt').value)||100;
+  const win=parseInt(document.getElementById('si-win').value)||72;
+  const cp=document.getElementById('si-cp').value.trim();
+  if (nx && C.mounted) {
+    nx.emit('nexus.stake.intent', {
+      eventId: C._stakeIntent.evId,
+      postContent: C._stakeIntent.content.slice(0, 80),
+      amount: amt, windowHours: win, counterparty: cp || null,
+    });
+  }
+  const st=document.getElementById('stake-msg-status');
+  if(st){
+    st.textContent=C.mounted?'✓ Stake intent sent — switch to Wallet block → ⚡ Stake tab':'⚠ Not connected to Nexus OS — paste the event ID in Wallet manually';
+    st.style.color=C.mounted?'var(--ok)':'var(--warn)';
+  }
+  _toast('⚡ stake intent sent');
+};
+
+function _modal(name,open){
+  document.getElementById('modal-'+name).classList.toggle('open',open);
+  const inputs={'create':['new-ch-name'],'join':['join-id'],'share':[]};
+  if(open&&inputs[name]?.length) setTimeout(()=>document.getElementById(inputs[name][0])?.focus(),100);
+}
+
+let _tt;
+function _toast(msg){
+  const e=document.getElementById('toast');if(!e)return;
+  e.textContent=msg;e.classList.add('show');
+  clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),2600);
+}
+</script>
+</body>
+</html>

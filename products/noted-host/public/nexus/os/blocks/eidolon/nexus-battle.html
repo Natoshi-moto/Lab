@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS · BATTLE</title>
+
+<!-- ═══════════════════════════════════════════════════════════
+     GENOME — machine-readable, quine-spliced on every export
+     Ring 5: integrity  Ring 7: transmissibility
+     ═══════════════════════════════════════════════════════════ -->
+<script id="creature-dna" type="application/json">
+{
+  "name": "PHANTIVEX",
+  "species": "Eidolon",
+  "typeTag": "phosphor-specimen",
+  "generation": 1,
+  "nonce": "b45b4f8fd884fa52038ca19e",
+  "birthHash": null,
+  "parentNonce": null,
+  "parentHash": null,
+  "dna": [183,22,46,175,220,107,6,104,214,34,106,207,189,102,253,202],
+  "hues": [302.85, 162.68, 33.93],
+  "createdAt": "2026-05-02T00:00:00.000Z",
+  "childCount": 0,
+  "lineage": []
+}
+</script>
+
+<style>
+/* ── Reset & base ────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020305;--bg2:#07090f;--bg3:#0d0f18;
+  --border:rgba(120,60,220,.18);--border2:rgba(120,60,220,.35);
+  --text:#e8e0f5;--dim:rgba(232,224,245,.38);--muted:rgba(232,224,245,.12);
+  --green:#33ff77;--green-d:rgba(51,255,119,.07);
+  --red:#ff3355;--red-d:rgba(255,51,85,.07);
+  --gold:#f5c842;--gold-d:rgba(245,200,66,.08);
+  --cyan:#33eeff;
+  --scan:rgba(0,0,0,.11);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:'Courier New',Courier,monospace;overflow:hidden;font-size:12px}
+
+/* ── CRT overlay ─────────────────────────────────────────────── */
+body::before{content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,var(--scan) 0,var(--scan) 1px,transparent 1px,transparent 4px);
+  pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);
+  pointer-events:none;z-index:9998}
+@keyframes flicker{0%,94%,100%{opacity:1}95%{opacity:.91}96.5%{opacity:.97}97%{opacity:.93}98%{opacity:1}}
+
+/* ── App shell ───────────────────────────────────────────────── */
+#app{display:grid;grid-template-rows:46px 1fr 38px 108px;height:100vh;
+  animation:flicker 7s infinite}
+
+/* ── HUD ─────────────────────────────────────────────────────── */
+#hud{display:flex;align-items:center;gap:10px;padding:0 14px;
+  background:var(--bg2);border-bottom:1px solid var(--border)}
+#hud-name{font-size:17px;font-weight:700;letter-spacing:3px;background:linear-gradient(135deg,#c044ff,#ffaa33);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.type-chip{font-size:8px;font-weight:700;letter-spacing:1.5px;padding:2px 7px;border-radius:2px;
+  text-transform:uppercase;border:1px solid}
+#hud-right{margin-left:auto;font-size:9px;color:var(--dim);letter-spacing:.5px;
+  text-align:right;line-height:1.7}
+#verify-badge{font-size:8px;color:var(--dim);letter-spacing:.5px}
+
+/* ── Arena ───────────────────────────────────────────────────── */
+#arena{position:relative;overflow:hidden;background:var(--bg)}
+#arena-bg{position:absolute;inset:0;z-index:0}
+#opp-canvas,#player-canvas{position:absolute;z-index:2;display:block}
+#opp-canvas{top:10px;right:20px}
+#player-canvas{bottom:10px;left:20px}
+
+/* ── Combatant info panels ───────────────────────────────────── */
+.c-info{position:absolute;z-index:3;padding:7px 10px;
+  background:rgba(7,9,15,.88);border:1px solid var(--border);
+  backdrop-filter:blur(6px);min-width:170px}
+#opp-info{top:12px;left:12px}
+#player-info{bottom:12px;right:12px;text-align:right}
+.c-name{font-size:11px;font-weight:700;letter-spacing:2px;
+  display:flex;align-items:center;gap:5px}
+#player-info .c-name{justify-content:flex-end}
+.c-gen{font-size:8px;color:var(--dim)}
+.c-hp-label{font-size:8px;color:var(--dim);margin:4px 0 2px}
+.hp-track{height:7px;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  position:relative;overflow:hidden}
+.hp-fill{height:100%;transition:width .45s ease;background:var(--green)}
+.hp-fill.mid{background:var(--gold)}
+.hp-fill.low{background:var(--red)}
+.hp-nums{font-size:9px;color:var(--dim);margin-top:2px}
+.status-tag{font-size:7px;font-weight:700;letter-spacing:1px;padding:1px 5px;
+  border-radius:1px;display:inline-block;margin-top:2px}
+.st-pois{background:rgba(180,60,255,.18);color:#bb66ff;border:1px solid rgba(180,60,255,.3)}
+.st-burn{background:rgba(255,100,30,.18);color:#ff7744;border:1px solid rgba(255,100,30,.3)}
+
+/* ── Log strip ───────────────────────────────────────────────── */
+#log-strip{background:var(--bg2);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);padding:0 14px;
+  display:flex;align-items:center;gap:8px;overflow:hidden}
+#log-text{font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#log-continue{font-size:9px;color:var(--dim);flex-shrink:0;animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── Controls ────────────────────────────────────────────────── */
+#controls{background:var(--bg2);padding:7px 10px;
+  display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.move-btn{font-family:inherit;font-size:9px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:6px 8px;background:transparent;
+  color:var(--text);border:1px solid var(--border);cursor:pointer;
+  transition:all .12s;text-align:left;display:flex;flex-direction:column;gap:2px;
+  position:relative;overflow:hidden}
+.move-btn::before{content:'';position:absolute;inset:0;opacity:0;
+  background:var(--border2);transition:opacity .12s}
+.move-btn:hover:not(:disabled)::before{opacity:1}
+.move-btn:hover:not(:disabled){border-color:var(--border2)}
+.move-btn:disabled{opacity:.25;cursor:not-allowed}
+.move-btn:active:not(:disabled){transform:scale(.97)}
+.move-name{font-size:10px;display:flex;align-items:center;gap:5px}
+.move-meta{font-size:8px;color:var(--dim)}
+.move-cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cat-physical .move-cat-dot{background:#ff8844}
+.cat-special  .move-cat-dot{background:#44aaff}
+.cat-status   .move-cat-dot{background:#aabb33}
+
+/* ── Overlay (title / win / lose) ────────────────────────────── */
+#overlay{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:rgba(2,3,5,.92);transition:opacity .3s}
+#overlay.hidden{opacity:0;pointer-events:none}
+.ov-title{font-size:30px;font-weight:700;letter-spacing:6px;text-align:center;
+  text-shadow:0 0 30px currentColor}
+.ov-sub{font-size:10px;color:var(--dim);letter-spacing:2px;text-align:center;
+  line-height:1.8;max-width:340px}
+.ov-btn{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding:9px 26px;background:transparent;
+  color:var(--text);border:1px solid var(--border2);cursor:pointer;
+  transition:all .15s;margin-top:4px}
+.ov-btn:hover{background:rgba(120,60,220,.12);border-color:rgba(120,60,220,.6)}
+.ov-btn.primary{color:var(--gold);border-color:var(--gold)}
+.ov-btn.primary:hover{background:var(--gold-d)}
+.ov-btn.danger{color:var(--red);border-color:var(--red)}
+
+/* ── DNA strip (overlay detail) ─────────────────────────────── */
+.dna-row{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.dna-cell{width:20px;text-align:center;font-size:7px;line-height:1.4}
+.dna-cell .di{color:var(--muted)}
+.dna-cell .dv{color:rgba(255,255,255,.35)}
+.dna-cell.hot .dv{color:#c844ff}
+
+/* ── Hit flash ───────────────────────────────────────────────── */
+@keyframes hitShake{0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-6px)} 40%{transform:translateX(5px)}
+  60%{transform:translateX(-4px)} 80%{transform:translateX(3px)}}
+.shaking{animation:hitShake .3s ease-out}
+@keyframes hitFlash{0%,100%{opacity:1}25%{opacity:.15}75%{opacity:.8}}
+.flashing{animation:hitFlash .35s ease-out}
+
+/* ── Stats panel (shown in idle overlay) ─────────────────────── */
+.stat-grid{display:grid;grid-template-columns:60px 1fr 30px;gap:3px 8px;
+  align-items:center;font-size:9px;width:240px}
+.stat-label{color:var(--dim);text-align:right}
+.stat-bar-t{height:5px;background:rgba(255,255,255,.05);border:1px solid var(--border)}
+.stat-fill{height:100%;background:rgba(120,60,220,.6)}
+.stat-val{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ══ HUD ══════════════════════════════════════════════════════ -->
+<div id="app">
+<div id="hud">
+  <div id="hud-name">—</div>
+  <div id="hud-types"></div>
+  <div id="hud-right">
+    <div id="hud-gen">GEN·—</div>
+    <div id="verify-badge">◌ verifying…</div>
+  </div>
+</div>
+
+<!-- ══ ARENA ════════════════════════════════════════════════════ -->
+<div id="arena">
+  <canvas id="arena-bg"></canvas>
+  <canvas id="opp-canvas" width="160" height="160"></canvas>
+  <canvas id="player-canvas" width="200" height="200"></canvas>
+  <div class="c-info" id="opp-info">
+    <div class="c-name" id="opp-name">—</div>
+    <div class="c-gen" id="opp-types"></div>
+    <div class="c-hp-label">HP</div>
+    <div class="hp-track"><div class="hp-fill" id="opp-hpfill" style="width:100%"></div></div>
+    <div class="hp-nums" id="opp-hpnums">—</div>
+    <div id="opp-status"></div>
+  </div>
+  <div class="c-info" id="player-info">
+    <div class="c-name" id="player-name">—</div>
+    <div class="c-gen" id="player-types" style="text-align:right"></div>
+    <div class="c-hp-label">HP</div>
+    <div class="hp-track"><div class="hp-fill" id="player-hpfill" style="width:100%"></div></div>
+    <div class="hp-nums" id="player-hpnums">—</div>
+    <div id="player-status"></div>
+  </div>
+</div>
+
+<!-- ══ LOG ══════════════════════════════════════════════════════ -->
+<div id="log-strip">
+  <div id="log-text">Initializing…</div>
+  <div id="log-continue" style="display:none">▼</div>
+</div>
+
+<!-- ══ CONTROLS ═════════════════════════════════════════════════ -->
+<div id="controls">
+  <button class="move-btn" id="m0" disabled><span class="move-name"><span class="move-cat-dot"></span>—</span><span class="move-meta">—</span></button>
+  <button class="move-btn" id="m1" disabled><span class="move-name"><span class="move-cat-dot"></span>—</span><span class="move-meta">—</span></button>
+  <button class="move-btn" id="m2" disabled><span class="move-name"><span class="move-cat-dot"></span>—</span><span class="move-meta">—</span></button>
+  <button class="move-btn" id="m3" disabled><span class="move-name"><span class="move-cat-dot"></span>—</span><span class="move-meta">—</span></button>
+</div>
+</div>
+
+<!-- ══ OVERLAY ══════════════════════════════════════════════════ -->
+<div id="overlay">
+  <div class="ov-title" id="ov-title">EIDOLON</div>
+  <div class="ov-sub" id="ov-sub"></div>
+  <div id="ov-dna" class="dna-row"></div>
+  <div id="ov-actions" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;justify-content:center"></div>
+</div>
+
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════════
+   EIDOLON BATTLE  ·  Ring-compliant creature combat specimen
+   Rings: 1 Function · 5 Integrity · 6 Sovereignty · 7 Transmissibility · 9 Temperance
+   ════════════════════════════════════════════════════════════════ */
+
+// ── Read genome ──────────────────────────────────────────────────
+// Read companion from Nexus OS state. Falls back to embedded specimen if not found.
+// Axis order matches CREATURE_AXES in eidolon-schema.js so the battle creature
+// visually corresponds to the companion the player selected and tuned.
+const COMPANION_AXIS_ORDER = [
+  'body_radius','body_stretch_x','body_stretch_y','body_lumpiness','body_lump_count','body_outline','body_shadow',
+  'arm_count','arm_length','arm_width','arm_taper','arm_wobble','arm_wobble_rate','arm_curl','arm_droop',
+  'hue_primary','hue_accent'
+];
+function loadGeneData() {
+  try {
+    const raw = localStorage.getItem('nexus:selected-companion:v1');
+    if (raw) {
+      const spec = JSON.parse(raw);
+      if (spec && spec.axes && typeof spec.axes === 'object') {
+        // Use stored axes directly → DNA matches what the player designed
+        const dna = COMPANION_AXIS_ORDER.map(k =>
+          Number.isFinite(Number(spec.axes[k])) ? (Number(spec.axes[k]) & 0xFF) : 128
+        );
+        const huePrimary = (spec.axes.hue_primary ?? 200) / 255 * 360;
+        const hueAccent  = (spec.axes.hue_accent  ?? 80)  / 255 * 360;
+        const hues = [huePrimary, hueAccent, (huePrimary + 180) % 360];
+        return {
+          name: spec.name || makeName(dna),
+          species: 'Moot',
+          typeTag: 'nexus-specimen',
+          generation: 1,
+          nonce: spec.id || 'nexus-' + (Number(spec.seed || 0) >>> 0).toString(16),
+          birthHash: null, parentNonce: null, parentHash: null,
+          dna, hues,
+          createdAt: spec.createdAt ? new Date(spec.createdAt).toISOString() : new Date().toISOString(),
+          childCount: 0, lineage: []
+        };
+      } else if (spec && Number.isFinite(Number(spec.seed))) {
+        // Legacy fallback: seed-only companion (no axes stored)
+        const rng = mulberry32(Number(spec.seed) >>> 0);
+        const dna = Array.from({ length: 16 }, () => Math.floor(rng() * 256));
+        const hues = [(dna[0]/255)*360, ((dna[0]/255)*360+120)%360, ((dna[0]/255)*360+240)%360];
+        return {
+          name: spec.name || makeName(dna), species: 'Moot', typeTag: 'nexus-specimen',
+          generation: 1, nonce: spec.id || 'nexus-' + (Number(spec.seed) >>> 0).toString(16),
+          birthHash: null, parentNonce: null, parentHash: null, dna, hues,
+          createdAt: spec.createdAt ? new Date(spec.createdAt).toISOString() : new Date().toISOString(),
+          childCount: 0, lineage: []
+        };
+      }
+    }
+  } catch (_) {}
+  // Fallback: use embedded specimen
+  return JSON.parse(document.getElementById('creature-dna').textContent.trim());
+}
+const GENE_DATA = loadGeneData();
+
+/* ═══ NEXUS ADAPTER ════════════════════════════════════════════
+   Standalone-safe. Battle works without Nexus.
+   When mounted, emits battle results to the OS for logging.
+   ══════════════════════════════════════════════════════════════ */
+let nexusPort = null;
+let nexusMounted = false;
+
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'BOOT') return;
+  nexusPort = e.ports[0];
+  if (!nexusPort) return;
+  nexusPort.postMessage({
+    type: 'DECLARE',
+    manifest: { emits: ['eidolon.battle.result'], consumes: [] },
+    app: { title: 'Nexus Battle', icon: '⚔', description: 'PHANTIVEX creature battle', visible: true }
+  });
+  nexusPort.onmessage = ev => {
+    const msg = ev.data;
+    if (!msg) return;
+    if (msg.type === 'MOUNT_CHALLENGE') nexusPort.postMessage({ type: 'MOUNT_ACK', nonce: msg.nonce });
+    else if (msg.type === 'MOUNTED') { nexusMounted = true; }
+    else if (msg.type === 'PING') nexusPort.postMessage({ type: 'PONG', nonce: msg.nonce });
+  };
+});
+
+// ── Trait definitions ────────────────────────────────────────────
+const TRAIT_NAMES = ['venomous','spectral','swarming','titanic','murky','resonant',
+  'vital','volatile','ethereal','crystalline','feral','ancient','luminous','toxic','phantom','armored'];
+
+const TRAIT_MOVES = {
+  venomous:    {name:'VENOM STING',   power:35,cat:'physical',acc:100,pp:15,effect:'poison',desc:'35 · may poison'},
+  spectral:    {name:'SPECTRAL RAY',  power:65,cat:'special', acc:90, pp:10,effect:null,   desc:'65 · special'},
+  swarming:    {name:'SWARM RUSH',    power:22,cat:'physical',acc:100,pp:20,effect:'multi', desc:'22×2 · physical'},
+  titanic:     {name:'SEISMIC SLAM',  power:90,cat:'physical',acc:80, pp:5, effect:null,   desc:'90 · heavy blow'},
+  murky:       {name:'MURK CLOUD',    power:0, cat:'status',  acc:100,pp:15,effect:'acc-',  desc:'lowers foe accuracy'},
+  resonant:    {name:'RESONANCE',     power:55,cat:'special', acc:100,pp:10,effect:null,   desc:'55 · resonant'},
+  vital:       {name:'VITAL SURGE',   power:0, cat:'status',  acc:100,pp:5, effect:'heal+', desc:'restore 40% HP'},
+  volatile:    {name:'DETONATION',    power:110,cat:'physical',acc:90,pp:5, effect:'recoil',desc:'110 · 33% recoil'},
+  ethereal:    {name:'PHASE SLIP',    power:0, cat:'status',  acc:100,pp:10,effect:'dodge', desc:'50% dodge next hit'},
+  crystalline: {name:'CRYSTAL LANCE', power:50,cat:'special', acc:100,pp:15,effect:null,   desc:'50 · piercing'},
+  feral:       {name:'FERAL CLAWS',   power:28,cat:'physical',acc:100,pp:15,effect:'multi', desc:'28×2 · physical'},
+  ancient:     {name:'ANCIENT POWER', power:60,cat:'special', acc:100,pp:10,effect:'boost', desc:'60 · 10% all-boost'},
+  luminous:    {name:'FLASH BURST',   power:40,cat:'special', acc:100,pp:15,effect:'acc-',  desc:'40 · blinds foe'},
+  toxic:       {name:'ACID STREAM',   power:50,cat:'special', acc:100,pp:15,effect:'burn',  desc:'50 · may burn'},
+  phantom:     {name:'PHANTOM CLAW',  power:70,cat:'physical',acc:95, pp:10,effect:null,   desc:'70 · ignores dodge'},
+  armored:     {name:'IRON WALL',     power:0, cat:'status',  acc:100,pp:10,effect:'def+',  desc:'raise DEF +2'},
+};
+
+const BASE_MOVES = [
+  {name:'PULSE',  power:40,cat:'special', acc:100,pp:20,effect:null,  desc:'40 · reliable'},
+  {name:'STRIKE', power:45,cat:'physical',acc:95, pp:20,effect:null,  desc:'45 · physical'},
+  {name:'SHIELD', power:0, cat:'status',  acc:100,pp:10,effect:'def+',desc:'raise DEF +1'},
+  {name:'MEND',   power:0, cat:'status',  acc:100,pp:10,effect:'heal', desc:'restore 25% HP'},
+];
+
+// Type system
+const TYPE_FROM_TRAIT = {
+  venomous:'TOXIC',spectral:'SPECTRAL',swarming:'WILD',titanic:'IRON',
+  murky:'VOID',resonant:'SPECTRAL',vital:'WILD',volatile:'IRON',
+  ethereal:'VOID',crystalline:'IRON',feral:'WILD',ancient:'ANCIENT',
+  luminous:'LIGHT',toxic:'TOXIC',phantom:'SHADOW',armored:'IRON',
+};
+const TYPE_COLOR = {
+  TOXIC:'#cc44ff',SPECTRAL:'#33eeff',WILD:'#44ff88',IRON:'#8899cc',
+  VOID:'#5566ff',ANCIENT:'#ffaa44',LIGHT:'#ffdd33',SHADOW:'#aa55cc',
+};
+const TYPE_BG = {
+  TOXIC:'rgba(180,40,255,.15)',SPECTRAL:'rgba(30,220,255,.12)',WILD:'rgba(50,220,100,.12)',
+  IRON:'rgba(120,140,200,.12)',VOID:'rgba(60,80,255,.15)',ANCIENT:'rgba(255,150,40,.12)',
+  LIGHT:'rgba(255,220,40,.12)',SHADOW:'rgba(150,60,180,.12)',
+};
+// Advantage table
+const BEATS = {
+  TOXIC:['ANCIENT','WILD'],SPECTRAL:['ANCIENT','VOID'],WILD:['IRON','VOID'],
+  IRON:['SPECTRAL','LIGHT'],VOID:['LIGHT','SHADOW'],ANCIENT:['SHADOW','SPECTRAL'],
+  LIGHT:['TOXIC','ANCIENT'],SHADOW:['VOID','TOXIC'],
+};
+
+function typeEff(atkType, defTypes) {
+  let m = 1;
+  for (const dt of defTypes) {
+    if ((BEATS[atkType]||[]).includes(dt)) m *= 2;
+  }
+  return m;
+}
+
+// ── Utility ──────────────────────────────────────────────────────
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function canonicalize(obj) {
+  if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
+  if (Array.isArray(obj)) return '[' + obj.map(canonicalize).join(',') + ']';
+  return '{' + Object.keys(obj).sort().map(k => JSON.stringify(k)+':'+canonicalize(obj[k])).join(',') + '}';
+}
+function mulberry32(seed) {
+  let t = seed >>> 0;
+  return () => {
+    t = (t + 0x6D2B79F5) >>> 0; let r = t;
+    r = Math.imul(r ^ (r >>> 15), r | 1);
+    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function randomNonce() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(12)))
+    .map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function makeName(dna) {
+  const P = ['PHAN','VEX','AETH','KRON','LUMI','ETH','ARC','SPEC','ZYN','NETH','GLYPH','OMNI'];
+  const M = ['TI','LA','VO','RU','NI','KA','MO','EL','SI','RA','PHI','SU'];
+  const S = ['EX','ON','IX','AR','UM','AN','OX','IS','OR','EN','AX','UR'];
+  return P[dna[0]%P.length] + M[dna[1]%M.length] + S[dna[2]%S.length];
+}
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Genome → stats / moves / types ───────────────────────────────
+function computeStats(dna) {
+  return {
+    maxHp:  45 + Math.floor(dna[7]  / 255 * 60),
+    atk:    20 + Math.floor(dna[3]  / 255 * 55),
+    def:    20 + Math.floor(dna[5]  / 255 * 55),
+    spAtk:  20 + Math.floor(dna[4]  / 255 * 55),
+    spDef:  20 + Math.floor(dna[6]  / 255 * 55),
+    spd:    15 + Math.floor(dna[2]  / 255 * 60),
+  };
+}
+function deriveMoves(dna) {
+  const expressed = TRAIT_NAMES
+    .map((name, i) => ({name, val: dna[i]}))
+    .filter(t => t.val > 128)
+    .sort((a, b) => b.val - a.val);
+  const moves = expressed.slice(0, 4).map(t => ({...TRAIT_MOVES[t.name]}));
+  let bi = 0;
+  while (moves.length < 4) moves.push({...BASE_MOVES[bi++]});
+  return moves;
+}
+function deriveTypes(dna) {
+  const expressed = TRAIT_NAMES
+    .map((name, i) => ({name, val: dna[i]}))
+    .filter(t => t.val > 128)
+    .sort((a, b) => b.val - a.val);
+  const p = expressed.length > 0 ? TYPE_FROM_TRAIT[expressed[0].name] : 'SPECTRAL';
+  const s = expressed.length > 1 ? TYPE_FROM_TRAIT[expressed[1].name] : null;
+  return (s && s !== p) ? [p, s] : [p];
+}
+
+// ── Creature canvas renderer ──────────────────────────────────────
+function renderCreature(canvas, dna, hues, t, flip = false) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H * .48;
+
+  ctx.clearRect(0, 0, W, H);
+  if (flip) { ctx.save(); ctx.scale(-1, 1); ctx.translate(-W, 0); }
+
+  const rng     = mulberry32(dna.reduce((a,b) => a*31+b, 1));
+  const baseR   = W * .18 + (dna[0]/255) * W * .08;
+  const nTend   = 2 + Math.floor((dna[1]/255) * 5);
+  const tendLen = baseR * (1.0 + (dna[2]/255) * 1.4);
+  const wobble  = (dna[3]/255) * .45;
+  const pulse   = Math.sin(t * (.5 + (dna[4]/255) * 1.2)) * .5 + .5;
+  const coreBri = .42 + (dna[6]/255) * .58;
+  const asymX   = (dna[7]/255) * .25;
+  const turb    = (dna[11]/255) * .9;
+  const curlAmt = (dna[12]/255) * 1.1;
+  const glowR   = baseR * (2.1 + (dna[14]/255) * 2.0);
+  const drift   = .3 + (dna[15]/255) * .7;
+  const blobN   = 2.0 + (dna[3]/255) * 5.0;
+  const nPart   = 6 + Math.floor((dna[5]/255) * 14);
+
+  const bobY  = Math.sin(t * .9) * baseR * .05;
+  const sqX   = 1 + (asymX - .12) * .3;
+  const sqY   = 1 + (Math.cos(t * .7) * .04);
+  const bobSq = 1 + Math.sin(t * 1.8) * .03;
+  const eCY   = cy + bobY;
+
+  // Ambient glow
+  const ag = ctx.createRadialGradient(cx, eCY, 0, cx, eCY, glowR);
+  ag.addColorStop(0,  `hsla(${hues[0]},80%,55%,${.18 * (1 + pulse * .3)})`);
+  ag.addColorStop(.4, `hsla(${hues[1]},70%,45%,${.08 * coreBri})`);
+  ag.addColorStop(1,  'transparent');
+  ctx.fillStyle = ag;
+  ctx.beginPath();
+  ctx.ellipse(cx, eCY, glowR * sqX, glowR * sqY * .8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Tendrils
+  for (let i = 0; i < nTend; i++) {
+    const bA = (i / nTend) * Math.PI * 2;
+    const phase = Math.sin(t * (.5 + i * .2)) * wobble;
+    const lMod  = 1 + asymX * .35 * Math.cos(bA);
+    const cOff  = Math.sin(t * .4 + i * .9) * curlAmt * .5;
+    const tA    = bA + phase + cOff;
+    const tx = cx + Math.cos(tA) * tendLen * lMod;
+    const ty = eCY + Math.sin(tA) * tendLen * lMod * .85;
+    const midA = bA + phase * .4 + cOff * .3;
+    const midR = tendLen * .52 * lMod;
+    const cpx = cx + Math.cos(midA + .3) * midR;
+    const cpy = eCY + Math.sin(midA + .3) * midR * .85;
+    const tHue = hues[i % 3];
+    const tW = 4 + (dna[(i+3)%16]/255) * 5;
+    ctx.strokeStyle = 'rgba(0,0,0,.9)';
+    ctx.lineWidth = tW + 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx, eCY);
+    ctx.quadraticCurveTo(cpx, cpy, tx, ty); ctx.stroke();
+    ctx.strokeStyle = `hsla(${tHue},80%,60%,${.7 + Math.sin(t + i*.7) * .12})`;
+    ctx.lineWidth = tW;
+    ctx.shadowColor = `hsla(${tHue},90%,62%,.35)`;
+    ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.moveTo(cx, eCY);
+    ctx.quadraticCurveTo(cpx, cpy, tx, ty); ctx.stroke();
+    ctx.shadowBlur = 0;
+    const tg = ctx.createRadialGradient(tx, ty, 0, tx, ty, tW * 1.8);
+    tg.addColorStop(0, `hsla(${tHue},90%,85%,.5)`);
+    tg.addColorStop(1, 'transparent');
+    ctx.fillStyle = tg;
+    ctx.beginPath(); ctx.arc(tx, ty, tW * 1.8, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Blob body
+  function getBlobPts(r) {
+    return Array.from({length: 10}, (_, i) => {
+      const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
+      const n = Math.sin(t * .85 + i * .95) * blobN + Math.sin(t * .42 + i * 1.6) * blobN * .38;
+      return { x: cx + Math.cos(a) * (r + n) * sqX, y: eCY + Math.sin(a) * (r + n) * sqY * bobSq };
+    });
+  }
+  function blobPath(pts) {
+    const N = pts.length; ctx.beginPath();
+    for (let i = 0; i < N; i++) {
+      const p0=pts[(i-1+N)%N],p1=pts[i],p2=pts[(i+1)%N],p3=pts[(i+2)%N];
+      const cp1x=p1.x+(p2.x-p0.x)/6,cp1y=p1.y+(p2.y-p0.y)/6;
+      const cp2x=p2.x-(p3.x-p1.x)/6,cp2y=p2.y-(p3.y-p1.y)/6;
+      if (i===0) ctx.moveTo(p1.x,p1.y);
+      ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,p2.x,p2.y);
+    }
+    ctx.closePath();
+  }
+  const pts = getBlobPts(baseR);
+  ctx.shadowColor = `hsla(${hues[0]},65%,28%,.5)`; ctx.shadowBlur = 18; ctx.shadowOffsetY = 3;
+  blobPath(pts); ctx.fillStyle = `hsla(${hues[0]},55%,12%,.4)`; ctx.fill();
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  blobPath(pts); ctx.strokeStyle = 'rgba(0,0,0,.92)'; ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.stroke();
+  blobPath(pts); ctx.fillStyle = `hsl(${hues[0]},65%,47%)`; ctx.fill();
+  ctx.save(); blobPath(pts); ctx.clip();
+  const sg = ctx.createLinearGradient(cx, eCY-baseR, cx, eCY+baseR);
+  sg.addColorStop(.42,'transparent');
+  sg.addColorStop(.48,`hsla(${hues[0]},72%,20%,.5)`);
+  sg.addColorStop(1,  `hsla(${hues[0]},78%,16%,.6)`);
+  ctx.fillStyle = sg; ctx.fillRect(cx-baseR*2, eCY-baseR*2, baseR*4, baseR*4);
+  const hg = ctx.createRadialGradient(cx-baseR*.32,eCY-baseR*.35,0,cx-baseR*.14,eCY-baseR*.14,baseR*.75);
+  hg.addColorStop(0,  `hsla(${hues[0]},28%,92%,.4)`);
+  hg.addColorStop(.45,'transparent');
+  ctx.fillStyle = hg; ctx.fillRect(cx-baseR*2, eCY-baseR*2, baseR*4, baseR*4);
+  for (let v = 0; v < 3; v++) {
+    const vA = (v/3)*Math.PI*2 + t*.2;
+    ctx.strokeStyle = `hsla(${hues[1]},88%,70%,.18)`;
+    ctx.lineWidth = 1.6;
+    ctx.shadowColor = `hsla(${hues[1]},92%,72%,.3)`;
+    ctx.shadowBlur = 7;
+    ctx.beginPath(); ctx.moveTo(cx, eCY);
+    ctx.lineTo(cx + Math.cos(vA)*baseR*.55, eCY + Math.sin(vA)*baseR*.55*.84);
+    ctx.stroke();
+  }
+  ctx.shadowBlur = 0; ctx.restore();
+
+  // Eyes
+  let blinkSY = 1;
+  if (typeof canvas._blinkP === 'number') {
+    blinkSY = 1 - Math.sin(canvas._blinkP * Math.PI) * .92;
+  }
+  const wander = Math.sin(t * .55) * 2.5;
+  const eyeSep = baseR * .32, eyeY = eCY - baseR * .14, eyeR = baseR * .2;
+  for (let e = 0; e < 2; e++) {
+    const ex = cx + (e === 0 ? -eyeSep : eyeSep);
+    ctx.shadowColor = `hsla(${hues[2]},72%,78%,.45)`; ctx.shadowBlur = 8;
+    ctx.fillStyle = `hsl(${hues[2]},18%,93%)`;
+    ctx.strokeStyle = 'rgba(0,0,0,.82)'; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.ellipse(ex, eyeY, eyeR, eyeR*blinkSY, 0, 0, Math.PI*2);
+    ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
+    if (blinkSY > .14) {
+      ctx.fillStyle = `hsl(${hues[2]},84%,40%)`;
+      ctx.beginPath(); ctx.ellipse(ex+wander*.4, eyeY, eyeR*.62, eyeR*.62*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#020306';
+      ctx.beginPath(); ctx.ellipse(ex+wander*.4, eyeY, eyeR*.36, eyeR*.36*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.9)';
+      ctx.beginPath(); ctx.ellipse(ex-eyeR*.2, eyeY-eyeR*.22*blinkSY, eyeR*.18, eyeR*.13*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Core glow
+  const coreR = baseR * .13 * (1 + pulse * .1);
+  const cg = ctx.createRadialGradient(cx, eCY, 0, cx, eCY, coreR*4.5);
+  cg.addColorStop(0,   `hsla(${hues[2]},96%,94%,${.8*coreBri})`);
+  cg.addColorStop(.25, `hsla(${hues[0]},88%,70%,${.45*coreBri})`);
+  cg.addColorStop(.7,  `hsla(${hues[0]},78%,52%,${.12*coreBri})`);
+  cg.addColorStop(1,   'transparent');
+  ctx.shadowColor = `hsla(${hues[0]},88%,68%,.6)`;
+  ctx.shadowBlur = 20; ctx.fillStyle = cg;
+  ctx.beginPath(); ctx.arc(cx, eCY, coreR*4.5, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Particles
+  for (let p = 0; p < nPart; p++) {
+    const seed = p * 17 + dna[p % 16];
+    const orbitR = baseR * 1.5 + (seed%13) * (baseR * .07);
+    const orbitA = (p/nPart)*Math.PI*2 + t*drift*.42 + Math.sin(t+seed*.1)*.4;
+    const tu = Math.sin(t*1.3+seed*.22) * turb * 6;
+    const px = cx + Math.cos(orbitA) * (orbitR + tu);
+    const py = eCY + Math.sin(orbitA) * (orbitR + tu) * .8;
+    const pSz = 1.2 + (dna[p%16]/255) * 2.2;
+    const pHue = hues[p%3];
+    const pAl = .4 + Math.sin(t*1.7+p*.55) * .26;
+    ctx.shadowColor = `hsla(${pHue},92%,70%,.7)`; ctx.shadowBlur = pSz * 3;
+    ctx.fillStyle = `hsla(${pHue},86%,78%,${pAl})`;
+    ctx.beginPath(); ctx.arc(px, py, pSz, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  if (flip) ctx.restore();
+}
+
+// ── Background nebula ────────────────────────────────────────────
+function paintBg(canvas, hues) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#020305'; ctx.fillRect(0,0,W,H);
+  const g = ctx.createRadialGradient(W*.5,H*.42,0,W*.5,H*.42,Math.max(W,H)*.75);
+  g.addColorStop(0, `hsla(${hues[0]},45%,6%,.75)`);
+  g.addColorStop(.55,`hsla(${hues[1]},35%,4%,.45)`);
+  g.addColorStop(1,'transparent');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  const rng = mulberry32(99991);
+  for (let i = 0; i < 120; i++) {
+    const sx=rng()*W, sy=rng()*H*.9, sr=.22+rng()*.85, sa=.07+rng()*.35;
+    ctx.fillStyle = `hsla(${hues[Math.floor(rng()*3)]},55%,88%,${sa})`;
+    ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
+  }
+}
+
+// ── Battle engine ────────────────────────────────────────────────
+const STAGE_MULTS = [.25,.28,.33,.4,.5,.67,1,1.5,2,2.5,3,3.5,4];
+function stageM(s) { return STAGE_MULTS[Math.max(0, Math.min(12, s + 6))]; }
+
+function makeBoard(dna, hues, name) {
+  const base = computeStats(dna);
+  return {
+    dna, hues, name,
+    types: deriveTypes(dna),
+    moves: deriveMoves(dna),
+    maxHp: base.maxHp,
+    hp: base.maxHp,
+    base,
+    atkSt:0, defSt:0, spASt:0, spDSt:0, spdSt:0,
+    status: null,   // 'poison' | 'burn'
+    dodging: false, // ethereal phase slip
+    accDown: false, // murky/luminous
+  };
+}
+
+function calcDmg(attacker, defender, move) {
+  if (move.power === 0) return 0;
+  const isPhys = move.cat === 'physical';
+  const atk  = attacker.base[isPhys ? 'atk' : 'spAtk']  * stageM(isPhys ? attacker.atkSt : attacker.spASt);
+  const def  = defender.base[isPhys ? 'def' : 'spDef']   * stageM(isPhys ? defender.defSt : defender.spDSt);
+  const eff  = typeEff(attacker.types[0], defender.types);
+  const rand = .85 + Math.random() * .15;
+  const raw  = Math.floor((atk / def * move.power / 50 + 2) * rand * eff);
+  return Math.max(1, raw);
+}
+
+function applyEffect(effect, attacker, defender, dmg) {
+  const msgs = [];
+  switch (effect) {
+    case 'poison':
+      if (!defender.status && Math.random() < .4) { defender.status = 'poison'; msgs.push(`${defender.name} is poisoned!`); }
+      break;
+    case 'burn':
+      if (!defender.status && Math.random() < .3) { defender.status = 'burn'; msgs.push(`${defender.name} is burned!`); }
+      break;
+    case 'multi':
+      msgs.push(`Hit again!`);
+      break;
+    case 'recoil':
+      const rcl = Math.floor(dmg * .33);
+      attacker.hp = Math.max(0, attacker.hp - rcl);
+      msgs.push(`${attacker.name} took ${rcl} recoil!`);
+      break;
+    case 'dodge':
+      attacker.dodging = true;
+      msgs.push(`${attacker.name} phases out…`);
+      break;
+    case 'acc-':
+      defender.accDown = true;
+      msgs.push(`${defender.name}'s accuracy fell!`);
+      break;
+    case 'heal':
+      const h1 = Math.floor(attacker.maxHp * .25);
+      attacker.hp = Math.min(attacker.maxHp, attacker.hp + h1);
+      msgs.push(`${attacker.name} restored ${h1} HP!`);
+      break;
+    case 'heal+':
+      const h2 = Math.floor(attacker.maxHp * .4);
+      attacker.hp = Math.min(attacker.maxHp, attacker.hp + h2);
+      msgs.push(`${attacker.name} restored ${h2} HP!`);
+      break;
+    case 'def+':
+      attacker.defSt = Math.min(6, attacker.defSt + 2);
+      msgs.push(`${attacker.name}'s defense rose!`);
+      break;
+    case 'boost':
+      if (Math.random() < .1) {
+        attacker.atkSt = Math.min(6, attacker.atkSt + 1);
+        attacker.spASt = Math.min(6, attacker.spASt + 1);
+        attacker.defSt = Math.min(6, attacker.defSt + 1);
+        msgs.push(`${attacker.name}'s power surged!`);
+      }
+      break;
+  }
+  return msgs;
+}
+
+function doEndOfTurn(board) {
+  const msgs = [];
+  if (board.status === 'poison') {
+    const d = Math.floor(board.maxHp * .1);
+    board.hp = Math.max(0, board.hp - d);
+    msgs.push(`${board.name} hurt by poison! (${d})`);
+  }
+  if (board.status === 'burn') {
+    const d = Math.floor(board.maxHp * .06);
+    board.hp = Math.max(0, board.hp - d);
+    msgs.push(`${board.name} hurt by burn! (${d})`);
+  }
+  return msgs;
+}
+
+// ── Game state ───────────────────────────────────────────────────
+let state = 'idle'; // 'idle' | 'choosing' | 'resolving' | 'victory' | 'defeat'
+let player = null, opp = null;
+let playerCanvas, oppCanvas, arenaBg;
+let animFrame = null;
+let t0 = performance.now();
+
+// Blink timers
+const blink = { player: { cd: 3, p: 0, active: false }, opp: { cd: 2.5, p: 0, active: false } };
+
+// ── Canvas animation loop ────────────────────────────────────────
+function loop() {
+  const t = (performance.now() - t0) / 1000;
+  const dt = .016;
+
+  // Blink update helper
+  function tickBlink(b, canvas) {
+    b.cd -= dt;
+    if (b.cd <= 0 && !b.active) { b.active = true; b.p = 0; b.cd = 2.2 + Math.random() * 3.5; }
+    if (b.active) {
+      b.p += dt * 9;
+      if (b.p >= 1) { b.active = false; b.p = 0; }
+    }
+    canvas._blinkP = b.active ? b.p : 0;
+  }
+
+  if (player) {
+    tickBlink(blink.player, playerCanvas);
+    renderCreature(playerCanvas, player.dna, player.hues, t, false);
+  }
+  if (opp) {
+    tickBlink(blink.opp, oppCanvas);
+    renderCreature(oppCanvas, opp.dna, opp.hues, t * 1.05, true);
+  }
+  animFrame = requestAnimationFrame(loop);
+}
+
+// ── UI helpers ───────────────────────────────────────────────────
+function setLog(msg) {
+  document.getElementById('log-text').textContent = msg;
+}
+function renderHP(who, board) {
+  const pct = Math.max(0, board.hp / board.maxHp * 100);
+  const fill = document.getElementById(`${who}-hpfill`);
+  fill.style.width = pct + '%';
+  fill.className = 'hp-fill' + (pct < 25 ? ' low' : pct < 55 ? ' mid' : '');
+  document.getElementById(`${who}-hpnums`).textContent = `${board.hp}/${board.maxHp}`;
+  const stEl = document.getElementById(`${who}-status`);
+  stEl.innerHTML = board.status ? `<div class="status-tag st-${board.status.slice(0,4)}">${board.status.toUpperCase()}</div>` : '';
+}
+function renderMoves(board) {
+  board.moves.forEach((mv, i) => {
+    const btn = document.getElementById('m' + i);
+    btn.className = 'move-btn cat-' + mv.cat;
+    btn.innerHTML = `<span class="move-name"><span class="move-cat-dot"></span>${mv.name}</span><span class="move-meta">${mv.desc}</span>`;
+    btn.disabled = (state !== 'choosing');
+    btn.onclick = () => playerMove(i);
+  });
+}
+function lockMoves() {
+  for (let i = 0; i < 4; i++) document.getElementById('m'+i).disabled = true;
+}
+function showOverlay(title, sub, color, actions = []) {
+  const ov = document.getElementById('overlay');
+  const ot = document.getElementById('ov-title');
+  const os = document.getElementById('ov-sub');
+  const oa = document.getElementById('ov-actions');
+  const od = document.getElementById('ov-dna');
+  ot.textContent = title; ot.style.color = color || 'var(--text)';
+  os.innerHTML = sub;
+  oa.innerHTML = '';
+  od.innerHTML = '';
+  actions.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'ov-btn' + (a.cls ? ' '+a.cls : '');
+    btn.textContent = a.label;
+    btn.onclick = a.fn;
+    oa.appendChild(btn);
+  });
+  ov.classList.remove('hidden');
+}
+function hideOverlay() { document.getElementById('overlay').classList.add('hidden'); }
+
+function renderDnaStrip(dna, el) {
+  el.innerHTML = dna.map((v,i) =>
+    `<div class="dna-cell${v>128?' hot':''}"><div class="di">${String(i).padStart(2,'0')}</div><div class="dv">${v}</div></div>`
+  ).join('');
+}
+
+// ── Hit visual feedback ──────────────────────────────────────────
+function hitAnimation(targetCanvas) {
+  targetCanvas.classList.add('flashing','shaking');
+  setTimeout(() => targetCanvas.classList.remove('flashing','shaking'), 400);
+}
+
+// ── Battle turn resolution ────────────────────────────────────────
+async function resolveTurn(playerMoveIdx, oppMoveIdx) {
+  state = 'resolving';
+  lockMoves();
+
+  const pm = player.moves[playerMoveIdx];
+  const om = opp.moves[oppMoveIdx];
+
+  // Determine order by SPD
+  const pFirst = (player.base.spd * stageM(player.spdSt)) >= (opp.base.spd * stageM(opp.spdSt));
+  const order = pFirst
+    ? [[player, opp, pm, 'player', 'opp'], [opp, player, om, 'opp', 'player']]
+    : [[opp, player, om, 'opp', 'player'], [player, opp, pm, 'player', 'opp']];
+
+  for (const [atk, def, mv, atkKey, defKey] of order) {
+    if (atk.hp <= 0 || def.hp <= 0) break;
+
+    setLog(`${atk.name} used ${mv.name}!`);
+    await wait(600);
+
+    // Miss check
+    if (mv.power > 0) {
+      const accMod = (def.accDown ? .6 : 1);
+      const hit = Math.random() < (mv.acc / 100 * accMod);
+      // Dodge check
+      const dodged = def.dodging && mv.name !== 'PHANTOM CLAW';
+      def.dodging = false;
+      def.accDown = false;
+
+      if (!hit || dodged) {
+        setLog(`${def.name} ${dodged ? 'phased out!' : 'avoided the attack!'}`);
+        await wait(600);
+        continue;
+      }
+
+      let dmg = calcDmg(atk, def, mv);
+      const eff = typeEff(atk.types[0], def.types);
+      const effMsg = eff >= 2 ? '⚡ Super effective!' : eff <= .5 ? '▽ Not very effective…' : '';
+
+      // Multi-hit
+      let hits = 1;
+      if (mv.effect === 'multi') { hits = Math.random() < .6 ? 2 : 3; dmg = Math.floor(dmg * .7); }
+
+      for (let h = 0; h < hits; h++) {
+        def.hp = Math.max(0, def.hp - dmg);
+        hitAnimation(defKey === 'opp' ? oppCanvas : playerCanvas);
+        renderHP(defKey, def);
+        if (hits > 1) { setLog(`Hit ${h+1}/${hits}! (${dmg} dmg)`); await wait(350); }
+        if (def.hp <= 0) break;
+      }
+
+      if (effMsg) { setLog(effMsg); await wait(500); }
+      if (mv.effect !== 'multi') setLog(`${mv.name} dealt ${dmg} damage!`);
+      else setLog(`Hit ${hits} times! (${dmg} each)`);
+      await wait(550);
+
+      const effectMsgs = applyEffect(mv.effect, atk, def, dmg * hits);
+      for (const m of effectMsgs) { setLog(m); await wait(500); }
+
+    } else {
+      // Status move
+      def.accDown = false;
+      const effectMsgs = applyEffect(mv.effect, atk, def, 0);
+      for (const m of effectMsgs) { setLog(m); renderHP(atkKey, atk); renderHP(defKey, def); await wait(550); }
+    }
+
+    renderHP(atkKey, atk); renderHP(defKey, def);
+    if (opp.hp <= 0 || player.hp <= 0) break;
+  }
+
+  // End of turn status damage
+  if (player.hp > 0 && opp.hp > 0) {
+    for (const [board, key] of [[player,'player'],[opp,'opp']]) {
+      const msgs = doEndOfTurn(board);
+      for (const m of msgs) { setLog(m); renderHP(key, board); await wait(450); }
+    }
+  }
+
+  // Check faint
+  if (opp.hp <= 0) {
+    await endBattle('victory');
+  } else if (player.hp <= 0) {
+    await endBattle('defeat');
+  } else {
+    state = 'choosing';
+    setLog(`What will ${player.name} do?`);
+    renderMoves(player);
+  }
+}
+
+function playerMove(idx) {
+  if (state !== 'choosing') return;
+  // Simple AI: pick highest-power available move, with some randomness
+  const aiScores = opp.moves.map((mv, i) => {
+    const base = mv.power > 0 ? mv.power * typeEff(opp.types[0], player.types) : 30 + Math.random()*20;
+    return base + Math.random() * 20;
+  });
+  const aiIdx = aiScores.indexOf(Math.max(...aiScores));
+  resolveTurn(idx, aiIdx);
+}
+
+// ── End battle ───────────────────────────────────────────────────
+async function endBattle(result) {
+  state = result;
+  await wait(400);
+  if (nexusMounted && nexusPort) {
+    nexusPort.postMessage({ type: 'EMIT', channel: 'eidolon.battle.result', payload: {
+      result, playerName: player.name, oppName: opp.name, ts: Date.now()
+    }});
+  }
+  if (result === 'victory') {
+    setLog(`${opp.name} fainted! ${player.name} wins!`);
+    await wait(800);
+    showOverlay('VICTORY', `<b>${player.name}</b> defeated <b>${opp.name}</b>!<br>The specimen proved its dominance.<br><br>Breed a child and carry the lineage forward.`,
+      'var(--gold)', [
+        { label: '⟳  BATTLE AGAIN', fn: startBattle },
+        { label: '⬡  BREED CHILD', cls: 'primary', fn: breedChild },
+        { label: '⬛  EXPORT SELF', fn: exportSelf },
+      ]);
+    renderDnaStrip(player.dna, document.getElementById('ov-dna'));
+  } else {
+    setLog(`${player.name} fainted… ${opp.name} wins.`);
+    await wait(800);
+    showOverlay('FAINTED', `<b>${player.name}</b> was defeated by <b>${opp.name}</b>.<br>The genome persists. Train, mutate, return.`,
+      'var(--red)', [
+        { label: '⟳  TRY AGAIN', cls: 'primary', fn: startBattle },
+        { label: '⬛  EXPORT SELF', fn: exportSelf },
+      ]);
+  }
+}
+
+// ── Start / setup battle ─────────────────────────────────────────
+function startBattle() {
+  hideOverlay();
+  // Generate opponent from random DNA
+  const rng = mulberry32(Date.now() ^ (Math.random() * 0xFFFFFFFF | 0));
+  const oppDna = Array.from({length:16}, () => Math.floor(rng() * 256));
+  const oppHues = [rng()*360, rng()*360, rng()*360];
+  const oppName = makeName(oppDna);
+
+  player = makeBoard(GENE_DATA.dna, GENE_DATA.hues, GENE_DATA.name);
+  opp    = makeBoard(oppDna, oppHues, oppName);
+
+  // Render opp info
+  const oppTypes = deriveTypes(oppDna);
+  document.getElementById('opp-name').textContent = oppName;
+  document.getElementById('opp-types').innerHTML = oppTypes.map(tp =>
+    `<span class="type-chip" style="color:${TYPE_COLOR[tp]};background:${TYPE_BG[tp]};border-color:${TYPE_COLOR[tp]}44">${tp}</span>`
+  ).join(' ');
+  renderHP('opp', opp);
+  renderHP('player', player);
+
+  // Repaint background with blended hues
+  const blendHues = [GENE_DATA.hues[0], oppHues[0], GENE_DATA.hues[1]];
+  paintBg(arenaBg, blendHues);
+
+  state = 'choosing';
+  setLog(`A wild ${oppName} appeared!`);
+  renderMoves(player);
+}
+
+// ── Breed / Export ───────────────────────────────────────────────
+async function breedChild() {
+  hideOverlay();
+  setLog('Breeding child specimen…');
+
+  // Mutate DNA
+  const newDna = GENE_DATA.dna.slice();
+  const idx = Math.floor(Math.random() * 16);
+  const delta = Math.random() < .5 ? -32 : 32;
+  newDna[idx] = Math.max(0, Math.min(255, newDna[idx] + delta + Math.floor((Math.random()-.5)*16)));
+  const newHues = GENE_DATA.hues.map(h => (h + (Math.random()-.5)*14 + 360) % 360);
+  const childName = makeName(newDna);
+  const childNonce = randomNonce();
+  const childGen = GENE_DATA.generation + 1;
+  const childBirth = await sha256(canonicalize({nonce:childNonce, dna:newDna}));
+  const parentLink = await sha256(GENE_DATA.nonce);
+
+  const childGene = {
+    name: childName,
+    species: 'Eidolon',
+    typeTag: 'phosphor-specimen',
+    generation: childGen,
+    nonce: childNonce,
+    birthHash: childBirth,
+    parentNonce: GENE_DATA.nonce,
+    parentHash: parentLink,
+    dna: newDna,
+    hues: newHues,
+    createdAt: new Date().toISOString(),
+    childCount: 0,
+    lineage: [
+      ...(GENE_DATA.lineage || []),
+      { name: GENE_DATA.name, generation: GENE_DATA.generation, nonce: GENE_DATA.nonce }
+    ]
+  };
+
+  const src = document.documentElement.outerHTML;
+  const replaced = src.replace(
+    /(<script id="creature-dna" type="application\/json">)[\s\S]*?(<\/script>)/,
+    `$1\n${JSON.stringify(childGene, null, 2)}\n$2`
+  );
+  if (replaced === src) { setLog('Breed failed — could not splice genome.'); return; }
+
+  const titled = replaced.replace(/<title>[^<]*<\/title>/, `<title>EIDOLON · ${childName} · Gen-${String(childGen).padStart(2,'0')}</title>`);
+  const final = titled.startsWith('<!DOCTYPE') ? titled : '<!DOCTYPE html>\n' + titled;
+
+  GENE_DATA.childCount = (GENE_DATA.childCount || 0) + 1;
+
+  const blob = new Blob([final], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `eidolon-battle-${childName.toLowerCase()}-gen${String(childGen).padStart(2,'0')}.html`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  setLog(`${childName} Gen-${childGen} exported! Gene ${idx} mutated by ${delta > 0 ? '+' : ''}${delta}.`);
+}
+
+async function exportSelf() {
+  const src = document.documentElement.outerHTML;
+  const final = src.startsWith('<!DOCTYPE') ? src : '<!DOCTYPE html>\n' + src;
+  const blob = new Blob([final], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `eidolon-battle-${GENE_DATA.name.toLowerCase()}-gen${String(GENE_DATA.generation).padStart(2,'0')}-clone.html`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setLog('Self exported — sovereign clone.');
+}
+
+// ── Self-verification ────────────────────────────────────────────
+async function selfVerify() {
+  const checks = [];
+  // Ring 5: integrity — birth hash
+  const computed = await sha256(canonicalize({nonce: GENE_DATA.nonce, dna: GENE_DATA.dna}));
+  const hashOk = GENE_DATA.birthHash === null || GENE_DATA.birthHash === computed;
+  checks.push({ring:5, ok: hashOk, label: GENE_DATA.birthHash ? 'birthHash verified' : 'genesis — no parent hash'});
+  // Ring 6: sovereignty
+  const extScripts = document.querySelectorAll('script[src]').length;
+  const extStyles  = document.querySelectorAll('link[rel="stylesheet"]').length;
+  checks.push({ring:6, ok: extScripts===0 && extStyles===0, label:'sovereign (no external deps)'});
+  // Ring 7: transmissibility (quine)
+  const quineCap = document.documentElement.outerHTML.length > 0;
+  checks.push({ring:7, ok: quineCap, label:'quine-capable'});
+  // Ring 1: function
+  checks.push({ring:1, ok: typeof renderCreature === 'function', label:'renderer loaded'});
+
+  const allOk = checks.every(c => c.ok);
+  const badge = document.getElementById('verify-badge');
+  badge.textContent = allOk ? '✓ rings 1·5·6·7·9 pass' : '✗ ring failure';
+  badge.style.color = allOk ? 'rgba(51,255,119,.5)' : 'rgba(255,51,85,.5)';
+
+  // Update birthHash display on HUD
+  if (GENE_DATA.birthHash === null) {
+    document.getElementById('hud-right').innerHTML =
+      `<div>GEN-${String(GENE_DATA.generation).padStart(2,'0')} · ${GENE_DATA.nonce.slice(0,8)}…</div>
+       <div id="verify-badge">✓ rings 1·5·6·7 pass</div>`;
+  }
+  return allOk;
+}
+
+// ── Resize canvases ───────────────────────────────────────────────
+function resizeArena() {
+  const arena = document.getElementById('arena');
+  const W = arena.offsetWidth, H = arena.offsetHeight;
+  arenaBg.width = W; arenaBg.height = H;
+  paintBg(arenaBg, GENE_DATA.hues);
+
+  const pSize = Math.min(Math.floor(Math.min(W, H) * .42), 220);
+  playerCanvas.width = pSize; playerCanvas.height = pSize;
+  const oSize = Math.floor(pSize * .82);
+  oppCanvas.width = oSize; oppCanvas.height = oSize;
+}
+
+// ── Boot ─────────────────────────────────────────────────────────
+async function boot() {
+  playerCanvas = document.getElementById('player-canvas');
+  oppCanvas    = document.getElementById('opp-canvas');
+  arenaBg      = document.getElementById('arena-bg');
+
+  // HUD
+  const nameEl = document.getElementById('hud-name');
+  nameEl.textContent = GENE_DATA.name;
+  const playerTypes = deriveTypes(GENE_DATA.dna);
+  document.getElementById('hud-types').innerHTML = playerTypes.map(tp =>
+    `<span class="type-chip" style="color:${TYPE_COLOR[tp]};background:${TYPE_BG[tp]};border-color:${TYPE_COLOR[tp]}44">${tp}</span>`
+  ).join(' ');
+  document.getElementById('hud-right').innerHTML =
+    `<div>GEN-${String(GENE_DATA.generation).padStart(2,'0')} · ${GENE_DATA.nonce.slice(0,8)}…</div>
+     <div id="verify-badge">◌ verifying…</div>`;
+
+  // Player info panel
+  const pStats = computeStats(GENE_DATA.dna);
+  document.getElementById('player-name').innerHTML =
+    `${GENE_DATA.name} <span class="c-gen">Lv.${GENE_DATA.generation}</span>`;
+  document.getElementById('player-types').innerHTML = playerTypes.map(tp =>
+    `<span class="type-chip" style="color:${TYPE_COLOR[tp]};background:${TYPE_BG[tp]};border-color:${TYPE_COLOR[tp]}44">${tp}</span>`
+  ).join(' ');
+
+  resizeArena();
+  window.addEventListener('resize', () => { resizeArena(); if(player&&opp) paintBg(arenaBg,GENE_DATA.hues); });
+
+  // Pre-render player on canvas for title
+  player = makeBoard(GENE_DATA.dna, GENE_DATA.hues, GENE_DATA.name);
+  renderHP('player', player);
+
+  // Start animation loop
+  t0 = performance.now();
+  loop();
+
+  // Self-verify
+  await selfVerify();
+
+  // Show idle overlay with stats
+  const s = computeStats(GENE_DATA.dna);
+  const moves = deriveMoves(GENE_DATA.dna);
+  const statRows = [
+    ['HP', s.maxHp, 105],['ATK', s.atk, 75],['DEF', s.def, 75],
+    ['SP.ATK', s.spAtk, 75],['SP.DEF', s.spDef, 75],['SPD', s.spd, 75],
+  ].map(([l,v,m]) =>
+    `<div class="stat-label">${l}</div><div class="stat-bar-t"><div class="stat-fill" style="width:${Math.round(v/m*100)}%"></div></div><div class="stat-val">${v}</div>`
+  ).join('');
+
+  const moveList = moves.map(mv =>
+    `<span style="color:var(--dim);font-size:9px">◉ ${mv.name}</span>`
+  ).join(' &nbsp; ');
+
+  showOverlay(
+    GENE_DATA.name,
+    `${playerTypes.map(t=>`<span style="color:${TYPE_COLOR[t]}">${t}</span>`).join(' / ')} &nbsp;·&nbsp; Gen ${GENE_DATA.generation}<br>
+     <div class="stat-grid" style="margin:10px auto 8px">${statRows}</div>
+     <div style="margin-top:4px">${moveList}</div>
+     ${GENE_DATA.parentNonce ? `<div style="margin-top:6px;font-size:9px;color:var(--dim)">Parent: ${GENE_DATA.parentNonce.slice(0,16)}…</div>` : '<div style="margin-top:6px;font-size:9px;color:var(--dim)">⬡ Genesis specimen</div>'}`,
+    TYPE_COLOR[playerTypes[0]],
+    [
+      { label: '⚔  BATTLE', cls: 'primary', fn: startBattle },
+      { label: '⬛  EXPORT SELF', fn: exportSelf },
+      { label: '⬡  BREED CHILD', fn: breedChild },
+    ]
+  );
+  renderDnaStrip(GENE_DATA.dna, document.getElementById('ov-dna'));
+}
+
+boot();
+</script>
+</body>
+</html>

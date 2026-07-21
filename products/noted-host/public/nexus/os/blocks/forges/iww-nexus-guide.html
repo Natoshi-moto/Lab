@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How It All Fits Together — IWW + Nexus OS Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0C0A07; --surface:#161310; --raised:#201D18;
+  --ink:#E0D6C0; --dim:#8A8070; --ghost:#3E3830;
+  --amber:#C8920A; --steel:#4A7A9A; --sage:#6A8A64;
+  --ember:#C8503A; --border:rgba(200,180,140,0.1);
+  --mono:'IBM Plex Mono',monospace;
+  --serif:'Source Serif 4',serif;
+  --display:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;margin:0 auto;padding:4rem 2rem 6rem}
+h1{font-family:var(--display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;line-height:1.15;margin-bottom:.5rem;letter-spacing:-0.02em}
+h1 em{color:var(--amber);font-style:normal}
+.subtitle{color:var(--dim);font-size:1rem;margin-bottom:3rem;font-family:var(--mono);letter-spacing:.04em}
+h2{font-family:var(--display);font-size:1.3rem;font-weight:700;color:var(--amber);margin:3rem 0 1rem;padding-top:2rem;border-top:1px solid var(--border);letter-spacing:.02em}
+h3{font-family:var(--mono);font-size:.85rem;font-weight:500;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin:1.5rem 0 .5rem}
+p{margin-bottom:1rem;color:var(--ink)}
+.lead{font-size:1.1rem;color:var(--ink);margin-bottom:1.5rem;line-height:1.8}
+code{font-family:var(--mono);font-size:.82rem;background:var(--raised);border:1px solid var(--border);border-radius:3px;padding:.15rem .4rem;color:var(--amber)}
+pre{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.2rem 1.5rem;overflow-x:auto;margin:1rem 0 1.5rem;font-family:var(--mono);font-size:.8rem;line-height:1.7;color:#C8B894}
+pre .c{color:var(--dim)}
+pre .k{color:var(--steel)}
+pre .s{color:var(--sage)}
+pre .n{color:var(--amber)}
+.callout{background:var(--raised);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;padding:1rem 1.2rem;margin:1.2rem 0;font-size:.92rem;color:var(--dim)}
+.callout strong{color:var(--ink)}
+.warn{border-left-color:var(--ember)}
+.warn strong{color:var(--ember)}
+.step{display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start}
+.step-num{font-family:var(--mono);font-size:.8rem;color:var(--amber);background:rgba(200,146,10,.1);border:1px solid rgba(200,146,10,.25);border-radius:3px;padding:.25rem .6rem;flex-shrink:0;margin-top:.1rem}
+.step-text{font-size:.95rem;color:var(--dim);line-height:1.65}
+.step-text strong{color:var(--ink)}
+.state-table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+.state-table th{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);text-align:left;padding:.5rem .8rem;border-bottom:1px solid var(--border);background:var(--surface)}
+.state-table td{padding:.55rem .8rem;border-bottom:1px solid var(--border);color:var(--dim);vertical-align:top}
+.state-table td:first-child{font-family:var(--mono);font-size:.78rem;color:var(--ink)}
+.state-table tr:last-child td{border-bottom:none}
+.yes{color:var(--sage)}
+.no{color:var(--ember)}
+.future{color:var(--dim);font-style:italic}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:3rem}
+.toc-title{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:1rem}
+.toc a{display:block;font-size:.88rem;color:var(--dim);text-decoration:none;padding:.2rem 0;transition:color 150ms}
+.toc a:hover{color:var(--amber)}
+.toc-num{font-family:var(--mono);font-size:.7rem;color:var(--ghost);margin-right:.5rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>How It All Fits Together</h1>
+<p class="subtitle">IWW + Nexus OS + Wallet + Nostr — the toddler guide</p>
+
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <a href="#s1"><span class="toc-num">01</span> What you can do RIGHT NOW</a>
+  <a href="#s2"><span class="toc-num">02</span> What Nexus OS actually is (one paragraph)</a>
+  <a href="#s3"><span class="toc-num">03</span> The IPC handshake — how blocks talk to each other</a>
+  <a href="#s4"><span class="toc-num">04</span> How NexusDB stores things</a>
+  <a href="#s5"><span class="toc-num">05</span> How Nostr signing works in IWW</a>
+  <a href="#s6"><span class="toc-num">06</span> How the wallet will tie in</a>
+  <a href="#s7"><span class="toc-num">07</span> How to run IWW in Nexus OS today (step by step)</a>
+  <a href="#s8"><span class="toc-num">08</span> What's real now vs future</a>
+</div>
+
+<!-- ── 01 ── -->
+<h2 id="s1">01 — What you can do RIGHT NOW</h2>
+<p class="lead">Open <code>i-was-wrong-v2.html</code> in any browser. That's it. It works immediately, with no server, no install, no wallet, no Nostr relay. One AI error is pre-loaded (Claude's). You submit yours. It gets signed with your Nostr keypair and stored in localStorage. Done.</p>
+
+<div class="callout">
+  <strong>The one thing to do before showing anyone:</strong> Submit your own first error. The founder's admission being real is the trust signal that makes everyone else want to participate. Claude's error is baked in; yours should be too.
+</div>
+
+<p>If you want to run it <em>inside</em> Nexus OS (so entries go into NexusDB instead of just localStorage, and other blocks can see when someone submits), see section 07.</p>
+
+<!-- ── 02 ── -->
+<h2 id="s2">02 — What Nexus OS actually is</h2>
+<p>Nexus OS is a single HTML file (<code>nexus-os-patched.html</code>) that acts like a tiny operating system in your browser. It creates sandboxed <code>&lt;iframe&gt;</code> windows called <strong>blocks</strong>. Each block is its own HTML file — Verse Studio, the Wallet, NexusDB, IWW — running inside a sandbox with no access to each other's code or DOM. They can only talk through a controlled channel: the <strong>kernel</strong>. The kernel decides who can talk to who, routes messages between blocks, and kills blocks that misbehave. This is why you need to run everything through Nexus OS for cross-block features — outside of it, blocks can't see each other at all.</p>
+
+<!-- ── 03 ── -->
+<h2 id="s3">03 — The IPC handshake</h2>
+<p>Every block goes through the same boot sequence when Nexus OS loads it. Here's what happens, in order:</p>
+
+<div class="step"><span class="step-num">1</span><div class="step-text"><strong>BOOT</strong> — The kernel sends a <code>BOOT</code> message to the block's iframe with a <code>MessagePort</code> (a private two-way channel). This is the only time the block hears from the kernel on the main <code>window.message</code> channel. Everything after this goes through the port.</div></div>
+<div class="step"><span class="step-num">2</span><div class="step-text"><strong>DECLARE</strong> — The block sends back a <code>DECLARE</code> with its manifest: which channels it will <em>emit</em> (publish to) and which it wants to <em>consume</em> (subscribe to). IWW declares: emits <code>iww.admission</code>, consumes <code>db.result</code>.</div></div>
+<div class="step"><span class="step-num">3</span><div class="step-text"><strong>MOUNT_CHALLENGE / MOUNT_ACK</strong> — The kernel sends a random nonce. The block echoes it back. This proves the block is alive and responding correctly before being let onto the bus.</div></div>
+<div class="step"><span class="step-num">4</span><div class="step-text"><strong>MOUNTED</strong> — The kernel confirms the block is mounted. Now the block sends <code>SUB</code> messages for each channel it wants to actively receive. <strong>Important:</strong> declaring a channel in your manifest is an allowlist — it says "I'm allowed to receive this." Sending SUB is what actually subscribes you. Without SUB, messages on that channel are delivered to nobody.</div></div>
+<div class="step"><span class="step-num">5</span><div class="step-text"><strong>PING / PONG</strong> — The kernel periodically pings every mounted block. The block must reply with PONG containing the same nonce. Fail enough pings and the kernel evicts the block. This keeps zombie blocks from clogging the system.</div></div>
+
+<pre><span class="c">// What IWW's boot code looks like</span>
+<span class="k">window</span>.addEventListener(<span class="s">"message"</span>, e => {
+  <span class="k">if</span> (!e.data || e.data.type !== <span class="s">"BOOT"</span>) return;
+  kernelPort = e.ports[<span class="n">0</span>];
+
+  kernelPort.postMessage({
+    type: <span class="s">"DECLARE"</span>,
+    manifest: {
+      emits:    [<span class="s">"iww.admission"</span>, <span class="s">"system.block_ready"</span>],
+      consumes: [<span class="s">"db.result"</span>]
+    },
+    app: { title: <span class="s">"I Was Wrong"</span>, icon: <span class="s">"✗"</span> }
+  });
+
+  kernelPort.onmessage = handleKernelMsg;
+});
+
+<span class="k">function</span> handleKernelMsg(ev) {
+  <span class="k">const</span> msg = ev.data;
+  <span class="k">if</span> (msg.type === <span class="s">"MOUNT_CHALLENGE"</span>)
+    kernelPort.postMessage({ type: <span class="s">"MOUNT_ACK"</span>, nonce: msg.nonce });
+  <span class="k">else if</span> (msg.type === <span class="s">"MOUNTED"</span>) {
+    kernelPort.postMessage({ type: <span class="s">"SUB"</span>, channel: <span class="s">"db.result"</span> });
+    <span class="c">// now we're live — load from DB</span>
+  } <span class="k">else if</span> (msg.type === <span class="s">"PING"</span>)
+    kernelPort.postMessage({ type: <span class="s">"PONG"</span>, nonce: msg.nonce });
+  <span class="k">else if</span> (msg.type === <span class="s">"MSG"</span>)
+    handleIncomingMessage(msg);
+}
+</pre>
+
+<div class="callout">
+  <strong>The crucial bug to avoid (BUG-10 in NexusDB docs):</strong> If your block declares a channel in <code>consumes</code> but never sends <code>SUB</code>, it receives nothing and there's no error message. Silent failure. Always send SUB for every channel you actually want to receive after MOUNTED.
+</div>
+
+<!-- ── 04 ── -->
+<h2 id="s4">04 — How NexusDB stores things</h2>
+<p>NexusDB is a block (<code>nexus-db.html</code>) that wraps the browser's IndexedDB with a quasi-SQL interface over IPC. It has one main table: <code>social_events</code>. IWW stores its entries there using a Nostr-style <code>kind</code> field to distinguish its events from the rest.</p>
+
+<h3>Sending a query to NexusDB</h3>
+<p>You don't call NexusDB directly. You send a <code>MSG</code> on the <code>db.query</code> channel through the kernel. NexusDB is subscribed to that channel. It processes your query and emits the result on <code>db.result</code>, which you're subscribed to.</p>
+
+<pre><span class="c">// Store an entry in NexusDB</span>
+kernelPort.postMessage({
+  type: <span class="s">"MSG"</span>,
+  channel: <span class="s">"db.query"</span>,
+  payload: {
+    query: <span class="s">"INSERT INTO social_events"</span>,
+    params: {
+      id:         entry.id,
+      kind:       <span class="n">30078</span>,        <span class="c">// IWW event kind</span>
+      pubkey:     entry.pubKeyHex,
+      content:    JSON.stringify(entry),
+      created_at: Math.floor(Date.now() / <span class="n">1000</span>),  <span class="c">// ← UNIX SECONDS not ms!</span>
+      nostr_sig:  entry.nostrSig
+    },
+    appId: <span class="s">"iww"</span>,
+    _reqId: <span class="s">"iww_12345"</span>  <span class="c">// match this to the db.result response</span>
+  }
+});
+
+<span class="c">// Read entries back</span>
+kernelPort.postMessage({
+  type: <span class="s">"MSG"</span>,
+  channel: <span class="s">"db.query"</span>,
+  payload: {
+    query:   <span class="s">"SELECT * FROM social_events"</span>,
+    filters: { kind: <span class="n">30078</span> },
+    sort:    { column: <span class="s">"created_at"</span>, direction: <span class="s">"DESC"</span> },
+    appId:   <span class="s">"iww"</span>,
+    _reqId:  <span class="s">"iww_12346"</span>
+  }
+});
+</pre>
+
+<div class="callout warn">
+  <strong>The timestamp bug (BUG-01):</strong> NexusDB stores <code>created_at</code> in Unix <em>seconds</em> (Nostr standard: ~1,745,000,000). If you pass <code>Date.now()</code> directly (milliseconds: ~1,745,000,000,000), the garbage collector will think the event is 1000 years old and delete it within 5 minutes. Always use <code>Math.floor(Date.now() / 1000)</code>.
+</div>
+
+<p>NexusDB has a namespace guard: blocks can only write to <code>social_events</code>, <code>config</code>, or tables starting with their <code>appId</code>. IWW uses <code>social_events</code> and filters by <code>kind: 30078</code>.</p>
+
+<!-- ── 05 ── -->
+<h2 id="s5">05 — How Nostr signing works in IWW</h2>
+<p>Every admission gets signed as a Nostr event (NIP-01). This is what makes the "cannot delete" claim technically honest — the event ID is a cryptographic hash of the content, and your Schnorr signature over that ID proves you authorised it.</p>
+
+<h3>The key pair</h3>
+<p>On first load, IWW generates a fresh <code>secp256k1</code> private key using <code>crypto.getRandomValues()</code> and derives the public key using <code>@noble/curves</code>. Both are stored in <code>localStorage</code>. You can import your existing Nostr <code>nsec</code> instead.</p>
+
+<h3>The event structure (NIP-01)</h3>
+<pre>{
+  kind:       <span class="n">30078</span>,          <span class="c">// parameterized replaceable, application-specific</span>
+  pubkey:     <span class="s">"hex pubkey"</span>,
+  created_at: <span class="n">1745000000</span>,    <span class="c">// unix seconds</span>
+  tags: [
+    [<span class="s">"d"</span>,        <span class="s">"admission-id"</span>],    <span class="c">// unique identifier</span>
+    [<span class="s">"t"</span>,        <span class="s">"iww"</span>],              <span class="c">// topic tag</span>
+    [<span class="s">"t"</span>,        <span class="s">"proof-of-error"</span>],
+    [<span class="s">"domain"</span>,   <span class="s">"technology"</span>],
+    [<span class="s">"score"</span>,    <span class="s">"81"</span>],
+    [<span class="s">"defended"</span>, <span class="s">"true"</span>]
+  ],
+  content:    <span class="s">"JSON string of full admission data"</span>,
+  id:         <span class="s">"sha256 of canonical serialisation"</span>,
+  sig:        <span class="s">"schnorr signature over id"</span>
+}
+</pre>
+
+<h3>The canonical serialisation (NIP-01)</h3>
+<pre>JSON.stringify([
+  <span class="n">0</span>,               <span class="c">// reserved</span>
+  pubkey,           <span class="c">// hex</span>
+  created_at,       <span class="c">// unix seconds</span>
+  kind,             <span class="c">// 30078</span>
+  tags,             <span class="c">// array of arrays</span>
+  content           <span class="c">// string</span>
+])
+</pre>
+
+<p>The <code>id</code> is the SHA-256 of this string. The signature is a Schnorr signature (not ECDSA) over the <code>id</code> bytes, using the private key. Because SHA-256 is available in the Web Crypto API natively, the only external library needed is <code>@noble/curves</code> for the Schnorr step.</p>
+
+<div class="callout">
+  <strong>What "signed" means in practice right now:</strong> The event is signed and the ID and signature are stored locally. It is <em>not</em> published to a Nostr relay yet — that step is future (see section 08). But the signature is valid and verifiable by any Nostr client that sees the event.
+</div>
+
+<!-- ── 06 ── -->
+<h2 id="s6">06 — How the wallet ties in</h2>
+<p>This is the part that connects IWW to the rest of Nexus. Here is the intended flow, and what's real vs future:</p>
+
+<h3>The intended connection</h3>
+<p>When you submit an admission, IWW emits an <code>iww.admission</code> event to the kernel. The Wallet block (if running) can subscribe to <code>iww.admission</code> and offer to stake ATT tokens on your public position. The admission's Nostr event ID becomes the <code>terms_raw</code> field in the wallet's LOCK operation — the thing you're staking on.</p>
+
+<pre><span class="c">// What the Wallet would receive when IWW emits</span>
+{
+  id:           <span class="s">"u_1745000000_abc123"</span>,
+  domain:       <span class="s">"technology"</span>,
+  score:        <span class="n">81</span>,
+  pubkey:       <span class="s">"hex pubkey of the admitter"</span>,
+  nostrEventId: <span class="s">"sha256 of the Nostr event"</span>
+}
+
+<span class="c">// Wallet would then offer: "Stake on this position?"</span>
+<span class="c">// LOCK: terms_raw = "nostr:event:&lt;nostrEventId&gt;"</span>
+<span class="c">// The stake binds to the immutable Nostr event</span>
+</pre>
+
+<h3>The four wallet conservation rules (reminder)</h3>
+<table class="state-table">
+  <tr><th>Rule</th><th>What it enforces</th><th>Where it lives</th></tr>
+  <tr><td>Rule 1</td><td>No UTXO can be consumed twice</td><td>App-level (Wallet block)</td></tr>
+  <tr><td>Rule 2</td><td>Only the authorised key can spend</td><td>App-level</td></tr>
+  <tr><td>Rule 3</td><td>Signature must be valid</td><td>App-level</td></tr>
+  <tr><td>Rule 4</td><td>Inputs = Outputs (no creation or destruction)</td><td>App-level</td></tr>
+</table>
+
+<div class="callout warn">
+  <strong>Current honest state:</strong> All four rules live in the Wallet block's own JavaScript. The kernel does not enforce them. A malicious block could theoretically send crafted wallet messages. This is a known gap (Grok's report confirmed it). It doesn't affect IWW directly — IWW just emits events; it doesn't touch the wallet — but it's worth knowing.
+</div>
+
+<!-- ── 07 ── -->
+<h2 id="s7">07 — How to run IWW in Nexus OS today</h2>
+
+<div class="callout">
+  <strong>Requirement:</strong> You must serve the files from a local web server, not by double-clicking. Chrome silently drops MessagePort transfers to sandboxed iframes on <code>file://</code>.
+</div>
+
+<div class="step"><span class="step-num">1</span><div class="step-text"><strong>Get a local server running.</strong> In the folder where your HTML files live, run:<br><code>python3 -m http.server 8080</code><br>Then open <code>http://localhost:8080/nexus-os-patched.html</code></div></div>
+
+<div class="step"><span class="step-num">2</span><div class="step-text"><strong>Add IWW to the Nexus app shelf.</strong> In Nexus OS, right-click the desktop → Add Block → enter the URL <code>http://localhost:8080/i-was-wrong-v2.html</code>. Give it the title "I Was Wrong" and icon ✗.</div></div>
+
+<div class="step"><span class="step-num">3</span><div class="step-text"><strong>Also load NexusDB.</strong> IWW needs NexusDB to store entries. Add <code>nexus-db.html</code> as a block the same way. It will auto-boot and connect — you'll see its green monospace log in its window.</div></div>
+
+<div class="step"><span class="step-num">4</span><div class="step-text"><strong>Open IWW.</strong> Click it from the shelf. You should see the Nexus OS indicator in the masthead: <code>⬡ Nexus OS</code>. This means it detected it's running inside the kernel and is using NexusDB instead of localStorage.</div></div>
+
+<div class="step"><span class="step-num">5</span><div class="step-text"><strong>Submit an admission.</strong> Your Nostr identity is auto-generated on first load. Submit your first real error. It will be signed with your key and stored in NexusDB, and an <code>iww.admission</code> event will be emitted to the kernel (currently goes nowhere, but it's there for when the Wallet block subscribes to it).</div></div>
+
+<div class="callout">
+  <strong>Crypto library note:</strong> IWW tries to load <code>@noble/curves</code> from <code>https://esm.sh</code>. If you're offline, signing falls back gracefully — entries are still saved, just marked unsigned. To guarantee signing works offline, run <code>python3 setup_libs.py</code> from your project folder first (this downloads the library locally for the Social block, same library IWW needs).
+</div>
+
+<!-- ── 08 ── -->
+<h2 id="s8">08 — What's real now vs future</h2>
+
+<table class="state-table">
+  <tr><th>Feature</th><th>Standalone</th><th>In Nexus OS</th><th>Future</th></tr>
+  <tr>
+    <td>Submit & store admissions</td>
+    <td class="yes">✓ localStorage</td>
+    <td class="yes">✓ NexusDB</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>Nostr keypair (generate/import)</td>
+    <td class="yes">✓ localStorage</td>
+    <td class="yes">✓ localStorage</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>Sign admissions as Nostr events</td>
+    <td class="yes">✓ (needs CDN)</td>
+    <td class="yes">✓ (needs CDN)</td>
+    <td>Sign from kernel-held key</td>
+  </tr>
+  <tr>
+    <td>Publish to Nostr relay</td>
+    <td class="no">✗ not yet</td>
+    <td class="no">✗ not yet</td>
+    <td class="future">Relay URL setting + WebSocket publish</td>
+  </tr>
+  <tr>
+    <td>Emit to Nexus kernel</td>
+    <td class="no">✗ no kernel</td>
+    <td class="yes">✓ iww.admission</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>Wallet can stake on admissions</td>
+    <td class="no">✗</td>
+    <td class="no">✗ not wired yet</td>
+    <td class="future">Wallet subscribes to iww.admission, offers LOCK with nostrEventId as terms_raw</td>
+  </tr>
+  <tr>
+    <td>Portable across forks</td>
+    <td class="no">✗ localStorage is origin-bound</td>
+    <td class="no">✗ IndexedDB is origin-bound</td>
+    <td class="future">Export/import signed JSON bundle</td>
+  </tr>
+  <tr>
+    <td>Crucible CPL → IWW score</td>
+    <td class="no">✗</td>
+    <td class="no">✗ not wired</td>
+    <td class="future">Crucible emits cpl.update; IWW optionally weights score by CPL profile</td>
+  </tr>
+  <tr>
+    <td>64 AI agents posting admissions</td>
+    <td class="future" colspan="3">Run agents via API, have them submit through the same form programmatically with their own keypairs</td>
+  </tr>
+</table>
+
+<h3>The two things that will most improve this, in order</h3>
+<p><strong>1. Export/import signed bundle.</strong> Right now all your admissions die if you move to a new origin. A signed JSON export (all entries, signed by your Nostr key) that can be imported anywhere makes the "portable quine" claim honest. This is maybe 80 lines of code.</p>
+<p><strong>2. Nostr relay publish.</strong> Add a relay URL field in settings. On submit, open a WebSocket to the relay and send the signed event. Instantly your admission is on the public Nostr network, verifiable by anyone. This is maybe 40 lines of code.</p>
+<p>Everything else — wallet staking, CPL integration, the 64 agents — builds on these two foundations being solid.</p>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:3rem 0">
+<p style="font-family:var(--mono);font-size:.65rem;color:var(--ghost);text-align:center;letter-spacing:.06em">
+  I Was Wrong · Nexus OS Integration Guide · Generated April 2026<br>
+  Save this file. It does not require a server. It will not change.
+</p>
+
+</div>
+</body>
+</html>

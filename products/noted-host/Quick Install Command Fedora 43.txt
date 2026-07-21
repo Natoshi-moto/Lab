@@ -1,0 +1,13 @@
+Noted v0.01 — Quick Install on Fedora 43
+
+Run this from inside the unzipped folder containing package.json:
+
+    chmod +x ./install-noted-v0.01-fedora.sh && ./install-noted-v0.01-fedora.sh
+
+Launch after install:
+
+    noted-v0.01
+
+Reset workspace (if app shows "workspace could not be loaded"):
+
+    noted-v0.01-reset && noted-v0.01

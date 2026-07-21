@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notepad</title>
+<style>
+:root { color-scheme: dark; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 13px; }
+body { background: #111318; color: #d2d5de; display: flex; flex-direction: column; }
+#nx-boot-screen {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px;
+}
+#nx-boot-icon  { font-size: 40px; }
+#nx-boot-title { font-size: 15px; font-weight: 600; }
+#nx-boot-state { font-size: 10px; color: #6b7089; letter-spacing: 1px; margin-top: 4px; }
+#nx-app { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; }
+body.nx-mounted #nx-boot-screen { display: none; }
+body.nx-mounted #nx-app         { display: flex; }
+/* Scrollbars */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #262a35; border-radius: 3px; }
+/* Shared surface tokens */
+:root {
+  --bg: #08090c; --surface: #111318; --surface-2: #181b22; --surface-3: #1f222b;
+  --border: #262a35; --border-hi: #363b4a; --text: #d2d5de; --text-dim: #6b7089;
+  --text-muted: #3e4255; --accent: #4dbb7a; --accent-dim: rgba(77,187,122,.10);
+  --danger: #ef4444; --warn: #f59e0b; --info: #3b82f6; --radius: 6px;
+}
+
+#np-toolbar {
+  padding: 6px 10px; border-bottom: 1px solid var(--border); display: flex;
+  gap: 6px; align-items: center; background: var(--surface-2); flex-shrink: 0;
+}
+.np-btn {
+  font-size: 11px; padding: 3px 10px; border-radius: var(--radius); cursor: pointer;
+  background: var(--surface-3); border: 1px solid var(--border); color: var(--text-dim);
+  font-family: inherit; transition: all .12s; white-space: nowrap;
+}
+.np-btn:hover { color: var(--accent); border-color: var(--accent); }
+#np-filename {
+  background: var(--surface-3); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-family: inherit; font-size: 11px; padding: 3px 8px;
+  outline: none; width: 180px; transition: border-color .12s;
+}
+#np-filename:focus { border-color: var(--accent); }
+#np-status { margin-left: auto; font-size: 10px; color: var(--text-muted); }
+#np-editor {
+  flex: 1; background: var(--bg); color: var(--text); font-family: inherit;
+  font-size: 13px; padding: 14px 16px; border: none; outline: none;
+  resize: none; line-height: 1.6; tab-size: 2;
+}
+
+</style>
+</head>
+<body>
+
+<!-- Shown during protocol handshake -->
+<div id="nx-boot-screen">
+  <div id="nx-boot-icon">◉</div>
+  <div id="nx-boot-title">Notepad</div>
+  <div id="nx-boot-state">WAITING</div>
+</div>
+
+<!-- App UI — revealed on MOUNTED -->
+<div id="nx-app">
+  <div id="np-toolbar">
+    <input id="np-filename" type="text" value="untitled.txt" autocomplete="off">
+    <button class="np-btn" id="np-open">Open</button>
+    <button class="np-btn" id="np-save">Save</button>
+    <button class="np-btn" id="np-new">New</button>
+    <span id="np-status">no folder mounted</span>
+  </div>
+  <textarea id="np-editor" spellcheck="false" placeholder="Start typing…"></textarea>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+"use strict";
+// ══════════════════════════════════════════════════════════════
+//  Nexus OS — Managed Block  |  Notepad
+//  Uses engines/nexus-block-client.js for the kernel handshake.
+// ══════════════════════════════════════════════════════════════
+
+const editor   = document.getElementById("np-editor");
+const filename = document.getElementById("np-filename");
+const status   = document.getElementById("np-status");
+let   folderMounted = false;
+let   _reqId = 0;
+
+function nextId() { return "np-" + (++_reqId); }
+function setStatus(s) { status.textContent = s; }
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ["fs.write","fs.read","fs.status"],
+    consumes: ["fs.result","fs.mounted"],
+    app: {
+      title:       "Notepad",
+      icon:        "◉",
+      description: "Text editor with file save/open",
+      visible:     true
+    }
+  },
+  onMessage({ channel, payload }) {
+    if (channel === "fs.mounted") {
+      folderMounted = true;
+      setStatus("📂 " + (payload.name || "mounted"));
+    }
+    if (channel === "fs.result") {
+      if (payload.requestChannel === "fs.status") {
+        folderMounted = !!payload.mounted;
+        setStatus(folderMounted ? "📂 " + (payload.folderName || "mounted") : "no folder mounted");
+      }
+      if (payload.requestChannel === "fs.read" && payload.ok) {
+        editor.value = payload.content || "";
+        setStatus("opened: " + filename.value);
+      }
+      if (payload.requestChannel === "fs.write") {
+        setStatus(payload.ok ? "saved ✓" : "save failed: " + payload.error);
+      }
+    }
+  }
+});
+
+if (nx) {
+  nx.ready.then(() => {
+    document.body.classList.add("nx-mounted");
+    nx.subscribe("fs.result");
+    nx.subscribe("fs.mounted");
+    nx.emit("fs.status", { _reqId: "init" });
+  });
+}
+
+document.getElementById("np-save").onclick = () => {
+  if (!folderMounted) { setStatus("mount a folder first"); return; }
+  const name = filename.value.trim() || "untitled.txt";
+  if (nx) nx.emit("fs.write", { path: name, content: editor.value, _reqId: nextId() });
+  setStatus("saving…");
+};
+
+document.getElementById("np-open").onclick = () => {
+  if (!folderMounted) { setStatus("mount a folder first"); return; }
+  const name = filename.value.trim();
+  if (!name) { setStatus("enter a filename to open"); return; }
+  if (nx) nx.emit("fs.read", { path: name, _reqId: nextId() });
+  setStatus("reading…");
+};
+
+document.getElementById("np-new").onclick = () => {
+  editor.value = "";
+  filename.value = "untitled.txt";
+  setStatus("new file");
+};
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "commonjs",
+  "description": "Node test-mode sentinel only; Nexus Moot has no npm dependencies or build step."
+}

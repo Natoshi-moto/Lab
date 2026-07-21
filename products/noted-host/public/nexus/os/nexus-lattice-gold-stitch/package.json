@@ -1,0 +1,17 @@
+{
+  "name": "nexus-lattice",
+  "version": "0.3.0-judge",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "smoke": "npm run build && node dist/test/smoke.js",
+    "audit": "node scripts/audit.mjs",
+    "verify": "npm run typecheck && npm run smoke && npm run audit"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  },
+  "description": "Deterministic Nexus Lattice vertical slice stitched from fragmented provider outputs."
+}

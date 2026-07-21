@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · FORGE</title>
+<meta name="nexus-block" content="managed">
+<meta name="nexus-emits" content="vibe.save vibe.load vibe.list vibe.delete">
+<meta name="nexus-consumes" content="vibe.result vibe.notify">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   EIDOLON FORGE — creator tool
+   No CRT theater. No archetypes. No lineage. No types. No stats.
+   Sliders. Labels you write yourself. Sweep to discover. Save.
+   ═══════════════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0e;
+  --bg2:#13131a;
+  --bg3:#1a1a23;
+  --line:#2a2a36;
+  --line2:#3a3a4a;
+  --text:#e8e8ee;
+  --dim:#7a7a88;
+  --dim2:#4a4a58;
+  --accent:#c8ffaa;
+  --accent2:#aaeeff;
+  --sweep:#ff88aa;
+  --warn:#ffcc66;
+  --red:#ff5566;
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono','SF Mono',Menlo,Consolas,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:var(--mono);font-size:12px;overflow:hidden;
+  -webkit-font-smoothing:antialiased}
+
+#app{display:grid;grid-template-columns:1fr 380px;height:100vh}
+
+/* ═══ STAGE ═══ */
+#stage{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden}
+#topbar{display:flex;align-items:center;gap:14px;padding:0 16px;height:36px;
+  border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg2)}
+#brand{font-size:11px;letter-spacing:3px;font-weight:600;color:var(--text)}
+#brand b{color:var(--accent)}
+#name-field{flex:1;background:transparent;border:none;color:var(--text);
+  font-family:inherit;font-size:13px;letter-spacing:1px;outline:none;
+  padding:4px 8px;border-radius:2px}
+#name-field:hover{background:var(--bg3)}
+#name-field:focus{background:var(--bg3);outline:1px solid var(--line2)}
+#axis-count{font-size:10px;color:var(--dim);letter-spacing:1px}
+#sweep-indicator{font-size:10px;color:var(--sweep);letter-spacing:1px;
+  padding:2px 8px;border:1px solid var(--sweep);display:none}
+#sweep-indicator.show{display:inline-block}
+
+#canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);min-height:0;position:relative;padding:16px;overflow:hidden}
+#canvas{display:block;max-width:100%;max-height:100%;background:#050508;
+  border:1px solid var(--line)}
+
+#stage-foot{height:36px;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--bg2);
+  flex-shrink:0}
+.btn{font-family:inherit;font-size:11px;letter-spacing:1px;color:var(--dim);
+  background:transparent;border:1px solid var(--line);padding:6px 12px;
+  cursor:pointer;transition:all .12s;border-radius:2px;text-transform:lowercase}
+.btn:hover{color:var(--text);border-color:var(--line2);background:var(--bg3)}
+.btn.primary{color:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{background:rgba(200,255,170,.08)}
+.btn.warn{color:var(--warn);border-color:var(--dim2)}
+#status{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:1px}
+
+/* ═══ CONTROLS ═══ */
+#controls{display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--line);
+  font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+  background:var(--bg2)}
+.panel-head .ph-hint{color:var(--dim2);font-size:9px;text-transform:none;letter-spacing:.5px}
+
+#axes{flex:1;overflow-y:auto;padding:6px 0}
+#axes::-webkit-scrollbar{width:6px}
+#axes::-webkit-scrollbar-track{background:var(--bg2)}
+#axes::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+
+.axis{display:grid;grid-template-columns:1fr 36px 18px 14px;
+  gap:6px;align-items:center;padding:5px 14px;cursor:default;
+  border-left:2px solid transparent;transition:background .1s,border-color .1s}
+.axis:hover{background:var(--bg3)}
+.axis.sweeping{border-left-color:var(--sweep);background:rgba(255,136,170,.05)}
+.axis.locked{border-left-color:var(--warn);background:rgba(255,204,102,.04)}
+.axis.locked .axis-slider{opacity:.4}
+
+.axis-row{display:flex;flex-direction:column;gap:3px;min-width:0}
+.axis-label{font-size:10px;color:var(--text);letter-spacing:.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  cursor:text;padding:1px 3px;border-radius:2px;
+  background:transparent;border:1px solid transparent;
+  font-family:inherit}
+.axis-label:hover{background:var(--bg);border-color:var(--line)}
+.axis-label:focus{outline:none;background:var(--bg);
+  border-color:var(--accent);color:var(--accent)}
+.axis-label.renamed{color:var(--accent2);font-weight:500}
+.axis-label.renamed:hover{color:var(--accent2)}
+
+.axis-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;outline:none;
+  background:var(--bg);border:1px solid var(--line);cursor:pointer;border-radius:0}
+.axis-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:14px;
+  background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.axis-slider::-moz-range-thumb{width:10px;height:14px;
+  background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.axis.sweeping .axis-slider::-webkit-slider-thumb{background:var(--sweep)}
+.axis.sweeping .axis-slider::-moz-range-thumb{background:var(--sweep)}
+
+.axis-val{font-size:10px;color:var(--dim);text-align:right;
+  font-variant-numeric:tabular-nums}
+.axis.sweeping .axis-val{color:var(--sweep)}
+
+.axis-sweep{font-size:11px;line-height:1;color:var(--dim2);
+  background:transparent;border:1px solid transparent;cursor:pointer;
+  width:18px;height:18px;display:flex;align-items:center;
+  justify-content:center;border-radius:2px;transition:color .1s,border-color .1s}
+.axis-sweep:hover{color:var(--sweep);border-color:var(--sweep)}
+.axis.sweeping .axis-sweep{color:var(--sweep);border-color:var(--sweep)}
+
+.axis-lock{font-size:9px;line-height:1;color:var(--dim2);
+  background:transparent;border:1px solid transparent;cursor:pointer;
+  width:14px;height:14px;display:flex;align-items:center;
+  justify-content:center;border-radius:2px;transition:color .1s,border-color .1s;
+  font-family:inherit;padding:0}
+.axis-lock:hover{color:var(--warn);border-color:var(--warn)}
+.axis.locked .axis-lock{color:var(--warn);border-color:var(--warn);background:rgba(255,204,102,.08)}
+
+.group-head{padding:10px 14px 4px;font-size:9px;letter-spacing:2px;
+  color:var(--dim2);text-transform:uppercase;border-top:1px solid var(--line);
+  margin-top:4px;background:var(--bg2);position:sticky;top:0;z-index:1;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.group-head:first-child{border-top:none;margin-top:0}
+.group-head-name{flex:1}
+.group-rand{font-size:11px;line-height:1;color:var(--dim2);
+  background:transparent;border:1px solid var(--line);cursor:pointer;
+  padding:2px 6px;border-radius:2px;font-family:inherit;
+  transition:color .1s,border-color .1s,background .1s;letter-spacing:1px}
+.group-rand:hover{color:var(--accent);border-color:var(--accent);background:rgba(200,255,170,.06)}
+
+/* Hidden file input */
+#file-input{display:none}
+
+/* Nexus status banner */
+#nexus-status{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--dim);letter-spacing:1px}
+#nexus-dot{width:7px;height:7px;border-radius:50%;background:#ffcc66;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="stage">
+  <div id="topbar">
+    <span id="brand"><b>◆</b>&nbsp;EIDOLON FORGE</span>
+    <input id="name-field" type="text" value="Untitled" maxlength="32" spellcheck="false">
+    <span id="sweep-indicator">SWEEPING</span>
+    <span id="axis-count">36 axes</span>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="canvas" width="600" height="600"></canvas>
+  </div>
+  <div id="stage-foot">
+    <button class="btn" onclick="randomize()">randomize</button>
+    <button class="btn" onclick="resetAll()">reset</button>
+    <button class="btn" onclick="loadDispatch()">load…</button>
+    <input id="file-input" type="file" accept=".json,application/json" onchange="onLoadFile(this)">
+    <button class="btn primary" onclick="saveCreature()">save</button>
+    <span id="nexus-status"><span id="nexus-dot"></span><span id="nexus-label">standalone</span></span>
+    <span id="status">ready</span>
+  </div>
+</div>
+
+<div id="controls">
+  <div class="panel-head">
+    <span>AXES</span>
+    <span class="ph-hint">click label to rename · ⇌ sweep · ⚿ lock</span>
+  </div>
+  <div id="axes"></div>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════
+   AXES — each one does ONE visible thing, fully independent.
+   id: stable identifier for save/load
+   group: visual category (header)
+   default: starting value [0..255]
+   defaultLabel: descriptive plain-english starting name
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ NEXUS ADAPTER ═══════════════════════════════════════════════
+   Standalone-safe. If no BOOT message arrives, the forge keeps
+   working as a file-only tool. If BOOT arrives, the handshake
+   completes and the forge becomes a managed Nexus block that
+   persists vibes via the Library.
+   Pattern verified against atlas.html lines 819–905.
+   ═══════════════════════════════════════════════════════════════ */
+let nexusPort = null;
+let nexusMounted = false;
+const nexusPending = new Map();
+
+function nexusEmit(channel, payload) {
+  if (nexusPort) nexusPort.postMessage({ type: 'EMIT', channel, payload });
+}
+function nexusCall(channel, payload, timeoutMs = 8000) {
+  return new Promise((resolve, reject) => {
+    const _reqId = 'r_' + (crypto.randomUUID?.()?.slice(0, 12) || Math.random().toString(36).slice(2, 14));
+    const timer = setTimeout(() => {
+      if (nexusPending.has(_reqId)) {
+        nexusPending.delete(_reqId);
+        reject(new Error(`timeout: ${channel}`));
+      }
+    }, timeoutMs);
+    nexusPending.set(_reqId, { resolve, reject, timer });
+    try { nexusEmit(channel, { ...payload, _reqId }); }
+    catch (e) { clearTimeout(timer); nexusPending.delete(_reqId); reject(e); }
+  });
+}
+
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'BOOT') return;
+  nexusPort = e.ports[0];
+  if (!nexusPort) return;
+
+  nexusPort.postMessage({
+    type: 'DECLARE',
+    manifest: {
+      emits:    ['vibe.save', 'vibe.load', 'vibe.list', 'vibe.delete'],
+      consumes: ['vibe.result', 'vibe.notify']
+    },
+    app: {
+      title:       'Eidolon Forge',
+      icon:        '⚒',
+      description: 'Creature axis forge — randomize, sweep, save',
+      visible:     true
+    }
+  });
+
+  nexusPort.onmessage = ev => {
+    const msg = ev.data;
+    if (!msg || typeof msg.type !== 'string') return;
+    if (msg.type === 'MOUNT_CHALLENGE') {
+      nexusPort.postMessage({ type: 'MOUNT_ACK', nonce: msg.nonce });
+    } else if (msg.type === 'MOUNTED') {
+      nexusPort.postMessage({ type: 'SUB', channel: 'vibe.result' });
+      nexusPort.postMessage({ type: 'SUB', channel: 'vibe.notify' });
+      nexusMounted = true;
+      const dot = document.getElementById('nexus-dot');
+      const lbl = document.getElementById('nexus-label');
+      if (dot) dot.style.background = '#aaffaa';
+      if (lbl) lbl.textContent = 'mounted';
+    } else if (msg.type === 'PING') {
+      nexusPort.postMessage({ type: 'PONG', nonce: msg.nonce });
+    } else if (msg.type === 'MSG') {
+      if (msg.channel === 'vibe.result') {
+        const p = msg.payload || {};
+        const slot = nexusPending.get(p._reqId);
+        if (slot) {
+          clearTimeout(slot.timer);
+          nexusPending.delete(p._reqId);
+          slot.resolve(p);
+        }
+      }
+      // vibe.notify ignored for now — reserved for live-refresh of the picker.
+    }
+  };
+});
+
+/* Canonical hash for content-addressed vibe ids (matches Atlas). */
+function nexusCanonical(v) {
+  if (v === null || v === undefined) return JSON.stringify(v);
+  if (typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(nexusCanonical).join(',') + ']';
+  return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + nexusCanonical(v[k])).join(',') + '}';
+}
+async function nexusSha256Hex(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function nexusBuildEnvelope(type, subFormat, name, payload, source) {
+  const hash = await nexusSha256Hex(nexusCanonical(payload));
+  return {
+    format: 'vibe/1',
+    id: `v_${type}_${hash.slice(0, 16)}`,
+    type, subFormat,
+    name: name || 'Untitled',
+    tags: [], parents: [],
+    birthHash: `sha256:${hash}`,
+    createdAt: new Date().toISOString(),
+    source,
+    payload
+  };
+}
+
+const AXES = [
+  // Body shape
+  { id:'body_radius',     group:'body',  default:160, label:'body radius' },
+  { id:'body_stretch_x',  group:'body',  default:128, label:'body width' },
+  { id:'body_stretch_y',  group:'body',  default:128, label:'body height' },
+  { id:'body_lumpiness',  group:'body',  default: 50, label:'body lumpiness' },
+  { id:'body_lump_count', group:'body',  default:140, label:'body lump count' },
+  { id:'body_outline',    group:'body',  default:140, label:'outline weight' },
+  { id:'body_shadow',     group:'body',  default:140, label:'shadow band' },
+
+  // Appendages
+  { id:'arm_count',       group:'appendages', default: 80, label:'appendage count' },
+  { id:'arm_length',      group:'appendages', default:128, label:'appendage length' },
+  { id:'arm_width',       group:'appendages', default:128, label:'appendage width' },
+  { id:'arm_taper',       group:'appendages', default:160, label:'appendage taper' },
+  { id:'arm_wobble',      group:'appendages', default:120, label:'appendage wobble' },
+  { id:'arm_wobble_rate', group:'appendages', default:128, label:'wobble speed' },
+  { id:'arm_curl',        group:'appendages', default: 60, label:'appendage curl' },
+  { id:'arm_droop',       group:'appendages', default:128, label:'appendage angle' },
+
+  // Eyes
+  { id:'eye_count',       group:'eyes', default:128, label:'eye count' },
+  { id:'eye_size',        group:'eyes', default:128, label:'eye size' },
+  { id:'eye_spacing',     group:'eyes', default:128, label:'eye spacing' },
+  { id:'eye_height',      group:'eyes', default:100, label:'eye position' },
+  { id:'eye_pupil',       group:'eyes', default:140, label:'pupil size' },
+  { id:'eye_glow',        group:'eyes', default:120, label:'eye glow' },
+
+  // Surface marks (each one independent)
+  { id:'mark_runes',      group:'surface', default: 40, label:'rune marks' },
+  { id:'mark_spots',      group:'surface', default: 40, label:'glow spots' },
+  { id:'mark_drips',      group:'surface', default:  0, label:'surface drips' },
+  { id:'mark_facets',     group:'surface', default:  0, label:'crystal facets' },
+
+  // Particles
+  { id:'particle_count',  group:'particles', default: 80, label:'particle count' },
+  { id:'particle_radius', group:'particles', default:140, label:'orbit radius' },
+  { id:'particle_size',   group:'particles', default:120, label:'particle size' },
+  { id:'particle_drift',  group:'particles', default:100, label:'drift speed' },
+  { id:'particle_turb',   group:'particles', default: 60, label:'particle turbulence' },
+
+  // Glow & core
+  { id:'glow_radius',     group:'glow', default:140, label:'outer glow radius' },
+  { id:'glow_strength',   group:'glow', default:140, label:'outer glow strength' },
+  { id:'core_size',       group:'glow', default:120, label:'core size' },
+  { id:'core_brightness', group:'glow', default:160, label:'core brightness' },
+  { id:'pulse_rate',      group:'glow', default:128, label:'pulse rate' },
+
+  // Color
+  { id:'hue_primary',     group:'color', default:200, label:'primary hue' },
+  { id:'hue_accent',      group:'color', default: 80, label:'accent hue' },
+  { id:'hue_glow',        group:'color', default:140, label:'glow hue' },
+  { id:'saturation',      group:'color', default:170, label:'saturation' },
+  { id:'lightness',       group:'color', default:130, label:'lightness' },
+];
+
+const N = AXES.length;
+const ID_INDEX = Object.fromEntries(AXES.map((a,i)=>[a.id,i]));
+
+/* ═══ STATE ═══ */
+let values  = AXES.map(a => a.default);
+let labels  = AXES.map(a => a.label);          // Editable
+let renamed = AXES.map(() => false);           // Has user renamed it?
+let locked  = AXES.map(() => false);           // Pinned against randomize?
+let creatureName = 'Untitled';
+
+let sweepIdx     = -1;
+let sweepStart   = 0;
+let sweepBaseVal = 0;
+const SWEEP_PERIOD = 4.0;
+
+const t0 = performance.now();
+let prevT = 0;
+let blinkCd = 3, blinkP = 0, blinkActive = false;
+
+/* ═══ READ HELPERS ═══════════════════════════════════════════════
+   Each helper extracts a normalized value from one axis.
+   01() returns [0..1]; n11() returns [-1..1]; raw() returns [0..255].
+   ═══════════════════════════════════════════════════════════════ */
+function v(id){ return values[ID_INDEX[id]]; }
+function v01(id){ return values[ID_INDEX[id]] / 255; }
+function vN11(id){ return (values[ID_INDEX[id]] - 128) / 128; }
+function vRange(id, min, max){ return min + (values[ID_INDEX[id]]/255) * (max-min); }
+
+/* ═══ RENDERER ════════════════════════════════════════════════════
+   Pure read from named axes — nothing is bundled, nothing overloads.
+   Each visual property maps to exactly one axis.
+   ═══════════════════════════════════════════════════════════════ */
+function mulberry32(seed){
+  let t = seed >>> 0;
+  return () => {
+    t = (t + 0x6D2B79F5) >>> 0; let r = t;
+    r = Math.imul(r ^ (r >>> 15), r | 1);
+    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function render(canvas, t){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Read axes — each one independent
+  const baseR     = vRange('body_radius',    W*0.06, W*0.28);
+  const stretchX  = vRange('body_stretch_x', 0.50,  1.50);
+  const stretchY  = vRange('body_stretch_y', 0.50,  1.50);
+  const lumpAmp   = vRange('body_lumpiness', 0.0,   30.0);
+  const lumpN     = 5 + Math.floor(v01('body_lump_count') * 13);  // 5..18
+  const outline   = vRange('body_outline',   0.5,   9.0);
+  const shadowPos = vRange('body_shadow',    0.20,  0.80);
+
+  const armN      = Math.floor(v01('arm_count') * 14);            // 0..14
+  const armLen    = vRange('arm_length', 0.20, 2.40);              // × baseR
+  const armW      = vRange('arm_width',  1.0,  10.0);
+  const armTaper  = v01('arm_taper');                              // 0..1
+  const armWobAmp = vRange('arm_wobble',      0.0, 0.7);
+  const armWobRt  = vRange('arm_wobble_rate', 0.0, 3.0);
+  const armCurl   = vRange('arm_curl',        0.0, 1.4);
+  const armDroop  = vN11('arm_droop') * 0.6;                       // -0.6..0.6 vertical bias
+
+  const eyeN      = Math.round(v01('eye_count') * 8);              // 0..8
+  const eyeSz     = vRange('eye_size',    0.04, 0.30);              // × baseR
+  const eyeSpace  = vRange('eye_spacing', 0.05, 0.85);              // × baseR
+  const eyeY      = vN11('eye_height') * 0.7;                       // -0.7..0.7
+  const eyePupil  = v01('eye_pupil');                               // 0..1 (fraction of eye)
+  const eyeGlow   = v01('eye_glow');
+
+  const runeN     = Math.floor(v01('mark_runes')  * 9);
+  const spotN     = Math.floor(v01('mark_spots')  * 9);
+  const dripN     = Math.floor(v01('mark_drips')  * 8);
+  const facetN    = Math.floor(v01('mark_facets') * 14);
+
+  const partN     = Math.floor(v01('particle_count') * 36);         // 0..36
+  const partR     = vRange('particle_radius', 1.0, 2.6);            // × baseR
+  const partSz    = vRange('particle_size',   0.4, 4.5);
+  const partDrift = vRange('particle_drift',  0.0, 1.5);
+  const partTurb  = vRange('particle_turb',   0.0, 1.2);
+
+  const glowR     = baseR * vRange('glow_radius',   1.4, 4.5);
+  const glowStr   = v01('glow_strength');
+  const coreSz    = baseR * vRange('core_size', 0.04, 0.45);
+  const coreBri   = v01('core_brightness');
+  const pulseRt   = vRange('pulse_rate', 0.0, 2.5);
+
+  const huePri    = Math.round(v01('hue_primary') * 359);
+  const hueAcc    = Math.round(v01('hue_accent')  * 359);
+  const hueGlow   = Math.round(v01('hue_glow')    * 359);
+  const sat       = Math.round(vRange('saturation', 0, 100));
+  const light     = Math.round(vRange('lightness',  20, 80));
+
+  const cx = W/2, cy = H*0.50;
+  const pulse = Math.sin(t*pulseRt)*0.5 + 0.5;
+  const bobY = Math.sin(t*0.85) * baseR * 0.05;
+  const bcy = cy + bobY;
+  const sx = stretchX, sy = stretchY;
+
+  // Outer glow
+  const og = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, glowR);
+  og.addColorStop(0, `hsla(${huePri},${sat}%,${light}%,${0.18*glowStr + pulse*0.06*glowStr})`);
+  og.addColorStop(0.4,`hsla(${hueAcc},${sat*0.8}%,${light*0.7}%,${0.10*glowStr})`);
+  og.addColorStop(1, 'transparent');
+  ctx.fillStyle = og;
+  ctx.beginPath();
+  ctx.ellipse(cx, bcy, glowR*sx, glowR*sy*0.85, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body blob shape
+  function blobPts(bcx, bcyy, r){
+    const pts = [];
+    for(let i=0; i<lumpN; i++){
+      const a = (i/lumpN)*Math.PI*2 - Math.PI/2;
+      const n = Math.sin(t*0.7 + i*0.9)*lumpAmp + Math.sin(t*0.3 + i*1.5)*lumpAmp*0.4;
+      pts.push({
+        x: bcx + Math.cos(a)*(r+n)*sx,
+        y: bcyy + Math.sin(a)*(r+n)*sy
+      });
+    }
+    return pts;
+  }
+  function blobPath(c, pts){
+    const M = pts.length;
+    c.beginPath();
+    for(let i=0; i<M; i++){
+      const p0 = pts[(i-1+M)%M], p1 = pts[i], p2 = pts[(i+1)%M], p3 = pts[(i+2)%M];
+      const c1x = p1.x + (p2.x-p0.x)/6, c1y = p1.y + (p2.y-p0.y)/6;
+      const c2x = p2.x - (p3.x-p1.x)/6, c2y = p2.y - (p3.y-p1.y)/6;
+      if(i===0) c.moveTo(p1.x, p1.y);
+      c.bezierCurveTo(c1x, c1y, c2x, c2y, p2.x, p2.y);
+    }
+    c.closePath();
+  }
+
+  const pts = blobPts(cx, bcy, baseR);
+
+  // Appendages — drawn before body so they emerge from behind
+  if(armN > 0){
+    for(let i=0; i<armN; i++){
+      const baseA = (i/armN)*Math.PI*2 + armDroop;
+      const wob = Math.sin(t*armWobRt + i*0.7) * armWobAmp;
+      const curl = Math.sin(t*0.5 + i*0.9) * armCurl * 0.5;
+      const a = baseA + wob;
+      const len = baseR * armLen;
+      const tipX = cx + Math.cos(a + curl)*len*sx;
+      const tipY = bcy + Math.sin(a + curl)*len*sy;
+      const cpx = cx + Math.cos(baseA + wob*0.4)*len*0.5*sx;
+      const cpy = bcy + Math.sin(baseA + wob*0.4)*len*0.5*sy + curl*len*0.3;
+      // Outline pass
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+      ctx.lineWidth = armW + 3;
+      ctx.beginPath(); ctx.moveTo(cx, bcy); ctx.quadraticCurveTo(cpx, cpy, tipX, tipY); ctx.stroke();
+      // Color pass — taper applied via lineWidth interpolation segments
+      const segs = 6;
+      for(let s=0; s<segs; s++){
+        const t0_ = s/segs, t1_ = (s+1)/segs;
+        const w0 = armW * (1 - armTaper*t0_*0.85);
+        const x0 = (1-t0_)*(1-t0_)*cx + 2*(1-t0_)*t0_*cpx + t0_*t0_*tipX;
+        const y0 = (1-t0_)*(1-t0_)*bcy + 2*(1-t0_)*t0_*cpy + t0_*t0_*tipY;
+        const x1 = (1-t1_)*(1-t1_)*cx + 2*(1-t1_)*t1_*cpx + t1_*t1_*tipX;
+        const y1 = (1-t1_)*(1-t1_)*bcy + 2*(1-t1_)*t1_*cpy + t1_*t1_*tipY;
+        ctx.strokeStyle = `hsla(${huePri},${sat}%,${light+10}%,0.85)`;
+        ctx.lineWidth = w0;
+        ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+      }
+    }
+  }
+
+  // Body shadow
+  ctx.save();
+  ctx.shadowColor = `hsla(${huePri},${sat}%,15%,0.55)`;
+  ctx.shadowBlur = 18; ctx.shadowOffsetY = 4;
+  blobPath(ctx, pts);
+  ctx.fillStyle = `hsla(${huePri},${sat*0.6}%,8%,0.4)`;
+  ctx.fill();
+  ctx.restore();
+
+  // Body outline
+  blobPath(ctx, pts);
+  ctx.strokeStyle = 'rgba(0,0,0,0.92)';
+  ctx.lineWidth = outline;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Body fill
+  blobPath(ctx, pts);
+  ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`;
+  ctx.fill();
+
+  // Cel shading inside body
+  ctx.save();
+  blobPath(ctx, pts);
+  ctx.clip();
+  // Shadow band
+  const sg = ctx.createLinearGradient(cx, bcy-baseR, cx, bcy+baseR);
+  sg.addColorStop(shadowPos - 0.04, 'transparent');
+  sg.addColorStop(shadowPos,        `hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.55)`);
+  sg.addColorStop(1.0,              `hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.65)`);
+  ctx.fillStyle = sg;
+  ctx.fillRect(cx-baseR*3, bcy-baseR*3, baseR*6, baseR*6);
+  // Highlight
+  const hg = ctx.createRadialGradient(cx-baseR*0.3, bcy-baseR*0.35, 0, cx-baseR*0.15, bcy-baseR*0.15, baseR*0.7);
+  hg.addColorStop(0,    `hsla(${huePri},${sat*0.4}%,92%,0.45)`);
+  hg.addColorStop(0.5,  'transparent');
+  ctx.fillStyle = hg;
+  ctx.fillRect(cx-baseR*3, bcy-baseR*3, baseR*6, baseR*6);
+
+  // Glow spots
+  if(spotN > 0){
+    const r1 = mulberry32(spotN*53 + 1);
+    for(let i=0; i<spotN; i++){
+      const sa = r1()*Math.PI*2;
+      const sr_ = baseR * (0.15 + r1()*0.55);
+      const sxp = cx + Math.cos(sa)*sr_*sx;
+      const syp = bcy + Math.sin(sa)*sr_*sy;
+      const ssz = baseR * (0.05 + r1()*0.10);
+      const lg = ctx.createRadialGradient(sxp,syp,0, sxp,syp,ssz*2.5);
+      lg.addColorStop(0, `hsla(${hueGlow},95%,90%,${0.7+pulse*0.2})`);
+      lg.addColorStop(0.4,`hsla(${hueGlow},85%,75%,0.3)`);
+      lg.addColorStop(1,'transparent');
+      ctx.fillStyle = lg;
+      ctx.beginPath(); ctx.arc(sxp,syp, ssz*2.5, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Runes
+  if(runeN > 0){
+    const r2 = mulberry32(runeN*71 + 7);
+    ctx.strokeStyle = `hsla(${hueAcc},80%,70%,0.30)`;
+    ctx.lineWidth = 1.5;
+    for(let i=0; i<runeN; i++){
+      const ra = r2()*Math.PI*2;
+      const rr = baseR * (0.1 + r2()*0.45);
+      const rx = cx + Math.cos(ra)*rr*sx;
+      const ry = bcy + Math.sin(ra)*rr*sy;
+      const rs = baseR * (0.06 + r2()*0.12);
+      ctx.beginPath();
+      ctx.moveTo(rx, ry-rs); ctx.lineTo(rx+rs*0.6, ry+rs*0.5);
+      ctx.moveTo(rx, ry-rs); ctx.lineTo(rx-rs*0.6, ry+rs*0.5);
+      ctx.moveTo(rx-rs*0.4, ry+rs*0.1); ctx.lineTo(rx+rs*0.4, ry+rs*0.1);
+      ctx.stroke();
+    }
+  }
+
+  // Crystal facets
+  if(facetN > 0){
+    const r3 = mulberry32(facetN*89 + 13);
+    ctx.strokeStyle = `hsla(${hueGlow},85%,88%,0.32)`;
+    ctx.lineWidth = 1.0;
+    for(let i=0; i<facetN; i++){
+      const fa = r3()*Math.PI*2;
+      const fr = baseR * (0.1 + r3()*0.7);
+      const fx = cx + Math.cos(fa)*fr*sx;
+      const fy = bcy + Math.sin(fa)*fr*sy;
+      const fs = baseR * (0.05 + r3()*0.10);
+      ctx.beginPath();
+      ctx.moveTo(fx, fy-fs); ctx.lineTo(fx+fs, fy);
+      ctx.lineTo(fx, fy+fs); ctx.lineTo(fx-fs, fy);
+      ctx.closePath(); ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // Eyes
+  if(eyeN > 0){
+    blinkCd; // eslint
+    const blinkSY = blinkActive ? Math.max(0.05, 1 - Math.sin(blinkP*Math.PI)*0.92) : 1;
+    const wander = Math.sin(t*0.55) * 2.5;
+    const eR = baseR * eyeSz;
+    const eyePos = [];
+    if(eyeN === 1){
+      eyePos.push([cx, bcy + baseR*eyeY]);
+    } else if(eyeN === 2){
+      const sep = baseR*eyeSpace;
+      eyePos.push([cx-sep, bcy + baseR*eyeY], [cx+sep, bcy + baseR*eyeY]);
+    } else {
+      // Distribute around the upper portion
+      const sep = baseR*eyeSpace*0.95;
+      const yOff = baseR*eyeY;
+      const ang = Math.PI;
+      for(let i=0; i<eyeN; i++){
+        const tt = eyeN === 1 ? 0.5 : i/(eyeN-1);
+        const a = -ang/2 + tt*ang;
+        eyePos.push([
+          cx + Math.cos(a + Math.PI*1.5) * sep,
+          bcy + Math.sin(a + Math.PI*1.5) * sep + yOff
+        ]);
+      }
+    }
+    for(const [ex,ey] of eyePos){
+      // Eye glow
+      if(eyeGlow > 0.05){
+        const eg = ctx.createRadialGradient(ex,ey,0, ex,ey, eR*2.2);
+        eg.addColorStop(0, `hsla(${hueGlow},90%,80%,${0.4*eyeGlow})`);
+        eg.addColorStop(1, 'transparent');
+        ctx.fillStyle = eg;
+        ctx.beginPath(); ctx.arc(ex,ey, eR*2.2, 0, Math.PI*2); ctx.fill();
+      }
+      // Sclera
+      ctx.fillStyle = `hsl(${hueGlow}, 18%, 92%)`;
+      ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+      ctx.lineWidth = Math.max(1.2, outline*0.45);
+      ctx.beginPath(); ctx.ellipse(ex, ey, eR, eR*blinkSY, 0, 0, Math.PI*2);
+      ctx.fill(); ctx.stroke();
+      if(blinkSY > 0.12 && eyePupil > 0.05){
+        // Iris
+        ctx.fillStyle = `hsl(${hueGlow}, 84%, 38%)`;
+        const irisR = eR * (0.45 + eyePupil*0.4);
+        ctx.beginPath(); ctx.ellipse(ex+wander*0.3, ey, irisR, irisR*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+        // Pupil
+        ctx.fillStyle = '#020306';
+        const pR = eR * eyePupil * 0.55;
+        ctx.beginPath(); ctx.ellipse(ex+wander*0.3, ey, pR, pR*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+        // Catchlight
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        const cR_ = eR * 0.12;
+        ctx.beginPath(); ctx.ellipse(ex - eR*0.22, ey - eR*0.22*blinkSY, cR_, cR_*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+      }
+    }
+  }
+
+  // Drips (above body, falling)
+  if(dripN > 0){
+    const r4 = mulberry32(Math.floor(t*2) + dripN*17);
+    for(let i=0; i<dripN; i++){
+      const dx = cx + (r4()-0.5)*baseR*1.4*sx;
+      const dy = bcy + baseR*0.45*sy + ((t*40 + i*23) % 60) * baseR*0.018;
+      const ds = 1.5 + r4()*2.2;
+      ctx.fillStyle = `hsla(${huePri},85%,55%,${0.45 + r4()*0.3})`;
+      ctx.beginPath(); ctx.arc(dx, dy, ds, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Core glow
+  if(coreSz > 0.1 && coreBri > 0.05){
+    const cg = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, coreSz*4);
+    cg.addColorStop(0,    `hsla(${hueGlow},96%,94%,${0.85*coreBri})`);
+    cg.addColorStop(0.25, `hsla(${huePri},88%,70%,${0.45*coreBri})`);
+    cg.addColorStop(0.7,  `hsla(${huePri},78%,52%,${0.12*coreBri})`);
+    cg.addColorStop(1,    'transparent');
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(cx, bcy, coreSz*4, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Particles
+  if(partN > 0){
+    for(let p=0; p<partN; p++){
+      const seed = p*17;
+      const orR = baseR * partR + (seed%13)*(baseR*0.05);
+      const orA = (p/partN)*Math.PI*2 + t*partDrift*0.5 + Math.sin(t + seed*0.1)*0.4;
+      const tu  = Math.sin(t*1.3 + seed*0.22) * partTurb * 8;
+      const px = cx + Math.cos(orA)*(orR+tu)*sx;
+      const py = bcy + Math.sin(orA)*(orR+tu)*sy*0.85;
+      const pSz = partSz * (0.6 + ((seed%5)/5)*0.8);
+      const pAl = 0.4 + Math.sin(t*1.8 + p*0.55)*0.3;
+      ctx.fillStyle = `hsla(${hueAcc},88%,75%,${pAl})`;
+      ctx.beginPath(); ctx.arc(px, py, pSz, 0, Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+/* ═══ ANIMATION ═══ */
+let animId = null;
+function loop(){
+  const now = (performance.now() - t0) / 1000;
+  const dt = Math.min(now - prevT, 0.05);
+  prevT = now;
+
+  // Blink tick
+  blinkCd -= dt;
+  if(blinkCd <= 0 && !blinkActive){ blinkActive = true; blinkP = 0; blinkCd = 2 + Math.random()*4; }
+  if(blinkActive){ blinkP += dt*8; if(blinkP >= 1){ blinkActive = false; blinkP = 0; } }
+
+  // Sweep tick
+  if(sweepIdx !== -1){
+    const elapsed = now - sweepStart;
+    const phase = (elapsed % SWEEP_PERIOD) / SWEEP_PERIOD;
+    const tri = phase < 0.5 ? phase*2 : (1-phase)*2;
+    const newVal = Math.round(tri * 255);
+    if(values[sweepIdx] !== newVal){
+      values[sweepIdx] = newVal;
+      const slider = document.getElementById('axs-' + AXES[sweepIdx].id);
+      if(slider) slider.value = newVal;
+      const vEl = document.getElementById('axv-' + AXES[sweepIdx].id);
+      if(vEl) vEl.textContent = newVal;
+    }
+  }
+
+  const canvas = document.getElementById('canvas');
+  if(canvas.width > 0) render(canvas, now);
+  animId = requestAnimationFrame(loop);
+}
+
+/* ═══ UI ═══ */
+function buildAxes(){
+  const el = document.getElementById('axes');
+  el.innerHTML = '';
+  let lastGroup = null;
+  AXES.forEach((a, i) => {
+    if(a.group !== lastGroup){
+      const h = document.createElement('div');
+      h.className = 'group-head';
+      h.innerHTML = `
+        <span class="group-head-name">${a.group}</span>
+        <button class="group-rand" data-group="${a.group}" title="randomize only this group (locked axes ignored)">⚄ shuffle</button>
+      `;
+      h.querySelector('.group-rand').addEventListener('click', () => randomizeGroup(a.group));
+      el.appendChild(h);
+      lastGroup = a.group;
+    }
+    const row = document.createElement('div');
+    row.className = 'axis';
+    row.id = 'ax-' + a.id;
+    row.dataset.idx = i;
+    row.innerHTML = `
+      <div class="axis-row">
+        <input class="axis-label" id="axl-${a.id}" type="text" value="${a.label}" maxlength="40" spellcheck="false">
+        <input class="axis-slider" id="axs-${a.id}" type="range" min="0" max="255" value="${values[i]}">
+      </div>
+      <span class="axis-val" id="axv-${a.id}">${values[i]}</span>
+      <button class="axis-sweep" id="axw-${a.id}" title="sweep this axis 0→255 (4s loop)">⇌</button>
+      <button class="axis-lock" id="axk-${a.id}" title="lock this axis against randomize">⚿</button>
+    `;
+    el.appendChild(row);
+
+    const slider = row.querySelector('.axis-slider');
+    slider.addEventListener('input', e => onSlide(i, e.target.value));
+
+    const labelInput = row.querySelector('.axis-label');
+    labelInput.addEventListener('focus', () => labelInput.select());
+    labelInput.addEventListener('change', () => onLabelChange(i, labelInput.value));
+    labelInput.addEventListener('keydown', e => {
+      if(e.key === 'Enter') labelInput.blur();
+      if(e.key === 'Escape'){ labelInput.value = labels[i]; labelInput.blur(); }
+    });
+
+    row.querySelector('.axis-sweep').addEventListener('click', e => {
+      e.stopPropagation();
+      toggleSweep(i);
+    });
+    row.querySelector('.axis-lock').addEventListener('click', e => {
+      e.stopPropagation();
+      toggleLock(i);
+    });
+  });
+}
+
+function onSlide(i, val){
+  values[i] = parseInt(val);
+  document.getElementById('axv-' + AXES[i].id).textContent = values[i];
+  // If user manually moves a sweeping axis, stop sweep
+  if(sweepIdx === i) stopSweep();
+}
+
+function onLabelChange(i, newLabel){
+  newLabel = (newLabel || '').trim();
+  if(!newLabel) newLabel = AXES[i].label;
+  labels[i] = newLabel;
+  renamed[i] = (newLabel !== AXES[i].label);
+  const el = document.getElementById('axl-'+AXES[i].id);
+  if(el){
+    el.value = newLabel;
+    el.classList.toggle('renamed', renamed[i]);
+  }
+  setStatus(renamed[i] ? `renamed → "${newLabel}"` : `reset → "${newLabel}"`);
+}
+
+function toggleSweep(i){
+  if(sweepIdx === i){ stopSweep(); return; }
+  if(sweepIdx !== -1){
+    // Restore previous sweep base before starting new
+    values[sweepIdx] = sweepBaseVal;
+    document.getElementById('ax-' + AXES[sweepIdx].id)?.classList.remove('sweeping');
+    document.getElementById('axs-' + AXES[sweepIdx].id).value = sweepBaseVal;
+    document.getElementById('axv-' + AXES[sweepIdx].id).textContent = sweepBaseVal;
+  }
+  sweepIdx = i;
+  sweepBaseVal = values[i];
+  sweepStart = (performance.now() - t0) / 1000;
+  document.getElementById('ax-' + AXES[i].id).classList.add('sweeping');
+  document.getElementById('sweep-indicator').classList.add('show');
+  setStatus(`sweeping "${labels[i]}"`);
+}
+function stopSweep(){
+  if(sweepIdx === -1) return;
+  values[sweepIdx] = sweepBaseVal;
+  const slider = document.getElementById('axs-' + AXES[sweepIdx].id);
+  if(slider) slider.value = sweepBaseVal;
+  const vEl = document.getElementById('axv-' + AXES[sweepIdx].id);
+  if(vEl) vEl.textContent = sweepBaseVal;
+  document.getElementById('ax-' + AXES[sweepIdx].id)?.classList.remove('sweeping');
+  document.getElementById('sweep-indicator').classList.remove('show');
+  sweepIdx = -1;
+  setStatus('sweep ended');
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && sweepIdx !== -1) stopSweep();
+});
+
+function syncAllSliders(){
+  AXES.forEach((a,i) => {
+    document.getElementById('axs-'+a.id).value = values[i];
+    document.getElementById('axv-'+a.id).textContent = values[i];
+    const lbl = document.getElementById('axl-'+a.id);
+    lbl.value = labels[i];
+    lbl.classList.toggle('renamed', renamed[i]);
+    document.getElementById('ax-'+a.id)?.classList.toggle('locked', locked[i]);
+  });
+}
+
+function toggleLock(i){
+  // If this axis is currently being swept, stop the sweep first — locking
+  // and sweeping are conflicting intents.
+  if(sweepIdx === i) stopSweep();
+  locked[i] = !locked[i];
+  const row = document.getElementById('ax-' + AXES[i].id);
+  if(row) row.classList.toggle('locked', locked[i]);
+  setStatus(locked[i] ? `locked "${labels[i]}"` : `unlocked "${labels[i]}"`);
+}
+
+function randomize(){
+  if(sweepIdx !== -1) stopSweep();
+  for(let i=0; i<N; i++){
+    if(!locked[i]) values[i] = Math.floor(Math.random()*256);
+  }
+  syncAllSliders();
+  const lockedCount = locked.filter(Boolean).length;
+  setStatus(lockedCount > 0 ? `randomized · ${lockedCount} locked held` : 'randomized');
+}
+
+function randomizeGroup(group){
+  if(sweepIdx !== -1) stopSweep();
+  let touched = 0, heldByLock = 0;
+  for(let i=0; i<N; i++){
+    if(AXES[i].group !== group) continue;
+    if(locked[i]){ heldByLock++; continue; }
+    values[i] = Math.floor(Math.random()*256);
+    touched++;
+  }
+  syncAllSliders();
+  let msg = `shuffled ${group} · ${touched} axes`;
+  if(heldByLock > 0) msg += ` · ${heldByLock} locked held`;
+  setStatus(msg);
+}
+
+function resetAll(){
+  if(sweepIdx !== -1) stopSweep();
+  values = AXES.map(a => a.default);
+  labels = AXES.map(a => a.label);
+  renamed = AXES.map(() => false);
+  locked  = AXES.map(() => false);
+  creatureName = 'Untitled';
+  document.getElementById('name-field').value = creatureName;
+  syncAllSliders();
+  setStatus('reset');
+}
+
+function setStatus(msg){
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  clearTimeout(setStatus._tm);
+  setStatus._tm = setTimeout(() => { el.textContent = 'ready'; }, 2400);
+}
+
+document.getElementById('name-field').addEventListener('change', e => {
+  creatureName = (e.target.value || 'Untitled').trim() || 'Untitled';
+  e.target.value = creatureName;
+});
+
+/* ═══ SAVE / LOAD ═══════════════════════════════════════════════
+   Format is plain JSON. No nonces, no hashes, no chains, no ceremony.
+   Round-trip restores values + labels + name + which labels were
+   user-renamed.
+   ═══════════════════════════════════════════════════════════════ */
+function buildSpec(){
+  return {
+    format: 'eidolon-forge/1',
+    name: creatureName,
+    savedAt: new Date().toISOString(),
+    axes: AXES.map((a,i) => ({
+      id: a.id,
+      label: labels[i],
+      renamed: renamed[i],
+      locked: locked[i],
+      value: values[i]
+    }))
+  };
+}
+
+async function saveCreature(){
+  if(sweepIdx !== -1) stopSweep();
+  const spec = buildSpec();
+  const json = JSON.stringify(spec, null, 2);
+  const safe = (creatureName || 'untitled')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'untitled';
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${safe}.eidolon.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1200);
+  if(nexusMounted){
+    try {
+      const envelope = await nexusBuildEnvelope('creature', 'eidolon-forge/1', creatureName, spec, 'eidolon-forge');
+      nexusEmit('vibe.save', envelope);
+      setStatus(`saved · file + library · ${creatureName}`);
+    } catch(e){
+      setStatus(`saved: ${safe}.eidolon.json · library: ${e.message}`);
+    }
+  } else {
+    setStatus(`saved: ${safe}.eidolon.json`);
+  }
+}
+
+function applyLoadedSpec(spec, fallbackName){
+  if(sweepIdx !== -1) stopSweep();
+  values = AXES.map(a => a.default);
+  labels = AXES.map(a => a.label);
+  renamed = AXES.map(() => false);
+  locked  = AXES.map(() => false);
+  let applied = 0, unknown = 0;
+  for(const ax of spec.axes){
+    const idx = ID_INDEX[ax.id];
+    if(idx === undefined){ unknown++; continue; }
+    if(typeof ax.value === 'number'){
+      values[idx] = Math.max(0, Math.min(255, ax.value|0));
+    }
+    if(typeof ax.label === 'string' && ax.label.trim()){
+      labels[idx] = ax.label.trim();
+      renamed[idx] = !!ax.renamed || (labels[idx] !== AXES[idx].label);
+    }
+    if(typeof ax.locked === 'boolean'){ locked[idx] = ax.locked; }
+    applied++;
+  }
+  creatureName = (spec.name || (fallbackName || 'Untitled').replace(/\.eidolon\.json$/i,'')).trim() || 'Untitled';
+  document.getElementById('name-field').value = creatureName;
+  syncAllSliders();
+  let msg = `loaded ${creatureName} · ${applied} axes`;
+  if(unknown) msg += ` · ${unknown} unknown skipped`;
+  setStatus(msg);
+}
+
+async function onLoadFile(input){
+  const f = input.files && input.files[0];
+  input.value = '';
+  if(!f) return;
+  try {
+    const text = await f.text();
+    const spec = JSON.parse(text);
+    if(!spec || !Array.isArray(spec.axes)) throw new Error('not an eidolon spec');
+    applyLoadedSpec(spec, f.name);
+  } catch(err){
+    console.error(err);
+    setStatus('load failed: ' + err.message);
+  }
+}
+
+async function loadDispatch() {
+  if (!nexusMounted) {
+    document.getElementById('file-input').click();
+    return;
+  }
+  try {
+    const res = await nexusCall('vibe.list', { type: 'creature' });
+    if (!res?.ok) throw new Error(res?.error || 'list failed');
+    const items = res.data || [];
+    if (!items.length) {
+      setStatus('library empty — file picker:');
+      document.getElementById('file-input').click();
+      return;
+    }
+    showLibraryPicker(items);
+  } catch (e) {
+    setStatus('library list failed: ' + e.message);
+  }
+}
+
+function showLibraryPicker(items) {
+  const lines = items.map((it, i) =>
+    `${i + 1}. ${it.name || '(unnamed)'} · ${it.id?.slice(-8) || ''}`
+  ).join('\n');
+  const choice = prompt(
+    `Library — ${items.length} creature${items.length > 1 ? 's' : ''}:\n\n${lines}\n\n(number, or blank to cancel)`
+  );
+  if (!choice) return;
+  const idx = parseInt(choice, 10) - 1;
+  if (isNaN(idx) || !items[idx]) { setStatus('cancelled'); return; }
+  loadFromEnvelopeOrId(items[idx]);
+}
+
+async function loadFromEnvelopeOrId(item) {
+  let payload = item.payload;
+  if (!payload) {
+    const res = await nexusCall('vibe.load', { id: item.id });
+    if (!res?.ok) { setStatus('load failed: ' + (res?.error || '')); return; }
+    payload = res.envelope?.payload;
+  }
+  if (!payload || !Array.isArray(payload.axes)) {
+    setStatus('load failed: bad payload');
+    return;
+  }
+  applyLoadedSpec(payload, item.name);
+}
+
+/* ═══ BOOT ═══ */
+buildAxes();
+document.getElementById('axis-count').textContent = N + ' axes';
+loop();
+setStatus(`forge ready · ${N} axes`);
+</script>
+</body>
+</html>

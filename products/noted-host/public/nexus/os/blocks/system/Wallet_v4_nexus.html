@@ -1,0 +1,2717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>NEXUS · Wallet v4 · One NEX Balance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#060608;--s0:#0c0c10;--s1:#111116;--s2:#18181f;--s3:#22222c;
+  --border:#2a2a38;--border-hi:#3d3d52;
+  --text:#e2e2ea;--dim:#7a7a96;--muted:#3a3a50;
+  --gold:#f5a623;--gold-dim:rgba(245,166,35,.1);--gold-glow:rgba(245,166,35,.22);
+  --indigo:#818cf8;--indigo-dim:rgba(129,140,248,.1);
+  --cyan:#22d3ee;--cyan-dim:rgba(34,211,238,.08);
+  --danger:#f87171;--danger-dim:rgba(248,113,113,.08);
+  --green:#4ade80;--green-dim:rgba(74,222,128,.06);
+  --amber:#fbbf24;--amber-dim:rgba(251,191,36,.08);
+  --mono:'JetBrains Mono',monospace;--serif:'DM Serif Display',serif;--r:6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;overflow:hidden}
+#app{display:grid;grid-template-rows:52px 38px 1fr;height:100vh}
+#topbar{display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--s0);border-bottom:1px solid var(--border)}
+#logo{font-family:var(--serif);font-size:20px;color:var(--gold)}
+#logo sub{color:var(--dim);font-size:10px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;margin-left:6px;vertical-align:middle}
+.hdot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background .3s;flex-shrink:0}
+.hdot.live{background:var(--green);box-shadow:0 0 8px var(--green)}
+.hdot-wrap{display:flex;align-items:center;gap:5px;cursor:default}
+.hdot-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);transition:color .3s}
+.hdot-wrap:has(.hdot.live) .hdot-label{color:var(--green)}
+#tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.bal-chip{display:flex;align-items:baseline;gap:5px;padding:4px 12px;border:1px solid var(--border);background:var(--s1);border-radius:20px}
+.bal-chip .amt{font-family:var(--serif);font-size:18px;color:var(--gold)}
+.bal-chip .sym{font-size:10px;color:var(--dim);letter-spacing:.1em}
+.bal-chip .lk{font-size:10px;color:var(--indigo);margin-left:4px}
+.sid-chip{font-size:10px;color:var(--dim);background:var(--s2);padding:3px 8px;border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:border-color .15s}
+.sid-chip:hover{border-color:var(--gold);color:var(--gold)}
+#tabs{display:flex;background:var(--s0);border-bottom:1px solid var(--border);padding:0 18px;gap:0;align-items:flex-end;overflow-x:auto}
+#tabs::-webkit-scrollbar{height:0}
+.tab{padding:8px 13px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.tab:hover:not(.active){color:var(--dim)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+#panels{overflow:hidden;height:100%}
+.panel{display:none;height:100%;overflow-y:auto;padding:16px;gap:12px;flex-direction:column}
+.panel.active{display:flex}
+.panel::-webkit-scrollbar{width:4px}
+.panel::-webkit-scrollbar-thumb{background:var(--s3)}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;flex-shrink:0}
+.ct{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--dim);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:9px;padding:2px 7px;border-radius:3px;font-weight:700;letter-spacing:.06em}
+.b-new{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-glow)}
+.b-ok{background:var(--green-dim);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.b-warn{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.b-danger{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(248,113,113,.2)}
+.b-indigo{background:var(--indigo-dim);color:var(--indigo);border:1px solid rgba(129,140,248,.2)}
+.bal-hero{display:flex;align-items:baseline;gap:8px;margin:6px 0 10px}
+.bal-hero .amount{font-family:var(--serif);font-size:48px;color:var(--gold);line-height:1}
+.bal-hero .sym{font-size:16px;color:var(--dim)}
+.bal-hero .lksub{font-size:13px;color:var(--indigo);margin-left:4px}
+.addr-box{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-size:9px;color:var(--dim);word-break:break-all;line-height:1.7;cursor:pointer;transition:border-color .15s}
+.addr-box:hover{border-color:var(--gold)}
+.addr-box.copyable::after{content:' ·copy';color:var(--muted);font-size:8px}
+.out-card{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px;margin-bottom:6px;transition:border-color .2s}
+.out-card.consumed{opacity:.38}
+.out-card.locked-out{border-color:var(--indigo);background:var(--indigo-dim)}
+.out-id{font-size:9px;color:var(--muted)}
+.out-src{font-size:9px;color:var(--dim)}.out-src span{color:var(--indigo)}
+.out-amount{font-family:var(--serif);font-size:22px;color:var(--gold);text-align:right;grid-row:1/4;align-self:center}
+.out-amount.lk-color{color:var(--indigo)}.out-amount.cx-color{color:var(--muted)}
+.otag{display:inline-block;font-size:8px;text-transform:uppercase;letter-spacing:.1em;padding:1px 5px;border-radius:2px;margin-right:3px}
+.otag.genesis{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(34,211,238,.2)}
+.otag.spendable{background:var(--green-dim);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.otag.change{background:var(--s3);color:var(--dim);border:1px solid var(--border)}
+.otag.locked{background:var(--indigo-dim);color:var(--indigo);border:1px solid rgba(129,140,248,.2)}
+.otag.consumed{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(248,113,113,.2)}
+.field{margin-bottom:10px}
+label{display:block;font-size:9px;color:var(--dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:.1em}
+input,textarea,select{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:4px;outline:none;transition:border-color .12s}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:56px;line-height:1.6}
+.parsed-addr{font-size:9px;padding:5px 8px;border-radius:3px;margin-top:4px;display:none}
+.parsed-addr.ok{background:var(--green-dim);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.parsed-addr.err{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(248,113,113,.2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold);font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;border-radius:4px;letter-spacing:.06em;transition:all .12s;width:100%;margin-top:4px}
+.btn:hover{background:var(--gold-glow)}.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-ghost{border-color:var(--border);color:var(--dim);background:transparent}.btn-ghost:hover{border-color:var(--dim);background:var(--s2)}
+.btn-indigo{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-dim)}.btn-indigo:hover{background:rgba(129,140,248,.18)}
+.btn-danger{border-color:var(--danger);color:var(--danger);background:var(--danger-dim)}
+.btn-sm{padding:4px 10px;font-size:10px;width:auto;margin-top:0}
+.btn-row{display:flex;gap:8px}.btn-row .btn{flex:1}
+.tx-preview{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px;margin-top:8px}
+.tx-line{font-size:9px;color:var(--dim);padding:2px 0;display:flex;gap:8px;align-items:flex-start}
+.tx-line .lbl{color:var(--muted);width:80px;flex-shrink:0}
+.tx-line .val{color:var(--text);flex:1;word-break:break-all}
+.val.gold{color:var(--gold)}.val.grn{color:var(--green)}.val.red{color:var(--danger)}.val.ind{color:var(--indigo)}.val.ok{color:var(--green);font-weight:700}
+.tok-out{background:var(--bg);border:1px solid var(--gold);border-radius:4px;padding:10px;margin-top:10px;display:none}
+.tok-out.show{display:block;animation:glow .8s ease}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px var(--gold-glow)}}
+.nx-empty-state{padding:18px 14px;text-align:center;border:1px dashed var(--border);border-radius:var(--r);background:linear-gradient(180deg,var(--gold-dim),transparent);color:var(--dim);font-size:10px;line-height:1.65}.nx-empty-state .glyph{display:block;font-family:var(--serif);font-size:24px;color:var(--gold);margin-bottom:4px}.nx-empty-state .title{display:block;color:var(--text);font-family:var(--serif);font-size:16px;margin-bottom:2px}.nx-empty-state a{color:var(--gold)}
+.tok-str{font-size:9px;color:var(--gold);word-break:break-all;line-height:1.8}
+.pstep{display:flex;gap:10px;padding:8px 10px;border-radius:4px;margin-bottom:4px;background:var(--s2);border:1px solid var(--border);align-items:flex-start;animation:fi .22s ease}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}}
+.pstep.pass{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.04)}
+.pstep.fail{border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.04)}
+.pstep.block{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.04)}
+.pstep.lock{border-color:rgba(129,140,248,.3);background:rgba(129,140,248,.04)}
+.pstep.resolve{border-color:rgba(34,211,238,.3);background:rgba(34,211,238,.04)}
+.pstep.info{border-color:var(--border)}
+.psi{font-size:14px;flex-shrink:0;margin-top:1px}.psb{flex:1}
+.psl{font-size:11px;color:var(--text);margin-bottom:2px}
+.psd{font-size:9px;color:var(--dim);line-height:1.6;word-break:break-all}
+.psd .hl{color:var(--gold)}.psd .hlg{color:var(--green)}.psd .hlr{color:var(--danger)}.psd .hli{color:var(--indigo)}.psd .hlc{color:var(--cyan)}
+.proof-summary{padding:16px;border-radius:var(--r);margin-top:8px;text-align:center;display:none}
+.proof-summary.pass{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3)}
+.proof-summary.fail{background:var(--danger-dim);border:1px solid rgba(248,113,113,.3)}
+.ps-title{font-family:var(--serif);font-size:22px;margin-bottom:6px}
+.proof-summary.pass .ps-title{color:var(--green)}.proof-summary.fail .ps-title{color:var(--danger)}
+.ps-detail{font-size:10px;color:var(--dim);line-height:1.9}
+.notice{padding:8px 12px;border-radius:4px;font-size:10px;line-height:1.7;margin-bottom:10px}
+.notice.warn{background:var(--amber-dim);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+.notice.info{background:var(--indigo-dim);border:1px solid rgba(129,140,248,.2);color:var(--indigo)}
+.notice.ok{background:var(--green-dim);border:1px solid rgba(74,222,128,.2);color:var(--green)}
+.notice.err{background:var(--danger-dim);border:1px solid rgba(248,113,113,.2);color:var(--danger)}
+.inc-item{background:var(--green-dim);border:1px solid rgba(74,222,128,.2);border-radius:4px;padding:10px;margin-bottom:6px;animation:fi .2s ease}
+.inc-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.inc-amt{font-family:var(--serif);font-size:20px;color:var(--gold)}
+.inc-from{font-size:9px;color:var(--dim)}
+.log-wrap{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;min-height:200px;overflow-y:auto}
+.log-wrap::-webkit-scrollbar{width:3px}.log-wrap::-webkit-scrollbar-thumb{background:var(--s3)}
+.le{font-size:10px;color:var(--dim);padding:2px 0;line-height:1.6}
+.le.ok{color:var(--green)}.le.warn{color:var(--gold)}.le.err{color:var(--danger)}.le.info{color:var(--indigo)}.le.lock{color:var(--indigo)}.le.resolve{color:var(--cyan)}
+#toast{position:fixed;bottom:18px;right:18px;padding:8px 16px;border-radius:5px;font-size:11px;background:var(--s1);border:1px solid var(--border);color:var(--text);opacity:0;transition:opacity .22s;z-index:9999;pointer-events:none}
+#toast.show{opacity:1}
+#toast.t-ok{border-color:var(--green);color:var(--green)}
+#toast.t-warn{border-color:var(--gold);color:var(--gold)}
+#toast.t-err{border-color:var(--danger);color:var(--danger)}
+.sep{border-top:1px solid var(--border);margin:10px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}}
+.stat-box{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:10px 12px;text-align:center}
+.stat-num{font-family:var(--serif);font-size:28px;margin-bottom:2px}
+.stat-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.fin-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:4px;margin-bottom:6px}
+.fin-icon{font-size:16px;flex-shrink:0}.fin-body{flex:1}
+.fin-label{font-size:10px;color:var(--text)}.fin-detail{font-size:9px;color:var(--dim);line-height:1.5}
+.fin-state{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.fin-state.tentative{color:var(--amber)}.fin-state.locked{color:var(--indigo)}.fin-state.final{color:var(--green)}.fin-state.slashed{color:var(--danger)}.fin-state.released{color:var(--cyan)}
+*{scrollbar-width:thin;scrollbar-color:var(--s3) transparent}
+/* address share box */
+.addr-share{background:var(--s2);border:1px solid var(--indigo);border-radius:5px;padding:12px;word-break:break-all;font-size:9px;color:var(--indigo);line-height:1.8;cursor:pointer;transition:border-color .15s}
+.addr-share:hover{border-color:var(--gold);color:var(--gold)}
+/* ── Social Stake styles ── */
+.stake-card{background:var(--s2);border:1px solid var(--indigo);border-radius:5px;padding:12px;margin-bottom:8px;animation:fi .22s ease}
+.stake-card.social{border-color:var(--cyan)}
+.stake-card .stake-meta{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.stake-event{font-size:9px;color:var(--cyan);word-break:break-all;margin:4px 0;font-family:var(--mono)}
+.stake-terms{font-size:9px;color:var(--dim);margin:2px 0}
+.countdown{font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:3px;display:inline-block}
+.countdown.ticking{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.countdown.ready{background:var(--green-dim);color:var(--green);border:1px solid rgba(74,222,128,.2);animation:pulse 1.5s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+/* ── Quick actions on balance ── */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.qa-btn{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;font-family:var(--mono)}
+.qa-btn:hover{border-color:var(--gold);background:var(--gold-dim)}
+.qa-btn.stake-qa:hover{border-color:var(--indigo);background:var(--indigo-dim)}
+.qa-btn .qa-icon{font-size:18px;display:block;margin-bottom:4px}
+.qa-btn .qa-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+/* ── Mini activity ── */
+.mini-act-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:9px}
+.mini-act-row:last-child{border-bottom:none}
+/* ── Reputation ── */
+.rep-bar{height:4px;border-radius:2px;background:var(--s3);margin-top:8px;overflow:hidden}
+.rep-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+
+/* ── Sweep I/J visual communication polish ── */
+body{background:radial-gradient(circle at 20% -10%,rgba(245,166,35,.12),transparent 34%),radial-gradient(circle at 88% 8%,rgba(129,140,248,.09),transparent 32%),var(--bg)}
+#topbar{background:linear-gradient(90deg,rgba(12,12,16,.98),rgba(17,17,22,.94));box-shadow:0 10px 34px rgba(0,0,0,.22)}
+#logo{letter-spacing:.02em;text-shadow:0 0 20px var(--gold-glow)}
+.card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(17,17,22,.97),rgba(12,12,16,.97));box-shadow:0 10px 30px rgba(0,0,0,.18);transition:border-color .18s,box-shadow .18s,transform .18s}
+.card::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(245,166,35,.04),transparent);opacity:0;transition:opacity .18s}.card:hover{border-color:var(--border-hi);box-shadow:0 16px 42px rgba(0,0,0,.24)}.card:hover::before{opacity:1}
+.bal-hero{position:relative;padding:16px;border:1px solid rgba(245,166,35,.16);border-radius:12px;background:radial-gradient(circle at 18% 0%,rgba(245,166,35,.18),transparent 45%),linear-gradient(180deg,rgba(245,166,35,.06),rgba(12,12,16,.2));overflow:hidden}.bal-hero::after{content:'conviction ledger';position:absolute;right:12px;bottom:8px;color:var(--muted);font-size:8px;letter-spacing:.18em;text-transform:uppercase}.bal-hero .amount{font-size:clamp(42px,10vw,72px);text-shadow:0 0 30px var(--gold-glow)}
+.wallet-thread-card{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;border-color:rgba(34,211,238,.2);background:radial-gradient(circle at left,rgba(34,211,238,.08),transparent 48%),var(--s1)}.wallet-thread-glyph{font-family:var(--serif);font-size:26px;color:var(--cyan);width:34px;height:34px;border:1px solid rgba(34,211,238,.22);border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--cyan-dim)}.wallet-thread-title{font-family:var(--serif);font-size:18px;color:var(--text);line-height:1.1}.wallet-thread-copy{font-size:10px;color:var(--dim);line-height:1.65;margin-top:3px}.wallet-thread-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.wallet-thread-actions .btn{width:auto;margin:0}
+.nx-empty-state{position:relative;overflow:hidden;padding:24px 16px}.nx-empty-state::before{content:'';position:absolute;inset:-1px;background:radial-gradient(circle at 50% 0%,rgba(245,166,35,.12),transparent 50%);pointer-events:none}.nx-empty-state>*{position:relative}.nx-empty-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}.nx-empty-actions .btn{width:auto;margin-top:0}
+.genesis-ritual{border-color:rgba(245,166,35,.28);background:radial-gradient(circle at 24% 0%,rgba(245,166,35,.18),transparent 44%),linear-gradient(180deg,rgba(24,24,31,.98),rgba(6,6,8,.98))}.genesis-ritual .seal{font-family:var(--serif);font-size:36px;color:var(--gold);line-height:1;text-shadow:0 0 24px var(--gold-glow)}.genesis-title{font-family:var(--serif);font-size:26px;color:var(--text);margin:4px 0}.genesis-copy{font-size:10px;color:var(--dim);line-height:1.8;max-width:68ch}.genesis-status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.genesis-status-cell{border:1px solid var(--border);background:rgba(0,0,0,.14);border-radius:8px;padding:10px}.genesis-status-cell .k{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}.genesis-status-cell .v{font-family:var(--serif);font-size:18px;color:var(--gold);margin-top:2px}.genesis-drop{border-style:dashed;border-color:rgba(245,166,35,.28)}
+@media(max-width:700px){.wallet-thread-card{grid-template-columns:1fr}.wallet-thread-glyph{display:none}.wallet-thread-actions{justify-content:flex-start}.genesis-status-grid{grid-template-columns:1fr}.quick-actions{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.card,.card::before,.qa-btn,.bal-chip{transition:none!important}.countdown.ready{animation:none!important}}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="topbar">
+  <span id="logo">Nexus <sub>one wallet · v4</sub></span>
+  <div class="hdot-wrap" title="Nexus kernel connection">
+  <div class="hdot" id="hdot"></div>
+  <span class="hdot-label" id="hdot-label">—</span>
+</div>
+  <div id="tb-right">
+    <div class="bal-chip">
+      <span class="amt" id="bal-top">0</span>
+      <span class="sym" id="sym-top">NEX</span>
+      <span class="lk" id="lk-top" style="display:none"></span>
+    </div>
+    <div class="sid-chip" id="sid-chip" onclick="copySid()">—</div>
+  </div>
+</div>
+
+<div id="tabs">
+  <div class="tab active" onclick="sw('balance')">Balance</div>
+  <div class="tab" onclick="sw('sources')">Proof Outputs</div>
+  <div class="tab" onclick="sw('send')">Send</div>
+  <div class="tab" onclick="sw('lock')">Lock ⛓</div>
+  <div class="tab" onclick="sw('resolve')">Resolve ⚖</div>
+  <div class="tab" onclick="sw('stake')">⚡ Stake</div>
+  <div class="tab" onclick="sw('settlement')">Settlement</div>
+  <div class="tab" onclick="sw('genesis')">Genesis</div>
+  <div class="tab" onclick="sw('receive')">Receive</div>
+  <div class="tab" onclick="sw('proof')">⚔ Proof</div>
+  <div class="tab" onclick="sw('log')">Log</div>
+</div>
+
+<div id="panels">
+
+<!-- BALANCE -->
+<div class="panel active" id="panel-balance">
+  <div class="card">
+    <div class="ct">Available NEX <span class="badge b-new">ONE WALLET · BITCOIN-STYLE OUTPUTS</span></div>
+    <div class="bal-hero">
+      <div class="amount" id="bal-display">0</div>
+      <div class="sym" id="sym-display">NEX</div>
+      <div class="lksub" id="lk-display" style="display:none"></div>
+    </div>
+    <div class="addr-box copyable" id="addr-box" onclick="copySid()">generating...</div>
+    <div style="font-size:9px;color:var(--muted);margin-top:6px" id="utxo-summary"></div>
+  </div>
+  <div class="card wallet-thread-card">
+    <div class="wallet-thread-glyph">✦</div>
+    <div>
+      <div class="wallet-thread-title">One Wallet. One NEX Balance.</div>
+      <div class="wallet-thread-copy">You begin at <b>0 NEX</b>. NEX is earned through real realm activity, not onboarding tasks. Bitcoin-style proof outputs exist underneath, but they are pieces of one balance — not extra wallets or extra currencies.</div>
+    </div>
+    <div class="wallet-thread-actions">
+      <button class="btn btn-sm btn-ghost" onclick="sw('receive')">Receive</button>
+      <button class="btn btn-sm btn-indigo" onclick="sw('stake')">Stake</button>
+      <button class="btn btn-sm btn-ghost" onclick="sw('proof')">Proof</button>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="stat-box"><div class="stat-num gold" id="stat-unspent">0</div><div class="stat-label">Spendable Outputs</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:var(--indigo)" id="stat-locked">0</div><div class="stat-label">Locked Proof Outputs</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:var(--danger)" id="stat-consumed">0</div><div class="stat-label">Spent Source IDs</div></div>
+  </div>
+  <div class="quick-actions">
+    <div class="qa-btn" onclick="sw('send')"><span class="qa-icon">→</span><span class="qa-label">Send</span></div>
+    <div class="qa-btn stake-qa" onclick="sw('stake')"><span class="qa-icon">⚡</span><span class="qa-label">Stake</span></div>
+    <div class="qa-btn" onclick="sw('receive')"><span class="qa-icon">↓</span><span class="qa-label">Receive</span></div>
+  </div>
+  <div class="card" id="incoming-card" style="display:none">
+    <div class="ct">Pending Incoming <span id="inc-badge" class="badge b-ok"></span></div>
+    <div id="incoming-list"></div>
+  </div>
+  <div class="card" id="mini-activity-card" style="display:none">
+    <div class="ct">Recent Activity</div>
+    <div id="mini-activity-list"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Paste &amp; Accept</div>
+    <div class="field"><label>NX4 transition string</label><textarea id="paste-tx" placeholder="NX4:..."></textarea></div>
+    <button class="btn btn-ghost" onclick="acceptPasted()">✓ Verify &amp; Accept</button>
+    <div id="paste-result" style="font-size:10px;margin-top:6px;display:none;line-height:1.7"></div>
+  </div>
+</div>
+
+<!-- SOURCES -->
+<div class="panel" id="panel-sources">
+  <div class="card">
+    <div class="ct">Proof Outputs <span class="badge b-new">BITCOIN-STYLE UTXO · ADVANCED</span></div>
+    <details class="notice info" style="margin-bottom:10px" open><summary>Advanced proof outputs</summary><div style="margin-top:8px">These outputs are the proof machinery behind one visible NEX balance. They are not separate balances; they are the pieces that prove the one NEX balance above, similar to Bitcoin UTXOs. Collapse this section if you only care about the player-facing balance.</div></details>
+    <div id="utxo-list"><div class="nx-empty-state"><span class="glyph">◎</span><span class="title">No conviction yet.</span>The first NEX comes from witnessing, receiving a valid transition, or another real earning path.<div class="nx-empty-actions"><button class="btn btn-sm btn-ghost" onclick="sw('genesis')">Open Genesis</button><button class="btn btn-sm btn-indigo" onclick="sw('receive')">Show Address</button></div></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Consumed Source Registry <span class="badge b-danger" id="consumed-badge">0</span></div>
+    <div class="notice warn">Permanently consumed. Any transition referencing one of these sources is rejected before signature verification runs.</div>
+    <div id="consumed-list" style="max-height:180px;overflow-y:auto"><div style="color:var(--muted);font-size:10px">Empty.</div></div>
+  </div>
+</div>
+
+<!-- SEND -->
+<div class="panel" id="panel-send">
+  <div class="card">
+    <div class="ct">Build Spend Transition <span class="badge b-new">OWNERSHIP-BOUND</span></div>
+    <div class="notice warn" id="no-utxo-warn" style="display:none">No spendable NEX yet. Start at zero; receive or earn before spending.</div>
+    <div class="field"><label>Source Output</label><select id="src-sel"><option value="">— select —</option></select></div>
+    <div class="field">
+      <label>Recipient Address (NX4ADDR from Bob's Receive tab — Bob must be in a separate tab)</label>
+      <input id="send-addr" placeholder="NX4ADDR:a1b2c3d4:base64x:base64y" oninput="parseRecipientAddr('send')">
+      <div class="parsed-addr" id="send-addr-parsed"></div>
+    </div>
+    <div class="field"><label>Amount</label><input id="send-amt" type="number" value="100" min="0.001" step="0.001" oninput="updateSendPreview()"></div>
+    <div class="field"><label>Memo</label><input id="send-memo" placeholder="payment memo"></div>
+    <div class="tx-preview" id="send-preview" style="display:none">
+      <div class="tx-line"><span class="lbl">CONSUMES</span><span class="val" id="sp-consumes">—</span></div>
+      <div class="tx-line"><span class="lbl">OWNER CHECK</span><span class="val ok" id="sp-owner">✓ your key owns source</span></div>
+      <div class="tx-line"><span class="lbl">SENDS</span><span class="val gold" id="sp-sends">—</span></div>
+      <div class="tx-line"><span class="lbl">CHANGE</span><span class="val" id="sp-change">—</span></div>
+      <div class="tx-line"><span class="lbl">CONSERVATION</span><span class="val" id="sp-conservation">—</span></div>
+    </div>
+    <button class="btn" onclick="buildSend()">→ Sign Spend Transition</button>
+    <div class="tok-out" id="spend-out">
+      <div class="ct" style="margin-bottom:6px">Signed Transition — share with recipient</div>
+      <div class="tok-str" id="spend-str"></div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-sm btn-ghost" onclick="copyStr('spend-str')">Copy</button>
+        <button class="btn btn-sm btn-ghost" onclick="broadcastStr('spend-str')">Broadcast</button>
+        <button class="btn btn-sm btn-ghost" onclick="document.getElementById('spend-out').classList.remove('show')">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOCK -->
+<div class="panel" id="panel-lock">
+  <div class="card">
+    <div class="ct">Create Lock Output <span class="badge b-indigo">ENCUMBRANCE</span></div>
+    <div class="notice info">A Lock consumes a spendable output and creates a LockOutput. The source is consumed immediately — funds cannot be moved while locked. Resolution requires the challenge window to have expired.</div>
+    <div class="field"><label>Source Output to Lock</label><select id="lock-src-sel"><option value="">— select —</option></select></div>
+    <div class="field"><label>Amount to Lock</label><input id="lock-amt" type="number" value="500" min="0.001" step="0.001" oninput="updateLockPreview()"></div>
+    <div class="field">
+      <label>Counterparty Address (NX4ADDR format)</label>
+      <input id="lock-addr" placeholder="NX4ADDR:b2c3d4e5:base64x:base64y" oninput="parseRecipientAddr('lock')">
+      <div class="parsed-addr" id="lock-addr-parsed"></div>
+    </div>
+    <div class="field"><label>Lock Terms (human-readable — will be hashed)</label><input id="lock-terms" placeholder="deliver-work-Q2-2026"></div>
+    <div class="field"><label>Challenge Window (hours)</label><input id="lock-window" type="number" value="24" min="1" max="8760" oninput="updateLockPreview()"></div>
+    <div class="tx-preview" id="lock-preview" style="display:none">
+      <div class="tx-line"><span class="lbl">CONSUMES</span><span class="val" id="lp-consumes">—</span></div>
+      <div class="tx-line"><span class="lbl">OWNER CHECK</span><span class="val ok">✓ your key owns source</span></div>
+      <div class="tx-line"><span class="lbl">LOCKS</span><span class="val ind" id="lp-locks">—</span></div>
+      <div class="tx-line"><span class="lbl">CHANGE</span><span class="val" id="lp-change">—</span></div>
+      <div class="tx-line"><span class="lbl">CP PUBKEY</span><span class="val ind" id="lp-cp">—</span></div>
+      <div class="tx-line"><span class="lbl">EXPIRY</span><span class="val" id="lp-expiry">—</span></div>
+      <div class="tx-line"><span class="lbl">CONSERVATION</span><span class="val ok">lock + change = source ✓</span></div>
+    </div>
+    <button class="btn btn-indigo" onclick="buildLock()">⛓ Sign Lock Transition</button>
+    <div class="tok-out" id="lock-out">
+      <div class="ct" style="margin-bottom:6px">Signed Lock Transition</div>
+      <div class="tok-str" id="lock-str"></div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-sm btn-ghost" onclick="copyStr('lock-str')">Copy</button>
+        <button class="btn btn-sm btn-ghost" onclick="broadcastStr('lock-str')">Broadcast</button>
+        <button class="btn btn-sm btn-ghost" onclick="document.getElementById('lock-out').classList.remove('show')">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESOLVE -->
+<div class="panel" id="panel-resolve">
+  <div class="card">
+    <div class="ct">Resolve Lock Output <span class="badge b-indigo">BINARY SETTLEMENT</span></div>
+    <div class="notice info">Resolution is only accepted after the challenge window has expired. RELEASE returns to owner. AWARD sends to the counterparty pubkey embedded in the lock. SLASH burns — creates no outputs.</div>
+    <div class="field"><label>Lock Output to Resolve</label><select id="resolve-lock-sel"><option value="">— select —</option></select></div>
+    <div id="resolve-window-status" style="font-size:10px;margin-bottom:10px"></div>
+    <div class="field"><label>Resolution Type</label>
+      <select id="resolve-type" onchange="updateResolvePreview()">
+        <option value="RELEASE">RELEASE — return funds to original owner</option>
+        <option value="AWARD">AWARD — send funds to counterparty</option>
+        <option value="SLASH">SLASH — destroy / burn</option>
+      </select>
+    </div>
+    <div class="tx-preview" id="resolve-preview" style="display:none">
+      <div class="tx-line"><span class="lbl">CONSUMES LOCK</span><span class="val ind" id="rp-lock">—</span></div>
+      <div class="tx-line"><span class="lbl">RESOLUTION</span><span class="val gold" id="rp-type">—</span></div>
+      <div class="tx-line"><span class="lbl">OUTPUT TO</span><span class="val grn" id="rp-to">—</span></div>
+      <div class="tx-line"><span class="lbl">AMOUNT</span><span class="val" id="rp-amt">—</span></div>
+      <div class="tx-line"><span class="lbl">AUTH CHECK</span><span class="val ok">✓ you are lock owner</span></div>
+      <div class="tx-line"><span class="lbl">WINDOW</span><span class="val" id="rp-window">—</span></div>
+      <div class="tx-line"><span class="lbl">CONSERVATION</span><span class="val" id="rp-conservation">—</span></div>
+    </div>
+    <button class="btn" id="resolve-btn" onclick="buildResolve()">⚖ Sign Resolve Transition</button>
+    <div class="tok-out" id="resolve-out">
+      <div class="ct" style="margin-bottom:6px">Signed Resolve Transition</div>
+      <div class="tok-str" id="resolve-str"></div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-sm btn-ghost" onclick="copyStr('resolve-str')">Copy</button>
+        <button class="btn btn-sm btn-ghost" onclick="broadcastStr('resolve-str')">Broadcast</button>
+        <button class="btn btn-sm btn-ghost" onclick="document.getElementById('resolve-out').classList.remove('show')">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STAKE -->
+<div class="panel" id="panel-stake">
+  <div class="card">
+    <div class="ct">Social Stake <span class="badge b-indigo">CONVICTION ON-CHAIN</span></div>
+    <div class="notice info">Lock funds against a Nostr post. The counterparty pubkey, event ID, and amount are cryptographically bound together. After the window: RELEASE if you stand by it, AWARD if you concede, SLASH to burn rather than yield.</div>
+    <div class="field">
+      <label>Nostr Event ID (64-char hex or note1...)</label>
+      <input id="stake-event-id" placeholder="a1b2c3... or note1..." oninput="updateStakePreview()">
+      <div class="parsed-addr" id="stake-event-status"></div>
+    </div>
+    <div class="field">
+      <label>Source Output</label>
+      <select id="stake-src-sel" onchange="updateStakePreview()"><option value="">— select —</option></select>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Stake Amount</label><input id="stake-amt" type="number" value="100" min="1" step="1" oninput="updateStakePreview()"></div>
+      <div class="field"><label>Challenge Window (hours)</label><input id="stake-window" type="number" value="72" min="1" max="8760" oninput="updateStakePreview()"></div>
+    </div>
+    <div class="field">
+      <label>Counterparty Address (who you're staking against)</label>
+      <input id="stake-addr" placeholder="NX4ADDR:SID:pubkey_x:pubkey_y" oninput="parseStakeAddr()">
+      <div class="parsed-addr" id="stake-addr-parsed"></div>
+    </div>
+    <div class="tx-preview" id="stake-preview" style="display:none">
+      <div class="tx-line"><span class="lbl">POST ID</span><span class="val ind" id="stp-post">—</span></div>
+      <div class="tx-line"><span class="lbl">TERMS HASH</span><span class="val" id="stp-terms">—</span></div>
+      <div class="tx-line"><span class="lbl">AMOUNT</span><span class="val gold" id="stp-amt">—</span></div>
+      <div class="tx-line"><span class="lbl">AGAINST</span><span class="val ind" id="stp-against">—</span></div>
+      <div class="tx-line"><span class="lbl">EXPIRY</span><span class="val" id="stp-expiry">—</span></div>
+    </div>
+    <button class="btn btn-indigo" onclick="buildStake()">⚡ Sign Stake Transition</button>
+    <div class="tok-out" id="stake-out">
+      <div class="ct" style="margin-bottom:6px">Signed Stake Transition — share with counterparty</div>
+      <div class="tok-str" id="stake-str"></div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-sm btn-ghost" onclick="copyStr('stake-str')">Copy</button>
+        <button class="btn btn-sm btn-ghost" onclick="broadcastStr('stake-str')">Broadcast</button>
+        <button class="btn btn-sm btn-ghost" onclick="document.getElementById('stake-out').classList.remove('show')">Clear</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Active Stakes <span id="active-stakes-badge" class="badge b-indigo" style="display:none"></span></div>
+    <div id="active-stakes-list"><div class="nx-empty-state"><span class="glyph">◇</span><span class="title">No active stakes.</span>Your next lock will make conviction visible here.<div class="nx-empty-actions"><button class="btn btn-sm btn-indigo" onclick="sw('lock')">Create Lock</button><button class="btn btn-sm btn-ghost" onclick="sw('proof')">Run Proof</button></div></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Stake Reputation</div>
+    <div class="grid3">
+      <div class="stat-box"><div class="stat-num" style="color:var(--cyan)" id="rep-released">0</div><div class="stat-label">Released</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--indigo)" id="rep-awarded">0</div><div class="stat-label">Awarded</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--danger)" id="rep-slashed">0</div><div class="stat-label">Slashed</div></div>
+    </div>
+    <div class="rep-bar"><div class="rep-bar-fill" id="rep-bar-fill" style="width:0%;background:var(--cyan)"></div></div>
+    <div style="margin-top:8px;font-size:10px;color:var(--dim)" id="rep-summary">No resolved stakes yet.</div>
+  </div>
+</div>
+
+<!-- SETTLEMENT -->
+<div class="panel" id="panel-settlement">
+  <div class="card">
+    <div class="ct">Settlement Journal</div>
+    <div id="settlement-ok" class="notice ok" style="display:none"></div>
+    <div id="settlement-list"><div class="nx-empty-state"><span class="glyph">⌁</span><span class="title">Nothing has happened here.</span>When the first event in this realm reaches you, it will be recorded here.<div class="nx-empty-actions"><button class="btn btn-sm btn-ghost" onclick="sw('receive')">Prepare Receive</button><button class="btn btn-sm btn-ghost" onclick="sw('log')">Open Log</button></div></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Finality State</div>
+    <div id="finality-list"><div class="nx-empty-state"><span class="glyph">⛓</span><span class="title">No active lock states.</span>No stake is waiting on a future truth yet.<div class="nx-empty-actions"><button class="btn btn-sm btn-indigo" onclick="sw('lock')">Create Lock</button><button class="btn btn-sm btn-ghost" onclick="sw('stake')">Stake</button></div></div></div>
+  </div>
+</div>
+
+<!-- GENESIS -->
+<div class="panel" id="panel-genesis">
+  <div class="card genesis-ritual">
+    <div class="seal">⬡</div>
+    <div class="ct">Genesis Status <span class="badge b-new">TRUST ANCHOR</span></div>
+    <div class="genesis-title">Every balance needs an origin.</div>
+    <div class="genesis-copy">Genesis is not a login reward and not a task-completion faucet. It is an externally signed trust anchor. This wallet starts at zero and only accepts a genesis grant when the authority proof verifies.</div>
+    <div id="genesis-banner" class="notice info" style="margin-top:12px">Zero-start canonical: no automatic genesis claim runs on boot. Import a verified grant or earn NEX through live systems.</div>
+    <div class="genesis-status-grid">
+      <div class="genesis-status-cell"><div class="k">Source</div><div class="v">ROOT</div></div>
+      <div class="genesis-status-cell"><div class="k">Rule</div><div class="v">Once</div></div>
+      <div class="genesis-status-cell"><div class="k">Check</div><div class="v">P-256</div></div>
+    </div>
+    <div id="genesis-authority-display" style="display:none;margin-top:12px">
+      <div class="ct" style="margin-bottom:4px">Trusted Genesis Authority</div>
+      <div class="addr-box" id="genesis-authority-key"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Developer Genesis Tool <span class="badge b-warn">ADVANCED</span></div>
+    <div class="notice warn">Hidden behind an explicit developer action. This does not run automatically and should not be used for normal play; canonical player wallets begin at 0 NEX.</div>
+    <div class="grid2">
+      <div class="field"><label>Amount</label><input id="gen-amt" type="number" value="0"></div>
+      <div class="field"><label>Symbol</label><input id="gen-sym" value="NEX" maxlength="6" style="text-transform:uppercase"></div>
+    </div>
+    <button class="btn btn-ghost" onclick="issueLocalGenesis()">⟳ Developer: Issue &amp; Claim Local Genesis</button>
+  </div>
+  <div class="card genesis-drop">
+    <div class="ct">Paste External Genesis <span class="badge b-new">LOCAL VERIFY</span></div>
+    <div class="field"><textarea id="genesis-paste" placeholder='{"type":"genesis","id":"...","source_id":"GENESIS_ROOT","genesis_authority_pub":{...},...}'></textarea></div>
+    <button class="btn btn-ghost" onclick="claimGenesisFromPaste()">Claim Pasted Genesis</button>
+  </div>
+  <div class="card">
+    <div class="ct">Reset <span class="badge b-danger">DESTRUCTIVE</span></div>
+    <div class="notice warn">Clears ALL wallet data including keys, outputs, consumed registry, journal, AND the global genesis authority pin. Use this when testing between sessions to avoid genesis authority mismatch errors.</div>
+    <button class="btn btn-danger" onclick="resetAllData()">⚠ Reset All Wallet Data</button>
+  </div>
+</div>
+
+<!-- RECEIVE -->
+<div class="panel" id="panel-receive">
+  <div class="card">
+    <div class="ct">Your Address <span class="badge b-new">NX4ADDR FORMAT</span></div>
+    <div class="notice ok">Share this full address with anyone sending you funds or creating a lock with you as counterparty. It includes your pubkey — required for ownership-bound output creation.</div>
+    <div class="addr-share" id="addr-share" onclick="copyAddr()" title="Click to copy full NX4ADDR">generating...</div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn btn-sm btn-ghost" onclick="copyAddr()">Copy Full Address</button>
+      <button class="btn btn-sm btn-ghost" onclick="copySid()">Copy SID only</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">How Receiving Works (v4)</div>
+    <div style="font-size:10px;color:var(--dim);line-height:1.9">
+      <strong style="color:var(--text)">Incoming transitions carry the source_outputs they consume.</strong><br>
+      Each browser tab has its own wallet slot (shown in your address). Open Bob's wallet in a <strong>new tab</strong> (same browser, same profile) for auto-delivery via BroadcastChannel + shared outbox.<br>
+      When you receive a transition, all four checks run in order:<br><br>
+      <span style="color:var(--amber)">1. Consumed-source check</span> — every consumed source ID must not be in the consumed registry. Checked before any cryptographic work.<br>
+      <span style="color:var(--indigo)">2. Authorization check</span> — tx.from_pubkey.x must equal the owner_pubkey.x of every consumed source output. Signer must own what they spend.<br>
+      <span style="color:var(--cyan)">3. Signature verification</span> — ECDSA sig over the transition body using from_pubkey.<br>
+      <span style="color:var(--green)">4. Conservation check</span> — Σ source amounts must equal Σ output amounts (SLASH exempt).<br><br>
+      All four must pass or the transition is rejected.
+    </div>
+  </div>
+</div>
+
+<!-- PROOF -->
+<div class="panel" id="panel-proof">
+  <div class="card">
+    <div class="ct">Full Protocol Adversarial Proof <span class="badge b-new">LIVE · v4 RULES</span></div>
+    <div class="notice info">
+      Proves all four acceptance rules independently, then attempts adversarial violation of each: double-spend, unauthorized spend (wrong key), conservation fraud, lock re-resolution, early resolve before window expiry. All WebCrypto. No mocks. Isolated state.
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="proof-btn" onclick="runProof()">▶ Run Full v4 Proof</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearProof()" style="width:auto;margin-top:4px">Clear</button>
+    </div>
+  </div>
+  <div id="proof-steps"></div>
+  <div class="proof-summary" id="proof-summary">
+    <div class="ps-title" id="ps-title"></div>
+    <div class="ps-detail" id="ps-detail"></div>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="panel" id="panel-log">
+  <div class="card" style="flex:1">
+    <div class="ct">Activity Log <button class="btn btn-sm btn-ghost" style="width:auto;margin:0" onclick="clearLog()">Clear</button></div>
+    <div class="log-wrap" id="log" style="min-height:300px;max-height:none;height:auto"></div>
+  </div>
+</div>
+
+</div></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════════
+// NEXUS WALLET v4
+// Fixes over v3:
+//   1. Ownership binding: recipient's actual pubkey in all output creates
+//   2. AWARD: uses lock.counterparty_pubkey, not resolver's pubkey
+//   3. Challenge window: real — resolve rejected before expiry
+//   4. Genesis: genesis_authority_pub signature verified at claim time
+//   5. Authorization: from_pubkey.x === source.owner_pubkey.x enforced
+//   6. Conservation: Σ inputs === Σ outputs enforced on SPEND, LOCK, RESOLVE
+//   7. source_outputs included in transitions for external verification
+// ═══════════════════════════════════════════════════════════════════
+
+const BLOCK_ID  = 'w4-'+Math.random().toString(36).slice(2,8);
+// FIX 4: BroadcastChannel('nexus-kernel') REMOVED — was a public channel where
+// every block could read every message. Replaced with MessagePort (private pipe).
+// BC_V4 remains as standalone fallback for wallet-to-wallet when kernel isn't present.
+const BC_V4     = new BroadcastChannel('nexus-v4-transitions');
+
+// ── Kernel MessagePort (FIX 4) ──
+// Private point-to-point channel with the kernel. Received via BOOT message
+// when running inside Nexus OS as an iframe block. Null when standalone.
+let _kernelPort = null;
+let _kernelIPCStarted = false;
+
+// ── Kernel death watchdog (FIX 1) ──
+// Track last PING from kernel. If no PING in 12s, assume kernel is dead
+// and fall back to BroadcastChannel. Kernel PINGs every 3s, kills after 9s.
+let _lastPing = 0;
+let _watchdogInterval = null;
+const WATCHDOG_TIMEOUT_MS = 12000; // 12 seconds — 4 missed PINGs
+
+function emit(channel, payload){
+  if(mounted && _kernelPort){
+    _kernelPort.postMessage({ type:'EMIT', channel, payload });
+    return true;
+  }
+  return false;
+}
+
+// ── Transport: outbox + auto-delivery ──
+// OUTBOX: localStorage key for cross-tab/late-join delivery.
+// Transitions written here are read by any tab that opens later.
+// Entries expire after 24 hours and are pruned on every write.
+const OUTBOX_KEY = 'nx4_v4_outbox';
+const OUTBOX_TTL = 24 * 3600 * 1000; // 24 hours
+
+// ── INTEGER ARITHMETIC ──
+// 1 token = 100,000,000 smallest units (like Bitcoin satoshis).
+// All protocol-layer amounts are integers. Display layer divides for humans.
+// This eliminates the IEEE 754 floating-point imprecision that caused the
+// conservation check to use an epsilon tolerance (1e-9). With integers,
+// conservation is exact: inTotal === outTotal, no tolerance.
+const UNITS_PER_TOKEN = 100000000;
+function toUnits(tokens) { return Math.round(tokens * UNITS_PER_TOKEN); }
+function toTokens(units) { return units / UNITS_PER_TOKEN; }
+
+// ── Wallet slot: per-tab identity isolation ──
+// sessionStorage is per-tab (not shared between tabs at the same origin).
+// This lets two tabs share localStorage (outbox) and BroadcastChannel
+// while holding distinct keypairs and distinct SIDs.
+// Opening Alice in Tab 1 and Bob in Tab 2 of the same browser profile
+// gives each tab its own slot and therefore its own keypair.
+const WALLET_SLOT = (() => {
+  let s = sessionStorage.getItem('nx4_wallet_slot');
+  if (!s) {
+    s = Math.random().toString(36).slice(2, 10);
+    sessionStorage.setItem('nx4_wallet_slot', s);
+  }
+  return s;
+})();
+const KP_KEY = 'nx4_kp_' + WALLET_SLOT; // per-tab keypair storage key
+
+function writeOutbox(tx) {
+  // Write a transition to the shared outbox so late-opening
+  // recipient tabs can pick it up. Prunes expired entries first.
+  try {
+    const now = Date.now();
+    const raw = localStorage.getItem(OUTBOX_KEY);
+    let box = raw ? JSON.parse(raw) : [];
+    // Prune expired + keep last 50
+    box = box.filter(e => (now - e.ts) < OUTBOX_TTL);
+    box = box.slice(-49);
+    box.push({tx, ts: now});
+    localStorage.setItem(OUTBOX_KEY, JSON.stringify(box));
+  } catch(e) { /* storage full or unavailable — not fatal */ }
+}
+
+function txIsForMe(tx) {
+  // Returns true if this transition creates any output addressed to SID,
+  // or creates a lock where we are owner or counterparty.
+  if (!SID) return false;
+  const creates = (tx.creates || []).concat(tx.creates_change || []);
+  if (creates.some(o => o.owner_sid === SID)) return true;
+  if (tx.lock?.owner_sid === SID) return true;
+  if (tx.lock?.counterparty_sid === SID) return true;
+  return false;
+}
+
+function txAlreadyConsumed(tx) {
+  // True if every consumed source/lock is already in our CONSUMED set —
+  // meaning we've already accepted or originated this transition.
+  const ids = (tx.consumes || []).concat(tx.consumes_lock || []);
+  return ids.length > 0 && ids.every(id => CONSUMED.has(id));
+}
+
+function scanInbox() {
+  // Called on boot and on storage events. Reads the shared outbox
+  // and queues any transitions addressed to this wallet that we
+  // haven't already consumed.
+  if (!SID) return;
+  try {
+    const raw = localStorage.getItem(OUTBOX_KEY);
+    if (!raw) return;
+    const box = JSON.parse(raw);
+    for (const {tx} of box) {
+      if (!txIsForMe(tx)) continue;
+      if (txAlreadyConsumed(tx)) { maybeRecordForkProofForTx(tx); continue; }
+      // Avoid duplicate PENDING entries
+      const alreadyQueued = PENDING.some(p => {
+        const pids = (p.consumes||[]).concat(p.consumes_lock||[]).join(',');
+        const tids = (tx.consumes||[]).concat(tx.consumes_lock||[]).join(',');
+        return pids === tids;
+      });
+      if (!alreadyQueued) {
+        PENDING.push(tx);
+        log('Inbox: transition from ' + tx.from_sid + ' (' + tx.type + ')', 'info');
+      }
+    }
+    if (PENDING.length) { renderPending(); showIncomingBadge(); }
+  } catch(e) { /* malformed outbox — ignore */ }
+}
+
+function autoTransport(tx) {
+  // Called automatically after every outbound transition is locally accepted.
+  // 1. MessagePort to kernel — private, authenticated, rate-limited (FIX 4)
+  // 2. BroadcastChannel — fallback for standalone / kernel-dead mode
+  // 3. Outbox — persistent delivery for tabs that open later (ALWAYS fires)
+  if (mounted && _kernelPort) {
+    _kernelPort.postMessage({
+      type: 'EMIT',
+      channel: 'nexus.v4.transition',
+      payload: {type: 'TRANSITION', tx}
+    });
+    log('Auto-transport: kernel MessagePort nexus.v4.transition', 'info');
+  } else {
+    BC_V4.postMessage({type: 'TRANSITION', tx});
+    log('Auto-transport: BC_V4 (kernel not mounted)', 'warn');
+  }
+  writeOutbox(tx);
+}
+
+// Storage event — another tab wrote to the outbox
+window.addEventListener('storage', e => {
+  if (e.key === OUTBOX_KEY && SID) {
+    // Small delay so our own CONSUMED state is current before scanning
+    setTimeout(scanInbox, 50);
+  }
+});
+
+let KP = null, SID = null, TOKEN_SYM = 'NEX';
+let OUTPUTS  = new Map();   // output_id → SpendableOutput
+let LOCKS    = new Map();   // lock_id   → LockOutput
+let CONSUMED = new Set();   // all consumed output/lock IDs
+let JOURNAL  = [];
+let PENDING  = [];
+let FORK_PROOFS = new Map(); // fork_proof_id → portable double-spend proof
+const FORK_PROOF_DB_NAME = 'NX4_Wallet_ForkProofs';
+const FORK_PROOF_DB_VERSION = 1;
+let mounted  = false;
+// The genesis authority pubkey recorded on first successful genesis claim.
+// All subsequent genesis claims from a different authority are rejected.
+let GENESIS_AUTHORITY_PUB = null;
+const GENESIS_OUTPUT = null; // injected by issuer
+
+// ── CRYPTO ──
+const b64u = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const b64uDec = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c=>c.charCodeAt(0));
+const enc = s => new TextEncoder().encode(s);
+
+// ── CANONICAL SERIALIZATION ──
+// Deterministic JSON with key ordering at ALL depths.
+// JSON.stringify's array replacer only sorts top-level keys — nested objects
+// retain JavaScript insertion order. Two wallets constructing the same logical
+// object with different key insertion orders produce different byte sequences.
+// This function sorts keys recursively, producing identical output regardless
+// of insertion order at any nesting depth.
+// Drops undefined values: JSON.stringify(undefined) returns the JS value
+// undefined (not a string), which is not valid JSON. Without the filter,
+// {a:1, b:undefined} produces '{"a":1,"b":undefined}' — a wallet that never
+// had key "b" produces '{"a":1}'. Different bytes. Signature fails.
+// REQUIRED for cross-wallet signature verification.
+function canonicalize(obj) {
+  if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
+  if (Array.isArray(obj)) return '[' + obj.map(canonicalize).join(',') + ']';
+  const keys = Object.keys(obj).sort().filter(k => obj[k] !== undefined);
+  return '{' + keys.map(k => JSON.stringify(k) + ':' + canonicalize(obj[k])).join(',') + '}';
+}
+
+async function sha256(s){
+  const b = await crypto.subtle.digest('SHA-256', enc(typeof s==='string'?s:JSON.stringify(s)));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+// sign() and verify() use canonicalize() for object serialization.
+// This ensures cross-wallet signature verification works regardless of
+// key insertion order in the sigBody object. All signing and verification
+// paths go through these two functions — fixing them fixes everything.
+async function sign(key, data){
+  return b64u(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'}, key, enc(typeof data==='string'?data:canonicalize(data))));
+}
+async function verify(pub, data, sig){
+  try{
+    const k = await crypto.subtle.importKey('jwk',{kty:pub.kty,crv:pub.crv,x:pub.x,y:pub.y},{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
+    return await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'}, k, b64uDec(sig), enc(typeof data==='string'?data:canonicalize(data)));
+  }catch{ return false; }
+}
+function rSalt(){ return b64u(crypto.getRandomValues(new Uint8Array(12))); }
+
+// ── OUTPUT ID ──
+// id = sha256("NX4_OUT:" + source_id + ":" + owner_pubkey.x + ":" + amount + ":" + symbol + ":" + salt + ":" + type)
+// The owner's pubkey.x is embedded in the ID. Changing the pubkey changes the ID.
+async function outputId(source_id, pubx, amount, symbol, salt, type){
+  return sha256(`NX4_OUT:${source_id}:${pubx}:${amount}:${symbol}:${salt}:${type}`);
+}
+
+// ── LOCK ID ──
+// lock_id = sha256("NX4_LOCK:" + source_id + ":" + owner_pubkey.x + ":" + cp_pubkey.x + ":" + amount + ":" + symbol + ":" + terms_hash + ":" + expiry)
+// Both owner and counterparty pubkeys are embedded in the lock ID.
+async function lockId(source_id, owner_pubx, cp_pubx, amount, symbol, terms_hash, expiry){
+  return sha256(`NX4_LOCK:${source_id}:${owner_pubx}:${cp_pubx}:${amount}:${symbol}:${terms_hash}:${expiry}`);
+}
+
+// ── OUTPUT CREATION ──
+async function mkOutput({source_id, ownerSid, ownerPub, amount, symbol, type, sigKey}){
+  const salt = rSalt();
+  // owner_pubkey.x is bound into the ID — wrong pubkey = wrong ID = rejected by verifier
+  const id   = await outputId(source_id, ownerPub.x, amount, symbol, salt, type);
+  const body = {id, source_id, owner_sid:ownerSid, owner_pubkey:ownerPub, amount, symbol, salt, type};
+  const sig  = sigKey ? await sign(sigKey, body) : null;
+  return {...body, sig};
+}
+
+// ── LOCK CREATION ──
+async function mkLock({source_id, ownerSid, ownerPub, cpSid, cpPub, amount, symbol, termsRaw, windowHours, sigKey}){
+  const terms_hash = await sha256(termsRaw);
+  const expiry     = Date.now() + windowHours * 3600 * 1000;
+  const id = await lockId(source_id, ownerPub.x, cpPub.x, amount, symbol, terms_hash, expiry);
+  const body = {id, source_id, owner_sid:ownerSid, owner_pubkey:ownerPub,
+    counterparty_sid:cpSid, counterparty_pubkey:cpPub,   // cpPub stored in lock
+    amount, symbol, terms_hash, terms_raw:termsRaw, expiry, type:'LOCKED'};
+  const sig = sigKey ? await sign(sigKey, body) : null;
+  return {...body, sig};
+}
+
+// ── ADDRESS FORMAT ──
+// NX4ADDR:SID:pubkey_x:pubkey_y
+function formatAddr(sid, pub){ return `NX4ADDR:${sid}:${pub.x}:${pub.y}`; }
+function parseAddr(s){
+  if(!s||!s.startsWith('NX4ADDR:')) return null;
+  const parts = s.split(':');
+  if(parts.length<4) return null;
+  const [,sid,x,y] = parts;
+  if(!sid||!x||!y) return null;
+  return {sid, pub:{kty:'EC',crv:'P-256',x,y}};
+}
+
+// ── GETTERS ──
+function unspent(){ return [...OUTPUTS.values()].filter(o=>!CONSUMED.has(o.id)); }
+function lockedOuts(){ return [...LOCKS.values()].filter(l=>!CONSUMED.has(l.id)); }
+function balance(){ return unspent().reduce((s,o)=>s+o.amount,0); }
+function lockedBalance(){ return lockedOuts().reduce((s,l)=>s+l.amount,0); }
+
+// ══════════════════════════════════════════════════════
+// EXISTENCE PROOF — ancestry chain from trust anchor to output
+// ══════════════════════════════════════════════════════
+async function verifyOutputExistence(output, depth=0, localOutputs=OUTPUTS){
+  if(depth>20) return {ok:false,reason:'Proof chain depth > 20'};
+  if(localOutputs&&localOutputs.has(output.id)) return {ok:true};
+  const proof=output._proof;
+  if(!proof) return {ok:false,reason:`No _proof on ${output.id?.slice(0,12)}...`};
+
+  if(proof.type==='GENESIS'){
+    const gOut=proof.genesis_output;
+    if(!gOut?.genesis_authority_pub||!gOut.sig) return {ok:false,reason:'GENESIS proof missing authority or sig'};
+    const expGId=await outputId(gOut.source_id,gOut.owner_pubkey.x,gOut.amount,gOut.symbol,gOut.salt,gOut.type);
+    if(expGId!==gOut.id) return {ok:false,reason:'Genesis output ID hash invalid'};
+    const gBody={id:gOut.id,source_id:gOut.source_id,owner_sid:gOut.owner_sid,owner_pubkey:gOut.owner_pubkey,amount:gOut.amount,symbol:gOut.symbol,salt:gOut.salt,type:gOut.type};
+    if(!await verify(gOut.genesis_authority_pub,gBody,gOut.sig)) return {ok:false,reason:'Genesis authority signature invalid'};
+    if(GENESIS_AUTHORITY_PUB&&(gOut.genesis_authority_pub.x!==GENESIS_AUTHORITY_PUB.x||gOut.genesis_authority_pub.y!==GENESIS_AUTHORITY_PUB.y)) return {ok:false,reason:'Genesis authority mismatch'};
+    if(output.source_id!==gOut.id) return {ok:false,reason:`output.source_id does not match genesis_output.id`};
+    const expId=await outputId(output.source_id,output.owner_pubkey.x,output.amount,output.symbol,output.salt,output.type);
+    if(expId!==output.id) return {ok:false,reason:'Output ID hash invalid'};
+    return {ok:true};
+  }
+
+  if(proof.type==='SPEND'){
+    const parent=proof.source_output;
+    if(!parent?.id) return {ok:false,reason:'SPEND proof missing source_output'};
+    const pc=await verifyOutputExistence(parent,depth+1,localOutputs);
+    if(!pc.ok) return {ok:false,reason:`Ancestor: ${pc.reason}`};
+    if(output.source_id!==parent.id) return {ok:false,reason:`output.source_id does not match parent.id`};
+    const expId=await outputId(output.source_id,output.owner_pubkey.x,output.amount,output.symbol,output.salt,output.type);
+    if(expId!==output.id) return {ok:false,reason:'Output ID hash invalid'};
+    // STEP 3b: Verify intermediate spend signature
+    if(proof.sig && proof.from_pubkey && proof.creates_ids){
+      // Authorization: signer must own the parent output (STEP 6: both x AND y)
+      if(proof.from_pubkey.x!==parent.owner_pubkey.x || proof.from_pubkey.y!==parent.owner_pubkey.y)
+        return {ok:false,reason:'ANCESTRY_AUTH: signer pubkey does not match parent owner'};
+      // Reconstruct SPEND sigBody and verify signature
+      const sigBody={consumes:[parent.id], creates_ids:proof.creates_ids, from_sid:proof.from_sid, ts:proof.ts};
+      if(!await verify(proof.from_pubkey, sigBody, proof.sig))
+        return {ok:false,reason:'ANCESTRY_SIG: intermediate spend signature invalid'};
+      // Membership check: this output must be in the signed creates set
+      if(!proof.creates_ids.includes(output.id))
+        return {ok:false,reason:'ANCESTRY_MEMBERSHIP: output not in signed creates set'};
+    }
+    // Legacy proofs without sig fields pass structural checks only (backward compat)
+    return {ok:true};
+  }
+
+  if(proof.type==='LOCK_CHANGE'){
+    // Change output created by a LOCK transaction — uses LOCK sigBody shape
+    const parent=proof.source_output;
+    if(!parent?.id) return {ok:false,reason:'LOCK_CHANGE proof missing source_output'};
+    const pc=await verifyOutputExistence(parent,depth+1,localOutputs);
+    if(!pc.ok) return {ok:false,reason:`Ancestor: ${pc.reason}`};
+    if(output.source_id!==parent.id) return {ok:false,reason:`output.source_id does not match parent.id`};
+    const expId=await outputId(output.source_id,output.owner_pubkey.x,output.amount,output.symbol,output.salt,output.type);
+    if(expId!==output.id) return {ok:false,reason:'Output ID hash invalid'};
+    if(proof.sig && proof.from_pubkey && proof.lock_id && proof.creates_change_ids){
+      if(proof.from_pubkey.x!==parent.owner_pubkey.x || proof.from_pubkey.y!==parent.owner_pubkey.y)
+        return {ok:false,reason:'ANCESTRY_AUTH: signer pubkey does not match parent owner'};
+      // Reconstruct LOCK sigBody shape
+      const sigBody={consumes:[parent.id], lock_id:proof.lock_id, creates_change_ids:proof.creates_change_ids, from_sid:proof.from_sid, ts:proof.ts};
+      if(!await verify(proof.from_pubkey, sigBody, proof.sig))
+        return {ok:false,reason:'ANCESTRY_SIG: intermediate lock signature invalid'};
+      // Membership: change output must be in signed creates_change set
+      if(!proof.creates_change_ids.includes(output.id))
+        return {ok:false,reason:'ANCESTRY_MEMBERSHIP: output not in signed lock creates_change set'};
+    }
+    return {ok:true};
+  }
+
+  if(proof.type==='RESOLVE'){
+    const lock=proof.lock_output||proof.lock;  // lock_output (new) or lock (legacy)
+    if(!lock?.id) return {ok:false,reason:'RESOLVE proof missing lock'};
+    if(output.source_id!==lock.id) return {ok:false,reason:'output.source_id does not match lock.id'};
+    const expId=await outputId(output.source_id,output.owner_pubkey.x,output.amount,output.symbol,output.salt,output.type);
+    if(expId!==output.id) return {ok:false,reason:'Output ID hash invalid'};
+    const expLockId=await lockId(lock.source_id,lock.owner_pubkey.x,lock.counterparty_pubkey.x,lock.amount,lock.symbol,lock.terms_hash,lock.expiry);
+    if(expLockId!==lock.id) return {ok:false,reason:'Lock ID hash invalid in RESOLVE proof'};
+    // STEP 3b: Verify resolve signature (sigBody includes type:'RESOLVE' — asymmetric)
+    if(proof.sig && proof.from_pubkey && proof.creates_ids){
+      // Authorization: resolver must be lock owner (STEP 6: both x AND y)
+      if(proof.from_pubkey.x!==lock.owner_pubkey.x || proof.from_pubkey.y!==lock.owner_pubkey.y)
+        return {ok:false,reason:'ANCESTRY_AUTH: resolver pubkey does not match lock owner'};
+      const sigBody={type:'RESOLVE', consumes_lock:[lock.id], resolution:proof.resolution, creates_ids:proof.creates_ids, from_sid:proof.from_sid, ts:proof.ts};
+      if(!await verify(proof.from_pubkey, sigBody, proof.sig))
+        return {ok:false,reason:'ANCESTRY_SIG: resolve signature invalid'};
+      if(!proof.creates_ids.includes(output.id))
+        return {ok:false,reason:'ANCESTRY_MEMBERSHIP: output not in signed resolve creates set'};
+    }
+    // FIX 3: Recurse through the lock's own ancestry.
+    if(lock._source_proof){
+      const lockSource = {
+        id: lock.source_id,
+        owner_pubkey: lock.owner_pubkey,
+        amount: lock.amount,
+        symbol: lock.symbol,
+        salt: lock._source_salt || '',
+        type: lock._source_type || 'spendable',
+        _proof: lock._source_proof
+      };
+      const lockAncestry = await verifyOutputExistence(lockSource, depth+1, localOutputs);
+      if(!lockAncestry.ok) return {ok:false,reason:'Lock ancestry failed: '+lockAncestry.reason};
+    } else if(!localOutputs || !localOutputs.has(lock.source_id)){
+      return {ok:false,reason:'Lock source '+lock.source_id.slice(0,12)+'... not in local state and no _source_proof carried'};
+    }
+    return {ok:true};
+  }
+
+  return {ok:false,reason:`Unknown proof type: ${proof.type}`};
+}
+
+// ══════════════════════════════════════════════════════
+// TRANSITION BUILDERS
+// ══════════════════════════════════════════════════════
+
+// ── SPEND ──
+async function buildSpendTx({srcOutput, toSid, toPub, amount, memo}){
+  if(CONSUMED.has(srcOutput.id)) throw new Error('Source already consumed');
+  if(amount>srcOutput.amount) throw new Error('Amount exceeds source');
+  if(srcOutput.owner_pubkey.x !== KP._pub.x || srcOutput.owner_pubkey.y !== KP._pub.y) throw new Error('Authorization: this wallet does not own the source output');
+  const change = srcOutput.amount - amount; // integer subtraction — exact
+  // toPub is required — the recipient's actual pubkey binds the output to them
+  if(!toPub) throw new Error('Recipient pubkey required — cannot create ownership-bound output without it');
+  const creates = [];
+  creates.push(await mkOutput({source_id:srcOutput.id, ownerSid:toSid, ownerPub:toPub, amount, symbol:srcOutput.symbol, type:'spendable', sigKey:KP.privateKey}));
+  if(change>0) creates.push(await mkOutput({source_id:srcOutput.id, ownerSid:SID, ownerPub:KP._pub, amount:change, symbol:srcOutput.symbol, type:'change', sigKey:KP.privateKey}));
+  const ts = Date.now();
+  // Conservation pre-check (also checked by verifier) — exact integer equality
+  const outTotal = creates.reduce((s,o)=>s+o.amount,0);
+  if(srcOutput.amount !== outTotal) throw new Error(`Conservation: source=${srcOutput.amount} outputs=${outTotal}`);
+  const creates_ids = creates.map(o=>o.id);
+  const sigBody = {consumes:[srcOutput.id], creates_ids, from_sid:SID, ts};
+  const sig = await sign(KP.privateKey, sigBody);
+  // STEP 3d: Backfill full proof-hop data AFTER signing.
+  // The signature didn't exist when outputs were created (Trap 1).
+  // Each output carries the full proof chain so any future receiver can
+  // walk the ancestry and verify every intermediate signature.
+  for(const out of creates){
+    out._proof = {
+      type: 'SPEND',
+      source_output: srcOutput,   // carries srcOutput._proof (full chain)
+      sig,
+      from_pubkey: KP._pub,
+      from_sid: SID,
+      ts,
+      creates_ids
+    };
+  }
+  return {type:'SPEND', v:4, consumes:[srcOutput.id], source_outputs:[srcOutput], creates, from_sid:SID, from_pubkey:KP._pub, memo:memo||'', ts, sig};
+}
+
+// ── LOCK ──
+async function buildLockTx({srcOutput, amount, cpSid, cpPub, termsRaw, windowHours}){
+  if(CONSUMED.has(srcOutput.id)) throw new Error('Source already consumed');
+  if(amount>srcOutput.amount) throw new Error('Amount exceeds source');
+  if(srcOutput.owner_pubkey.x !== KP._pub.x || srcOutput.owner_pubkey.y !== KP._pub.y) throw new Error('Authorization: this wallet does not own the source output');
+  if(!cpPub) throw new Error('Counterparty pubkey required — needed to bind AWARD output');
+  const change = srcOutput.amount - amount; // integer subtraction — exact
+  const lock = await mkLock({source_id:srcOutput.id, ownerSid:SID, ownerPub:KP._pub, cpSid, cpPub, amount, symbol:srcOutput.symbol, termsRaw, windowHours, sigKey:KP.privateKey});
+  const creates_change = [];
+  if(change>0) creates_change.push(await mkOutput({source_id:srcOutput.id, ownerSid:SID, ownerPub:KP._pub, amount:change, symbol:srcOutput.symbol, type:'change', sigKey:KP.privateKey}));
+  // Conservation pre-check — exact integer equality
+  const lockAmt = lock.amount;
+  const changeAmt = creates_change.reduce((s,o)=>s+o.amount,0);
+  if(srcOutput.amount !== (lockAmt + changeAmt)) throw new Error(`Conservation: source=${srcOutput.amount} lock+change=${lockAmt+changeAmt}`);
+  const ts = Date.now();
+  const creates_change_ids = creates_change.map(o=>o.id);
+  const sigBody = {consumes:[srcOutput.id], lock_id:lock.id, creates_change_ids, from_sid:SID, ts};
+  const sig = await sign(KP.privateKey, sigBody);
+  // STEP 3d: Backfill proof-hop data on change outputs (LOCK_CHANGE type).
+  // The verifier needs the LOCK sigBody shape to reconstruct and verify.
+  for(const out of creates_change){
+    out._proof = {
+      type: 'LOCK_CHANGE',
+      source_output: srcOutput,
+      sig,
+      from_pubkey: KP._pub,
+      from_sid: SID,
+      ts,
+      lock_id: lock.id,
+      creates_change_ids
+    };
+  }
+  // Attach source ancestry to lock for cross-wallet verification (extends FIX 3)
+  if(srcOutput._proof) lock._source_proof = srcOutput._proof;
+  lock._source_salt = srcOutput.salt;
+  lock._source_type = srcOutput.type;
+  return {type:'LOCK', v:4, consumes:[srcOutput.id], source_outputs:[srcOutput], lock, creates_change, from_sid:SID, from_pubkey:KP._pub, ts, sig};
+}
+
+// ── RESOLVE ──
+async function buildResolveTx({lockOutput, resolutionType, force=false}){
+  if(CONSUMED.has(lockOutput.id)) throw new Error('Lock already consumed');
+  if(lockOutput.owner_pubkey.x !== KP._pub.x || lockOutput.owner_pubkey.y !== KP._pub.y) throw new Error('Authorization: only lock owner can resolve');
+  const window_expired = Date.now() > lockOutput.expiry;
+  if(!window_expired && !force) throw new Error(`Challenge window has not expired. Expires: ${new Date(lockOutput.expiry).toLocaleString()}`);
+  const ts = Date.now();
+  const creates = [];
+  if(resolutionType==='RELEASE'){
+    // Return to owner: use lock.owner_pubkey
+    creates.push(await mkOutput({source_id:lockOutput.id, ownerSid:lockOutput.owner_sid, ownerPub:lockOutput.owner_pubkey, amount:lockOutput.amount, symbol:lockOutput.symbol, type:'spendable', sigKey:KP.privateKey}));
+  } else if(resolutionType==='AWARD'){
+    // Send to counterparty: use lock.counterparty_pubkey (stored in lock, not resolver's key)
+    creates.push(await mkOutput({source_id:lockOutput.id, ownerSid:lockOutput.counterparty_sid, ownerPub:lockOutput.counterparty_pubkey, amount:lockOutput.amount, symbol:lockOutput.symbol, type:'spendable', sigKey:KP.privateKey}));
+  }
+  // SLASH: creates nothing (funds burned — no conservation requirement)
+  const creates_ids = creates.map(o=>o.id);
+  const sigBody = {type:'RESOLVE', consumes_lock:[lockOutput.id], resolution:resolutionType, creates_ids, from_sid:SID, ts};
+  const sig = await sign(KP.privateKey, sigBody);
+  // STEP 3d: Backfill proof-hop data on resolve outputs.
+  // RESOLVE sigBody includes type:'RESOLVE' — asymmetric with SPEND/LOCK.
+  for(const out of creates){
+    out._proof = {
+      type: 'RESOLVE',
+      lock_output: lockOutput,   // carries lock's own ancestry
+      sig,
+      from_pubkey: KP._pub,
+      from_sid: SID,
+      ts,
+      resolution: resolutionType,
+      creates_ids
+    };
+  }
+  return {type:'RESOLVE', v:4, consumes_lock:[lockOutput.id], lock_snapshot:lockOutput, resolution:resolutionType, creates, from_sid:SID, from_pubkey:KP._pub, ts, sig};
+}
+
+// ══════════════════════════════════════════════════════
+// FORK PROOFS — portable equivocation evidence
+// ══════════════════════════════════════════════════════
+function txConsumedIds(tx){ return (tx?.consumes || []).concat(tx?.consumes_lock || []); }
+function conflictingConsumedId(tx){ return txConsumedIds(tx).find(id => CONSUMED.has(id)) || null; }
+function findFirstConsumerTx(sourceId){
+  const entry = JOURNAL.find(e => txConsumedIds(e.tx).includes(sourceId));
+  return entry ? entry.tx : null;
+}
+function forkProofSummary(proof){
+  return {
+    id: proof.id,
+    type: proof.type,
+    source_output_id: proof.source_output_id,
+    tx_a_type: proof.tx_a?.type || '',
+    tx_b_type: proof.tx_b?.type || '',
+    detected_at: proof.detected_at
+  };
+}
+async function recordForkProof(sourceOutputId, secondTx){
+  const firstTx = findFirstConsumerTx(sourceOutputId);
+  if(!firstTx) return null;
+  const detected = Date.now();
+  const id = 'fork_' + (await sha256(canonicalize({source_output_id:sourceOutputId, tx_a:firstTx, tx_b:secondTx}))).slice(0,24);
+  if(FORK_PROOFS.has(id)) return FORK_PROOFS.get(id);
+  const proof = {
+    id,
+    type: 'lock_fork_proof',
+    source_output_id: sourceOutputId,
+    tx_a: firstTx,
+    tx_b: secondTx,
+    detected_at: detected
+  };
+  FORK_PROOFS.set(id, proof);
+  persistForkProofs();
+  try { await putForkProofStore(proof); } catch(e) { log('fork_proofs store write failed: '+e.message, 'warn'); }
+  log(`FORK PROOF: ${sourceOutputId.slice(0,12)}... double-consumed by ${firstTx.type}/${secondTx.type}`, 'warn');
+  emit('wallet.fork_proof.result', { ok:true, event:'detected', proof:forkProofSummary(proof) });
+  return proof;
+}
+async function maybeRecordForkProofForTx(tx){
+  const sourceId = conflictingConsumedId(tx);
+  if(!sourceId) return null;
+  try { return await recordForkProof(sourceId, tx); }
+  catch(e){ log('Fork proof record failed: '+e.message, 'warn'); return null; }
+}
+function openForkProofDB(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(FORK_PROOF_DB_NAME, FORK_PROOF_DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains('fork_proofs')){
+        const store = db.createObjectStore('fork_proofs', { keyPath:'id' });
+        store.createIndex('source_output_id', 'source_output_id', { unique:false });
+        store.createIndex('detected_at', 'detected_at', { unique:false });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error || new Error('fork_proofs open failed'));
+  });
+}
+async function putForkProofStore(proof){
+  const db = await openForkProofDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('fork_proofs', 'readwrite');
+    tx.objectStore('fork_proofs').put(proof);
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = e => reject(e.target.error || new Error('fork_proofs put failed'));
+  });
+}
+async function hydrateForkProofStore(){
+  try{
+    const db = await openForkProofDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction('fork_proofs', 'readonly');
+      const req = tx.objectStore('fork_proofs').getAll();
+      req.onsuccess = () => { for(const proof of (req.result || [])) FORK_PROOFS.set(proof.id, proof); resolve(true); };
+      req.onerror = e => reject(e.target.error || new Error('fork_proofs read failed'));
+    });
+    persistForkProofs();
+  }catch(e){ log('fork_proofs IndexedDB unavailable: '+e.message, 'warn'); }
+}
+function persistForkProofs(){
+  if(!SID) return;
+  try{ localStorage.setItem('nx4_fork_proofs_'+SID, JSON.stringify([...FORK_PROOFS.entries()])); }
+  catch(e){ log('Fork proof persist error: '+e.message, 'warn'); }
+}
+function loadForkProofs(){
+  if(!SID) return;
+  try{
+    const fp=localStorage.getItem('nx4_fork_proofs_'+SID);
+    if(fp) FORK_PROOFS=new Map(JSON.parse(fp));
+  }catch(e){ log('Fork proof load error: '+e.message, 'warn'); }
+}
+function handleForkProofRequest(channel, payload){
+  const _reqId = payload?._reqId;
+  if(channel === 'wallet.fork_proof.list'){
+    emit('wallet.fork_proof.result', { _reqId, ok:true, data:[...FORK_PROOFS.values()].map(forkProofSummary) });
+    return true;
+  }
+  if(channel === 'wallet.fork_proof.export'){
+    const id = payload?.id;
+    const proof = id ? FORK_PROOFS.get(id) : null;
+    if(!proof) emit('wallet.fork_proof.result', { _reqId, ok:false, error:'not found' });
+    else emit('wallet.fork_proof.result', { _reqId, ok:true, proof });
+    return true;
+  }
+  return false;
+}
+
+async function handleWalletLockRequest(channel, payload){
+  const _reqId = payload?._reqId;
+  try{
+    if(channel === 'wallet.lock.create'){
+      if(!KP || !SID) throw new Error('wallet not initialized');
+      const src = unspent().find(o => Number(o.amount||0) >= Number(payload.amount||1));
+      if(!src) throw new Error('no spendable output for lock');
+      const tx = await buildLockTx({srcOutput:src, amount:Number(payload.amount||1), cpSid:payload.counterparty_sid||SID, cpPub:payload.counterparty_pubkey||KP._pub, termsRaw:payload.terms_raw||'', windowHours:Number(payload.window_hours||0)});
+      const ok = await acceptTx(tx);
+      if(!ok) throw new Error('LOCK rejected by verifier');
+      emit('nexus.v4.transition', {type:'TRANSITION', tx});
+      emit('wallet.lock.result', {_reqId, ok:true, lock_id:tx.lock.id, output_id:tx.lock.id, lock:tx.lock, tx});
+      return true;
+    }
+    if(channel === 'wallet.lock.resolve'){
+      const lock = LOCKS.get(payload.lock_id);
+      if(!lock) throw new Error('lock not found');
+      const tx = await buildResolveTx({lockOutput:lock, resolutionType:payload.resolution||'RELEASE', force:!!payload.force});
+      const ok = await acceptTx(tx);
+      if(!ok) throw new Error('RESOLVE rejected by verifier');
+      emit('nexus.v4.transition', {type:'TRANSITION', tx});
+      emit('wallet.lock.result', {_reqId, ok:true, lock_id:payload.lock_id, tx});
+      return true;
+    }
+    if(channel === 'wallet.lock.verify'){
+      const tx = payload.tx;
+      if(!tx || tx.type !== 'LOCK') throw new Error('LOCK tx required');
+      const r = await verifyLock(tx);
+      emit('wallet.lock.result', {_reqId, ok:!!r.ok, error:r.ok?null:r.r, lock_id:tx.lock&&tx.lock.id, tx});
+      return true;
+    }
+  }catch(e){ emit('wallet.lock.result', {_reqId, ok:false, error:e.message}); return true; }
+  return false;
+}
+
+// ══════════════════════════════════════════════════════
+// VERIFICATION — all four rules in strict order
+// ══════════════════════════════════════════════════════
+
+async function verifySpend(tx){
+  if(tx.v!==4||tx.type!=='SPEND') return {ok:false,r:'Not NX4 SPEND'};
+  if(!tx.consumes?.length) return {ok:false,r:'No consumed sources declared'};
+
+  // Rule 1: consumed-source check — before any crypto
+  for(const cid of tx.consumes)
+    if(CONSUMED.has(cid)){ await recordForkProof(cid, tx); return {ok:false,r:`DOUBLE-SPEND: source ${cid.slice(0,12)}... already consumed`}; }
+
+  // Rule 2: local state first, then existence proof chain for foreign sources
+  const srcs = [];
+  for(const cid of tx.consumes){
+    const local = OUTPUTS.get(cid);
+    if(local){ srcs.push(local); }
+    else {
+      const carried=(tx.source_outputs||[]).find(s=>s.id===cid);
+      if(!carried) return {ok:false,r:`Source ${cid.slice(0,12)}... not in local state — carry source_outputs with _proof`};
+      const ec=await verifyOutputExistence(carried,0,OUTPUTS);
+      if(!ec.ok) return {ok:false,r:`Existence proof failed for ${cid.slice(0,12)}...: ${ec.reason}`};
+      srcs.push(carried);
+    }
+  }
+
+  // Authorization: signer must own every consumed source (STEP 6: x AND y)
+  for(const src of srcs){
+    if(src.owner_pubkey.x !== tx.from_pubkey.x || src.owner_pubkey.y !== tx.from_pubkey.y)
+      return {ok:false,r:`AUTHORIZATION FAILURE: signer does not own source ${src.id.slice(0,12)}... owner=${src.owner_pubkey.x.slice(0,16)}... signer=${tx.from_pubkey.x.slice(0,16)}...`};
+  }
+
+  // Rule 3: signature
+  const sigBody = {consumes:tx.consumes, creates_ids:tx.creates.map(o=>o.id), from_sid:tx.from_sid, ts:tx.ts};
+  if(!await verify(tx.from_pubkey, sigBody, tx.sig)) return {ok:false,r:'Invalid sender signature'};
+
+  // Rule 4: conservation — exact integer equality, no epsilon
+  const inTotal  = srcs.reduce((s,o)=>s+o.amount, 0);
+  const outTotal = tx.creates.reduce((s,o)=>s+o.amount, 0);
+  if(!Number.isSafeInteger(inTotal)||!Number.isSafeInteger(outTotal))
+    return {ok:false,r:'Amount exceeds safe integer range'};
+  if(inTotal !== outTotal)
+    return {ok:false,r:`CONSERVATION VIOLATION: inputs=${inTotal} outputs=${outTotal} (Δ=${inTotal-outTotal})`};
+
+  for(const out of tx.creates){
+    const exp = await outputId(out.source_id, out.owner_pubkey.x, out.amount, out.symbol, out.salt, out.type);
+    if(exp !== out.id) return {ok:false,r:`Output ID mismatch: ${out.id.slice(0,12)}...`};
+    if(!tx.consumes.includes(out.source_id)) return {ok:false,r:'Output source_id not in consumes list'};
+  }
+  return {ok:true};
+}
+
+async function verifyLock(tx){
+  if(tx.v!==4||tx.type!=='LOCK') return {ok:false,r:'Not NX4 LOCK'};
+  if(!tx.consumes?.length) return {ok:false,r:'No consumed sources declared'};
+  const lock = tx.lock;
+  if(!lock) return {ok:false,r:'Missing lock object'};
+
+  // Rule 1: consumed-source check
+  for(const cid of tx.consumes)
+    if(CONSUMED.has(cid)){ await recordForkProof(cid, tx); return {ok:false,r:`DOUBLE-SPEND: source ${cid.slice(0,12)}... already consumed`}; }
+
+  // Rule 2: local state first, then existence proof chain for foreign sources
+  const srcs = [];
+  for(const cid of tx.consumes){
+    const local = OUTPUTS.get(cid);
+    if(local){ srcs.push(local); }
+    else {
+      const carried=(tx.source_outputs||[]).find(s=>s.id===cid);
+      if(!carried) return {ok:false,r:`Source ${cid.slice(0,12)}... not in local state — carry source_outputs with _proof`};
+      const ec=await verifyOutputExistence(carried,0,OUTPUTS);
+      if(!ec.ok) return {ok:false,r:`Existence proof failed for ${cid.slice(0,12)}...: ${ec.reason}`};
+      srcs.push(carried);
+    }
+  }
+
+  // Authorization (STEP 6: x AND y)
+  for(const src of srcs){
+    if(src.owner_pubkey.x !== tx.from_pubkey.x || src.owner_pubkey.y !== tx.from_pubkey.y)
+      return {ok:false,r:`AUTHORIZATION FAILURE: signer does not own source ${src.id.slice(0,12)}...`};
+  }
+
+  // Rule 3: signature
+  const sigBody = {consumes:tx.consumes, lock_id:lock.id, creates_change_ids:tx.creates_change.map(o=>o.id), from_sid:tx.from_sid, ts:tx.ts};
+  if(!await verify(tx.from_pubkey, sigBody, tx.sig)) return {ok:false,r:'Invalid lock signature'};
+
+  // Lock ID verification
+  const expLockId = await lockId(lock.source_id, lock.owner_pubkey.x, lock.counterparty_pubkey.x, lock.amount, lock.symbol, lock.terms_hash, lock.expiry);
+  if(expLockId !== lock.id) return {ok:false,r:'Lock ID does not verify (owner or counterparty pubkey mismatch)'};
+
+  // Rule 4: conservation — exact integer equality, no epsilon
+  const inTotal  = srcs.reduce((s,o)=>s+o.amount,0);
+  const outTotal = lock.amount + tx.creates_change.reduce((s,o)=>s+o.amount,0);
+  if(!Number.isSafeInteger(inTotal)||!Number.isSafeInteger(outTotal))
+    return {ok:false,r:'Amount exceeds safe integer range'};
+  if(inTotal !== outTotal)
+    return {ok:false,r:`CONSERVATION VIOLATION: source=${inTotal} lock+change=${outTotal}`};
+
+  return {ok:true};
+}
+
+async function verifyResolve(tx){
+  if(tx.v!==4||tx.type!=='RESOLVE') return {ok:false,r:'Not NX4 RESOLVE'};
+  if(!tx.consumes_lock?.length) return {ok:false,r:'No lock ID declared'};
+
+  // Rule 1: consumed-lock check
+  for(const lid of tx.consumes_lock)
+    if(CONSUMED.has(lid)){ await recordForkProof(lid, tx); return {ok:false,r:`DOUBLE-RESOLVE: lock ${lid.slice(0,12)}... already consumed`}; }
+
+  // Rule D: resolve lock against local authoritative LOCKS map.
+  // A pasted resolve for a lock this wallet never accepted is rejected.
+  // tx.lock_snapshot is only used as a fallback label; the authoritative
+  // data always comes from LOCKS.get().
+  const lid = tx.consumes_lock[0];
+  const lock = LOCKS.get(lid);
+  if(!lock)
+    return {ok:false,r:`Lock ${lid.slice(0,12)}... not in local accepted state — cannot verify resolve (paste the LOCK transition first)`};
+
+  // Rule 2: authorization — resolver must be lock owner (STEP 6: x AND y)
+  if(lock.owner_pubkey.x !== tx.from_pubkey.x || lock.owner_pubkey.y !== tx.from_pubkey.y)
+    return {ok:false,r:`AUTHORIZATION FAILURE: resolver is not the lock owner (expected ${lock.owner_pubkey.x.slice(0,16)}... got ${tx.from_pubkey.x.slice(0,16)}...)`};
+
+  // Challenge window: derived from local lock.expiry — tx boolean is ignored
+  const window_expired = Date.now() > lock.expiry;
+  if(!window_expired)
+    return {ok:false,r:`PREMATURE RESOLVE: challenge window has not expired (expires ${new Date(lock.expiry).toLocaleString()})`};
+
+  // Rule 3: signature
+  const sigBody = {type:'RESOLVE', consumes_lock:tx.consumes_lock, resolution:tx.resolution, creates_ids:tx.creates.map(o=>o.id), from_sid:tx.from_sid, ts:tx.ts};
+  if(!await verify(tx.from_pubkey, sigBody, tx.sig)) return {ok:false,r:'Invalid resolve signature'};
+
+  // Rule 4: conservation
+  if(tx.resolution==='SLASH'){
+    if(tx.creates.length!==0) return {ok:false,r:'SLASH must create 0 outputs'};
+  } else {
+    if(tx.creates.length!==1) return {ok:false,r:`${tx.resolution} must create exactly 1 output`};
+    if(tx.creates[0].amount !== lock.amount)
+      return {ok:false,r:`CONSERVATION VIOLATION: lock=${lock.amount} output=${tx.creates[0].amount}`};
+    if(tx.resolution==='RELEASE' && (tx.creates[0].owner_pubkey.x !== lock.owner_pubkey.x || tx.creates[0].owner_pubkey.y !== lock.owner_pubkey.y))
+      return {ok:false,r:'RELEASE output must be bound to lock owner pubkey'};
+    if(tx.resolution==='AWARD' && (tx.creates[0].owner_pubkey.x !== lock.counterparty_pubkey.x || tx.creates[0].owner_pubkey.y !== lock.counterparty_pubkey.y))
+      return {ok:false,r:`AWARD output must be bound to counterparty pubkey from local lock record`};
+    for(const out of tx.creates){
+      const exp = await outputId(out.source_id, out.owner_pubkey.x, out.amount, out.symbol, out.salt, out.type);
+      if(exp!==out.id) return {ok:false,r:`Resolve output ID mismatch: ${out.id.slice(0,12)}...`};
+    }
+  }
+  return {ok:true};
+}
+
+async function acceptTx(tx){
+  let result;
+  if(tx.type==='SPEND')   result = await verifySpend(tx);
+  else if(tx.type==='LOCK')    result = await verifyLock(tx);
+  else if(tx.type==='RESOLVE') result = await verifyResolve(tx);
+  else return false;
+  if(!result.ok){ log(result.r,'err'); return false; }
+
+  const entry = {tx, ts:Date.now()};
+  if(tx.type==='SPEND'){
+    for(const cid of tx.consumes) CONSUMED.add(cid);
+    const spendSrc=OUTPUTS.get(tx.consumes[0])||(tx.source_outputs||[]).find(s=>s.id===tx.consumes[0]);
+    for(const out of tx.creates){
+      if(out.owner_sid===SID){
+        // STEP 3c: Store full proof-hop data so the NEXT receiver can verify
+        // the entire chain. spendSrc carries its own _proof (Russian-doll nesting).
+        out._proof={
+          type:'SPEND',
+          source_output:spendSrc,
+          sig:tx.sig,
+          from_pubkey:tx.from_pubkey,
+          from_sid:tx.from_sid,
+          ts:tx.ts,
+          creates_ids:tx.creates.map(o=>o.id)
+        };
+        OUTPUTS.set(out.id,out);
+      }
+    }
+    TOKEN_SYM = tx.creates[0]?.symbol||TOKEN_SYM;
+    entry.label = `SPEND: consumed ${tx.consumes[0].slice(0,10)}...`;
+  }
+  if(tx.type==='LOCK'){
+    for(const cid of tx.consumes) CONSUMED.add(cid);
+    LOCKS.set(tx.lock.id, tx.lock);
+    const lockSrc=OUTPUTS.get(tx.consumes[0])||(tx.source_outputs||[]).find(s=>s.id===tx.consumes[0]);
+    for(const out of tx.creates_change){
+      if(out.owner_sid===SID){
+        // STEP 3c: LOCK_CHANGE — verifier reconstructs LOCK sigBody shape
+        out._proof={
+          type:'LOCK_CHANGE',
+          source_output:lockSrc,
+          sig:tx.sig,
+          from_pubkey:tx.from_pubkey,
+          from_sid:tx.from_sid,
+          ts:tx.ts,
+          lock_id:tx.lock.id,
+          creates_change_ids:tx.creates_change.map(o=>o.id)
+        };
+        OUTPUTS.set(out.id,out);
+      }
+    }
+    TOKEN_SYM = tx.lock.symbol||TOKEN_SYM;
+    entry.label = `LOCK: ${tx.lock.amount} ${tx.lock.symbol} locked · expiry ${new Date(tx.lock.expiry).toLocaleString()}`;
+  }
+  if(tx.type==='RESOLVE'){
+    // Capture authoritative lock BEFORE deletion — tx.lock_snapshot is attacker-controlled
+    const resolvedLock = LOCKS.get(tx.consumes_lock[0]);
+    for(const lid of tx.consumes_lock){ CONSUMED.add(lid); LOCKS.delete(lid); }
+    for(const out of tx.creates){
+      if(out.owner_sid===SID){
+        // STEP 3c: Full RESOLVE proof with authoritative lock data.
+        // RESOLVE sigBody includes type:'RESOLVE' — asymmetric with SPEND/LOCK.
+        out._proof={
+          type:'RESOLVE',
+          lock_output:resolvedLock||tx.lock_snapshot,  // prefer local, fallback to snapshot
+          sig:tx.sig,
+          from_pubkey:tx.from_pubkey,
+          from_sid:tx.from_sid,
+          ts:tx.ts,
+          resolution:tx.resolution,
+          creates_ids:tx.creates.map(o=>o.id)
+        };
+        OUTPUTS.set(out.id,out);
+      }
+    }
+    entry.label = `RESOLVE(${tx.resolution}): lock ${tx.consumes_lock[0].slice(0,10)}... → ${tx.creates.map(o=>`${o.amount} ${o.symbol} → ${o.owner_sid}`).join(', ')||'BURNED'}`;
+  }
+  JOURNAL.push(entry);
+  persist();
+  renderAll();
+  log(entry.label, tx.type==='LOCK'?'lock':tx.type==='RESOLVE'?'resolve':'ok');
+  return true;
+}
+
+// ── WALLET READ API ──
+function broadcastWalletState(){
+  if(!mounted||!_kernelPort||!SID) return;
+  _kernelPort.postMessage({type:'EMIT',channel:'nexus.wallet.state',payload:{
+    type:'WALLET_STATE',sid:SID,
+    balance:balance(),lockedBalance:lockedBalance(),symbol:TOKEN_SYM,
+    unspentCount:unspent().length,lockedCount:lockedOuts().length,
+    activeLocks:lockedOuts().map(l=>({id:l.id,amount:l.amount,symbol:l.symbol,
+      terms_raw:l.terms_raw||'',expiry:l.expiry,counterparty_sid:l.counterparty_sid,
+      resolvable:Date.now()>l.expiry})),ts:Date.now()
+  }});
+}
+
+// ── SOCIAL STAKE ──
+let _stakeCp=null;
+function parseStakeAddr(){
+  const val=document.getElementById('stake-addr').value.trim();
+  const el=document.getElementById('stake-addr-parsed');
+  const parsed=parseAddr(val);
+  if(parsed){el.className='parsed-addr ok';el.style.display='block';
+    el.textContent=`✓ SID: ${parsed.sid} · pubkey.x: ${parsed.pub.x.slice(0,20)}...`;
+    _stakeCp=parsed;updateStakePreview();
+  }else if(val.length>5){el.className='parsed-addr err';el.style.display='block';
+    el.textContent='✗ Not a valid NX4ADDR — must start NX4ADDR:SID:x:y';_stakeCp=null;
+  }else{el.style.display='none';_stakeCp=null;}
+}
+function updateStakePreview(){
+  const eventId=document.getElementById('stake-event-id').value.trim();
+  const srcId=document.getElementById('stake-src-sel').value;
+  const amtTokens=parseFloat(document.getElementById('stake-amt').value)||0;
+  const hours=parseInt(document.getElementById('stake-window').value)||72;
+  const p=document.getElementById('stake-preview');
+  const eStatus=document.getElementById('stake-event-status');
+  const isValidHex=/^[0-9a-f]{64}$/i.test(eventId);
+  const isNote=eventId.startsWith('note1')&&eventId.length>10;
+  if(eventId.length>5){
+    eStatus.style.display='block';
+    if(isValidHex){eStatus.className='parsed-addr ok';eStatus.textContent='✓ Valid Nostr event ID (hex)';}
+    else if(isNote){eStatus.className='parsed-addr ok';eStatus.textContent='✓ Nostr note ID (bech32)';}
+    else{eStatus.className='parsed-addr err';eStatus.textContent='✗ Must be 64-char hex or note1... bech32';}
+  }else{eStatus.style.display='none';}
+  if(!srcId||!eventId||(!isValidHex&&!isNote)){p.style.display='none';return;}
+  const src=OUTPUTS.get(srcId);if(!src)return;
+  const changeAmt=src.amount-toUnits(amtTokens);
+  p.style.display='block';
+  document.getElementById('stp-post').textContent=eventId.length>24?eventId.slice(0,24)+'...':eventId;
+  document.getElementById('stp-terms').textContent=`nostr:event:${eventId}`;
+  document.getElementById('stp-amt').textContent=`${amtTokens} ${src.symbol} · change ${toTokens(changeAmt>=0?changeAmt:0)} back to self`;
+  document.getElementById('stp-against').textContent=_stakeCp?`${_stakeCp.sid} · pubkey cryptographically bound`:'(no counterparty yet)';
+  document.getElementById('stp-expiry').textContent=new Date(Date.now()+hours*3600000).toLocaleString();
+}
+async function buildStake(){
+  const eventId=document.getElementById('stake-event-id').value.trim();
+  const srcId=document.getElementById('stake-src-sel').value;
+  const amtTokens=parseFloat(document.getElementById('stake-amt').value);
+  const amt=toUnits(amtTokens);
+  const hours=parseInt(document.getElementById('stake-window').value)||72;
+  const isValidHex=/^[0-9a-f]{64}$/i.test(eventId);
+  const isNote=eventId.startsWith('note1')&&eventId.length>10;
+  if(!eventId||(!isValidHex&&!isNote)){toast('Enter a valid Nostr event ID','warn');return;}
+  if(!srcId){toast('Select source output','warn');return;}
+  if(!_stakeCp){toast('Enter counterparty NX4ADDR','warn');return;}
+  if(!amtTokens||amtTokens<=0){toast('Invalid amount','warn');return;}
+  const src=OUTPUTS.get(srcId);if(!src){toast('Source not found','err');return;}
+  if(CONSUMED.has(srcId)){toast('Source consumed!','err');return;}
+  if(amt>src.amount){toast('Exceeds source amount','err');return;}
+  try{
+    const tx=await buildLockTx({srcOutput:src,amount:amt,cpSid:_stakeCp.sid,cpPub:_stakeCp.pub,
+      termsRaw:`nostr:event:${eventId}`,windowHours:hours});
+    await acceptTx(tx);autoTransport(tx);
+    document.getElementById('stake-str').textContent='NX4:'+btoa(JSON.stringify(tx));
+    document.getElementById('stake-out').classList.add('show');
+    toast('Stake created · auto-broadcast','ok');renderStake();
+  }catch(e){toast(e.message,'err');log('Stake error: '+e.message,'err');}
+}
+function renderStake(){
+  const u=unspent();
+  const ssel=document.getElementById('stake-src-sel');
+  if(ssel){ssel.innerHTML='<option value="">— select —</option>';
+    u.forEach(o=>{const opt=document.createElement('option');opt.value=o.id;
+      opt.textContent=`${o.id.slice(0,10)}... · ${fmt(o.amount)} ${o.symbol}`;ssel.appendChild(opt);});}
+  const allLocks=lockedOuts();
+  const sl=document.getElementById('active-stakes-list');
+  const badge=document.getElementById('active-stakes-badge');
+  if(badge){badge.style.display=allLocks.length?'':'none';badge.textContent=allLocks.length;}
+  if(sl){
+    if(!allLocks.length){sl.innerHTML='<div style="color:var(--muted);font-size:10px">No active stakes.</div>';}
+    else{sl.innerHTML=allLocks.map(l=>{
+      const isSocial=l.terms_raw&&l.terms_raw.startsWith('nostr:event:');
+      const eventId=isSocial?l.terms_raw.replace('nostr:event:',''):null;
+      const expired=Date.now()>l.expiry;
+      return `<div class="stake-card ${isSocial?'social':''}">
+        <div class="stake-meta">
+          <div style="flex:1">
+            <div style="font-size:10px;color:var(--text);font-weight:500">${isSocial?'📡 Social Stake':'⛓ General Lock'}</div>
+            ${isSocial?`<div class="stake-event">nostr:event:${eventId.slice(0,28)}...</div>`:''}
+            <div class="stake-terms">${l.terms_raw||(l.id.slice(0,20)+'...')}</div>
+            <div style="font-size:9px;color:var(--dim);margin-top:3px">${fmt(l.amount)} ${l.symbol} · vs ${l.counterparty_sid}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;padding-left:10px">
+            <div class="countdown ${expired?'ready':'ticking'}" data-expiry="${l.expiry}">${expired?'✓ RESOLVABLE':'...'}</div>
+            <div style="font-size:8px;color:var(--muted);margin-top:4px">${new Date(l.expiry).toLocaleDateString()}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');}
+  }
+  // Reputation
+  const resolves=JOURNAL.filter(e=>e.tx.type==='RESOLVE');
+  const released=resolves.filter(e=>e.tx.resolution==='RELEASE').length;
+  const awarded=resolves.filter(e=>e.tx.resolution==='AWARD').length;
+  const slashed=resolves.filter(e=>e.tx.resolution==='SLASH').length;
+  const total=released+awarded+slashed;
+  const repR=document.getElementById('rep-released');
+  const repA=document.getElementById('rep-awarded');
+  const repS=document.getElementById('rep-slashed');
+  const repBar=document.getElementById('rep-bar-fill');
+  const repSum=document.getElementById('rep-summary');
+  if(repR)repR.textContent=released;
+  if(repA)repA.textContent=awarded;
+  if(repS)repS.textContent=slashed;
+  if(repBar){const pct=total?Math.round(((released+awarded)/total)*100):0;
+    repBar.style.width=pct+'%';
+    repBar.style.background=pct>66?'var(--green)':pct>33?'var(--amber)':'var(--danger)';}
+  if(repSum){repSum.textContent=total===0
+    ?'No resolved stakes yet. Your on-chain conviction record starts here.'
+    :`${total} resolved · ${released} held · ${awarded} conceded · ${slashed} burned · conviction ${Math.round(((released+awarded)/total)*100)}%`;}
+}
+function renderMiniActivity(){
+  const card=document.getElementById('mini-activity-card');
+  const list=document.getElementById('mini-activity-list');
+  if(!card||!list)return;
+  const recent=[...JOURNAL].reverse().slice(0,4);
+  if(!recent.length){card.style.display='none';return;}
+  card.style.display='block';
+  const colorOf={SPEND:'var(--green)',LOCK:'var(--indigo)',RESOLVE:'var(--cyan)',GENESIS_CLAIM:'var(--gold)'};
+  list.innerHTML=recent.map(e=>{
+    const label=e.tx.type==='RESOLVE'?`RESOLVE · ${e.tx.resolution}`:e.tx.type;
+    return `<div class="mini-act-row"><span style="color:${colorOf[e.tx.type]||'var(--text)'}">${label}</span><span style="color:var(--muted)">${new Date(e.ts).toLocaleTimeString()}</span></div>`;
+  }).join('');
+}
+// ── LIVE COUNTDOWNS ──
+let _countdownStarted=false;
+function startCountdowns(){
+  if(_countdownStarted)return;_countdownStarted=true;
+  setInterval(()=>{
+    document.querySelectorAll('.countdown[data-expiry]').forEach(el=>{
+      const exp=parseInt(el.dataset.expiry);const remaining=exp-Date.now();
+      if(remaining<=0){el.textContent='✓ RESOLVABLE';el.className='countdown ready';}
+      else{const h=Math.floor(remaining/3600000);const m=Math.floor((remaining%3600000)/60000);const s=Math.floor((remaining%60000)/1000);
+        el.textContent=h>23?`${Math.floor(h/24)}d ${h%24}h`:`${h}h ${m}m ${s}s`;el.className='countdown ticking';}
+    });
+  },1000);
+}
+
+// ── GENESIS ──
+async function issueLocalGenesis(){
+  const amtTokens = parseFloat(document.getElementById('gen-amt').value)||10000;
+  const amt = toUnits(amtTokens); // convert human-readable tokens to integer units
+  const sym = document.getElementById('gen-sym').value.trim().toUpperCase()||'ATT';
+  const salt = rSalt();
+  const id = await outputId('GENESIS_ROOT', KP._pub.x, amt, sym, salt, 'genesis');
+  const body = {id, source_id:'GENESIS_ROOT', owner_sid:SID, owner_pubkey:KP._pub, amount:amt, symbol:sym, salt, type:'genesis'};
+  const sig = await sign(KP.privateKey, body); // self-signed demo
+  const gOut = {...body, sig, genesis_authority_pub:KP._pub}; // self is authority
+  const r = await claimGenesisOutput(gOut);
+  if(r.ok){ toast(`Genesis: ${amtTokens} ${sym}`,'ok'); renderAll(); }
+  else toast(r.reason,'err');
+}
+
+async function claimGenesisFromPaste(){
+  const txt = document.getElementById('genesis-paste').value.trim();
+  if(!txt){ toast('Paste JSON first','warn'); return; }
+  let obj; try{ obj=JSON.parse(txt); }catch(e){ toast('Invalid JSON','err'); return; }
+  const r = await claimGenesisOutput(obj);
+  if(r.ok){ toast('Genesis claimed!','ok'); renderAll(); }
+  else toast(r.reason,'err');
+}
+
+async function claimGenesisOutput(gOut){
+  if(!gOut?.id) return {ok:false,reason:'Missing id'};
+  if(gOut.source_id!=='GENESIS_ROOT') return {ok:false,reason:'source_id must be GENESIS_ROOT'};
+  if(!gOut.genesis_authority_pub) return {ok:false,reason:'Missing genesis_authority_pub — unverifiable genesis'};
+
+  // Rule 1: consumed check
+  if(CONSUMED.has(gOut.id)){
+    updateGenesisBanner('err','✗ DOUBLE-CLAIM BLOCKED — genesis output already consumed. This file is a copy.');
+    return {ok:false,reason:`DOUBLE-CLAIM BLOCKED: genesis output ${gOut.id.slice(0,12)}... already consumed`};
+  }
+
+  // Rule 2: genesis authority signature verification
+  // The sig must have been produced by genesis_authority_pub over the output body
+  const bodyForSig = {id:gOut.id, source_id:gOut.source_id, owner_sid:gOut.owner_sid, owner_pubkey:gOut.owner_pubkey, amount:gOut.amount, symbol:gOut.symbol, salt:gOut.salt, type:gOut.type};
+  const sigValid = await verify(gOut.genesis_authority_pub, bodyForSig, gOut.sig);
+  if(!sigValid) return {ok:false,reason:'GENESIS AUTHORITY SIGNATURE INVALID — genesis output is fraudulent'};
+
+  // Rule 3: authority consistency — if we've seen a genesis before, it must be from the same authority (STEP 6: x AND y)
+  if(GENESIS_AUTHORITY_PUB && (gOut.genesis_authority_pub.x !== GENESIS_AUTHORITY_PUB.x || gOut.genesis_authority_pub.y !== GENESIS_AUTHORITY_PUB.y))
+    return {ok:false,reason:'GENESIS AUTHORITY MISMATCH — different authority from first-seen genesis'};
+
+  // Rule 4: output ID verification
+  const exp = await outputId(gOut.source_id, gOut.owner_pubkey.x, gOut.amount, gOut.symbol, gOut.salt, gOut.type);
+  if(exp !== gOut.id) return {ok:false,reason:'Genesis output ID does not verify'};
+
+  // Accept
+  CONSUMED.add(gOut.id);
+  if(!GENESIS_AUTHORITY_PUB) GENESIS_AUTHORITY_PUB = gOut.genesis_authority_pub;
+
+  const spendable = await mkOutput({source_id:gOut.id, ownerSid:SID, ownerPub:KP._pub, amount:gOut.amount, symbol:gOut.symbol, type:'genesis-claim', sigKey:KP.privateKey});
+  spendable._proof = {type:'GENESIS', genesis_output:gOut};
+  OUTPUTS.set(spendable.id, spendable);
+  TOKEN_SYM = gOut.symbol;
+  JOURNAL.push({tx:{type:'GENESIS_CLAIM',v:4,genesis_id:gOut.id,spendable_id:spendable.id,amount:gOut.amount,symbol:gOut.symbol,ts:Date.now()},ts:Date.now(),label:`GENESIS_CLAIM: ${toTokens(gOut.amount)} ${gOut.symbol}`});
+
+  updateGenesisBanner('ok',`✓ Genesis claimed — ${toTokens(gOut.amount)} ${gOut.symbol} · Authority sig: verified · Output: ${spendable.id.slice(0,14)}...`);
+  showGenesisAuthority(gOut.genesis_authority_pub);
+  persist();
+  return {ok:true};
+}
+
+function updateGenesisBanner(type, msg){
+  const b = document.getElementById('genesis-banner');
+  b.className='notice '+type; b.textContent=msg;
+}
+function showGenesisAuthority(pub){
+  document.getElementById('genesis-authority-display').style.display='block';
+  document.getElementById('genesis-authority-key').textContent=`pubkey.x: ${pub.x}`;
+}
+
+// ── RESET ──
+function resetAllData(){
+  if(!confirm('This will delete ALL wallet data including keys, outputs, and the genesis authority. Continue?')) return;
+  if(!confirm('Are you sure? This cannot be undone.')) return;
+  // Clear per-SID state
+  if(SID){
+    localStorage.removeItem('nx4_outputs_'+SID);
+    localStorage.removeItem('nx4_locks_'+SID);
+    localStorage.removeItem('nx4_consumed_'+SID);
+    localStorage.removeItem('nx4_journal_'+SID);
+    localStorage.removeItem('nx4_sym_'+SID);
+    localStorage.removeItem('nx4_fork_proofs_'+SID);
+  }
+  // Clear per-slot keypair
+  localStorage.removeItem(KP_KEY);
+  // Clear global genesis authority pin
+  localStorage.removeItem('nx4_genesis_authority');
+  // Clear outbox
+  localStorage.removeItem(OUTBOX_KEY);
+  // Clear session storage slot
+  sessionStorage.removeItem('nx4_wallet_slot');
+  log('ALL DATA CLEARED — reloading...','warn');
+  setTimeout(()=>location.reload(), 500);
+}
+
+// ── PERSISTENCE ──
+function persist(){
+  if(!SID) return;
+  try{
+    localStorage.setItem('nx4_outputs_'+SID,  JSON.stringify([...OUTPUTS.entries()]));
+    localStorage.setItem('nx4_locks_'+SID,    JSON.stringify([...LOCKS.entries()]));
+    localStorage.setItem('nx4_consumed_'+SID, JSON.stringify([...CONSUMED]));
+    localStorage.setItem('nx4_journal_'+SID,  JSON.stringify(JOURNAL.slice(-500)));
+    localStorage.setItem('nx4_sym_'+SID, TOKEN_SYM);
+    persistForkProofs();
+    // FIX 2: Genesis authority is stored under a GLOBAL key — not per-SID.
+    // The genesis authority is a property of the NETWORK, not of a single wallet identity.
+    // Without this fix, opening a new tab creates a fresh SID with no authority pin,
+    // allowing an attacker to present a forged genesis from a different authority.
+    if(GENESIS_AUTHORITY_PUB) localStorage.setItem('nx4_genesis_authority', JSON.stringify(GENESIS_AUTHORITY_PUB));
+  }catch(e){ log('Persist error: '+e.message,'warn'); }
+}
+function loadState(){
+  try{
+    const o=localStorage.getItem('nx4_outputs_'+SID); if(o) OUTPUTS=new Map(JSON.parse(o));
+    const l=localStorage.getItem('nx4_locks_'+SID);   if(l) LOCKS=new Map(JSON.parse(l));
+    const c=localStorage.getItem('nx4_consumed_'+SID);if(c) CONSUMED=new Set(JSON.parse(c));
+    const j=localStorage.getItem('nx4_journal_'+SID); if(j) JOURNAL=JSON.parse(j);
+    const s=localStorage.getItem('nx4_sym_'+SID);     if(s) TOKEN_SYM=s;
+    loadForkProofs();
+    // FIX 2: Read genesis authority from GLOBAL key — survives new tabs, new SIDs, new slots.
+    // A fresh tab with a fresh identity still inherits the network's trusted genesis authority.
+    const ga=localStorage.getItem('nx4_genesis_authority'); if(ga) GENESIS_AUTHORITY_PUB=JSON.parse(ga);
+  }catch(e){ log('Load error: '+e.message,'warn'); }
+}
+
+// ── BOOT ──
+async function boot(){
+  log('NEXUS Wallet v4 · auto-transport booting...','info');
+  log('Wallet slot: ' + WALLET_SLOT + ' (per-tab — open a new tab for a second wallet)','info');
+  log('Fixes: ownership binding, AWARD pubkey, real challenge window, genesis authority sig, authorization, conservation','info');
+  log('FIX 1: kernel death watchdog · FIX 2: global genesis pin · FIX 3: RESOLVE recursion · FIX 4: MessagePort IPC','info');
+  const stored = localStorage.getItem(KP_KEY); // per-tab slot key
+  if(stored){
+    try{
+      const {pub,priv}=JSON.parse(stored);
+      KP={
+        privateKey: await crypto.subtle.importKey('jwk',priv,{name:'ECDSA',namedCurve:'P-256'},true,['sign']),
+        publicKey:  await crypto.subtle.importKey('jwk',{kty:pub.kty,crv:pub.crv,x:pub.x,y:pub.y},{name:'ECDSA',namedCurve:'P-256'},true,['verify']),
+        _pub:pub,_priv:priv
+      };
+      SID=(await sha256(JSON.stringify(pub))).slice(0,8);
+      loadState();
+      log('Keypair restored · SID: '+SID,'ok');
+    }catch(e){ await genKP(); }
+  } else { await genKP(); }
+  // FIX 2: Always load global genesis authority — even if genKP() created a fresh identity.
+  // loadState() loads it when restoring an existing keypair. This covers the fresh-keypair path.
+  // Without this, a fresh tab has GENESIS_AUTHORITY_PUB=null and accepts any authority.
+  if(!GENESIS_AUTHORITY_PUB){
+    try{
+      const ga=localStorage.getItem('nx4_genesis_authority');
+      if(ga) { GENESIS_AUTHORITY_PUB=JSON.parse(ga); log('Global genesis authority loaded','ok'); }
+    }catch(e){}
+  }
+  await hydrateForkProofStore();
+  if(GENESIS_OUTPUT && !CONSUMED.has(GENESIS_OUTPUT.id)){
+    log('Embedded genesis present but not auto-claimed — zero-start wallet canon','info');
+  }
+  renderAll();
+  initKernelIPC();
+  startCountdowns();
+  // Scan shared outbox for any transitions addressed to us
+  // that were sent while this tab was closed or not yet open.
+  setTimeout(scanInbox, 200);
+}
+
+async function genKP(){
+  KP=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);
+  const pub=await crypto.subtle.exportKey('jwk',KP.publicKey);
+  const priv=await crypto.subtle.exportKey('jwk',KP.privateKey);
+  KP._pub=pub;KP._priv=priv;
+  SID=(await sha256(JSON.stringify(pub))).slice(0,8);
+  localStorage.setItem(KP_KEY, JSON.stringify({pub,priv})); // per-tab slot key
+  log('New keypair · SID: '+SID,'ok');
+}
+
+// ── BUILD ACTIONS ──
+let _sendRecipient=null, _lockCp=null;
+
+function parseRecipientAddr(ctx){
+  const inputId = ctx==='send'?'send-addr':'lock-addr';
+  const statusId = ctx==='send'?'send-addr-parsed':'lock-addr-parsed';
+  const val = document.getElementById(inputId).value.trim();
+  const el = document.getElementById(statusId);
+  const parsed = parseAddr(val);
+  if(parsed){
+    el.className='parsed-addr ok'; el.style.display='block';
+    el.textContent=`✓ SID: ${parsed.sid} · pubkey.x: ${parsed.pub.x.slice(0,20)}...`;
+    if(ctx==='send'){ _sendRecipient=parsed; updateSendPreview(); }
+    else { _lockCp=parsed; updateLockPreview(); }
+  } else if(val.length>5){
+    el.className='parsed-addr err'; el.style.display='block';
+    el.textContent='✗ Not a valid NX4ADDR — must start NX4ADDR:SID:x:y';
+    if(ctx==='send') _sendRecipient=null;
+    else _lockCp=null;
+  } else {
+    el.style.display='none';
+  }
+}
+
+function populateSels(){
+  const u=unspent();
+  for(const [selId,filter] of [['src-sel',_=>true],['lock-src-sel',_=>true]]){
+    const sel=document.getElementById(selId); if(!sel) continue;
+    sel.innerHTML='<option value="">— select —</option>';
+    u.forEach(o=>{ const opt=document.createElement('option'); opt.value=o.id; opt.textContent=`${o.id.slice(0,10)}... · ${fmt(o.amount)} ${o.symbol}`; sel.appendChild(opt); });
+  }
+  document.getElementById('no-utxo-warn').style.display=u.length?'none':'block';
+  const rsel=document.getElementById('resolve-lock-sel');
+  rsel.innerHTML='<option value="">— select —</option>';
+  lockedOuts().forEach(l=>{ const opt=document.createElement('option'); opt.value=l.id; opt.textContent=`${l.id.slice(0,10)}... · ${fmt(l.amount)} ${l.symbol} · exp:${new Date(l.expiry).toLocaleDateString()}`; rsel.appendChild(opt); });
+}
+
+function updateSendPreview(){
+  const srcId=document.getElementById('src-sel').value;
+  const amtTokens=parseFloat(document.getElementById('send-amt').value)||0;
+  const amt=toUnits(amtTokens);
+  const p=document.getElementById('send-preview');
+  if(!srcId){p.style.display='none';return;}
+  const src=OUTPUTS.get(srcId);if(!src)return;
+  const ch=src.amount-amt;
+  const srcDisp=toTokens(src.amount), chDisp=toTokens(ch);
+  p.style.display='block';
+  document.getElementById('sp-consumes').textContent=`${srcId.slice(0,14)}... (${srcDisp} ${src.symbol})`;
+  document.getElementById('sp-sends').textContent=_sendRecipient?`${amtTokens} ${src.symbol} → ${_sendRecipient.sid} (pubkey bound)`:`${amtTokens} ${src.symbol} → (no recipient address yet)`;
+  document.getElementById('sp-change').textContent=ch>=0?`${chDisp} ${src.symbol} → self (${SID})`:'⚠ insufficient';
+  document.getElementById('sp-conservation').textContent=`${srcDisp} in = ${amtTokens} + ${ch>=0?chDisp:'?'} out → ${src.amount===amt+(ch>=0?ch:0)?'✓ balanced':'⚠ imbalanced'}`;
+}
+
+function updateLockPreview(){
+  const srcId=document.getElementById('lock-src-sel').value;
+  const amtTokens=parseFloat(document.getElementById('lock-amt').value)||0;
+  const amt=toUnits(amtTokens);
+  const hours=parseInt(document.getElementById('lock-window').value)||24;
+  const p=document.getElementById('lock-preview');
+  if(!srcId){p.style.display='none';return;}
+  const src=OUTPUTS.get(srcId);if(!src)return;
+  const ch=src.amount-amt;
+  const srcDisp=toTokens(src.amount), chDisp=toTokens(ch);
+  p.style.display='block';
+  document.getElementById('lp-consumes').textContent=`${srcId.slice(0,14)}... (${srcDisp} ${src.symbol})`;
+  document.getElementById('lp-locks').textContent=`${amtTokens} ${src.symbol} → LOCKED`;
+  document.getElementById('lp-change').textContent=ch>=0?`${chDisp} ${src.symbol} → self`:'⚠ insufficient';
+  document.getElementById('lp-cp').textContent=_lockCp?`${_lockCp.sid} · pubkey.x: ${_lockCp.pub.x.slice(0,20)}...`:'(no counterparty yet)';
+  document.getElementById('lp-expiry').textContent=new Date(Date.now()+hours*3600000).toLocaleString();
+}
+
+function updateResolvePreview(){
+  const lockId_v=document.getElementById('resolve-lock-sel').value;
+  const resType=document.getElementById('resolve-type').value;
+  const p=document.getElementById('resolve-preview');
+  const wst=document.getElementById('resolve-window-status');
+  if(!lockId_v){p.style.display='none';wst.textContent='';return;}
+  const lock=LOCKS.get(lockId_v);if(!lock)return;
+  const expired=Date.now()>lock.expiry;
+  wst.textContent=expired?`✓ Challenge window expired ${new Date(lock.expiry).toLocaleString()}`:`⏳ Window not yet expired — resolves after ${new Date(lock.expiry).toLocaleString()}`;
+  wst.style.color=expired?'var(--green)':'var(--amber)';
+  p.style.display='block';
+  document.getElementById('rp-lock').textContent=`${lockId_v.slice(0,14)}... (${fmt(lock.amount)} ${lock.symbol})`;
+  document.getElementById('rp-type').textContent=resType;
+  const toLabel=resType==='RELEASE'?`${lock.owner_sid} (owner · own pubkey)`:resType==='AWARD'?`${lock.counterparty_sid} (counterparty pubkey from lock)`:'BURN (no output created)';
+  document.getElementById('rp-to').textContent=toLabel;
+  document.getElementById('rp-amt').textContent=resType==='SLASH'?`0 (burned) — SLASH creates no outputs`:fmt(lock.amount)+' '+lock.symbol;
+  document.getElementById('rp-window').textContent=`expiry: ${new Date(lock.expiry).toLocaleString()} · expired: ${expired}`;
+  document.getElementById('rp-conservation').textContent=resType==='SLASH'?'SLASH: burn (no conservation req.)':resType==='RELEASE'?`${fmt(lock.amount)} → owner ✓`:`${fmt(lock.amount)} → counterparty ✓`;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('src-sel').addEventListener('change', updateSendPreview);
+  document.getElementById('lock-src-sel').addEventListener('change', updateLockPreview);
+  document.getElementById('resolve-lock-sel').addEventListener('change', updateResolvePreview);
+  document.getElementById('resolve-type').addEventListener('change', updateResolvePreview);
+  document.getElementById('stake-src-sel').addEventListener('change', updateStakePreview);
+});
+
+async function buildSend(){
+  const srcId=document.getElementById('src-sel').value;
+  const amtTokens=parseFloat(document.getElementById('send-amt').value);
+  const amt=toUnits(amtTokens); // convert human-readable to integer units
+  const memo=document.getElementById('send-memo').value.trim();
+  if(!srcId){toast('Select source','warn');return;}
+  if(!_sendRecipient){toast('Enter recipient NX4ADDR','warn');return;}
+  if(!amtTokens||amtTokens<=0){toast('Invalid amount','warn');return;}
+  const src=OUTPUTS.get(srcId);if(!src){toast('Source not found','err');return;}
+  if(CONSUMED.has(srcId)){toast('Source already consumed!','err');return;}
+  if(amt>src.amount){toast('Exceeds source amount','err');return;}
+  try{
+    const tx=await buildSpendTx({srcOutput:src, toSid:_sendRecipient.sid, toPub:_sendRecipient.pub, amount:amt, memo});
+    await acceptTx(tx);
+    autoTransport(tx);   // ← auto-broadcast + outbox write
+    document.getElementById('spend-str').textContent='NX4:'+btoa(JSON.stringify(tx));
+    document.getElementById('spend-out').classList.add('show');
+    toast('Sent · auto-broadcast','ok');
+  }catch(e){toast(e.message,'err');log('Spend error: '+e.message,'err');}
+}
+
+async function buildLock(){
+  const srcId=document.getElementById('lock-src-sel').value;
+  const amtTokens=parseFloat(document.getElementById('lock-amt').value);
+  const amt=toUnits(amtTokens); // convert human-readable to integer units
+  const terms=document.getElementById('lock-terms').value.trim()||'default-terms';
+  const hours=parseInt(document.getElementById('lock-window').value)||24;
+  if(!srcId){toast('Select source','warn');return;}
+  if(!_lockCp){toast('Enter counterparty NX4ADDR','warn');return;}
+  if(!amtTokens||amtTokens<=0){toast('Invalid amount','warn');return;}
+  const src=OUTPUTS.get(srcId);if(!src){toast('Source not found','err');return;}
+  if(CONSUMED.has(srcId)){toast('Source consumed!','err');return;}
+  if(amt>src.amount){toast('Exceeds source','err');return;}
+  try{
+    const tx=await buildLockTx({srcOutput:src, amount:amt, cpSid:_lockCp.sid, cpPub:_lockCp.pub, termsRaw:terms, windowHours:hours});
+    await acceptTx(tx);
+    autoTransport(tx);   // ← auto-broadcast + outbox write
+    document.getElementById('lock-str').textContent='NX4:'+btoa(JSON.stringify(tx));
+    document.getElementById('lock-out').classList.add('show');
+    toast('Lock created · auto-broadcast','ok');
+  }catch(e){toast(e.message,'err');log('Lock error: '+e.message,'err');}
+}
+
+async function buildResolve(){
+  const lockId_v=document.getElementById('resolve-lock-sel').value;
+  const resType=document.getElementById('resolve-type').value;
+  if(!lockId_v){toast('Select lock output','warn');return;}
+  const lock=LOCKS.get(lockId_v);if(!lock){toast('Lock not found','err');return;}
+  if(CONSUMED.has(lockId_v)){toast('Lock already resolved!','err');return;}
+  try{
+    const tx=await buildResolveTx({lockOutput:lock, resolutionType:resType});
+    await acceptTx(tx);
+    autoTransport(tx);   // ← auto-broadcast + outbox write
+    document.getElementById('resolve-str').textContent='NX4:'+btoa(JSON.stringify(tx));
+    document.getElementById('resolve-out').classList.add('show');
+    toast(`Resolved: ${resType} · auto-broadcast`,'ok');
+  }catch(e){toast(e.message,'err');log('Resolve error: '+e.message,'err');}
+}
+
+async function acceptPasted(){
+  const raw=document.getElementById('paste-tx').value.trim();
+  const res=document.getElementById('paste-result');
+  if(!raw) return;
+  let tx; try{tx=JSON.parse(atob(raw.replace(/^NX4:/,'')))}catch(e){res.style.display='block';res.style.color='var(--danger)';res.textContent='✗ Parse error: '+e.message;return;}
+  const ok=await acceptTx(tx);
+  res.style.display='block';
+  if(ok){res.style.color='var(--green)';res.textContent='✓ Accepted: '+tx.type;document.getElementById('paste-tx').value='';}
+  else{res.style.color='var(--danger)';res.textContent='✗ Rejected — see log';}
+}
+
+// ── RENDER ──
+function renderAll(){
+  const bal=balance(); const locbal=lockedBalance();
+  const usp=unspent(); const locks_=lockedOuts();
+  document.getElementById('sid-chip').textContent=SID||'—';
+  document.getElementById('bal-top').textContent=fmt(bal);
+  document.getElementById('sym-top').textContent=TOKEN_SYM;
+  const lkt=document.getElementById('lk-top');
+  if(locbal>0){lkt.style.display='';lkt.textContent='+ '+fmt(locbal)+' locked';}else{lkt.style.display='none';}
+  document.getElementById('bal-display').textContent=toTokens(bal).toLocaleString(undefined,{maximumFractionDigits:4});
+  document.getElementById('sym-display').textContent=TOKEN_SYM;
+  const lkd=document.getElementById('lk-display');
+  if(locbal>0){lkd.style.display='';lkd.textContent='+ '+fmt(locbal)+' locked';}else{lkd.style.display='none';}
+  document.getElementById('addr-box').textContent='SID: '+(SID||'—')+'  ·  slot: '+WALLET_SLOT+'  ·  pubkey.x: '+(KP?._pub?.x?.slice(0,20)||'—')+'...';
+  const fullAddr=KP?._pub?formatAddr(SID,KP._pub):'—';
+  document.getElementById('addr-share').textContent=fullAddr; // addr-receive panel reads addr-share directly
+  document.getElementById('utxo-summary').textContent=`Spendable: ${fmt(bal)} ${TOKEN_SYM} · locked proof outputs: ${fmt(locbal)} ${TOKEN_SYM} · ${usp.length} spendable UTXO${usp.length===1?'':'s'}`;
+  document.getElementById('stat-unspent').textContent=usp.length;
+  document.getElementById('stat-locked').textContent=locks_.length;
+  document.getElementById('stat-consumed').textContent=CONSUMED.size;
+  document.getElementById('hdot').className='hdot'+(mounted?' live':'');
+  document.getElementById('hdot-label').textContent = mounted ? 'Connected' : '—';
+  renderSettlement();
+  renderStake();
+  renderMiniActivity();
+  populateSels();
+  broadcastWalletState();
+}
+
+// Display amounts in human-readable tokens (internal units / UNITS_PER_TOKEN)
+function fmt(n){ const t=toTokens(n); return t%1===0?t.toLocaleString():t.toFixed(4); }
+
+function renderSources(){
+  const all=[...OUTPUTS.values(),...LOCKS.values()];
+  const ul=document.getElementById('utxo-list');
+  ul.innerHTML=all.length?all.map(o=>{
+    const con=CONSUMED.has(o.id); const isLk=o.type==='LOCKED';
+    const cls=con?'out-card consumed':isLk?'out-card locked-out':'out-card';
+    const amtCls=con?'out-amount cx-color':isLk?'out-amount lk-color':'out-amount';
+    const tag=con?'consumed':isLk?'locked':o.type==='genesis-claim'?'genesis':o.type==='change'?'change':'spendable';
+    return `<div class="${cls}"><div>
+      <div class="out-id">ID: ${o.id.slice(0,16)}...</div>
+      <div class="out-src">SRC: <span>${o.source_id==='GENESIS_ROOT'?'GENESIS_ROOT':o.source_id.slice(0,14)+'...'}</span></div>
+      <div style="font-size:9px;color:var(--dim);margin-top:1px">OWNER: ${o.owner_pubkey?.x?.slice(0,16)||'—'}...</div>
+      ${isLk?`<div style="font-size:9px;color:var(--indigo)">CP KEY: ${o.counterparty_pubkey?.x?.slice(0,16)||'—'}... · exp: ${new Date(o.expiry).toLocaleDateString()}</div>`:''}
+      <div style="margin-top:4px"><span class="otag ${tag}">${con?'CONSUMED':tag.toUpperCase()}</span></div>
+    </div><div class="${amtCls}">${fmt(o.amount)}</div></div>`;
+  }).join(''):`<div class="nx-empty-state"><span class="glyph">◎</span><span class="title">No conviction yet.</span>The first NEX comes from witnessing, receiving a valid transition, or another real earning path.<div class="nx-empty-actions"><button class="btn btn-sm btn-ghost" onclick="sw('genesis')">Open Genesis</button><button class="btn btn-sm btn-indigo" onclick="sw('receive')">Show Address</button></div></div>`;
+
+  const cl=document.getElementById('consumed-list');
+  document.getElementById('consumed-badge').textContent=CONSUMED.size;
+  cl.innerHTML=[...CONSUMED].map(id=>`<div style="font-size:9px;color:var(--danger);padding:3px 0;border-bottom:1px solid var(--border);word-break:break-all">${id}</div>`).join('')||'<div style="color:var(--muted);font-size:10px">Empty.</div>';
+}
+
+function renderSettlement(){
+  const sl=document.getElementById('settlement-list');
+  if(!JOURNAL.length){sl.innerHTML=`<div class="nx-empty-state"><span class="glyph">⌁</span><span class="title">Nothing has happened here.</span>When the first event in this realm reaches you, it will be recorded here.<div class="nx-empty-actions"><button class="btn btn-sm btn-ghost" onclick="sw('receive')">Prepare Receive</button><button class="btn btn-sm btn-ghost" onclick="sw('log')">Open Log</button></div></div>`;return;}
+  document.getElementById('settlement-ok').style.display='block';
+  document.getElementById('settlement-ok').textContent=`${JOURNAL.length} transition${JOURNAL.length>1?'s':''} in local settlement journal.`;
+  const colorOf={SPEND:'var(--green)',LOCK:'var(--indigo)',RESOLVE:'var(--cyan)',GENESIS_CLAIM:'var(--gold)'};
+  sl.innerHTML=[...JOURNAL].reverse().slice(0,20).map(e=>`<div style="border-left:2px solid ${colorOf[e.tx.type]||'var(--border)'};padding-left:10px;margin-bottom:8px">
+    <div style="font-size:10px;color:${colorOf[e.tx.type]||'var(--text)'}">${e.tx.type} v${e.tx.v||'—'}</div>
+    <div style="font-size:9px;color:var(--dim);line-height:1.6">${new Date(e.ts).toLocaleString()}<br>${e.label||''}
+    ${e.tx.type==='RESOLVE'?`<br>Resolution: <strong style="color:var(--cyan)">${e.tx.resolution}</strong> · window_expired: ${Date.now()>(e.tx.lock_snapshot?.expiry||0)} (derived from lock.expiry)`:''}
+    </div></div>`).join('');
+
+  const fl=document.getElementById('finality-list');
+  const fins=lockedOuts().map(l=>{
+    const exp=Date.now()>l.expiry;
+    return `<div class="fin-row"><div class="fin-icon">⛓</div><div class="fin-body"><div class="fin-label">${l.id.slice(0,14)}...</div><div class="fin-detail">${fmt(l.amount)} ${l.symbol} · CP: ${l.counterparty_sid} · exp: ${new Date(l.expiry).toLocaleString()}</div></div><div class="fin-state ${exp?'final':'locked'}">${exp?'RESOLVABLE':'LOCKED'}</div></div>`;
+  }).concat(JOURNAL.filter(e=>e.tx.type==='RESOLVE').slice(-5).map(e=>{
+    const cls=e.tx.resolution==='SLASH'?'slashed':e.tx.resolution==='RELEASE'?'released':'final';
+    return `<div class="fin-row"><div class="fin-icon">⚖</div><div class="fin-body"><div class="fin-label">RESOLVED ${e.tx.resolution}</div><div class="fin-detail">${new Date(e.ts).toLocaleString()} · lock: ${e.tx.consumes_lock[0].slice(0,12)}...</div></div><div class="fin-state ${cls}">${e.tx.resolution}</div></div>`;
+  }));
+  fl.innerHTML=fins.join('')||`<div class="nx-empty-state"><span class="glyph">⛓</span><span class="title">No active lock states.</span>No stake is waiting on a future truth yet.<div class="nx-empty-actions"><button class="btn btn-sm btn-indigo" onclick="sw('lock')">Create Lock</button><button class="btn btn-sm btn-ghost" onclick="sw('stake')">Stake</button></div></div>`;
+}
+
+// ── ADVERSARIAL PROOF ──
+let proofRunning=false;
+
+async function runProof(){
+  if(proofRunning) return;
+  proofRunning=true;
+  document.getElementById('proof-btn').disabled=true;
+  document.getElementById('proof-btn').textContent='⏳ Running...';
+  clearProof();
+
+  const steps=document.getElementById('proof-steps');
+  let errors=0;
+
+  async function step(type,label,detail){
+    const icons={pass:'✓',fail:'✗',block:'⛔',lock:'⛓',resolve:'⚖',info:'→'};
+    const d=document.createElement('div');
+    d.className=`pstep ${type}`;
+    d.innerHTML=`<div class="psi">${icons[type]||'·'}</div><div class="psb"><div class="psl">${label}</div><div class="psd">${detail}</div></div>`;
+    steps.appendChild(d); d.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return new Promise(r=>setTimeout(r,80));
+  }
+  function w(ms){return new Promise(r=>setTimeout(r,ms));}
+
+  // Isolated proof state
+  const P={consumed:new Set(),outputs:new Map(),locks:new Map()};
+
+  // Rule-checking functions — mirror real verifySpend/verifyLock, using P state
+  async function pVerifySpend(tx){
+    if(!tx.consumes?.length) return {ok:false,r:'No consumed sources'};
+    for(const cid of tx.consumes) if(P.consumed.has(cid)) return {ok:false,r:`DOUBLE-SPEND: ${cid.slice(0,12)}... already consumed`};
+    const srcs=[];
+    for(const cid of tx.consumes){
+      const local=P.outputs.get(cid);
+      if(local){ srcs.push(local); }
+      else {
+        const carried=(tx.source_outputs||[]).find(s=>s.id===cid);
+        if(!carried) return {ok:false,r:`Source ${cid.slice(0,12)}... not in proof state`};
+        const ec=await verifyOutputExistence(carried,0,P.outputs);
+        if(!ec.ok) return {ok:false,r:`Existence proof failed: ${ec.reason}`};
+        srcs.push(carried);
+      }
+    }
+    for(const src of srcs) if(src.owner_pubkey.x!==tx.from_pubkey.x||src.owner_pubkey.y!==tx.from_pubkey.y) return {ok:false,r:`AUTHORIZATION FAILURE: signer does not own ${src.id.slice(0,12)}...`};
+    const sigBody={consumes:tx.consumes,creates_ids:tx.creates.map(o=>o.id),from_sid:tx.from_sid,ts:tx.ts};
+    if(!await verify(tx.from_pubkey,sigBody,tx.sig)) return {ok:false,r:'Invalid signature'};
+    const inT=srcs.reduce((s,o)=>s+o.amount,0), outT=tx.creates.reduce((s,o)=>s+o.amount,0);
+    if(inT!==outT) return {ok:false,r:`CONSERVATION: in=${inT} out=${outT}`};
+    for(const out of tx.creates){
+      const exp=await outputId(out.source_id,out.owner_pubkey.x,out.amount,out.symbol,out.salt,out.type);
+      if(exp!==out.id) return {ok:false,r:`Output ID mismatch: ${out.id.slice(0,12)}...`};
+    }
+    return {ok:true};
+  }
+  async function pVerifyLock(tx){
+    if(!tx.consumes?.length) return {ok:false,r:'No consumed sources'};
+    const lock=tx.lock;
+    for(const cid of tx.consumes) if(P.consumed.has(cid)) return {ok:false,r:`DOUBLE-SPEND: ${cid.slice(0,12)}...`};
+    const srcs=[];
+    for(const cid of tx.consumes){
+      const local=P.outputs.get(cid);
+      if(local){ srcs.push(local); }
+      else {
+        const carried=(tx.source_outputs||[]).find(s=>s.id===cid);
+        if(!carried) return {ok:false,r:`Source ${cid.slice(0,12)}... not in proof state`};
+        const ec=await verifyOutputExistence(carried,0,P.outputs);
+        if(!ec.ok) return {ok:false,r:`Existence proof failed: ${ec.reason}`};
+        srcs.push(carried);
+      }
+    }
+    for(const src of srcs) if(src.owner_pubkey.x!==tx.from_pubkey.x||src.owner_pubkey.y!==tx.from_pubkey.y) return {ok:false,r:'AUTHORIZATION FAILURE'};
+    const expLockId=await lockId(lock.source_id,lock.owner_pubkey.x,lock.counterparty_pubkey.x,lock.amount,lock.symbol,lock.terms_hash,lock.expiry);
+    if(expLockId!==lock.id) return {ok:false,r:'Lock ID mismatch'};
+    const sigBody={consumes:tx.consumes,lock_id:lock.id,creates_change_ids:tx.creates_change.map(o=>o.id),from_sid:tx.from_sid,ts:tx.ts};
+    if(!await verify(tx.from_pubkey,sigBody,tx.sig)) return {ok:false,r:'Invalid signature'};
+    const inT=srcs.reduce((s,o)=>s+o.amount,0), outT=lock.amount+tx.creates_change.reduce((s,o)=>s+o.amount,0);
+    if(inT!==outT) return {ok:false,r:`CONSERVATION: in=${inT} lock+change=${outT}`};
+    return {ok:true};
+  }
+  async function pVerifyResolve(tx){
+    const lock=tx.lock_snapshot;
+    for(const lid of tx.consumes_lock) if(P.consumed.has(lid)) return {ok:false,r:`DOUBLE-RESOLVE: ${lid.slice(0,12)}...`};
+    if(lock.owner_pubkey.x!==tx.from_pubkey.x||lock.owner_pubkey.y!==tx.from_pubkey.y) return {ok:false,r:'AUTHORIZATION FAILURE: not lock owner'};
+    const window_expired_p = Date.now() > lock.expiry;
+    if(!window_expired_p) return {ok:false,r:'PREMATURE RESOLVE: window not expired'};
+    const sigBody={type:'RESOLVE',consumes_lock:tx.consumes_lock,resolution:tx.resolution,creates_ids:tx.creates.map(o=>o.id),from_sid:tx.from_sid,ts:tx.ts};
+    if(!await verify(tx.from_pubkey,sigBody,tx.sig)) return {ok:false,r:'Invalid signature'};
+    if(tx.resolution==='SLASH'){if(tx.creates.length!==0) return {ok:false,r:'SLASH must create 0 outputs'};}
+    else{
+      if(tx.creates.length!==1) return {ok:false,r:'Must create 1 output'};
+      if(tx.creates[0].amount!==lock.amount) return {ok:false,r:`CONSERVATION: lock=${lock.amount} output=${tx.creates[0].amount}`};
+      if(tx.resolution==='RELEASE'&&(tx.creates[0].owner_pubkey.x!==lock.owner_pubkey.x||tx.creates[0].owner_pubkey.y!==lock.owner_pubkey.y)) return {ok:false,r:'RELEASE output not bound to owner pubkey'};
+      if(tx.resolution==='AWARD'&&(tx.creates[0].owner_pubkey.x!==lock.counterparty_pubkey.x||tx.creates[0].owner_pubkey.y!==lock.counterparty_pubkey.y)) return {ok:false,r:'AWARD output not bound to counterparty pubkey'};
+    }
+    return {ok:true};
+  }
+
+  try{
+    await step('info','Setup: generating fresh keypairs for genesis authority, Alice, Bob, Carol','All WebCrypto P-256. Fully isolated proof state — no wallet CONSUMED or OUTPUTS are used.');
+
+    const mkKP=async()=>{
+      const kp=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);
+      const pub=await crypto.subtle.exportKey('jwk',kp.publicKey);
+      const sid=(await sha256(JSON.stringify(pub))).slice(0,8);
+      return {priv:kp.privateKey,pub,sid};
+    };
+    const G=await mkKP(), A=await mkKP(), B=await mkKP(), C=await mkKP();
+    await step('pass','Keypairs ready',`G:${G.sid} A:${A.sid} B:${B.sid} C:${C.sid}`);
+
+    // ── GENESIS ──
+    await w(60);
+    await step('info','─── 1. Genesis authority issues output for Alice ───','');
+    const gSalt=rSalt();
+    const gId=await outputId('GENESIS_ROOT',A.pub.x,1000,'ATT',gSalt,'genesis');
+    const gBody={id:gId,source_id:'GENESIS_ROOT',owner_sid:A.sid,owner_pubkey:A.pub,amount:1000,symbol:'ATT',salt:gSalt,type:'genesis'};
+    const gSig=await sign(G.priv,gBody);
+    // Verify with genesis authority pub — correct
+    const gSigOk=await verify(G.pub,gBody,gSig);
+    // Verify with Alice's pub — should fail
+    const gSigWrong=await verify(A.pub,gBody,gSig);
+    await step(gSigOk&&!gSigWrong?'pass':'fail','Genesis authority signature check',
+      `Verify with genesis_authority_pub: <span class="${gSigOk?'hlg':'hlr'}">${gSigOk}</span> (required: true)<br>Verify with wrong key (Alice's): <span class="${!gSigWrong?'hlg':'hlr'}">${gSigWrong}</span> (required: false)`);
+    if(!gSigOk||gSigWrong){ errors++; }
+
+    // Fraudulent genesis (wrong authority sig)
+    const fraudSig=await sign(B.priv,gBody); // Bob signs genesis body
+    const fraudAccepted=await verify(G.pub,gBody,fraudSig);
+    await step(!fraudAccepted?'block':'fail','Fraudulent genesis (signed by non-authority) rejected',
+      `Sig by non-authority (Bob): <span class="hlr">${fraudAccepted}</span> (required: false) → genesis claim rejected`);
+    if(fraudAccepted) errors++;
+
+    P.consumed.add(gId);
+    const aSalt=rSalt();
+    const aId=await outputId(gId,A.pub.x,1000,'ATT',aSalt,'genesis-claim');
+    // Attach existence proof — genesis authority sig is the trust anchor
+    const aOut={id:aId,source_id:gId,owner_sid:A.sid,owner_pubkey:A.pub,amount:1000,symbol:'ATT',salt:aSalt,type:'genesis-claim',
+      _proof:{type:'GENESIS', genesis_output:{...gBody, sig:gSig, genesis_authority_pub:G.pub}}};
+    P.outputs.set(aId,aOut);
+    await step('pass','Alice claims genesis: genesis consumed, spendable output created',
+      `SPENDABLE: <span class="hl">${aId.slice(0,14)}...</span> (1000 ATT) owner: <span class="hl">A.pub.x</span>`);
+
+    // ── SPEND with correct recipient pubkey ──
+    await w(60);
+    await step('info','─── 2. Spend with correct ownership binding: Alice → Bob (300 ATT) ───','');
+    const bSalt=rSalt(), chSalt=rSalt();
+    const bId=await outputId(aId,B.pub.x,300,'ATT',bSalt,'spendable');
+    const chId=await outputId(aId,A.pub.x,700,'ATT',chSalt,'change');
+    const bOut={id:bId,source_id:aId,owner_sid:B.sid,owner_pubkey:B.pub,amount:300,symbol:'ATT',salt:bSalt,type:'spendable'};
+    const chOut={id:chId,source_id:aId,owner_sid:A.sid,owner_pubkey:A.pub,amount:700,symbol:'ATT',salt:chSalt,type:'change'};
+    const t1Ts=Date.now();
+    const t1_sb={consumes:[aId],creates_ids:[bId,chId],from_sid:A.sid,ts:t1Ts};
+    const t1_sig=await sign(A.priv,t1_sb);
+    const t1={type:'SPEND',v:4,consumes:[aId],source_outputs:[aOut],creates:[bOut,chOut],from_sid:A.sid,from_pubkey:A.pub,memo:'',ts:t1Ts,sig:t1_sig};
+    const t1_r=await pVerifySpend(t1);
+    await step(t1_r.ok?'pass':'fail','T1 verified: ownership bound to B.pub (300 ATT), conservation 1000=300+700',
+      `from_pubkey === source.owner_pubkey: <span class="hlg">${A.pub.x===aOut.owner_pubkey.x}</span><br>Bob output bound to B.pub.x: <span class="hlg">${bOut.owner_pubkey.x===B.pub.x}</span><br>Conservation: 1000 in = 300+700 = <span class="hlg">1000</span> ✓<br>Result: <span class="${t1_r.ok?'hlg':'hlr'}">${t1_r.ok?'ACCEPTED':t1_r.r}</span>`);
+    if(!t1_r.ok) errors++;
+    P.consumed.add(aId);
+    // STEP 3d: Full proof-hop data (matches buildSpendTx backfill)
+    bOut._proof={type:'SPEND', source_output:aOut, sig:t1_sig, from_pubkey:A.pub, from_sid:A.sid, ts:t1Ts, creates_ids:[bId,chId]};
+    chOut._proof={type:'SPEND', source_output:aOut, sig:t1_sig, from_pubkey:A.pub, from_sid:A.sid, ts:t1Ts, creates_ids:[bId,chId]};
+    P.outputs.set(bId,bOut); P.outputs.set(chId,chOut);
+
+    // ── DOUBLE-SPEND ──
+    await w(60);
+    const t2_same={...t1, ts:Date.now()};
+    const t2_r=await pVerifySpend(t2_same);
+    await step(t2_r.ok?'fail':'block','T2: double-spend of aId — REJECTED at Rule 1 (before any crypto)',
+      `consumed.has(aId): <span class="hlr">true</span> → rejected before sig check<br>Result: <span class="${!t2_r.ok?'hlg':'hlr'}">${t2_r.ok?'WRONGLY ACCEPTED':t2_r.r}</span>`);
+    if(t2_r.ok) errors++;
+
+    // ── AUTHORIZATION FAILURE: wrong signer ──
+    await w(60);
+    await step('info','─── 3. Authorization: Bob attempts to spend Alice\'s change output ───','');
+    const theftTs=Date.now();
+    const theft_sb={consumes:[chId],creates_ids:[bId],from_sid:B.sid,ts:theftTs};
+    const theft_sig=await sign(B.priv,theft_sb); // Bob signs
+    // Manually build a transaction claiming to spend chOut but signed by Bob
+    const theft_tx={type:'SPEND',v:4,consumes:[chId],source_outputs:[chOut],creates:[{...bOut}],from_sid:B.sid,from_pubkey:B.pub,ts:theftTs,sig:theft_sig,memo:''};
+    const theft_r=await pVerifySpend(theft_tx);
+    await step(!theft_r.ok?'block':'fail','Bob attempts theft of Alice\'s change: REJECTED at Rule 2 (authorization)',
+      `from_pubkey (B.pub.x): <span class="hlr">${B.pub.x.slice(0,16)}...</span><br>source.owner_pubkey.x (A.pub.x): <span class="hl">${A.pub.x.slice(0,16)}...</span><br>Match: <span class="hlr">false</span> → authorization failure<br>Result: <span class="${!theft_r.ok?'hlg':'hlr'}">${theft_r.ok?'WRONGLY ACCEPTED':theft_r.r}</span>`);
+    if(theft_r.ok) errors++;
+
+    // ── CONSERVATION FRAUD ──
+    await w(60);
+    await step('info','─── 4. Conservation: Alice creates more outputs than source ───','');
+    const inf_salt=rSalt();
+    const inf_id=await outputId(chId,A.pub.x,9999,'ATT',inf_salt,'spendable'); // inflated
+    const inf_out={id:inf_id,source_id:chId,owner_sid:A.sid,owner_pubkey:A.pub,amount:9999,symbol:'ATT',salt:inf_salt,type:'spendable'};
+    const infTs=Date.now();
+    const inf_sb={consumes:[chId],creates_ids:[inf_id],from_sid:A.sid,ts:infTs};
+    const inf_sig=await sign(A.priv,inf_sb);
+    const inf_tx={type:'SPEND',v:4,consumes:[chId],source_outputs:[chOut],creates:[inf_out],from_sid:A.sid,from_pubkey:A.pub,ts:infTs,sig:inf_sig,memo:''};
+    const inf_r=await pVerifySpend(inf_tx);
+    await step(!inf_r.ok?'block':'fail','Conservation violation (700 in, 9999 out) rejected at Rule 4',
+      `Source: 700 ATT · Output claimed: 9999 ATT · Δ: 9299<br>Result: <span class="${!inf_r.ok?'hlg':'hlr'}">${inf_r.ok?'WRONGLY ACCEPTED':inf_r.r}</span>`);
+    if(inf_r.ok) errors++;
+
+    // ── LOCK ──
+    await w(60);
+    await step('info','─── 5. Lock: Alice locks change output with Carol as counterparty ───','Counterparty pubkey (C.pub) embedded in lock ID and stored in lock object.');
+    const lkTerms='deliver-widget-Q3';
+    const lkHash=await sha256(lkTerms);
+    const lkExpiry=Date.now()-500; // already expired for proof — tests resolution immediately
+    const lkId=await lockId(chId,A.pub.x,C.pub.x,700,'ATT',lkHash,lkExpiry);
+    const lkObj={id:lkId,source_id:chId,owner_sid:A.sid,owner_pubkey:A.pub,counterparty_sid:C.sid,counterparty_pubkey:C.pub,amount:700,symbol:'ATT',terms_hash:lkHash,terms_raw:lkTerms,expiry:lkExpiry,type:'LOCKED'};
+    const lkTs=Date.now();
+    const lkSigBody={consumes:[chId],lock_id:lkId,creates_change_ids:[],from_sid:A.sid,ts:lkTs};
+    const lkSig=await sign(A.priv,lkSigBody);
+    const lkTx={type:'LOCK',v:4,consumes:[chId],source_outputs:[chOut],lock:lkObj,creates_change:[],from_sid:A.sid,from_pubkey:A.pub,ts:lkTs,sig:lkSig};
+    const lk_r=await pVerifyLock(lkTx);
+    await step(lk_r.ok?'lock':'fail','Lock transition verified: chId consumed, counterparty pubkey C.pub bound into lock ID',
+      `Lock ID: <span class="hli">${lkId.slice(0,16)}...</span><br>Lock ID includes C.pub.x: <span class="hlg">verified via lockId() hash</span><br>Conservation: 700 source = 700 locked + 0 change ✓<br>Result: <span class="${lk_r.ok?'hlg':'hlr'}">${lk_r.ok?'ACCEPTED':lk_r.r}</span>`);
+    if(!lk_r.ok) errors++;
+    P.consumed.add(chId); P.locks.set(lkId,lkObj);
+
+    // Try to spend chOut again (now locked/consumed)
+    const lk_ds_r=await pVerifySpend({...inf_tx, consumes:[chId], source_outputs:[chOut]});
+    await step(!lk_ds_r.ok?'block':'fail','Locked source cannot be double-spent',
+      `consumed.has(chId): <span class="hlr">true</span> → rejected<br>Result: <span class="${!lk_ds_r.ok?'hlg':'hlr'}">${lk_ds_r.ok?'WRONGLY ACCEPTED':lk_ds_r.r}</span>`);
+    if(lk_ds_r.ok) errors++;
+
+    // ── PREMATURE RESOLVE ──
+    await w(60);
+    await step('info','─── 6. Premature resolve rejected (window not expired) ───','');
+    const futureExpiry=Date.now()+3600000;
+    const lkFuture={...lkObj, expiry:futureExpiry, id: await lockId(chId,A.pub.x,C.pub.x,700,'ATT',lkHash,futureExpiry)};
+    P.locks.set(lkFuture.id,lkFuture);
+    const preTs=Date.now();
+    const preSb={type:'RESOLVE',consumes_lock:[lkFuture.id],resolution:'AWARD',creates_ids:[],from_sid:A.sid,ts:preTs};
+    const preSig=await sign(A.priv,preSb);
+    const preTx={type:'RESOLVE',v:4,consumes_lock:[lkFuture.id],lock_snapshot:lkFuture,resolution:'AWARD',creates:[],from_sid:A.sid,from_pubkey:A.pub,ts:preTs,challenge_window_expired:false,sig:preSig};
+    const pre_r=await pVerifyResolve(preTx);
+    await step(!pre_r.ok?'block':'fail','Premature resolve rejected: challenge_window_expired=false',
+      `lock.expiry: ${new Date(futureExpiry).toLocaleString()}<br>challenge_window_expired: <span class="hlr">false</span><br>Result: <span class="${!pre_r.ok?'hlg':'hlr'}">${pre_r.ok?'WRONGLY ACCEPTED':pre_r.r}</span>`);
+    if(pre_r.ok) errors++;
+
+    // ── RESOLVE AWARD with correct counterparty pubkey ──
+    await w(60);
+    await step('info','─── 7. RESOLVE(AWARD): output bound to C.pub, not resolver\'s pub ───','');
+    // Award output must use C.pub — that's what\'s stored in the lock
+    const awSalt=rSalt();
+    const awId=await outputId(lkId,C.pub.x,700,'ATT',awSalt,'spendable'); // C.pub here — correct
+    const awOut={id:awId,source_id:lkId,owner_sid:C.sid,owner_pubkey:C.pub,amount:700,symbol:'ATT',salt:awSalt,type:'spendable'};
+    const awTs=Date.now();
+    const awSb={type:'RESOLVE',consumes_lock:[lkId],resolution:'AWARD',creates_ids:[awId],from_sid:A.sid,ts:awTs};
+    const awSig=await sign(A.priv,awSb);
+    const awTx={type:'RESOLVE',v:4,consumes_lock:[lkId],lock_snapshot:lkObj,resolution:'AWARD',creates:[awOut],from_sid:A.sid,from_pubkey:A.pub,ts:awTs,challenge_window_expired:true,sig:awSig};
+    const aw_r=await pVerifyResolve(awTx);
+    await step(aw_r.ok?'resolve':'fail','AWARD verified: output is bound to C.pub (counterparty), not A.pub (resolver)',
+      `award output.owner_pubkey.x: <span class="hli">${C.pub.x.slice(0,16)}...</span> = C.pub ✓<br>lock.counterparty_pubkey.x: <span class="hli">${lkObj.counterparty_pubkey.x.slice(0,16)}...</span><br>Match: <span class="${C.pub.x===lkObj.counterparty_pubkey.x?'hlg':'hlr'}">${C.pub.x===lkObj.counterparty_pubkey.x}</span><br>Result: <span class="${aw_r.ok?'hlg':'hlr'}">${aw_r.ok?'ACCEPTED':aw_r.r}</span>`);
+    if(!aw_r.ok) errors++;
+    P.consumed.add(lkId);
+
+    // Now verify that AWARD would fail if output were bound to resolver's pubkey instead
+    const wrongAwardSalt=rSalt();
+    const wrongAwardId=await outputId(lkId,A.pub.x,700,'ATT',wrongAwardSalt,'spendable'); // A.pub — wrong!
+    const wrongAwardOut={id:wrongAwardId,source_id:lkId,owner_sid:A.sid,owner_pubkey:A.pub,amount:700,symbol:'ATT',salt:wrongAwardSalt,type:'spendable'};
+    const waTs=Date.now();
+    const waSb={type:'RESOLVE',consumes_lock:[lkId],resolution:'AWARD',creates_ids:[wrongAwardId],from_sid:A.sid,ts:waTs};
+    const waSig=await sign(A.priv,waSb);
+    const waTx={type:'RESOLVE',v:4,consumes_lock:[lkId],lock_snapshot:lkObj,resolution:'AWARD',creates:[wrongAwardOut],from_sid:A.sid,from_pubkey:A.pub,ts:waTs,challenge_window_expired:true,sig:waSig};
+    P.consumed.delete(lkId); // temporarily unmark to test this path
+    const wa_r=await pVerifyResolve(waTx);
+    P.consumed.add(lkId); // re-mark
+    await step(!wa_r.ok?'block':'fail','AWARD with resolver\'s pubkey instead of counterparty\'s — REJECTED',
+      `output.owner_pubkey.x: <span class="hlr">${A.pub.x.slice(0,16)}...</span> = A.pub (WRONG)<br>Expected: <span class="hli">${C.pub.x.slice(0,16)}...</span> = C.pub<br>Result: <span class="${!wa_r.ok?'hlg':'hlr'}">${wa_r.ok?'WRONGLY ACCEPTED':wa_r.r}</span>`);
+    if(wa_r.ok) errors++;
+
+    // ── DOUBLE-RESOLVE ──
+    await w(60);
+    const dr_r=await pVerifyResolve({...awTx});
+    await step(!dr_r.ok?'block':'fail','Double-resolve rejected: lock already consumed',
+      `P.consumed.has(lkId): <span class="hlr">true</span> → rejected before sig check<br>Result: <span class="${!dr_r.ok?'hlg':'hlr'}">${dr_r.ok?'WRONGLY ACCEPTED':dr_r.r}</span>`);
+    if(dr_r.ok) errors++;
+
+    // ── SLASH ──
+    await w(60);
+    await step('info','─── 8. RESOLVE(SLASH): burns funds, creates 0 outputs ───','');
+    const slLkId=await lockId(awId,C.pub.x,A.pub.x,700,'ATT',lkHash,Date.now()-1);
+    const slLk={id:slLkId,source_id:awId,owner_sid:C.sid,owner_pubkey:C.pub,counterparty_sid:A.sid,counterparty_pubkey:A.pub,amount:700,symbol:'ATT',terms_hash:lkHash,terms_raw:lkTerms,expiry:Date.now()-1,type:'LOCKED'};
+    P.locks.set(slLkId,slLk);
+    const slTs=Date.now();
+    const slSb={type:'RESOLVE',consumes_lock:[slLkId],resolution:'SLASH',creates_ids:[],from_sid:C.sid,ts:slTs};
+    const slSig=await sign(C.priv,slSb);
+    const slTx={type:'RESOLVE',v:4,consumes_lock:[slLkId],lock_snapshot:slLk,resolution:'SLASH',creates:[],from_sid:C.sid,from_pubkey:C.pub,ts:slTs,challenge_window_expired:true,sig:slSig};
+    const sl_r=await pVerifyResolve(slTx);
+    await step(sl_r.ok?'resolve':'fail','SLASH verified: 0 outputs created, funds destroyed',
+      `creates: [] · SLASH conservation: no requirement (explicit burn)<br>Result: <span class="${sl_r.ok?'hlg':'hlr'}">${sl_r.ok?'ACCEPTED':sl_r.r}</span>`);
+    if(!sl_r.ok) errors++;
+
+    // Verify SLASH with non-zero creates fails
+    const slBadTs=Date.now();
+    const slBadSb={type:'RESOLVE',consumes_lock:[slLkId],resolution:'SLASH',creates_ids:[awId],from_sid:C.sid,ts:slBadTs};
+    const slBadSig=await sign(C.priv,slBadSb);
+    const slBadTx={...slTx,creates:[awOut],ts:slBadTs,sig:slBadSig};
+    P.consumed.delete(slLkId);
+    const slBad_r=await pVerifyResolve(slBadTx);
+    P.consumed.add(slLkId);
+    await step(!slBad_r.ok?'block':'fail','SLASH with outputs rejected (SLASH must create 0)',
+      `Result: <span class="${!slBad_r.ok?'hlg':'hlr'}">${slBad_r.ok?'WRONGLY ACCEPTED':slBad_r.r}</span>`);
+    if(slBad_r.ok) errors++;
+
+    // ── CROSS-WALLET: Bob receives from Alice using proof chain ──
+    await w(80);
+    await step('info',"─── 9. Cross-wallet: Bob (empty state) accepts Alice's transition via ancestry proof ───",
+      "Bob has no prior local state. Alice's transition carries aOut with _proof={type:GENESIS,...}. Bob walks the chain: genesis authority sig verified → aOut proven → accept T1.");
+
+    const P2={consumed:new Set(),outputs:new Map(),locks:new Map()};
+
+    // Fix: swap genesis authority to test's authority so cross-wallet verification
+    // doesn't reject the test genesis as "unknown authority"
+    const savedGA = GENESIS_AUTHORITY_PUB;
+    GENESIS_AUTHORITY_PUB = G.pub;
+
+    try {
+    // Verify aOut existence from empty state
+    const xwExist=await verifyOutputExistence(aOut,0,P2.outputs);
+    await step(xwExist.ok?'pass':'fail','Bob: verifyOutputExistence(aOut) with empty local state',
+      `P2.outputs.has(aId): <span class="hlr">false</span> → walks _proof chain<br>`+
+      `aOut._proof.type: <span class="hl">GENESIS</span><br>`+
+      `genesis_authority_pub: G.pub · sig: verified by verifyOutputExistence<br>`+
+      `aOut.source_id === genesis_output.id: <span class="${aOut.source_id===gId?'hlg':'hlr'}">${aOut.source_id===gId}</span><br>`+
+      `Result: <span class="${xwExist.ok?'hlg':'hlr'}">${xwExist.ok?'EXISTS':'FAILED: '+xwExist.reason}</span>`);
+    if(!xwExist.ok) errors++;
+
+    // Build a fresh T1-equivalent for cross-wallet test
+    const xwTs=Date.now();
+    const xwSb={consumes:[aId],creates_ids:[bId,chId],from_sid:A.sid,ts:xwTs};
+    const xwSig=await sign(A.priv,xwSb);
+    const xwTx={type:'SPEND',v:4,consumes:[aId],source_outputs:[aOut],creates:[bOut,chOut],from_sid:A.sid,from_pubkey:A.pub,memo:'',ts:xwTs,sig:xwSig};
+
+    // Use pVerifySpend but with P2 state — temporarily swap P reference
+    const origP={consumed:P.consumed,outputs:P.outputs,locks:P.locks};
+    P.consumed=P2.consumed; P.outputs=P2.outputs; P.locks=P2.locks;
+    let xwResult;
+    try {
+      xwResult=await pVerifySpend(xwTx);
+    } finally {
+      P.consumed=origP.consumed; P.outputs=origP.outputs; P.locks=origP.locks;
+    }
+
+    await step(xwResult.ok?'pass':'fail','Bob: pVerifySpend passes all 4 rules from empty state',
+      `Rule 1 — consumed: <span class="${!P2.consumed.has(aId)?'hlg':'hlr'}">clean</span><br>`+
+      `Rule 2 — existence: genesis proof chain verified ✓<br>`+
+      `Rule 3 — signature: Alice ECDSA sig ✓<br>`+
+      `Rule 4 — conservation: 1000=300+700 ✓<br>`+
+      `Result: <span class="${xwResult.ok?'hlg':'hlr'}">${xwResult.ok?'ACCEPTED':'REJECTED: '+xwResult.r}</span>`);
+    if(!xwResult.ok) errors++;
+
+    if(xwResult.ok){
+      P2.consumed.add(aId);
+      // STEP 3c: Bob stores full proof-hop (matches acceptTx fix)
+      const bobReceived={...bOut, _proof:{type:'SPEND',source_output:aOut,sig:xwSig,from_pubkey:A.pub,from_sid:A.sid,ts:xwTs,creates_ids:[bId,chId]}};
+      P2.outputs.set(bId, bobReceived);
+      await step('pass','Bob stores bob_output · full proof chain: GENESIS ← aOut ← bobOut (2 hops)',
+        `Bob's balance: 300 ATT · chain depth: 2 · double-spend: impossible (aId in P2.consumed)`);
+    }
+
+    } finally {
+      // Restore real genesis authority after cross-wallet test — even if exception
+      GENESIS_AUTHORITY_PUB = savedGA;
+    }
+
+    // ── SUMMARY ──
+    await w(200);
+    const sum=document.getElementById('proof-summary');
+    sum.style.display='block';
+    sum.className='proof-summary '+(errors===0?'pass':'fail');
+    document.getElementById('ps-title').textContent=errors===0?'All v4 Rules Verified':''+errors+' Rule(s) Failed';
+    document.getElementById('ps-detail').innerHTML=errors===0
+      ?`<strong>Rule 1 — Consumed-source check:</strong> double-spend rejected before any crypto ✓<br>
+        <strong>Rule 2 — Authorization:</strong> signer must own consumed source (pubkey.x match) ✓<br>
+        &nbsp;&nbsp;→ Unauthorized spend by non-owner rejected ✓<br>
+        &nbsp;&nbsp;→ Fraudulent genesis (wrong authority) rejected ✓<br>
+        <strong>Rule 3 — Signature:</strong> ECDSA over transition body ✓<br>
+        <strong>Rule 4 — Conservation:</strong> Σ inputs === Σ outputs enforced ✓<br>
+        &nbsp;&nbsp;→ Inflation attempt (700 in → 9999 out) rejected ✓<br>
+        <strong>Lock invariants:</strong><br>
+        &nbsp;&nbsp;→ Counterparty pubkey bound into lock ID ✓<br>
+        &nbsp;&nbsp;→ Locked source cannot be double-spent ✓<br>
+        &nbsp;&nbsp;→ Premature resolve rejected (window not expired) ✓<br>
+        <strong>Resolve invariants:</strong><br>
+        &nbsp;&nbsp;→ AWARD output bound to counterparty pubkey (not resolver's) ✓<br>
+        &nbsp;&nbsp;→ AWARD with wrong pubkey rejected ✓<br>
+        &nbsp;&nbsp;→ Double-resolve rejected ✓<br>
+        &nbsp;&nbsp;→ SLASH creates 0 outputs ✓<br>
+        &nbsp;&nbsp;→ SLASH with outputs rejected ✓`
+      :`${errors} rule(s) failed. Review steps above.`;
+
+  }catch(err){
+    await step('fail','Proof exception',err.message);
+    const sum=document.getElementById('proof-summary');
+    sum.style.display='block'; sum.className='proof-summary fail';
+    document.getElementById('ps-title').textContent='Exception';
+    document.getElementById('ps-detail').textContent=err.message;
+  }
+  document.getElementById('proof-btn').disabled=false;
+  document.getElementById('proof-btn').textContent='▶ Run Full v4 Proof';
+  proofRunning=false;
+}
+
+function clearProof(){
+  document.getElementById('proof-steps').innerHTML='';
+  const s=document.getElementById('proof-summary');
+  s.style.display='none'; s.className='proof-summary';
+}
+
+// ── UI ──
+function sw(name){
+  const names=['balance','sources','send','lock','resolve','stake','settlement','genesis','receive','proof','log'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(['send','lock','resolve'].includes(name)) populateSels();
+}
+function copySid(){ if(!SID)return; navigator.clipboard.writeText(SID).then(()=>toast('SID copied','ok')); }
+function copyAddr(){
+  const s=document.getElementById('addr-share').textContent;
+  if(s&&s!=='—') navigator.clipboard.writeText(s).then(()=>toast('Address copied','ok'));
+}
+function copyStr(id){ navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>toast('Copied','ok')); }
+function broadcastStr(id){
+  const s=document.getElementById(id).textContent;
+  try{
+    const tx=JSON.parse(atob(s.replace(/^NX4:/,'')));
+    if(mounted && _kernelPort){
+      // FIX 4: Route through private kernel port
+      _kernelPort.postMessage({type:'EMIT',channel:'nexus.v4.transition',payload:{type:'TRANSITION',tx}});
+      log('Transition emitted via kernel MessagePort','info');
+    } else {
+      // Kernel not mounted — fall back to direct channel (standalone / file:// context)
+      BC_V4.postMessage({type:'TRANSITION',tx});
+      log('Transition emitted via direct channel (kernel not mounted)','warn');
+    }
+    toast('Broadcast','ok');
+  }catch(e){ toast('Parse error: '+e.message,'err'); }
+}
+function log(msg,cls=''){
+  const el=document.getElementById('log');
+  const t=new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const d=document.createElement('div'); d.className='le '+cls; d.textContent='['+t+'] '+msg;
+  el.appendChild(d); el.scrollTop=el.scrollHeight;
+}
+function clearLog(){ document.getElementById('log').innerHTML=''; }
+let _tt;
+function toast(msg,type=''){
+  const el=document.getElementById('toast'); el.textContent=msg; el.className='show t-'+type;
+  clearTimeout(_tt); _tt=setTimeout(()=>el.className='',2500);
+}
+// Receive panel alias
+const addr_receive_el = {textContent:''};
+Object.defineProperty(addr_receive_el,'textContent',{set(v){const e=document.getElementById('addr-share');if(e)e.textContent=v;},get(){return document.getElementById('addr-share')?.textContent||'';}});
+
+// Incoming
+BC_V4.onmessage=async e=>{
+  const m=e.data; if(!m||m.type!=='TRANSITION') return;
+  const tx=m.tx;
+  if(!SID) return; // not booted yet
+  if(!txIsForMe(tx)) return;
+  if(txAlreadyConsumed(tx)){ maybeRecordForkProofForTx(tx); return; } // already accepted
+  // Avoid duplicate PENDING entries
+  const already=PENDING.some(p=>{
+    const pids=(p.consumes||[]).concat(p.consumes_lock||[]).join(',');
+    const tids=(tx.consumes||[]).concat(tx.consumes_lock||[]).join(',');
+    return pids===tids;
+  });
+  if(already) return;
+  PENDING.push(tx); renderPending();
+  toast('⬡ Incoming '+tx.type+' from '+tx.from_sid,'ok');
+};
+function showIncomingBadge() {
+  // Flash tab title so user notices in another tab
+  const orig = document.title;
+  let n = 0;
+  const interval = setInterval(() => {
+    document.title = n++ % 2 === 0 ? `⬡ INCOMING [${WALLET_SLOT}]` : orig;
+    if (n > 6) { clearInterval(interval); document.title = orig; }
+  }, 500);
+  // Navigate to Balance panel so incoming card is visible
+  const currentActive = document.querySelector('.tab.active');
+  if (currentActive && !['balance','Balance'].includes(currentActive.textContent.trim())) {
+    sw('balance');
+  }
+}
+
+function renderPending(){
+  const card=document.getElementById('incoming-card');
+  const list=document.getElementById('incoming-list');
+  document.getElementById('inc-badge').textContent=PENDING.length+' pending';
+  card.style.display=PENDING.length?'block':'none';
+  if(PENDING.length) showIncomingBadge();
+  list.innerHTML=PENDING.map((tx,i)=>{
+    const myOuts=(tx.creates||[]).filter(o=>o.owner_sid===SID);
+    const myAmt=myOuts.reduce((s,o)=>s+o.amount,0);
+    const isLock=tx.type==='LOCK';
+    const dispAmt=isLock&&tx.lock?.counterparty_sid===SID?tx.lock.amount:myAmt;
+    return `<div class="inc-item">
+    <div class="inc-header"><div class="inc-from">From: ${tx.from_sid} · ${tx.type}</div>
+    <div class="inc-amt">${fmt(dispAmt)||'?'} ${TOKEN_SYM}</div></div>
+    <div style="font-size:9px;color:var(--dim);margin-bottom:6px">Consumes: ${(tx.consumes||tx.consumes_lock||[]).map(id=>id.slice(0,10)+'...').join(', ')}</div>
+    <div class="btn-row"><button class="btn btn-sm" onclick="acceptPI(${i})">✓ Accept</button><button class="btn btn-sm btn-ghost" onclick="rejectPI(${i})">Reject</button></div>
+  </div>`;}).join('');
+}
+async function acceptPI(i){ const tx=PENDING[i]; PENDING.splice(i,1); await acceptTx(tx); renderPending(); }
+function rejectPI(i){ PENDING.splice(i,1); renderPending(); toast('Rejected','warn'); }
+
+// ═══════════════════════════════════════════════════════════════
+// KERNEL IPC — FIX 4: MessagePort (private) replaces BroadcastChannel (public)
+// FIX 1: Watchdog detects kernel death and falls back automatically
+// ═══════════════════════════════════════════════════════════════
+
+// When running inside Nexus OS as an iframe block, the kernel sends a BOOT
+// message via window.postMessage with a MessagePort attached. That port is
+// a private pipe — only this wallet and the kernel can read it.
+// When running standalone (not in an iframe), this never fires and the
+// wallet operates via BroadcastChannel + outbox only.
+
+function initKernelIPC(){
+  if(_kernelIPCStarted) return;
+  _kernelIPCStarted = true;
+  // Are we in an iframe? If window === window.top, we're standalone.
+  if(window === window.top){
+    log('Standalone mode — no kernel IPC. Using BroadcastChannel + outbox.','warn');
+    return;
+  }
+
+  // Listen for BOOT message from kernel — carries the private MessagePort
+  window.addEventListener('message', function(e){
+    // SECURITY: Only accept BOOT from the parent frame (the kernel).
+    // Sibling iframes share our origin but are NOT the kernel.
+    // e.source is unforgeable — a sibling can't make postMessage appear to come from parent.
+    if(e.source !== window.parent) return;
+    if(!e.data || e.data.type !== 'BOOT') return;
+    _kernelPort = e.ports[0];
+    if(!_kernelPort) { log('BOOT received but no port attached','warn'); return; }
+
+    log('BOOT received — private kernel port established','ok');
+
+    _kernelPort.onmessage = function(ev){
+      const msg = ev.data;
+      if(!msg || !msg.type) return;
+
+      switch(msg.type){
+
+        case 'MOUNT_CHALLENGE':
+          // Echo nonce exactly — wrong nonce = violation = eviction
+          _kernelPort.postMessage({ type: 'MOUNT_ACK', nonce: msg.nonce });
+          _kernelPort.postMessage({ type: 'SUB', channel: 'nexus.v4.transition' });
+          _kernelPort.postMessage({ type: 'SUB', channel: 'nexus.wallet.query' });
+          _kernelPort.postMessage({ type: 'SUB', channel: 'wallet.fork_proof.list' });
+          _kernelPort.postMessage({ type: 'SUB', channel: 'wallet.fork_proof.export' });
+          _kernelPort.postMessage({ type: 'SUB', channel: 'wallet.lock.create' });
+          _kernelPort.postMessage({ type: 'SUB', channel: 'wallet.lock.resolve' });
+          _kernelPort.postMessage({ type: 'SUB', channel: 'wallet.lock.verify' });
+          if(!mounted){
+            mounted = true;
+            _lastPing = Date.now();
+            startWatchdog();
+            document.getElementById('hdot').className='hdot live';
+            document.getElementById('hdot-label').textContent = 'Connected';
+            log('Kernel: mounted (MessagePort, private channel)','ok');
+          }
+          break;
+
+        case 'PING':
+          // FIX 1: Record timestamp for watchdog
+          _lastPing = Date.now();
+          _kernelPort.postMessage({ type: 'PONG', nonce: msg.nonce });
+          break;
+
+        case 'WALLET_QUERY':
+          // Any block can query wallet state. Respond immediately.
+          if(SID && _kernelPort){
+            _kernelPort.postMessage({type:'WALLET_RESPONSE',requestId:msg.requestId||null,
+              sid:SID,balance:balance(),lockedBalance:lockedBalance(),symbol:TOKEN_SYM,
+              unspentCount:unspent().length,lockedCount:lockedOuts().length,
+              activeLocks:lockedOuts().map(l=>({id:l.id,amount:l.amount,symbol:l.symbol,
+                terms_raw:l.terms_raw||'',expiry:l.expiry,counterparty_sid:l.counterparty_sid,
+                resolvable:Date.now()>l.expiry}))
+            });
+            log('WALLET_QUERY received — state sent to requestor','info');
+          }
+          break;
+
+        case 'MSG':
+          // Incoming message from another block via kernel IPC bus
+          if(handleForkProofRequest(msg.channel, msg.payload || {})) break;
+          if(['wallet.lock.create','wallet.lock.resolve','wallet.lock.verify'].includes(msg.channel)){ handleWalletLockRequest(msg.channel, msg.payload || {}); break; }
+          if(msg.channel === 'nexus.v4.transition'){
+            const payload = msg.payload;
+            if(!payload || payload.type !== 'TRANSITION') break;
+            const tx = payload.tx;
+            const creates = (tx.creates||[]).concat(tx.creates_change||[]);
+            if(!creates.some(o=>o.owner_sid===SID) && !(tx.lock?.owner_sid===SID) && !(tx.lock?.counterparty_sid===SID)) break;
+            if(txAlreadyConsumed(tx)){ maybeRecordForkProofForTx(tx); break; }
+            // Dedup against PENDING
+            const alreadyQueued = PENDING.some(p => {
+              const pids = (p.consumes||[]).concat(p.consumes_lock||[]).join(',');
+              const tids = (tx.consumes||[]).concat(tx.consumes_lock||[]).join(',');
+              return pids === tids;
+            });
+            if(!alreadyQueued){
+              PENDING.push(tx);
+              renderPending();
+              toast('Incoming (kernel) '+tx.type,'ok');
+              log('Incoming transition via kernel: '+tx.type+' from '+tx.from_sid,'info');
+            }
+          }
+          break;
+
+        // Unknown message types: silently ignore (not a violation from our side)
+      }
+    };
+
+    _kernelPort.start(); // Required for MessagePort — activates delivery
+
+    // DECLARE — tell the kernel what we emit and consume
+    // Must fire synchronously before the 9-second watchdog kills us
+    _kernelPort.postMessage({
+      type: 'DECLARE',
+      manifest: {
+        emits:    ['nexus.v4.transition', 'nexus.wallet.state', 'wallet.fork_proof.result', 'wallet.lock.result'],
+        consumes: ['nexus.v4.transition', 'nexus.wallet.query', 'wallet.fork_proof.list', 'wallet.fork_proof.export', 'wallet.lock.create', 'wallet.lock.resolve', 'wallet.lock.verify']
+      },
+      app: {
+        title:       'Wallet v4',
+        icon:        '◈',
+        description: 'NX4 full-rules wallet — MessagePort secured',
+        visible:     true
+      }
+    });
+
+    log('DECLARE sent on private port','info');
+
+  }, { once: false }); // Keep listener for kernel restart/reload recovery
+}
+
+// ── FIX 1: Kernel death watchdog ──
+// The kernel PINGs every 3s. If we haven't received a PING in 12s,
+// the kernel is probably dead. Set mounted=false so autoTransport
+// falls back to BroadcastChannel instead of posting into the void.
+function startWatchdog(){
+  if(_watchdogInterval) clearInterval(_watchdogInterval);
+  _watchdogInterval = setInterval(function(){
+    if(mounted && _lastPing > 0 && (Date.now() - _lastPing > WATCHDOG_TIMEOUT_MS)){
+      mounted = false;
+      _kernelPort = null;
+      document.getElementById('hdot').className='hdot';
+      document.getElementById('hdot-label').textContent = '—';
+      log('Watchdog: kernel appears dead — no PING in ' + WATCHDOG_TIMEOUT_MS + 'ms. Falling back to BroadcastChannel.','warn');
+      toast('Kernel connection lost — using fallback transport','warn');
+      clearInterval(_watchdogInterval);
+      _watchdogInterval = null;
+    }
+  }, 5000); // Check every 5 seconds
+}
+
+// ── Standalone BroadcastChannel receiver (BC_V4) ──
+// This always runs regardless of kernel mount state.
+// Handles direct wallet-to-wallet transitions when there's no kernel.
+BC_V4.onmessage = e => {
+  if(!SID) return;
+  const payload = e.data;
+  if(!payload || payload.type !== 'TRANSITION') return;
+  const tx = payload.tx;
+  if(!txIsForMe(tx)) return;
+  if(txAlreadyConsumed(tx)){ maybeRecordForkProofForTx(tx); return; }
+  const alreadyQueued = PENDING.some(p => {
+    const pids = (p.consumes||[]).concat(p.consumes_lock||[]).join(',');
+    const tids = (tx.consumes||[]).concat(tx.consumes_lock||[]).join(',');
+    return pids === tids;
+  });
+  if(!alreadyQueued){
+    PENDING.push(tx);
+    renderPending();
+    toast('Incoming (direct) '+tx.type,'ok');
+    log('Incoming transition via BC_V4: '+tx.type+' from '+tx.from_sid,'info');
+  }
+};
+
+window.addEventListener('beforeunload', () => {
+  if(_kernelPort){
+    try { _kernelPort.postMessage({type: 'LEAVE'}); } catch(e){}
+  }
+});
+
+// Install the kernel BOOT listener before the async wallet boot work begins.
+// The OS may post BOOT as soon as the iframe load event fires; wallet key/DB
+// hydration is allowed to continue after the private MessagePort is ready.
+initKernelIPC();
+boot();
+</script>
+</body>
+</html>

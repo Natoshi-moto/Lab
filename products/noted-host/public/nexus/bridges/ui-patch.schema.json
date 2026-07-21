@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ui-patch.schema.json",
+  "type": "object",
+  "required": [
+    "id",
+    "target",
+    "scope",
+    "operation",
+    "rationale",
+    "preview",
+    "reversible",
+    "requiresApproval"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "target": {
+      "type": "string"
+    },
+    "scope": {
+      "enum": [
+        "session",
+        "workspace",
+        "profile"
+      ]
+    },
+    "operation": {
+      "enum": [
+        "layout",
+        "theme",
+        "widget",
+        "menu",
+        "route",
+        "macro"
+      ]
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "preview": {
+      "type": "string"
+    },
+    "diff": {},
+    "reversible": {
+      "const": true
+    },
+    "requiresApproval": {
+      "type": "boolean"
+    }
+  }
+}

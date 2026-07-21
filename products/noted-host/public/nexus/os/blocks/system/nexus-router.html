@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NexusRouter · Direct-Channel Broker</title>
+<meta name="theme-color" content="#080a0c" />
+<meta name="color-scheme" content="dark" />
+
+<meta name="nexus:block-id" content="nexus-router" />
+<meta name="nexus:version" content="0.1.0" />
+<meta name="nexus:protocol" content="1" />
+<meta name="nexus:capabilities" content="producer-registry,stream-discovery,session-lifecycle" />
+<meta name="nexus:emits" content="router.result,router.debug,system.block_ready" />
+<meta name="nexus:consumes" content="router.register,router.connect,router.deregister,router.list,router.heartbeat" />
+
+<style>
+  :root {
+    --bg: #080a0c;
+    --panel: #0d1114;
+    --line: rgba(214,255,232,0.10);
+    --text: #d6ffe8;
+    --dim: #8aa399;
+    --gold: #f1c673;
+    --cyan: #8fcdff;
+    --red: #ff7a7a;
+    --green: #7dd99a;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px; line-height: 1.5;
+    height: 100vh; overflow: hidden;
+  }
+  body {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .head {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 6px 10px;
+    border-left: 2px solid var(--cyan);
+    background: var(--panel);
+  }
+  .head .title { color: var(--cyan); font-weight: 700; letter-spacing: .04em; }
+  .head .sub   { color: var(--dim); font-size: 10px; }
+  .head .dots  { color: var(--cyan); margin-left: 6px; }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    padding: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .metric { display: flex; flex-direction: column; }
+  .metric .label { color: var(--dim); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+  .metric .value { color: var(--text); font-size: 13px; font-weight: 700; margin-top: 2px; }
+  .metric .value.cyan { color: var(--cyan); }
+  .metric .value.gold { color: var(--gold); }
+
+  .panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    overflow: hidden;
+  }
+  .pane {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  .pane h2 {
+    margin: 0 0 6px 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--cyan);
+    border-bottom: 1px solid var(--line); padding-bottom: 4px;
+  }
+
+  .producer-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px; align-items: center;
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(214,255,232,0.04);
+  }
+  .producer-row .pid { color: var(--dim); font-size: 9px; }
+  .producer-row .kind { color: var(--gold); font-size: 11px; }
+  .producer-row .desc { color: var(--dim); font-size: 9px; margin-top: 1px; }
+  .producer-row .age { color: var(--green); font-size: 9px; }
+  .producer-row .age.stale { color: var(--red); }
+
+  .log-entry { font-size: 10px; word-break: break-word; }
+  .log-entry.register { color: var(--green); }
+  .log-entry.connect  { color: var(--cyan); }
+  .log-entry.deregister { color: var(--red); }
+  .log-entry.dim { color: var(--dim); }
+  .log-entry.err { color: var(--red); }
+
+  .empty { color: var(--dim); font-style: italic; text-align: center; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <span class="title">NEXUS·ROUTER</span>
+  <span class="sub">v0.1 · direct-channel broker</span>
+  <span class="dots" id="dots"></span>
+  <span style="flex:1"></span>
+  <span class="sub" id="status">booting…</span>
+</div>
+
+<div class="metrics">
+  <div class="metric"><span class="label">Producers</span><span class="value cyan" id="m-producers">0</span></div>
+  <div class="metric"><span class="label">Connections (total)</span><span class="value" id="m-connections">0</span></div>
+  <div class="metric"><span class="label">Registers (total)</span><span class="value" id="m-registers">0</span></div>
+  <div class="metric"><span class="label">Evictions</span><span class="value gold" id="m-evictions">0</span></div>
+  <div class="metric"><span class="label">Uptime</span><span class="value" id="m-uptime">—</span></div>
+</div>
+
+<div class="panes">
+  <div class="pane">
+    <h2>PRODUCERS</h2>
+    <div id="producers-list"><div class="empty">no producers registered</div></div>
+  </div>
+
+  <div class="pane">
+    <h2>EVENT LOG</h2>
+    <div id="log-container"></div>
+  </div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NexusRouter — Direct-Channel Broker
+   ─────────────────────────────────────────────────────────────────────────
+   Discovery + lifecycle service for streaming producers/consumers.
+
+   Producers register a "kind" (e.g. compute.stream.terrain-strip); the
+   router assigns a sessionId and a BroadcastChannel name. Consumers ask
+   for a kind and get back the channel name. The two sides then talk on
+   BroadcastChannel directly — the router never sees the stream traffic.
+
+   This earns its keep by providing:
+     - a single place to discover who provides what
+     - heartbeat-driven session lifecycle (stale producers evicted)
+     - debug visibility into who connected to whom and when
+
+   Channels:
+     consumes: router.register, router.connect, router.deregister,
+               router.list, router.heartbeat
+     emits:    router.result, router.debug, system.block_ready
+   ══════════════════════════════════════════════════════════════════════════ */
+
+
+// ── Constants ───────────────────────────────────────────────────────────────
+
+const HEARTBEAT_TIMEOUT_MS = 15000;  // producer is "stale" after this
+const HEARTBEAT_CHECK_MS   =  5000;  // run the staleness check this often
+const LOG_RING_SIZE        =   200;
+
+
+// ── State ───────────────────────────────────────────────────────────────────
+
+const state = {
+  producers: new Map(),    // sessionId → producer record
+  totals: {
+    registers:   0,
+    connections: 0,
+    evictions:   0
+  },
+  bootedAt: Date.now()
+};
+
+
+// ── ID generation ──────────────────────────────────────────────────────────
+
+function newSessionId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return 's_' + window.crypto.randomUUID().slice(0, 12);
+  }
+  return 's_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+}
+
+
+// ── UI ─────────────────────────────────────────────────────────────────────
+
+const logContainer = document.getElementById('log-container');
+function logEvent(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'log-entry ' + (type || 'dim');
+  el.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  logContainer.appendChild(el);
+  while (logContainer.children.length > LOG_RING_SIZE) logContainer.firstChild.remove();
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+setInterval(() => {
+  const d = document.getElementById('dots');
+  if (d) d.textContent = '.'.repeat(Math.floor((Date.now() / 500) % 4));
+}, 500);
+
+function refreshProducersUI() {
+  const root = document.getElementById('producers-list');
+  if (state.producers.size === 0) {
+    root.innerHTML = '<div class="empty">no producers registered</div>';
+    return;
+  }
+  root.innerHTML = '';
+  const now = Date.now();
+  for (const [sid, p] of state.producers.entries()) {
+    const age = now - p.lastHeartbeat;
+    const stale = age > HEARTBEAT_TIMEOUT_MS;
+    const row = document.createElement('div');
+    row.className = 'producer-row';
+    row.innerHTML =
+      '<div><div class="pid">' + sid + '</div>' +
+        '<div class="kind">' + escapeHTML(p.kind) + '</div>' +
+        '<div class="desc">' + escapeHTML(p.description || '') + '</div>' +
+        '<div class="desc">channel: ' + escapeHTML(p.channelName) + '</div></div>' +
+      '<div></div>' +
+      '<div class="age' + (stale ? ' stale' : '') + '">' + Math.round(age / 1000) + 's</div>';
+    root.appendChild(row);
+  }
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+}
+
+function refreshMetricsUI() {
+  document.getElementById('m-producers').textContent   = state.producers.size;
+  document.getElementById('m-connections').textContent = state.totals.connections;
+  document.getElementById('m-registers').textContent   = state.totals.registers;
+  document.getElementById('m-evictions').textContent   = state.totals.evictions;
+  const sec = Math.floor((Date.now() - state.bootedAt) / 1000);
+  const hh = Math.floor(sec / 3600);
+  const mm = Math.floor((sec % 3600) / 60);
+  const ss = sec % 60;
+  document.getElementById('m-uptime').textContent =
+    (hh > 0 ? hh + 'h ' : '') + (mm > 0 ? mm + 'm ' : '') + ss + 's';
+}
+
+
+// ── IPC handlers ───────────────────────────────────────────────────────────
+
+let nx = null;
+
+async function handleRegister(req) {
+  // req: { kind, blockId, description, _reqId, appId }
+  const kind = String(req.kind || '').trim();
+  if (!kind) return { ok: false, error: 'kind required' };
+
+  const sessionId = newSessionId();
+  // Channel name is derived from kind + sessionId so it's both
+  // human-readable in dev tools and unique across registrations.
+  const channelName = 'nexus-stream-' + kind.replace(/[^a-z0-9.-]/gi, '-') + '-' + sessionId;
+  const now = Date.now();
+  const record = {
+    sessionId: sessionId,
+    kind: kind,
+    blockId: String(req.blockId || ''),
+    appId:   String(req.appId   || ''),
+    description: String(req.description || ''),
+    channelName: channelName,
+    registeredAt: now,
+    lastHeartbeat: now
+  };
+  state.producers.set(sessionId, record);
+  state.totals.registers++;
+  emit('router.debug', { event: 'register', sessionId, kind, blockId: record.blockId, channelName });
+  logEvent('REGISTER ' + kind + ' → ' + sessionId + ' [' + record.blockId + ']', 'register');
+  refreshProducersUI();
+  refreshMetricsUI();
+  return { ok: true, sessionId, channelName, kind };
+}
+
+async function handleConnect(req) {
+  // req: { kind, consumerId, _reqId, appId }
+  const kind = String(req.kind || '').trim();
+  if (!kind) return { ok: false, error: 'kind required' };
+  // Find first producer matching kind. (Sweep-1 simplification: first registered wins.
+  // Multi-producer load-balancing is a future enhancement.)
+  let chosen = null;
+  for (const p of state.producers.values()) {
+    if (p.kind === kind) { chosen = p; break; }
+  }
+  if (!chosen) return { ok: false, error: 'no producer for kind: ' + kind };
+  state.totals.connections++;
+  emit('router.debug', {
+    event: 'connect',
+    sessionId: chosen.sessionId,
+    kind: kind,
+    consumerId: String(req.consumerId || req.appId || ''),
+    channelName: chosen.channelName
+  });
+  logEvent('CONNECT  ' + kind + ' ← consumer:' + (req.consumerId || req.appId || '?'), 'connect');
+  refreshMetricsUI();
+  return {
+    ok: true,
+    sessionId: chosen.sessionId,
+    channelName: chosen.channelName,
+    kind: chosen.kind,
+    description: chosen.description
+  };
+}
+
+async function handleDeregister(req) {
+  const sid = String(req.sessionId || '');
+  if (!sid) return { ok: false, error: 'sessionId required' };
+  const p = state.producers.get(sid);
+  if (!p) return { ok: false, error: 'unknown sessionId' };
+  state.producers.delete(sid);
+  emit('router.debug', { event: 'deregister', sessionId: sid, kind: p.kind, reason: 'explicit' });
+  logEvent('DEREGISTER ' + p.kind + ' (' + sid + ') — explicit', 'deregister');
+  refreshProducersUI();
+  refreshMetricsUI();
+  return { ok: true, sessionId: sid };
+}
+
+async function handleList(req) {
+  const producers = [];
+  for (const p of state.producers.values()) {
+    producers.push({
+      sessionId: p.sessionId, kind: p.kind, blockId: p.blockId,
+      description: p.description, channelName: p.channelName,
+      registeredAt: p.registeredAt, lastHeartbeat: p.lastHeartbeat
+    });
+  }
+  return { ok: true, producers };
+}
+
+// Heartbeat is fire-and-forget; producer pings us and we just update the timestamp.
+function handleHeartbeat(payload) {
+  if (!payload) return;
+  const sid = String(payload.sessionId || '');
+  const p = state.producers.get(sid);
+  if (!p) return;
+  p.lastHeartbeat = Date.now();
+}
+
+
+// ── Lifecycle: evict stale producers ───────────────────────────────────────
+
+setInterval(() => {
+  const now = Date.now();
+  const expired = [];
+  for (const [sid, p] of state.producers.entries()) {
+    if (now - p.lastHeartbeat > HEARTBEAT_TIMEOUT_MS) expired.push(sid);
+  }
+  for (const sid of expired) {
+    const p = state.producers.get(sid);
+    state.producers.delete(sid);
+    state.totals.evictions++;
+    emit('router.debug', { event: 'deregister', sessionId: sid, kind: p.kind, reason: 'heartbeat_timeout' });
+    logEvent('EVICT    ' + p.kind + ' (' + sid + ') — no heartbeat for ' + Math.round((now - p.lastHeartbeat)/1000) + 's', 'deregister');
+  }
+  if (expired.length > 0) { refreshProducersUI(); refreshMetricsUI(); }
+}, HEARTBEAT_CHECK_MS);
+
+// Periodic UI refresh so the age column ticks even when nothing else changes
+setInterval(() => { refreshProducersUI(); refreshMetricsUI(); }, 1000);
+
+
+// ── IPC helpers ────────────────────────────────────────────────────────────
+
+function emit(channel, payload) {
+  if (nx && typeof nx.emit === 'function') nx.emit(channel, payload);
+}
+
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+
+if (window.NexusBlockClient) {
+  nx = window.NexusBlockClient.bootBlock({
+    manifest: {
+      emits: ['router.result', 'router.debug', 'system.block_ready'],
+      consumes: [
+        'router.register', 'router.connect', 'router.deregister',
+        'router.list', 'router.heartbeat'
+      ],
+      app: {
+        title: 'NexusRouter',
+        icon:  '⇌',
+        visible: true,
+        description: 'Direct-channel broker for streaming producers and consumers'
+      }
+    }
+  });
+
+  nx.ready.then(() => {
+    document.getElementById('status').textContent = 'ONLINE';
+    logEvent('kernel handshake complete', 'dim');
+
+    nx.handle('router.register',   handleRegister,   { resultChannel: 'router.result' });
+    nx.handle('router.connect',    handleConnect,    { resultChannel: 'router.result' });
+    nx.handle('router.deregister', handleDeregister, { resultChannel: 'router.result' });
+    nx.handle('router.list',       handleList,       { resultChannel: 'router.result' });
+    nx.subscribe('router.heartbeat', handleHeartbeat);
+
+    emit('system.block_ready', { blockId: 'nexus_router', status: 'ONLINE' });
+    refreshMetricsUI();
+  });
+} else {
+  document.getElementById('status').textContent = 'STANDALONE';
+  logEvent('NexusBlockClient missing; running standalone (no IPC)', 'err');
+  refreshMetricsUI();
+}
+
+window.addEventListener('error', (e) => logEvent('window error: ' + (e.message || e), 'err'));
+window.addEventListener('unhandledrejection', (e) => logEvent('unhandled: ' + String(e.reason), 'err'));
+</script>
+</body>
+</html>

@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · MULTIFORGE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0e;--bg2:#13131a;--bg3:#1a1a23;
+  --line:#2a2a36;--line2:#3a3a4a;
+  --text:#e8e8ee;--dim:#7a7a88;--dim2:#4a4a58;
+  --accent:#aaffcc;--accent2:#aaeeff;
+  --red:#ff5566;
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono','SF Mono',Menlo,Consolas,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;overflow:hidden;-webkit-font-smoothing:antialiased}
+#app{display:grid;grid-template-columns:1fr 310px;height:100vh}
+
+/* ── Stage ── */
+#stage{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden}
+#topbar{display:flex;align-items:center;gap:12px;padding:0 14px;height:36px;border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg2)}
+#brand{font-size:11px;letter-spacing:3px;font-weight:600}
+#brand b{color:var(--accent)}
+.mode-btns{display:flex;gap:3px}
+.mode-btn{font-family:inherit;font-size:10px;letter-spacing:1px;padding:3px 10px;background:transparent;border:1px solid var(--line);color:var(--dim);cursor:pointer;border-radius:2px;transition:all .1s}
+.mode-btn:hover{color:var(--text);border-color:var(--line2)}
+.mode-btn.active-c{color:var(--bg);background:var(--accent);border-color:var(--accent)}
+.mode-btn.active-e{color:var(--bg);background:var(--accent2);border-color:var(--accent2)}
+#status{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:1px;white-space:nowrap}
+
+#grid-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg);min-height:0;padding:12px;overflow:hidden}
+#grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:4px;flex-shrink:0}
+
+.cell{position:relative;cursor:pointer;border:2px solid transparent;border-radius:2px;overflow:hidden;transition:border-color .1s;background:#050508}
+.cell:hover{border-color:var(--line2)}
+.cell.sel-c{border-color:var(--accent)}
+.cell.sel-e{border-color:var(--accent2)}
+.cell canvas{display:block;width:100%;height:100%}
+.cell-badge{position:absolute;bottom:4px;right:5px;font-size:9px;color:var(--dim2);letter-spacing:.5px;pointer-events:none}
+.cell.sel-c .cell-badge{color:var(--accent)}
+.cell.sel-e .cell-badge{color:var(--accent2)}
+
+#stage-foot{height:40px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--bg2);flex-shrink:0}
+#sel-info{font-size:10px;color:var(--dim);letter-spacing:.5px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tpl-name-wrap{display:none;align-items:center;gap:6px}
+#tpl-name-wrap.show{display:flex}
+#tpl-name-input{background:var(--bg3);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:11px;padding:3px 8px;border-radius:2px;outline:none;width:130px}
+#tpl-name-input:focus{border-color:var(--accent)}
+
+.btn{font-family:inherit;font-size:11px;letter-spacing:1px;color:var(--dim);background:transparent;border:1px solid var(--line);padding:5px 11px;cursor:pointer;transition:all .1s;border-radius:2px;text-transform:lowercase;white-space:nowrap;flex-shrink:0}
+.btn:hover{color:var(--text);border-color:var(--line2);background:var(--bg3)}
+.btn:disabled{opacity:.3;cursor:default;pointer-events:none}
+.btn.primary-c{color:var(--accent);border-color:var(--accent)}
+.btn.primary-c:hover{background:rgba(170,255,204,.08)}
+.btn.primary-e{color:var(--accent2);border-color:var(--accent2)}
+.btn.primary-e:hover{background:rgba(170,238,255,.08)}
+.btn.full{width:100%}
+
+/* ── Panel ── */
+#panel{display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;flex-shrink:0}
+#panel-body{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:14px}
+#panel-body::-webkit-scrollbar{width:4px}
+#panel-body::-webkit-scrollbar-thumb{background:var(--line2)}
+
+.section-label{font-size:9px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.ctrl-section{display:flex;flex-direction:column;gap:8px}
+.jitter-row{display:grid;grid-template-columns:46px 1fr 32px;align-items:center;gap:8px;font-size:10px;color:var(--dim)}
+.jitter-row input[type=range]{width:100%;height:4px;appearance:none;background:var(--bg);border:1px solid var(--line);cursor:pointer;border-radius:0;outline:none}
+.jitter-row input[type=range]::-webkit-slider-thumb{appearance:none;width:10px;height:14px;background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.jitter-row span{font-size:10px;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+
+/* ── Templates ── */
+.tpl-section{display:flex;flex-direction:column;gap:7px}
+#templates-list{display:flex;flex-direction:column;gap:5px;min-height:20px}
+.tpl-empty{font-size:10px;color:var(--dim2);line-height:1.6;font-style:italic}
+.tpl-item{display:flex;gap:4px;align-items:stretch}
+.tpl-btn{flex:1;font-family:inherit;font-size:10px;letter-spacing:.5px;color:var(--text);background:var(--bg3);border:1px solid var(--line);padding:6px 9px;cursor:pointer;border-radius:2px;text-align:left;display:flex;align-items:center;gap:7px;transition:all .1s;min-width:0;border-left-width:3px}
+.tpl-btn:hover{border-color:var(--line2);background:var(--bg)}
+.tpl-btn.c{border-left-color:var(--accent)}
+.tpl-btn.e{border-left-color:var(--accent2)}
+.tpl-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.tpl-dot.c{background:var(--accent)}
+.tpl-dot.e{background:var(--accent2)}
+.tpl-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.tpl-del{font-family:inherit;font-size:14px;line-height:1;color:var(--dim2);background:transparent;border:1px solid transparent;width:26px;cursor:pointer;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .1s}
+.tpl-del:hover{color:var(--red);border-color:var(--red);background:rgba(255,85,102,.08)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <div id="topbar">
+      <span id="brand"><b>◇</b>&nbsp;MULTIFORGE</span>
+      <div class="mode-btns">
+        <button class="mode-btn active-c" id="btn-c" onclick="setMode('creature')">creature</button>
+        <button class="mode-btn" id="btn-e" onclick="setMode('environment')">environment</button>
+      </div>
+      <span id="status">ready</span>
+    </div>
+    <div id="grid-wrap"><div id="grid"></div></div>
+    <div id="stage-foot">
+      <span id="sel-info">hit randomize · click any cell to select it</span>
+      <div id="tpl-name-wrap">
+        <input id="tpl-name-input" type="text" maxlength="32" spellcheck="false" placeholder="name…">
+        <button class="btn primary-c" id="btn-save-tpl" onclick="saveTemplate()">save template</button>
+      </div>
+    </div>
+  </div>
+  <div id="panel">
+    <div class="panel-head">controls</div>
+    <div id="panel-body">
+      <div class="ctrl-section">
+        <div class="jitter-row">
+          <label>jitter</label>
+          <input type="range" id="jitter-slider" min="0" max="255" value="80" oninput="onJitter(this.value)">
+          <span id="jitter-val">80</span>
+        </div>
+        <button class="btn primary-c full" id="btn-rand" onclick="randomizeGrid()">randomize grid</button>
+      </div>
+      <div class="tpl-section">
+        <div class="section-label">templates</div>
+        <div id="templates-list">
+          <div class="tpl-empty">select a cell after randomizing,<br>then save it as a template.<br>templates become their own<br>randomize buttons.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════
+   CREATURE AXES
+   ════════════════════════════════════════════ */
+const CREATURE_AXES = [
+  {id:'body_radius',    group:'body',       default:160,label:'body radius'},
+  {id:'body_stretch_x', group:'body',       default:128,label:'body width'},
+  {id:'body_stretch_y', group:'body',       default:128,label:'body height'},
+  {id:'body_lumpiness', group:'body',       default: 50,label:'body lumpiness'},
+  {id:'body_lump_count',group:'body',       default:140,label:'body lump count'},
+  {id:'body_outline',   group:'body',       default:140,label:'outline weight'},
+  {id:'body_shadow',    group:'body',       default:140,label:'shadow band'},
+  {id:'arm_count',      group:'appendages', default: 80,label:'appendage count'},
+  {id:'arm_length',     group:'appendages', default:128,label:'appendage length'},
+  {id:'arm_width',      group:'appendages', default:128,label:'appendage width'},
+  {id:'arm_taper',      group:'appendages', default:160,label:'appendage taper'},
+  {id:'arm_wobble',     group:'appendages', default:120,label:'appendage wobble'},
+  {id:'arm_wobble_rate',group:'appendages', default:128,label:'wobble speed'},
+  {id:'arm_curl',       group:'appendages', default: 60,label:'appendage curl'},
+  {id:'arm_droop',      group:'appendages', default:128,label:'appendage angle'},
+  {id:'eye_count',      group:'eyes',       default:128,label:'eye count'},
+  {id:'eye_size',       group:'eyes',       default:128,label:'eye size'},
+  {id:'eye_spacing',    group:'eyes',       default:128,label:'eye spacing'},
+  {id:'eye_height',     group:'eyes',       default:100,label:'eye position'},
+  {id:'eye_pupil',      group:'eyes',       default:140,label:'pupil size'},
+  {id:'eye_glow',       group:'eyes',       default:120,label:'eye glow'},
+  {id:'mark_runes',     group:'surface',    default: 40,label:'rune marks'},
+  {id:'mark_spots',     group:'surface',    default: 40,label:'glow spots'},
+  {id:'mark_drips',     group:'surface',    default:  0,label:'surface drips'},
+  {id:'mark_facets',    group:'surface',    default:  0,label:'crystal facets'},
+  {id:'particle_count', group:'particles',  default: 80,label:'particle count'},
+  {id:'particle_radius',group:'particles',  default:140,label:'orbit radius'},
+  {id:'particle_size',  group:'particles',  default:120,label:'particle size'},
+  {id:'particle_drift', group:'particles',  default:100,label:'drift speed'},
+  {id:'particle_turb',  group:'particles',  default: 60,label:'particle turbulence'},
+  {id:'glow_radius',    group:'glow',       default:140,label:'outer glow radius'},
+  {id:'glow_strength',  group:'glow',       default:140,label:'outer glow strength'},
+  {id:'core_size',      group:'glow',       default:120,label:'core size'},
+  {id:'core_brightness',group:'glow',       default:160,label:'core brightness'},
+  {id:'pulse_rate',     group:'glow',       default:128,label:'pulse rate'},
+  {id:'hue_primary',    group:'color',      default:200,label:'primary hue'},
+  {id:'hue_accent',     group:'color',      default: 80,label:'accent hue'},
+  {id:'hue_glow',       group:'color',      default:140,label:'glow hue'},
+  {id:'saturation',     group:'color',      default:170,label:'saturation'},
+  {id:'lightness',      group:'color',      default:130,label:'lightness'},
+];
+const CID = Object.fromEntries(CREATURE_AXES.map((a,i)=>[a.id,i]));
+
+/* ════════════════════════════════════════════
+   ENVIRONMENT AXES
+   ════════════════════════════════════════════ */
+const ENV_AXES = [
+  {id:'sky_top_hue',      group:'deep_bg',   default:148,label:'sky top hue'},
+  {id:'sky_top_lightness',group:'deep_bg',   default: 45,label:'sky top lightness'},
+  {id:'sky_bot_hue',      group:'deep_bg',   default:200,label:'sky bottom hue'},
+  {id:'sky_bot_lightness',group:'deep_bg',   default:120,label:'sky bottom lightness'},
+  {id:'sky_saturation',   group:'deep_bg',   default:120,label:'sky saturation'},
+  {id:'sky_band_position',group:'deep_bg',   default:140,label:'sky horizon band'},
+  {id:'sky_pulse_rate',   group:'deep_bg',   default:  0,label:'sky pulse rate'},
+  {id:'star_count',       group:'deep_bg',   default:  0,label:'star count'},
+  {id:'star_brightness',  group:'deep_bg',   default:128,label:'star brightness'},
+  {id:'far_count',        group:'far',       default: 80,label:'far shape count'},
+  {id:'far_height',       group:'far',       default:100,label:'far shape height'},
+  {id:'far_jitter',       group:'far',       default:140,label:'far shape variance'},
+  {id:'far_darkness',     group:'far',       default:140,label:'far shape darkness'},
+  {id:'far_haze',         group:'far',       default:120,label:'atmospheric haze'},
+  {id:'mid_count',        group:'mid',       default: 60,label:'mid shape count'},
+  {id:'mid_height',       group:'mid',       default:140,label:'mid shape height'},
+  {id:'mid_jitter',       group:'mid',       default:150,label:'mid shape variance'},
+  {id:'mid_darkness',     group:'mid',       default:180,label:'mid shape darkness'},
+  {id:'ground_y',         group:'ground',    default:170,label:'ground horizon y'},
+  {id:'ground_hue',       group:'ground',    default:128,label:'ground hue'},
+  {id:'ground_lightness', group:'ground',    default: 80,label:'ground lightness'},
+  {id:'ground_texture',   group:'ground',    default: 80,label:'ground texture density'},
+  {id:'ground_glow',      group:'ground',    default: 40,label:'ground rim glow'},
+  {id:'fg_count',         group:'foreground',default: 30,label:'foreground particle count'},
+  {id:'fg_size',          group:'foreground',default:120,label:'foreground particle size'},
+  {id:'fg_speed',         group:'foreground',default:128,label:'foreground drift speed'},
+  {id:'fg_direction',     group:'foreground',default:128,label:'foreground drift direction'},
+  {id:'fg_opacity',       group:'foreground',default:140,label:'foreground opacity'},
+  {id:'fog_density',      group:'ambient',   default: 30,label:'fog density'},
+  {id:'fog_hue',          group:'ambient',   default:150,label:'fog hue'},
+  {id:'vignette',         group:'ambient',   default: 80,label:'vignette amount'},
+  {id:'scene_tint',       group:'ambient',   default: 60,label:'scene tint strength'},
+];
+const EID = Object.fromEntries(ENV_AXES.map((a,i)=>[a.id,i]));
+
+/* ════════════════════════════════════════════
+   MODE CONFIG
+   ════════════════════════════════════════════ */
+const MODES = {
+  creature:    {aspect:1.0,   axes:CREATURE_AXES, idx:CID, render:renderCreature,    cw:400,ch:400},
+  environment: {aspect:16/9,  axes:ENV_AXES,      idx:EID, render:renderEnvironment, cw:640,ch:360},
+};
+
+/* ════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════ */
+let mode        = 'creature';
+let cells       = [];          // [{canvas, values, kind}]
+let selectedIdx = -1;
+let templates   = [];          // [{name, kind, values}]
+let jitter      = 80;
+let autoNum     = 0;
+
+const t0   = performance.now();
+let prevT  = 0;
+
+/* ════════════════════════════════════════════
+   SHARED UTILS
+   ════════════════════════════════════════════ */
+function mulberry32(seed){
+  let s=seed>>>0;
+  return()=>{s=(s+0x6D2B79F5)>>>0;let r=s;r=Math.imul(r^(r>>>15),r|1);r^=r+Math.imul(r^(r>>>7),r|61);return((r^(r>>>14))>>>0)/4294967296;};
+}
+
+/* ════════════════════════════════════════════
+   CREATURE RENDERER
+   (fully self-contained, vals passed in)
+   ════════════════════════════════════════════ */
+function renderCreature(canvas, vals, t){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const v01 =id=>vals[CID[id]]/255;
+  const vN11=id=>(vals[CID[id]]-128)/128;
+  const vR  =(id,a,b)=>a+(vals[CID[id]]/255)*(b-a);
+
+  const baseR    =vR('body_radius',W*0.06,W*0.28);
+  const stretchX =vR('body_stretch_x',0.50,1.50);
+  const stretchY =vR('body_stretch_y',0.50,1.50);
+  const lumpAmp  =vR('body_lumpiness',0.0,30.0);
+  const lumpN    =5+Math.floor(v01('body_lump_count')*13);
+  const outline  =vR('body_outline',0.5,9.0);
+  const shadowPos=vR('body_shadow',0.20,0.80);
+  const armN     =Math.floor(v01('arm_count')*14);
+  const armLen   =vR('arm_length',0.20,2.40);
+  const armW     =vR('arm_width',1.0,10.0);
+  const armTaper =v01('arm_taper');
+  const armWobAmp=vR('arm_wobble',0.0,0.7);
+  const armWobRt =vR('arm_wobble_rate',0.0,3.0);
+  const armCurl  =vR('arm_curl',0.0,1.4);
+  const armDroop =vN11('arm_droop')*0.6;
+  const eyeN     =Math.round(v01('eye_count')*8);
+  const eyeSz    =vR('eye_size',0.04,0.30);
+  const eyeSpace =vR('eye_spacing',0.05,0.85);
+  const eyeY     =vN11('eye_height')*0.7;
+  const eyePupil =v01('eye_pupil');
+  const eyeGlow  =v01('eye_glow');
+  const runeN    =Math.floor(v01('mark_runes')*9);
+  const spotN    =Math.floor(v01('mark_spots')*9);
+  const dripN    =Math.floor(v01('mark_drips')*8);
+  const facetN   =Math.floor(v01('mark_facets')*14);
+  const partN    =Math.floor(v01('particle_count')*36);
+  const partR    =vR('particle_radius',1.0,2.6);
+  const partSz   =vR('particle_size',0.4,4.5);
+  const partDrift=vR('particle_drift',0.0,1.5);
+  const partTurb =vR('particle_turb',0.0,1.2);
+  const glowR    =baseR*vR('glow_radius',1.4,4.5);
+  const glowStr  =v01('glow_strength');
+  const coreSz   =baseR*vR('core_size',0.04,0.45);
+  const coreBri  =v01('core_brightness');
+  const pulseRt  =vR('pulse_rate',0.0,2.5);
+  const huePri   =Math.round(v01('hue_primary')*359);
+  const hueAcc   =Math.round(v01('hue_accent')*359);
+  const hueGlow  =Math.round(v01('hue_glow')*359);
+  const sat      =Math.round(vR('saturation',0,100));
+  const light    =Math.round(vR('lightness',20,80));
+
+  const cx=W/2,cy=H*0.50;
+  const pulse=Math.sin(t*pulseRt)*0.5+0.5;
+  const bcy=cy+Math.sin(t*0.85)*baseR*0.05;
+  const sx=stretchX,sy=stretchY;
+
+  // Time-based blink (offset by canvas handle so cells don't all blink together)
+  const bPhase=((t*0.28)+(canvas._bOff||0))%1;
+  const blinkSY=bPhase<0.05?Math.max(0.05,1-Math.sin((bPhase/0.05)*Math.PI)*0.9):1.0;
+
+  // Outer glow
+  const og=ctx.createRadialGradient(cx,bcy,0,cx,bcy,glowR);
+  og.addColorStop(0,`hsla(${huePri},${sat}%,${light}%,${0.18*glowStr+pulse*0.06*glowStr})`);
+  og.addColorStop(0.4,`hsla(${hueAcc},${sat*0.8}%,${light*0.7}%,${0.10*glowStr})`);
+  og.addColorStop(1,'transparent');
+  ctx.fillStyle=og;ctx.beginPath();ctx.ellipse(cx,bcy,glowR*sx,glowR*sy*0.85,0,0,Math.PI*2);ctx.fill();
+
+  function bPts(r){
+    const p=[];
+    for(let i=0;i<lumpN;i++){
+      const a=(i/lumpN)*Math.PI*2-Math.PI/2;
+      const n=Math.sin(t*0.7+i*0.9)*lumpAmp+Math.sin(t*0.3+i*1.5)*lumpAmp*0.4;
+      p.push({x:cx+Math.cos(a)*(r+n)*sx,y:bcy+Math.sin(a)*(r+n)*sy});
+    }
+    return p;
+  }
+  function bPath(c,p){
+    const M=p.length;c.beginPath();
+    for(let i=0;i<M;i++){
+      const p0=p[(i-1+M)%M],p1=p[i],p2=p[(i+1)%M],p3=p[(i+2)%M];
+      const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+      const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+      if(i===0)c.moveTo(p1.x,p1.y);
+      c.bezierCurveTo(c1x,c1y,c2x,c2y,p2.x,p2.y);
+    }
+    c.closePath();
+  }
+  const pts=bPts(baseR);
+
+  // Appendages
+  if(armN>0){
+    for(let i=0;i<armN;i++){
+      const ba=(i/armN)*Math.PI*2+armDroop;
+      const wob=Math.sin(t*armWobRt+i*0.7)*armWobAmp;
+      const curl=Math.sin(t*0.5+i*0.9)*armCurl*0.5;
+      const a=ba+wob,len=baseR*armLen;
+      const tx=cx+Math.cos(a+curl)*len*sx,ty=bcy+Math.sin(a+curl)*len*sy;
+      const cpx=cx+Math.cos(ba+wob*0.4)*len*0.5*sx,cpy=bcy+Math.sin(ba+wob*0.4)*len*0.5*sy+curl*len*0.3;
+      ctx.lineCap='round';ctx.strokeStyle='rgba(0,0,0,0.85)';ctx.lineWidth=armW+3;
+      ctx.beginPath();ctx.moveTo(cx,bcy);ctx.quadraticCurveTo(cpx,cpy,tx,ty);ctx.stroke();
+      for(let s=0;s<6;s++){
+        const t0_=s/6,t1_=(s+1)/6,w0=armW*(1-armTaper*t0_*0.85);
+        const x0=(1-t0_)*(1-t0_)*cx+2*(1-t0_)*t0_*cpx+t0_*t0_*tx;
+        const y0=(1-t0_)*(1-t0_)*bcy+2*(1-t0_)*t0_*cpy+t0_*t0_*ty;
+        const x1=(1-t1_)*(1-t1_)*cx+2*(1-t1_)*t1_*cpx+t1_*t1_*tx;
+        const y1=(1-t1_)*(1-t1_)*bcy+2*(1-t1_)*t1_*cpy+t1_*t1_*ty;
+        ctx.strokeStyle=`hsla(${huePri},${sat}%,${light+10}%,0.85)`;ctx.lineWidth=w0;
+        ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+      }
+    }
+  }
+
+  // Body shadow
+  ctx.save();ctx.shadowColor=`hsla(${huePri},${sat}%,15%,0.55)`;ctx.shadowBlur=18;ctx.shadowOffsetY=4;
+  bPath(ctx,pts);ctx.fillStyle=`hsla(${huePri},${sat*0.6}%,8%,0.4)`;ctx.fill();ctx.restore();
+
+  // Body outline + fill
+  bPath(ctx,pts);ctx.strokeStyle='rgba(0,0,0,0.92)';ctx.lineWidth=outline;ctx.lineJoin='round';ctx.stroke();
+  bPath(ctx,pts);ctx.fillStyle=`hsl(${huePri},${sat}%,${light}%)`;ctx.fill();
+
+  // Cel shading
+  ctx.save();bPath(ctx,pts);ctx.clip();
+  const sg=ctx.createLinearGradient(cx,bcy-baseR,cx,bcy+baseR);
+  sg.addColorStop(shadowPos-0.04,'transparent');
+  sg.addColorStop(shadowPos,`hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.55)`);
+  sg.addColorStop(1,`hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.65)`);
+  ctx.fillStyle=sg;ctx.fillRect(cx-baseR*3,bcy-baseR*3,baseR*6,baseR*6);
+  const hg=ctx.createRadialGradient(cx-baseR*0.3,bcy-baseR*0.35,0,cx-baseR*0.15,bcy-baseR*0.15,baseR*0.7);
+  hg.addColorStop(0,`hsla(${huePri},${sat*0.4}%,92%,0.45)`);hg.addColorStop(0.5,'transparent');
+  ctx.fillStyle=hg;ctx.fillRect(cx-baseR*3,bcy-baseR*3,baseR*6,baseR*6);
+
+  if(spotN>0){const r1=mulberry32(spotN*53+1);for(let i=0;i<spotN;i++){const sa=r1()*Math.PI*2,sr_=baseR*(0.15+r1()*0.55),sxp=cx+Math.cos(sa)*sr_*sx,syp=bcy+Math.sin(sa)*sr_*sy,ssz=baseR*(0.05+r1()*0.10);const lg=ctx.createRadialGradient(sxp,syp,0,sxp,syp,ssz*2.5);lg.addColorStop(0,`hsla(${hueGlow},95%,90%,${0.7+pulse*0.2})`);lg.addColorStop(0.4,`hsla(${hueGlow},85%,75%,0.3)`);lg.addColorStop(1,'transparent');ctx.fillStyle=lg;ctx.beginPath();ctx.arc(sxp,syp,ssz*2.5,0,Math.PI*2);ctx.fill();}}
+  if(runeN>0){const r2=mulberry32(runeN*71+7);ctx.strokeStyle=`hsla(${hueAcc},80%,70%,0.30)`;ctx.lineWidth=1.5;for(let i=0;i<runeN;i++){const ra=r2()*Math.PI*2,rr=baseR*(0.1+r2()*0.45),rx=cx+Math.cos(ra)*rr*sx,ry=bcy+Math.sin(ra)*rr*sy,rs=baseR*(0.06+r2()*0.12);ctx.beginPath();ctx.moveTo(rx,ry-rs);ctx.lineTo(rx+rs*0.6,ry+rs*0.5);ctx.moveTo(rx,ry-rs);ctx.lineTo(rx-rs*0.6,ry+rs*0.5);ctx.moveTo(rx-rs*0.4,ry+rs*0.1);ctx.lineTo(rx+rs*0.4,ry+rs*0.1);ctx.stroke();}}
+  if(facetN>0){const r3=mulberry32(facetN*89+13);ctx.strokeStyle=`hsla(${hueGlow},85%,88%,0.32)`;ctx.lineWidth=1.0;for(let i=0;i<facetN;i++){const fa=r3()*Math.PI*2,fr=baseR*(0.1+r3()*0.7),fx=cx+Math.cos(fa)*fr*sx,fy=bcy+Math.sin(fa)*fr*sy,fs=baseR*(0.05+r3()*0.10);ctx.beginPath();ctx.moveTo(fx,fy-fs);ctx.lineTo(fx+fs,fy);ctx.lineTo(fx,fy+fs);ctx.lineTo(fx-fs,fy);ctx.closePath();ctx.stroke();}}
+  ctx.restore();
+
+  // Eyes
+  if(eyeN>0){
+    const wander=Math.sin(t*0.55)*2.5,eR=baseR*eyeSz,eyePos=[];
+    if(eyeN===1){eyePos.push([cx,bcy+baseR*eyeY]);}
+    else if(eyeN===2){const sep=baseR*eyeSpace;eyePos.push([cx-sep,bcy+baseR*eyeY],[cx+sep,bcy+baseR*eyeY]);}
+    else{const sep=baseR*eyeSpace*0.95,yOff=baseR*eyeY,ang=Math.PI;for(let i=0;i<eyeN;i++){const tt=i/(eyeN-1),a=-ang/2+tt*ang;eyePos.push([cx+Math.cos(a+Math.PI*1.5)*sep,bcy+Math.sin(a+Math.PI*1.5)*sep+yOff]);}}
+    for(const[ex,ey]of eyePos){
+      if(eyeGlow>0.05){const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,eR*2.2);eg.addColorStop(0,`hsla(${hueGlow},90%,80%,${0.4*eyeGlow})`);eg.addColorStop(1,'transparent');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(ex,ey,eR*2.2,0,Math.PI*2);ctx.fill();}
+      ctx.fillStyle=`hsl(${hueGlow},18%,92%)`;ctx.strokeStyle='rgba(0,0,0,0.85)';ctx.lineWidth=Math.max(1.2,outline*0.45);
+      ctx.beginPath();ctx.ellipse(ex,ey,eR,eR*blinkSY,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      if(blinkSY>0.12&&eyePupil>0.05){ctx.fillStyle=`hsl(${hueGlow},84%,38%)`;const iR=eR*(0.45+eyePupil*0.4);ctx.beginPath();ctx.ellipse(ex+wander*0.3,ey,iR,iR*blinkSY,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#020306';const pR=eR*eyePupil*0.55;ctx.beginPath();ctx.ellipse(ex+wander*0.3,ey,pR,pR*blinkSY,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,0.85)';const cR=eR*0.12;ctx.beginPath();ctx.ellipse(ex-eR*0.22,ey-eR*0.22*blinkSY,cR,cR*blinkSY,0,0,Math.PI*2);ctx.fill();}
+    }
+  }
+
+  // Drips
+  if(dripN>0){const r4=mulberry32(Math.floor(t*2)+dripN*17);for(let i=0;i<dripN;i++){const dx=cx+(r4()-0.5)*baseR*1.4*sx,dy=bcy+baseR*0.45*sy+((t*40+i*23)%60)*baseR*0.018,ds=1.5+r4()*2.2;ctx.fillStyle=`hsla(${huePri},85%,55%,${0.45+r4()*0.3})`;ctx.beginPath();ctx.arc(dx,dy,ds,0,Math.PI*2);ctx.fill();}}
+
+  // Core + particles
+  if(coreSz>0.1&&coreBri>0.05){const cg=ctx.createRadialGradient(cx,bcy,0,cx,bcy,coreSz*4);cg.addColorStop(0,`hsla(${hueGlow},96%,94%,${0.85*coreBri})`);cg.addColorStop(0.25,`hsla(${huePri},88%,70%,${0.45*coreBri})`);cg.addColorStop(0.7,`hsla(${huePri},78%,52%,${0.12*coreBri})`);cg.addColorStop(1,'transparent');ctx.fillStyle=cg;ctx.beginPath();ctx.arc(cx,bcy,coreSz*4,0,Math.PI*2);ctx.fill();}
+  if(partN>0){for(let p=0;p<partN;p++){const seed=p*17,orR=baseR*partR+(seed%13)*(baseR*0.05),orA=(p/partN)*Math.PI*2+t*partDrift*0.5+Math.sin(t+seed*0.1)*0.4,tu=Math.sin(t*1.3+seed*0.22)*partTurb*8,px=cx+Math.cos(orA)*(orR+tu)*sx,py=bcy+Math.sin(orA)*(orR+tu)*sy*0.85,pSz=partSz*(0.6+((seed%5)/5)*0.8),pAl=0.4+Math.sin(t*1.8+p*0.55)*0.3;ctx.fillStyle=`hsla(${hueAcc},88%,75%,${pAl})`;ctx.beginPath();ctx.arc(px,py,pSz,0,Math.PI*2);ctx.fill();}}
+}
+
+/* ════════════════════════════════════════════
+   ENVIRONMENT RENDERER
+   (fully self-contained, vals passed in)
+   ════════════════════════════════════════════ */
+function renderEnvironment(canvas, vals, t){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+
+  const v01 =id=>vals[EID[id]]/255;
+  const vN11=id=>(vals[EID[id]]-128)/128;
+  const vR  =(id,a,b)=>a+(vals[EID[id]]/255)*(b-a);
+
+  const skyTopH =Math.round(v01('sky_top_hue')*359);
+  const skyTopL =Math.round(vR('sky_top_lightness',0,60));
+  const skyBotH =Math.round(v01('sky_bot_hue')*359);
+  const skyBotL =Math.round(vR('sky_bot_lightness',0,80));
+  const skySat  =Math.round(vR('sky_saturation',0,100));
+  const skyBand =vR('sky_band_position',0.15,0.85);
+  const skyPulse=vR('sky_pulse_rate',0,2.5);
+  const starN   =Math.floor(v01('star_count')*280);
+  const starBri =v01('star_brightness');
+  const farN    =Math.floor(v01('far_count')*32);
+  const farH    =vR('far_height',0.05,0.45);
+  const farJit  =vR('far_jitter',0.0,1.0);
+  const farDark =vR('far_darkness',0.05,0.65);
+  const farHaze =v01('far_haze');
+  const midN    =Math.floor(v01('mid_count')*22);
+  const midH    =vR('mid_height',0.08,0.55);
+  const midJit  =vR('mid_jitter',0.0,1.0);
+  const midDark =vR('mid_darkness',0.10,0.85);
+  const groundY =vR('ground_y',0.45,0.95);
+  const groundH =Math.round(v01('ground_hue')*359);
+  const groundL =Math.round(vR('ground_lightness',4,50));
+  const groundTx=Math.floor(v01('ground_texture')*320);
+  const groundGl=v01('ground_glow');
+  const fgN     =Math.floor(v01('fg_count')*80);
+  const fgSize  =vR('fg_size',0.5,6.0);
+  const fgSpeed =vR('fg_speed',-2.5,2.5);
+  const fgDir   =vN11('fg_direction')*1.2;
+  const fgOp    =v01('fg_opacity');
+  const fogD    =v01('fog_density');
+  const fogH    =Math.round(v01('fog_hue')*359);
+  const vigAmt  =v01('vignette');
+  const tintStr =v01('scene_tint');
+
+  const pulseT=Math.sin(t*skyPulse)*0.5+0.5;
+  const skyTopLi=skyTopL+(skyPulse>0.05?pulseT*8:0);
+
+  const skyG=ctx.createLinearGradient(0,0,0,H*groundY);
+  skyG.addColorStop(0,`hsl(${skyTopH},${skySat}%,${Math.max(0,skyTopLi)}%)`);
+  skyG.addColorStop(skyBand,`hsl(${Math.round((skyTopH+skyBotH)/2)%360},${skySat}%,${Math.round((skyTopLi+skyBotL)/2)}%)`);
+  skyG.addColorStop(1,`hsl(${skyBotH},${skySat}%,${skyBotL}%)`);
+  ctx.fillStyle=skyG;ctx.fillRect(0,0,W,H*groundY);
+
+  if(starN>0){const sr=mulberry32(starN*131+7);for(let i=0;i<starN;i++){const x=sr()*W,y=sr()*H*groundY*0.85,sz=0.5+sr()*1.5,tw=0.6+Math.sin(t*1.4+i*0.6)*0.4;ctx.fillStyle=`hsla(${skyTopH},20%,95%,${starBri*tw*0.9})`;ctx.beginPath();ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();}}
+
+  if(farN>0){
+    const fr=mulberry32(farN*97+13);const bY=H*groundY;ctx.save();
+    ctx.fillStyle=`hsla(${skyTopH},${Math.round(skySat*0.4)}%,${Math.round(skyTopL*0.7)}%,${1-farHaze*0.5})`;
+    ctx.beginPath();ctx.moveTo(0,bY);const step=W/farN;let prev=bY-H*farH*(0.5+fr()*0.5);ctx.lineTo(0,prev);
+    for(let i=0;i<farN;i++){const x=i*step+step,pk=H*farH*(0.5+fr()*0.8)*(1+(fr()-0.5)*farJit*1.2),y=bY-Math.max(0,pk);ctx.lineTo(x-step*0.5,(prev+y)/2);ctx.lineTo(x,y);prev=y;}
+    ctx.lineTo(W,bY);ctx.closePath();ctx.fill();ctx.fillStyle=`rgba(0,0,0,${farDark})`;ctx.fill();ctx.restore();
+  }
+
+  if(midN>0){
+    const mr=mulberry32(midN*71+19);const bY=H*groundY;ctx.save();
+    ctx.fillStyle=`hsla(${skyBotH},${Math.round(skySat*0.5)}%,${Math.round(skyBotL*0.4)}%,1)`;
+    ctx.beginPath();ctx.moveTo(0,bY);const step=W/midN;let prev=bY-H*midH*(0.4+mr()*0.6);ctx.lineTo(0,prev);
+    for(let i=0;i<midN;i++){const x=i*step+step,pk=H*midH*(0.4+mr()*0.9)*(1+(mr()-0.5)*midJit*1.4),y=bY-Math.max(0,pk);ctx.lineTo(x-step*0.3,prev);ctx.lineTo(x,y);prev=y;}
+    ctx.lineTo(W,bY);ctx.closePath();ctx.fill();ctx.fillStyle=`rgba(0,0,0,${midDark})`;ctx.fill();ctx.restore();
+  }
+
+  const bY=H*groundY;
+  const gG=ctx.createLinearGradient(0,bY,0,H);
+  gG.addColorStop(0,`hsl(${groundH},${skySat}%,${groundL}%)`);
+  gG.addColorStop(1,`hsl(${groundH},${Math.round(skySat*0.6)}%,${Math.max(2,Math.round(groundL*0.3))}%)`);
+  ctx.fillStyle=gG;ctx.fillRect(0,bY,W,H-bY);
+  if(groundGl>0.05){const gg=ctx.createLinearGradient(0,bY-8,0,bY+16);gg.addColorStop(0,'transparent');gg.addColorStop(0.5,`hsla(${skyBotH},${skySat}%,75%,${groundGl*0.6})`);gg.addColorStop(1,'transparent');ctx.fillStyle=gg;ctx.fillRect(0,bY-8,W,24);}
+  if(groundTx>0){const gr=mulberry32(groundTx*53+41);ctx.fillStyle=`hsla(${groundH},${skySat}%,${Math.max(2,groundL*0.5)}%,0.7)`;for(let i=0;i<groundTx;i++){const tx=gr()*W,ty_=gr(),ty=bY+ty_*(H-bY),persp=0.3+ty_*1.2,sz=(0.4+gr()*1.0)*persp;ctx.fillRect(tx,ty,sz,sz);}}
+
+  if(fgN>0&&fgOp>0.05){for(let i=0;i<fgN;i++){const speed=fgSpeed*(0.6+((i%7)/7)*0.8),rawX=(i*137.5+t*speed*60)%W,x=rawX<0?rawX+W:rawX,baseYP=i*71.7%H,y=(baseYP+t*fgDir*40)%H,yW=y<0?y+H:y,sz=fgSize*(0.5+((i%5)/5)*0.8),al=fgOp*(0.5+Math.sin(t*1.1+i*0.7)*0.4);ctx.fillStyle=`hsla(${skyTopH},20%,90%,${Math.max(0,al)})`;ctx.beginPath();ctx.arc(x,yW,sz,0,Math.PI*2);ctx.fill();}}
+
+  if(fogD>0.03){const fg=ctx.createLinearGradient(0,0,0,H);fg.addColorStop(0,`hsla(${fogH},35%,60%,0)`);fg.addColorStop(0.5,`hsla(${fogH},35%,60%,${fogD*0.35})`);fg.addColorStop(1,`hsla(${fogH},25%,40%,${fogD*0.45})`);ctx.fillStyle=fg;ctx.fillRect(0,0,W,H);}
+  if(vigAmt>0.03){const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3,W/2,H/2,Math.max(W,H)*0.7);vg.addColorStop(0,'transparent');vg.addColorStop(1,`rgba(0,0,0,${vigAmt*0.7})`);ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);}
+  if(tintStr>0.03){ctx.fillStyle=`hsla(${skyTopH},${skySat}%,${skyTopLi+30}%,${tintStr*0.18})`;ctx.globalCompositeOperation='overlay';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';}
+}
+
+/* ════════════════════════════════════════════
+   GRID
+   ════════════════════════════════════════════ */
+function buildGrid(){
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  cells=[];
+  const cfg=MODES[mode];
+
+  for(let i=0;i<9;i++){
+    const cell=document.createElement('div');
+    cell.className='cell';
+    cell.dataset.idx=i;
+    cell.onclick=()=>selectCell(i);
+
+    const canvas=document.createElement('canvas');
+    canvas.width=cfg.cw;canvas.height=cfg.ch;
+    canvas._bOff=i*0.37; // stagger blink offsets
+
+    const badge=document.createElement('div');
+    badge.className='cell-badge';
+    badge.textContent=String.fromCharCode(65+i);
+
+    cell.appendChild(canvas);cell.appendChild(badge);
+    grid.appendChild(cell);
+    cells.push({canvas,values:cfg.axes.map(a=>a.default),kind:mode});
+  }
+  resizeGrid();
+}
+
+function resizeGrid(){
+  const wrap=document.getElementById('grid-wrap');
+  const grid=document.getElementById('grid');
+  if(!wrap||!grid||!cells.length)return;
+  const cfg=MODES[mode];
+  const pw=wrap.clientWidth-20,ph=wrap.clientHeight-20;
+  const a=cfg.aspect;
+  let w,h;
+  if(pw/ph>a){h=ph;w=h*a;}else{w=pw;h=w/a;}
+  grid.style.width=w+'px';grid.style.height=h+'px';
+}
+window.addEventListener('resize',resizeGrid);
+
+/* ════════════════════════════════════════════
+   MODE
+   ════════════════════════════════════════════ */
+function setMode(newMode){
+  mode=newMode;
+  selectedIdx=-1;
+  refreshModeUI();
+  buildGrid();
+  randomizeGrid();
+}
+
+function refreshModeUI(){
+  const btnC=document.getElementById('btn-c'),btnE=document.getElementById('btn-e');
+  btnC.className='mode-btn'+(mode==='creature'?' active-c':'');
+  btnE.className='mode-btn'+(mode==='environment'?' active-e':'');
+
+  const btnRand=document.getElementById('btn-rand');
+  const btnSave=document.getElementById('btn-save-tpl');
+  if(mode==='creature'){
+    btnRand.className='btn primary-c full';
+    btnSave.className='btn primary-c';
+  }else{
+    btnRand.className='btn primary-e full';
+    btnSave.className='btn primary-e';
+  }
+  hideNameWrap();
+}
+
+/* ════════════════════════════════════════════
+   SELECT / DESELECT
+   ════════════════════════════════════════════ */
+function selectCell(idx){
+  if(selectedIdx===idx){
+    deselectAll();return;
+  }
+  selectedIdx=idx;
+  const selCls=mode==='creature'?'sel-c':'sel-e';
+  document.querySelectorAll('.cell').forEach((c,i)=>{
+    c.classList.remove('sel-c','sel-e');
+    if(i===idx)c.classList.add(selCls);
+  });
+  const letter=String.fromCharCode(65+idx);
+  document.getElementById('sel-info').textContent=`cell ${letter} selected — name it & save`;
+  // Auto-name
+  autoNum++;
+  const prefix=mode==='creature'?'Eidolon':'Realm';
+  document.getElementById('tpl-name-input').value=`${prefix} ${autoNum}`;
+  showNameWrap();
+}
+
+function deselectAll(){
+  selectedIdx=-1;
+  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('sel-c','sel-e'));
+  document.getElementById('sel-info').textContent='click any cell to select it';
+  hideNameWrap();
+}
+
+function showNameWrap(){
+  const w=document.getElementById('tpl-name-wrap');
+  w.classList.add('show');
+  setTimeout(()=>document.getElementById('tpl-name-input').select(),10);
+}
+
+function hideNameWrap(){
+  document.getElementById('tpl-name-wrap').classList.remove('show');
+}
+
+/* ════════════════════════════════════════════
+   RANDOMIZE
+   ════════════════════════════════════════════ */
+function fullRandom(axes){
+  return axes.map(()=>Math.floor(Math.random()*256));
+}
+
+function jittered(anchor,amt){
+  return anchor.map(v=>{
+    const d=Math.round((Math.random()*2-1)*amt);
+    return Math.max(0,Math.min(255,v+d));
+  });
+}
+
+function randomizeGrid(){
+  const cfg=MODES[mode];
+  cells.forEach(cell=>{
+    cell.values=fullRandom(cfg.axes);
+    cell.kind=mode;
+  });
+  deselectAll();
+  document.getElementById('sel-info').textContent='randomized · click any cell to select it';
+  setStatus('randomized');
+}
+
+function randomizeFromTemplate(tplIdx){
+  const tpl=templates[tplIdx];
+  if(!tpl)return;
+  // Silently switch mode if template is a different kind
+  if(tpl.kind!==mode){
+    mode=tpl.kind;
+    refreshModeUI();
+    buildGrid();
+  }
+  cells.forEach(cell=>{
+    cell.values=jitter===0?[...tpl.values]:jittered(tpl.values,jitter);
+    cell.kind=tpl.kind;
+  });
+  deselectAll();
+  document.getElementById('sel-info').textContent=`"${tpl.name}" · jitter ${jitter}`;
+  setStatus(`from "${tpl.name}"`);
+}
+
+/* ════════════════════════════════════════════
+   TEMPLATES
+   ════════════════════════════════════════════ */
+function saveTemplate(){
+  if(selectedIdx<0)return;
+  const raw=(document.getElementById('tpl-name-input').value||'').trim();
+  const name=raw||`Template ${templates.length+1}`;
+  const cell=cells[selectedIdx];
+  templates.push({name,kind:cell.kind,values:[...cell.values]});
+  rebuildTemplateList();
+  deselectAll();
+  setStatus(`"${name}" saved`);
+}
+
+function deleteTemplate(idx){
+  const name=templates[idx].name;
+  templates.splice(idx,1);
+  rebuildTemplateList();
+  setStatus(`"${name}" removed`);
+}
+
+function rebuildTemplateList(){
+  const list=document.getElementById('templates-list');
+  if(!templates.length){
+    list.innerHTML='<div class="tpl-empty">save a cell as a template to create a custom randomizer button</div>';
+    return;
+  }
+  list.innerHTML='';
+  templates.forEach((tpl,i)=>{
+    const dotCls=tpl.kind==='creature'?'c':'e';
+    const btnCls=tpl.kind==='creature'?'c':'e';
+    const item=document.createElement('div');
+    item.className='tpl-item';
+    item.innerHTML=`
+      <button class="tpl-btn ${btnCls}" onclick="randomizeFromTemplate(${i})">
+        <span class="tpl-dot ${dotCls}"></span>
+        <span class="tpl-name">${escHTML(tpl.name)}</span>
+      </button>
+      <button class="tpl-del" onclick="deleteTemplate(${i})" title="delete">×</button>`;
+    list.appendChild(item);
+  });
+}
+
+function escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ════════════════════════════════════════════
+   JITTER
+   ════════════════════════════════════════════ */
+function onJitter(val){
+  jitter=parseInt(val);
+  document.getElementById('jitter-val').textContent=jitter;
+}
+
+/* ════════════════════════════════════════════
+   STATUS
+   ════════════════════════════════════════════ */
+function setStatus(msg){
+  const el=document.getElementById('status');
+  el.textContent=msg;
+  clearTimeout(setStatus._t);
+  setStatus._t=setTimeout(()=>{el.textContent='ready';},2400);
+}
+
+/* ════════════════════════════════════════════
+   KEYBOARD
+   ════════════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement.tagName;
+  if(tag==='INPUT')return;
+  if(e.key===' '){e.preventDefault();randomizeGrid();}
+  if(e.key==='Escape')deselectAll();
+});
+document.getElementById('tpl-name-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter')saveTemplate();
+  if(e.key==='Escape'){e.stopPropagation();deselectAll();}
+});
+
+/* ════════════════════════════════════════════
+   ANIMATION LOOP
+   ════════════════════════════════════════════ */
+function loop(){
+  const now=(performance.now()-t0)/1000;
+  prevT=now;
+  const cfg=MODES[mode];
+  cells.forEach(({canvas,values,kind})=>{
+    if(canvas.width>0) MODES[kind].render(canvas,values,now);
+  });
+  requestAnimationFrame(loop);
+}
+
+/* ════════════════════════════════════════════
+   BOOT
+   ════════════════════════════════════════════ */
+buildGrid();
+randomizeGrid();
+loop();
+</script>
+</body>
+</html>

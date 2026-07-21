@@ -1,0 +1,45 @@
+{
+  "version": "0.04",
+  "capabilities": [
+    {
+      "id": "noted.read",
+      "defaultApproval": "ask-once"
+    },
+    {
+      "id": "noted.write",
+      "defaultApproval": "always"
+    },
+    {
+      "id": "nexus.emit",
+      "defaultApproval": "none"
+    },
+    {
+      "id": "ui.patch",
+      "defaultApproval": "always"
+    },
+    {
+      "id": "nostr.read",
+      "defaultApproval": "ask-once"
+    },
+    {
+      "id": "nostr.sign",
+      "defaultApproval": "human-only"
+    },
+    {
+      "id": "nostr.publish",
+      "defaultApproval": "always"
+    },
+    {
+      "id": "online.fetch",
+      "defaultApproval": "always"
+    },
+    {
+      "id": "online.send",
+      "defaultApproval": "human-only"
+    },
+    {
+      "id": "agent.evolve",
+      "defaultApproval": "human-only"
+    }
+  ]
+}

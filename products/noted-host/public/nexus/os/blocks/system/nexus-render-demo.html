@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NexusRenderDemo · Terrain Stream Visualizer</title>
+<meta name="theme-color" content="#050709" />
+<meta name="color-scheme" content="dark" />
+
+<meta name="nexus:block-id" content="nexus-render-demo" />
+<meta name="nexus:version" content="0.1.0" />
+<meta name="nexus:protocol" content="1" />
+<meta name="nexus:capabilities" content="terrain-render,offscreen-canvas,stream-consumer" />
+<meta name="nexus:emits" content="router.connect,render-demo.metrics,system.block_ready" />
+<meta name="nexus:consumes" content="router.result,compute.metrics" />
+
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #050709;
+    color: #d6ffe8;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    height: 100vh; overflow: hidden;
+  }
+  canvas#stage {
+    display: block;
+    width: 100vw; height: 100vh;
+  }
+  #overlay {
+    position: fixed; top: 12px; right: 12px;
+    background: rgba(8,12,14,0.78);
+    border: 1px solid rgba(214,255,232,0.14);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 10px;
+    line-height: 1.6;
+    min-width: 240px;
+    backdrop-filter: blur(8px) saturate(130%);
+    pointer-events: auto;
+  }
+  #overlay h3 {
+    margin: 0 0 6px 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
+    color: #f1c673;
+    border-bottom: 1px solid rgba(214,255,232,0.12);
+    padding-bottom: 4px;
+  }
+  .row { display: flex; justify-content: space-between; gap: 12px; }
+  .row .k { color: #8aa399; }
+  .row .v { color: #d6ffe8; font-weight: 700; }
+  .row .v.cyan { color: #8fcdff; }
+  .row .v.gold { color: #f1c673; }
+  .row .v.red  { color: #ff7a7a; }
+  .row .v.green { color: #7dd99a; }
+  .sep { height: 6px; }
+  button {
+    background: linear-gradient(180deg, #1a2228, #0e1316);
+    color: #f1c673;
+    border: 1px solid rgba(241,198,115,0.32);
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-family: inherit; font-size: 10px;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  button:hover { border-color: #f1c673; }
+  #status-banner {
+    position: fixed; bottom: 12px; left: 12px;
+    background: rgba(8,12,14,0.78);
+    border: 1px solid rgba(214,255,232,0.14);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 10px;
+    color: #8aa399;
+  }
+  #status-banner.warn { color: #f1c673; border-color: rgba(241,198,115,0.32); }
+  #status-banner.err  { color: #ff7a7a; border-color: rgba(255,122,122,0.32); }
+  #status-banner.ok   { color: #7dd99a; border-color: rgba(125,217,154,0.32); }
+</style>
+</head>
+<body>
+
+<canvas id="stage"></canvas>
+
+<div id="overlay">
+  <h3>STREAM · LIVE</h3>
+  <div class="row"><span class="k">main thread</span><span class="v" id="m-main">— ms/frame</span></div>
+  <div class="row"><span class="k">worker draw</span><span class="v cyan" id="m-worker">— ms/frame</span></div>
+  <div class="sep"></div>
+  <div class="row"><span class="k">strips received</span><span class="v gold" id="m-strips">0</span></div>
+  <div class="row"><span class="k">strip rate</span><span class="v" id="m-striprate">0 / sec</span></div>
+  <div class="row"><span class="k">buffer chunks</span><span class="v" id="m-bufchunks">0</span></div>
+  <div class="row"><span class="k">scroll X</span><span class="v" id="m-scroll">0</span></div>
+  <div class="sep"></div>
+  <div class="row"><span class="k">kernel msg/sec</span><span class="v green" id="m-kmsg">0</span></div>
+  <div class="row"><span class="k">producer status</span><span class="v" id="m-prod">disconnected</span></div>
+  <div class="row"><span class="k">compute queue</span><span class="v" id="m-cqueue">—</span></div>
+  <div class="row"><span class="k">compute jps</span><span class="v" id="m-cjps">—</span></div>
+  <div class="sep"></div>
+  <button id="btn-pause">⏸ Pause</button>
+  <button id="btn-reseed">↻ Reseed</button>
+</div>
+
+<div id="status-banner">initializing…</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NexusRenderDemo — Terrain Stream Visualizer
+   ─────────────────────────────────────────────────────────────────────────
+   Proof-of-life for the compute + router architecture:
+
+     1. Asks the router for `compute.stream.terrain-strip`.
+     2. Opens the returned BroadcastChannel.
+     3. Pulls terrain chunks by sending `request` messages.
+     4. Forwards arriving chunks (with zero-copy transfer) to its own
+        OffscreenCanvas-backed render worker.
+     5. Render worker maintains a chunk buffer indexed by world X and
+        scroll-renders to the canvas — completely off the main thread.
+
+   The overlay reports:
+     - main-thread ms per frame (should stay tiny)
+     - worker draw ms per frame
+     - kernel messages per second (should drop to ~zero after handshake)
+     - whatever metrics compute publishes
+
+   Channels:
+     consumes: router.result, compute.metrics
+     emits:    router.connect, render-demo.metrics, system.block_ready
+   ══════════════════════════════════════════════════════════════════════════ */
+
+
+// ── Constants ───────────────────────────────────────────────────────────────
+
+const STREAM_KIND   = 'compute.stream.terrain-strip';
+const CHUNK_WIDTH   = 512;     // world units per request
+const CHUNK_STEP    = 2;       // world units per sample (256 samples per chunk)
+const KEEP_AHEAD    = 1024;    // keep this many world units buffered ahead of scroll
+const SCROLL_RATE   = 80;      // world units per second
+const RECONNECT_MS  = 2000;
+const METRICS_HZ    = 1;
+
+// ── Render-worker source ───────────────────────────────────────────────────
+// Runs inside a Worker that owns the OffscreenCanvas. Receives chunks and
+// scroll updates; redraws continuously via its own rAF loop.
+
+const RENDER_WORKER_SRC = `
+'use strict';
+
+let canvas = null, ctx = null;
+let width = 0, height = 0;
+const chunks = new Map();    // chunkStartX → { heights: Float32Array, biomes: Uint8Array, count, step }
+let scrollX = 0;
+let paused = false;
+
+// Visual constants
+const BIOME_COLORS = [
+  { fill: '#5a8fb8', glow: '#8fcdff' },   // 0 glassfen — cool blue
+  { fill: '#3f6e54', glow: '#7dd99a' },   // 1 mosswake — moss green
+  { fill: '#8a5e3a', glow: '#f1c673' }    // 2 ashloom — warm amber
+];
+
+const drawStats = { lastMs: 0, frames: 0, msSum: 0 };
+
+self.onmessage = (e) => {
+  const m = e.data;
+  if (!m) return;
+  if (m.type === 'init') {
+    canvas = m.canvas;
+    width  = canvas.width;
+    height = canvas.height;
+    ctx = canvas.getContext('2d');
+    requestAnimationFrame(drawLoop);
+  } else if (m.type === 'resize') {
+    if (!canvas) return;
+    canvas.width  = m.width;
+    canvas.height = m.height;
+    width  = m.width;
+    height = m.height;
+  } else if (m.type === 'chunk') {
+    chunks.set(m.xStart, {
+      heights: m.heights, biomes: m.biomes,
+      count: m.count, step: m.step, xStart: m.xStart
+    });
+    // Evict chunks far behind scroll. Each chunk knows its own width
+    // via count*step — never assume a constant chunk width here.
+    const cutoff = scrollX - 2048;
+    for (const [x, c] of chunks) {
+      if (x + c.count * c.step < cutoff) chunks.delete(x);
+    }
+    self.postMessage({ type: 'chunk-ack', xStart: m.xStart, chunkCount: chunks.size });
+  } else if (m.type === 'scroll') {
+    scrollX = m.x;
+  } else if (m.type === 'pause') {
+    paused = m.value;
+  } else if (m.type === 'clear') {
+    chunks.clear();
+    scrollX = 0;
+  }
+};
+
+function drawLoop() {
+  if (!ctx) { requestAnimationFrame(drawLoop); return; }
+  if (paused) { requestAnimationFrame(drawLoop); return; }
+
+  const t0 = performance.now();
+
+  // Sky gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, height);
+  grad.addColorStop(0,    '#0a1218');
+  grad.addColorStop(0.55, '#13202a');
+  grad.addColorStop(1,    '#05080a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+
+  // Horizon line
+  const horizonY = height * 0.55;
+  ctx.fillStyle = 'rgba(143,205,255,0.06)';
+  ctx.fillRect(0, horizonY - 1, width, 2);
+
+  // Sort chunks by xStart so painting order is left→right
+  const sortedChunks = Array.from(chunks.values()).sort((a, b) => a.xStart - b.xStart);
+
+  // Per-pixel-column terrain. For each screen column, find the chunk
+  // covering that worldX and sample its height + biome.
+  const HEIGHT_SCALE = 1.8;
+  for (const c of sortedChunks) {
+    const cStart = c.xStart;
+    const cEnd   = c.xStart + c.count * c.step;
+    // Skip if this chunk is entirely off-screen
+    const screenLeft  = cStart - scrollX;
+    const screenRight = cEnd   - scrollX;
+    if (screenRight < 0 || screenLeft > width) continue;
+    // Walk this chunk's samples
+    for (let i = 0; i < c.count; i++) {
+      const worldX = cStart + i * c.step;
+      const sx = worldX - scrollX;
+      if (sx < -c.step || sx > width + c.step) continue;
+      const h = c.heights[i];
+      const b = c.biomes[i] || 0;
+      const top = horizonY - h * HEIGHT_SCALE;
+      // Fill column from top down to bottom
+      ctx.fillStyle = BIOME_COLORS[b].fill;
+      ctx.fillRect(Math.floor(sx), Math.floor(top), Math.max(1, c.step), height - top);
+      // Rim light along the top edge
+      ctx.fillStyle = BIOME_COLORS[b].glow;
+      ctx.fillRect(Math.floor(sx), Math.floor(top), Math.max(1, c.step), 1);
+    }
+  }
+
+  // Foreground vignette (subtle)
+  const vg = ctx.createRadialGradient(width/2, height/2, Math.min(width,height)*0.3, width/2, height/2, Math.max(width,height)*0.7);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.35)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, width, height);
+
+  // Crosshair-ish position marker
+  ctx.fillStyle = 'rgba(241,198,115,0.5)';
+  ctx.fillRect(width/2 - 1, horizonY - 8, 2, 16);
+
+  const dt = performance.now() - t0;
+  drawStats.frames++;
+  drawStats.msSum += dt;
+  drawStats.lastMs = dt;
+
+  requestAnimationFrame(drawLoop);
+}
+
+// Report draw stats once per second
+setInterval(() => {
+  const avg = drawStats.frames > 0 ? drawStats.msSum / drawStats.frames : 0;
+  self.postMessage({ type: 'draw-stats', avgMs: avg, lastMs: drawStats.lastMs, frames: drawStats.frames });
+  drawStats.frames = 0;
+  drawStats.msSum = 0;
+}, 1000);
+`;
+
+
+// ── Canvas & worker init ───────────────────────────────────────────────────
+
+const stage = document.getElementById('stage');
+function fitCanvas() {
+  stage.width  = window.innerWidth;
+  stage.height = window.innerHeight;
+}
+fitCanvas();
+
+const renderWorkerBlob = new Blob([RENDER_WORKER_SRC], { type: 'application/javascript' });
+const renderWorker = new Worker(URL.createObjectURL(renderWorkerBlob));
+
+// Transfer the canvas ONCE — subsequent attempts throw.
+const offscreen = stage.transferControlToOffscreen();
+renderWorker.postMessage({ type: 'init', canvas: offscreen }, [offscreen]);
+
+window.addEventListener('resize', () => {
+  // We can't read stage.width once transferred. Just tell the worker the new size.
+  renderWorker.postMessage({ type: 'resize', width: window.innerWidth, height: window.innerHeight });
+});
+
+
+// ── State ──────────────────────────────────────────────────────────────────
+
+const state = {
+  // Stream session
+  channelName: null,
+  sessionId: null,
+  bc: null,
+  requesterId: 'rd-' + Math.random().toString(36).slice(2, 8),
+  reqSeq: 0,
+
+  // Scroll
+  scrollX: 0,
+  nextRequestX: 0,
+  paused: false,
+  realmSeed: 'demo_realm',
+
+  // Metrics counters
+  stripsReceived: 0,
+  stripsLastSec:  0,
+  stripsRateBuckets: new Array(5).fill(0),  // rolling 5-second window
+  stripsBucketIdx: 0,
+
+  kernelMsgs: 0,
+  kernelMsgsLastSec: 0,
+
+  mainMsAvg: 0,
+  mainMsFrames: 0,
+
+  workerDrawMs: 0,
+
+  computeQueue: null,
+  computeJps: null,
+
+  // Status
+  routerSeen: false,
+  reconnectTimer: null
+};
+
+
+// ── UI helpers ─────────────────────────────────────────────────────────────
+
+function setBanner(msg, cls) {
+  const el = document.getElementById('status-banner');
+  el.textContent = msg;
+  el.className = cls || '';
+}
+
+function updateOverlay() {
+  document.getElementById('m-main').textContent      = state.mainMsAvg.toFixed(2) + ' ms/frame';
+  document.getElementById('m-worker').textContent    = state.workerDrawMs.toFixed(2) + ' ms/frame';
+  document.getElementById('m-strips').textContent    = state.stripsReceived;
+  const rate = state.stripsRateBuckets.reduce((a, b) => a + b, 0) / state.stripsRateBuckets.length;
+  document.getElementById('m-striprate').textContent = rate.toFixed(1) + ' / sec';
+  document.getElementById('m-scroll').textContent    = Math.round(state.scrollX);
+  document.getElementById('m-kmsg').textContent      = state.kernelMsgsLastSec;
+  document.getElementById('m-cqueue').textContent    = state.computeQueue ?? '—';
+  document.getElementById('m-cjps').textContent      = state.computeJps != null ? state.computeJps.toFixed(1) : '—';
+}
+
+
+// ── Render-worker incoming messages ────────────────────────────────────────
+
+renderWorker.onmessage = (e) => {
+  const m = e.data;
+  if (m.type === 'draw-stats') {
+    state.workerDrawMs = m.avgMs;
+  } else if (m.type === 'chunk-ack') {
+    document.getElementById('m-bufchunks').textContent = m.chunkCount;
+  }
+};
+
+
+// ── Stream wiring ──────────────────────────────────────────────────────────
+
+let nx = null;
+
+function onBroadcastMessage(e) {
+  const m = e.data;
+  if (!m) return;
+  // Note: producer broadcasts to ALL listeners on this channel. We filter
+  // by requesterId so we only ingest frames meant for us.
+  if (m.type === 'frame' && m.requesterId === state.requesterId) {
+    state.stripsReceived++;
+    state.stripsRateBuckets[state.stripsBucketIdx]++;
+    const d = m.data;
+    if (!d || !d.heights || !d.biomes) return;
+    // Forward to render worker with zero-copy transfer of the buffers.
+    renderWorker.postMessage({
+      type: 'chunk',
+      xStart: d.xStart,
+      heights: d.heights,
+      biomes:  d.biomes,
+      count:   d.count,
+      step:    d.step
+    }, [d.heights.buffer, d.biomes.buffer]);
+  } else if (m.type === 'frame-error' && m.requesterId === state.requesterId) {
+    console.warn('frame-error from producer:', m.error);
+  }
+}
+
+function requestNextChunk() {
+  if (!state.bc) return;
+  const xStart = state.nextRequestX;
+  const xEnd   = xStart + CHUNK_WIDTH;
+  state.reqSeq++;
+  state.bc.postMessage({
+    type: 'request',
+    requesterId: state.requesterId,
+    reqSeq: state.reqSeq,
+    kind: 'terrain.strip',
+    payload: {
+      realmSeed: state.realmSeed,
+      layer: 'surface',
+      xStart: xStart,
+      xEnd:   xEnd,
+      step:   CHUNK_STEP
+    }
+  });
+  state.nextRequestX = xEnd;
+}
+
+async function attemptConnect() {
+  if (!nx) return;
+  if (state.bc) return;  // already connected
+  try {
+    const r = await nx.request('router.connect', {
+      kind: STREAM_KIND,
+      consumerId: state.requesterId
+    }, { timeout: 1500 });
+    if (r && r.ok && r.channelName) {
+      state.routerSeen = true;
+      state.channelName = r.channelName;
+      state.sessionId   = r.sessionId;
+      state.bc = new BroadcastChannel(r.channelName);
+      state.bc.onmessage = onBroadcastMessage;
+      document.getElementById('m-prod').textContent = 'connected';
+      document.getElementById('m-prod').className   = 'v green';
+      setBanner('connected to ' + r.channelName, 'ok');
+      // Prime the pump: request the first wave of chunks to fill the buffer.
+      for (let i = 0; i < 4; i++) requestNextChunk();
+      return;
+    }
+    document.getElementById('m-prod').textContent = r && r.error ? r.error : 'no producer';
+    document.getElementById('m-prod').className   = 'v gold';
+    setBanner('router reachable but no producer for ' + STREAM_KIND, 'warn');
+  } catch (e) {
+    document.getElementById('m-prod').textContent = 'router offline';
+    document.getElementById('m-prod').className   = 'v red';
+    setBanner('router not reachable; open nexus-router.html and nexus-compute.html', 'warn');
+  }
+  // Retry
+  state.reconnectTimer = setTimeout(attemptConnect, RECONNECT_MS);
+}
+
+
+// ── Scroll loop ────────────────────────────────────────────────────────────
+
+let lastFrameTime = performance.now();
+function scrollTick(now) {
+  const t0 = performance.now();
+  const dt = (now - lastFrameTime) / 1000;
+  lastFrameTime = now;
+
+  if (!state.paused) {
+    state.scrollX += SCROLL_RATE * dt;
+    renderWorker.postMessage({ type: 'scroll', x: state.scrollX });
+
+    // Request next chunk(s) if the buffer ahead is getting thin
+    while (state.nextRequestX - state.scrollX < KEEP_AHEAD && state.bc) {
+      requestNextChunk();
+    }
+  }
+
+  const dt2 = performance.now() - t0;
+  // Moving average of main-thread per-frame cost
+  state.mainMsAvg = state.mainMsAvg * 0.9 + dt2 * 0.1;
+  state.mainMsFrames++;
+
+  requestAnimationFrame(scrollTick);
+}
+requestAnimationFrame(scrollTick);
+
+
+// ── Buttons ────────────────────────────────────────────────────────────────
+
+document.getElementById('btn-pause').addEventListener('click', (e) => {
+  state.paused = !state.paused;
+  renderWorker.postMessage({ type: 'pause', value: state.paused });
+  e.target.textContent = state.paused ? '▶ Resume' : '⏸ Pause';
+});
+
+document.getElementById('btn-reseed').addEventListener('click', () => {
+  // Generate a new seed, clear the world, restart streaming from 0.
+  state.realmSeed = 'realm_' + Math.random().toString(36).slice(2, 8);
+  state.scrollX = 0;
+  state.nextRequestX = 0;
+  state.stripsReceived = 0;
+  renderWorker.postMessage({ type: 'clear' });
+  if (state.bc) {
+    for (let i = 0; i < 4; i++) requestNextChunk();
+  }
+  setBanner('reseeded → ' + state.realmSeed, 'ok');
+});
+
+
+// ── Periodic UI / metric updates ───────────────────────────────────────────
+
+setInterval(() => {
+  // Roll strip-rate ring buffer
+  state.stripsBucketIdx = (state.stripsBucketIdx + 1) % state.stripsRateBuckets.length;
+  state.stripsRateBuckets[state.stripsBucketIdx] = 0;
+  // Roll kernel-msg counter
+  state.kernelMsgsLastSec = state.kernelMsgs;
+  state.kernelMsgs = 0;
+  updateOverlay();
+  // Emit our own metrics if mounted
+  if (nx && nx.mounted) {
+    nx.emit('render-demo.metrics', {
+      mainMs: state.mainMsAvg,
+      workerMs: state.workerDrawMs,
+      stripsReceived: state.stripsReceived,
+      scrollX: state.scrollX,
+      connected: !!state.bc
+    });
+  }
+}, 1000 / METRICS_HZ);
+
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+
+if (window.NexusBlockClient) {
+  nx = window.NexusBlockClient.bootBlock({
+    manifest: {
+      emits: ['router.connect', 'render-demo.metrics', 'system.block_ready'],
+      consumes: ['router.result', 'compute.metrics'],
+      app: {
+        title: 'Render Demo',
+        icon:  '◐',
+        visible: true,
+        description: 'Terrain stream visualizer — proves the compute+router stack'
+      }
+    },
+    onMessage({ channel }) {
+      // Count any incoming kernel messages. After handshake + initial
+      // router.connect response, this should drop to ~0 since all stream
+      // traffic flows over BroadcastChannel.
+      state.kernelMsgs++;
+    }
+  });
+
+  nx.ready.then(() => {
+    setBanner('kernel handshake complete — searching for router…', 'warn');
+    nx.emit('system.block_ready', { blockId: 'nexus_render_demo', status: 'ONLINE' });
+
+    // Watch compute metrics for backpressure visibility in the overlay.
+    nx.subscribe('compute.metrics', (p) => {
+      if (!p) return;
+      state.computeQueue = p.queueDepth;
+      state.computeJps   = p.jobsPerSec;
+    });
+
+    attemptConnect();
+  });
+} else {
+  setBanner('NexusBlockClient missing; cannot connect to router', 'err');
+}
+
+window.addEventListener('error', (e) => setBanner('error: ' + (e.message || e), 'err'));
+window.addEventListener('unhandledrejection', (e) => setBanner('unhandled: ' + String(e.reason), 'err'));
+</script>
+</body>
+</html>

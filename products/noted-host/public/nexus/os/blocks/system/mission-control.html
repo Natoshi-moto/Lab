@@ -1,0 +1,4116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mission Control</title>
+<meta name="nexus-emits" content="vibe.list vibe.load vibe.lineage vibe.delete nexus.launch eidolon.sim.speed db.query db.subscribe api.call mc.inspect">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════════════
+   MISSION CONTROL — situation room for the Eidolon stack
+   ────────────────────────────────────────────────────────────────────
+   No imports. No coupling. Reads the system through channels alone.
+   Frame: military CIC. Annotations: naturalist field station.
+   ════════════════════════════════════════════════════════════════════ */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces — deeper than kernel for radar feel */
+  --void:        #06070a;
+  --hull:        #0c0e13;
+  --bulkhead:    #12141b;
+  --console:     #181b24;
+  --console-hi:  #1e222d;
+  --rivet:       #232838;
+  --rivet-hi:    #324158;
+
+  /* Signal colours — one per channel family */
+  --sig-vibe:    #c9920a;   /* amber — assets, lineage */
+  --sig-eidolon: #4dbb7a;   /* viridian — living things */
+  --sig-nexus:   #5e7ba3;   /* steel — infrastructure */
+  --sig-db:      #399a8e;   /* teal — persistence */
+  --sig-arena:   #7c5fc7;   /* violet — combat staging */
+  --sig-api:     #c4506e;   /* rose — outbound */
+  --sig-fs:      #8a7849;   /* dun — filesystem */
+  --sig-system:  #a0a8b8;   /* bone — kernel meta */
+
+  /* Severity */
+  --ok:    #4dbb7a;
+  --warn:  #c9920a;
+  --bad:   #c4506e;
+  --info:  #5e7ba3;
+
+  /* Type */
+  --ink:    #d8d4c8;
+  --ink-2:  #8a8478;
+  --ink-3:  #524e44;
+  --ink-4:  #2a2a32;
+  --paper:  #e9dfc8;        /* specimen tags */
+  --paper-shadow: rgba(0,0,0,0.55);
+
+  /* Fonts */
+  --f-display: 'Syne', sans-serif;
+  --f-mono:    'IBM Plex Mono', ui-monospace, monospace;
+  --f-script:  'Lora', serif;
+
+  /* Geometry */
+  --topbar-h:   42px;
+  --statusbar-h: 36px;
+
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--void);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* full-bleed grain over everything */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: var(--grain);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.45;
+  z-index: 9999;
+}
+
+/* ── TOPBAR ────────────────────────────────────────────────────── */
+.topbar {
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, var(--bulkhead) 0%, var(--hull) 100%);
+  border-bottom: 1px solid var(--rivet);
+  padding: 0 14px;
+  gap: 18px;
+  position: relative;
+}
+.topbar::before {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--sig-vibe) 50%, transparent 100%);
+  opacity: 0.35;
+}
+.brand {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.32em;
+  color: var(--ink);
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px;
+}
+.brand .pip {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--sig-eidolon);
+  box-shadow: 0 0 6px var(--sig-eidolon), 0 0 14px rgba(77,187,122,0.4);
+  animation: heartbeat 2.4s ease-in-out infinite;
+}
+@keyframes heartbeat {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  20%      { opacity: 1; transform: scale(1.18); }
+  40%      { opacity: 0.65; transform: scale(0.96); }
+  55%      { opacity: 1; transform: scale(1.12); }
+  75%      { opacity: 0.7; transform: scale(1); }
+}
+.callsign {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  border-left: 1px solid var(--rivet);
+  padding-left: 14px;
+}
+.callsign b { color: var(--ink); font-weight: 500; }
+
+.topbar-spacer { flex: 1; }
+
+.quickbar {
+  display: flex;
+  gap: 4px;
+}
+.qbtn {
+  background: transparent;
+  border: 1px solid var(--rivet);
+  color: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.qbtn:hover {
+  color: var(--ink);
+  border-color: var(--rivet-hi);
+  background: var(--console);
+}
+.qbtn .glyph { color: var(--sig-vibe); margin-right: 6px; font-size: 11px; }
+
+/* ── MAIN GRID ─────────────────────────────────────────────────── */
+.frame {
+  display: grid;
+  grid-template-rows: var(--topbar-h) 1fr var(--statusbar-h);
+  height: 100%;
+}
+.theatre {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.15fr) minmax(320px, 1fr) minmax(300px, 0.95fr);
+  overflow: hidden;
+  background: var(--void);
+}
+.bay {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--rivet);
+  background: var(--hull);
+  overflow: hidden;
+  position: relative;
+}
+.bay:last-child { border-right: 0; }
+
+.bay-head {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  background: var(--bulkhead);
+  border-bottom: 1px solid var(--rivet);
+  font-family: var(--f-display);
+  font-size: 9.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  gap: 8px;
+  flex-shrink: 0;
+}
+.bay-head .marker {
+  width: 6px; height: 6px;
+  background: var(--sig-vibe);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--sig-vibe);
+}
+.bay-head .marker.eidolon { background: var(--sig-eidolon); box-shadow: 0 0 6px var(--sig-eidolon); }
+.bay-head .marker.bone    { background: var(--sig-system); box-shadow: 0 0 6px var(--sig-system); }
+.bay-head .crumb {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+.bay-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOPOLOGY ──────────────────────────────────────────────────── */
+.topology {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(77,187,122,0.04) 0%, transparent 65%),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0.5) 0%, transparent 60%),
+    var(--hull);
+}
+.topology::before {
+  /* radar grid */
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 0, transparent calc(20% - 1px), rgba(94,123,163,0.07) calc(20% - 1px), rgba(94,123,163,0.07) 20%, transparent 20%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent calc(40% - 1px), rgba(94,123,163,0.06) calc(40% - 1px), rgba(94,123,163,0.06) 40%, transparent 40%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent calc(60% - 1px), rgba(94,123,163,0.05) calc(60% - 1px), rgba(94,123,163,0.05) 60%, transparent 60%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent calc(80% - 1px), rgba(94,123,163,0.04) calc(80% - 1px), rgba(94,123,163,0.04) 80%, transparent 80%);
+  pointer-events: none;
+}
+.topology::after {
+  /* sweeping line */
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 50%; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(77,187,122,0.18) 70%, rgba(77,187,122,0.4) 100%);
+  transform-origin: 0 50%;
+  animation: sweep 9s linear infinite;
+  pointer-events: none;
+}
+@keyframes sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+#topo-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
+.topo-empty {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--ink-3);
+  font-family: var(--f-script);
+  font-style: italic;
+  font-size: 13px;
+  pointer-events: none;
+  text-align: center;
+  padding: 20px;
+}
+.topo-empty .scan-line {
+  width: 80px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sig-eidolon), transparent);
+  animation: scan-pulse 2s ease-in-out infinite;
+}
+@keyframes scan-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.6); }
+  50%      { opacity: 1; transform: scaleX(1); }
+}
+
+/* topology nodes & edges */
+.t-node {
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.t-node circle.body {
+  fill: var(--console);
+  stroke: var(--rivet-hi);
+  stroke-width: 1.2;
+  transition: stroke 0.2s, stroke-width 0.2s, fill 0.3s;
+}
+.t-node:hover circle.body { stroke: var(--ink); stroke-width: 1.6; }
+.t-node.selected circle.body { stroke: var(--sig-vibe); stroke-width: 2; }
+.t-node circle.pulse {
+  fill: none;
+  stroke: var(--sig-eidolon);
+  stroke-width: 1.5;
+  opacity: 0;
+}
+.t-node.emitting circle.pulse { animation: emit-ring 700ms ease-out; }
+@keyframes emit-ring {
+  0%   { r: 12; opacity: 0.7; stroke-width: 2; }
+  100% { r: 28; opacity: 0;   stroke-width: 0.5; }
+}
+.t-node text {
+  fill: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-anchor: middle;
+  pointer-events: none;
+  text-transform: uppercase;
+  user-select: none;
+}
+.t-node.selected text { fill: var(--ink); }
+.t-node text.glyph {
+  font-size: 13px;
+  fill: var(--ink);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.t-node.evicted circle.body { stroke: var(--bad); stroke-dasharray: 2 3; opacity: 0.5; }
+.t-node.evicted text { fill: var(--bad); opacity: 0.6; }
+
+.t-edge {
+  fill: none;
+  stroke-linecap: round;
+  pointer-events: stroke;
+  cursor: pointer;
+  transition: stroke-opacity 0.3s;
+}
+.t-edge:hover { stroke-opacity: 1 !important; }
+
+.t-channel-label {
+  fill: var(--ink-3);
+  font-family: var(--f-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
+  text-anchor: middle;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.t-edge-group:hover .t-channel-label { opacity: 1; }
+
+/* topology legend */
+.topo-legend {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  background: rgba(12,14,19,0.85);
+  border: 1px solid var(--rivet);
+  padding: 8px 10px;
+  font-size: 9.5px;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+}
+.topo-legend .swatch-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.topo-legend .swatch {
+  width: 18px; height: 2px;
+  border-radius: 1px;
+}
+
+/* topology meta — top-right */
+.topo-meta {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  text-align: right;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+}
+.topo-meta b { color: var(--ink); font-weight: 500; }
+.topo-meta .row { margin-bottom: 2px; }
+
+/* ── FEED ───────────────────────────────────────────────────── */
+.feed-tools {
+  display: flex;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--bulkhead);
+  border-bottom: 1px solid var(--rivet);
+  flex-shrink: 0;
+  align-items: center;
+}
+.tog {
+  background: transparent;
+  border: 1px solid var(--rivet);
+  color: var(--ink-3);
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  padding: 4px 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.tog.on { color: var(--ink); border-color: var(--rivet-hi); background: var(--console); }
+.tog:hover { color: var(--ink); }
+.tog .dot {
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.tog.system .dot  { background: var(--sig-system); }
+.tog.channel .dot { background: var(--sig-vibe); }
+.tog.world .dot   { background: var(--sig-eidolon); }
+.feed-tools input {
+  flex: 1;
+  background: var(--hull);
+  border: 1px solid var(--rivet);
+  color: var(--ink);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  padding: 4px 8px;
+  outline: none;
+  letter-spacing: 0.04em;
+}
+.feed-tools input::placeholder { color: var(--ink-3); }
+.feed-tools input:focus { border-color: var(--rivet-hi); }
+
+#feed-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rivet) transparent;
+}
+#feed-list::-webkit-scrollbar { width: 6px; }
+#feed-list::-webkit-scrollbar-thumb { background: var(--rivet); border-radius: 3px; }
+#feed-list::-webkit-scrollbar-track { background: transparent; }
+
+.fe {
+  display: grid;
+  grid-template-columns: 4px 14px 1fr auto;
+  gap: 8px;
+  padding: 5px 12px 5px 0;
+  border-bottom: 1px dashed var(--ink-4);
+  align-items: baseline;
+  cursor: default;
+  transition: background 0.12s;
+  position: relative;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.fe:hover { background: var(--bulkhead); }
+.fe .bar {
+  width: 2px;
+  height: 100%;
+  background: var(--ink-4);
+  align-self: stretch;
+  margin-left: 6px;
+  border-radius: 1px;
+}
+.fe.system .bar  { background: var(--sig-system); }
+.fe.channel .bar { background: var(--sig-vibe); }
+.fe.world .bar   { background: var(--sig-eidolon); }
+.fe.warn .bar    { background: var(--warn); box-shadow: 0 0 4px var(--warn); }
+.fe.bad .bar     { background: var(--bad);  box-shadow: 0 0 4px var(--bad); }
+.fe .icon {
+  font-family: var(--f-mono);
+  color: var(--ink-3);
+  font-size: 11px;
+  text-align: center;
+}
+.fe.world  .icon { color: var(--sig-eidolon); }
+.fe.system .icon { color: var(--sig-system); }
+.fe.channel .icon{ color: var(--sig-vibe); }
+.fe.warn    .icon{ color: var(--warn); }
+.fe.bad     .icon{ color: var(--bad); }
+.fe .body { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fe .body .tok {
+  color: var(--ink-2);
+  font-style: italic;
+  font-family: var(--f-script);
+  font-size: 11px;
+}
+.fe .body .src    { color: var(--ink); font-weight: 500; cursor: pointer; }
+.fe .body .src:hover { color: var(--sig-eidolon); }
+.fe .body .ch     { color: var(--ink); font-weight: 500; cursor: pointer; padding: 0 2px; border-radius: 2px; }
+.fe .body .ch:hover { background: var(--console); }
+.fe .body .ch.vibe    { color: var(--sig-vibe); }
+.fe .body .ch.eidolon { color: var(--sig-eidolon); }
+.fe .body .ch.nexus   { color: var(--sig-nexus); }
+.fe .body .ch.db      { color: var(--sig-db); }
+.fe .body .ch.arena   { color: var(--sig-arena); }
+.fe .body .ch.api     { color: var(--sig-api); }
+.fe .body .ch.fs      { color: var(--sig-fs); }
+.fe .body .ch.system  { color: var(--sig-system); }
+.fe .ts {
+  color: var(--ink-3);
+  font-size: 10px;
+  font-feature-settings: 'tnum';
+  letter-spacing: 0.04em;
+  cursor: help;
+}
+.fe .ts:hover { color: var(--ink-2); }
+
+.fe .explain-trigger {
+  cursor: help;
+  border-bottom: 1px dotted var(--ink-3);
+  padding-bottom: 1px;
+}
+.fe .explain-trigger:hover { border-color: var(--ink-2); }
+
+/* ── INSPECTOR ──────────────────────────────────────────── */
+#inspector {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rivet) transparent;
+}
+#inspector::-webkit-scrollbar { width: 6px; }
+#inspector::-webkit-scrollbar-thumb { background: var(--rivet); border-radius: 3px; }
+
+.inspector-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 4px;
+  font-family: var(--f-script);
+  font-style: italic;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.inspector-empty .heading {
+  font-family: var(--f-display);
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.inspector-empty .totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 10px;
+  width: 100%;
+  font-family: var(--f-mono);
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+}
+.inspector-empty .totals .num {
+  font-family: var(--f-display);
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+  font-feature-settings: 'tnum';
+  display: block;
+}
+.inspector-empty .totals .lbl {
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dossier h2 {
+  font-family: var(--f-display);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rivet);
+  padding-bottom: 6px;
+  margin-bottom: 2px;
+  display: flex; align-items: baseline; gap: 8px;
+  font-weight: 600;
+}
+.dossier h2 .pin {
+  width: 6px; height: 6px;
+  background: var(--sig-vibe);
+  border-radius: 50%;
+}
+.dossier h2 .pin.eidolon { background: var(--sig-eidolon); }
+.dossier h2 .pin.nexus   { background: var(--sig-nexus); }
+.dossier h2 .pin.bad     { background: var(--bad); }
+.dossier .title {
+  font-family: var(--f-display);
+  font-size: 22px;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  word-break: break-word;
+}
+.dossier .subtitle {
+  color: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  margin-top: -8px;
+}
+.dossier .grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+  margin-top: 4px;
+}
+.dossier .field {
+  display: flex; flex-direction: column;
+  gap: 2px;
+}
+.dossier .field label {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.dossier .field .val {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--ink);
+  font-feature-settings: 'tnum';
+}
+.dossier .field .val.warn { color: var(--warn); }
+.dossier .field .val.ok   { color: var(--ok); }
+.dossier .field .val.bad  { color: var(--bad); }
+
+.dossier .chiplist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.dossier .chip {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--bulkhead);
+  border: 1px solid var(--rivet);
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.dossier .chip:hover { color: var(--ink); border-color: var(--rivet-hi); background: var(--console); }
+.dossier .chip.vibe    { color: var(--sig-vibe);    border-color: rgba(201,146,10,0.3); }
+.dossier .chip.eidolon { color: var(--sig-eidolon); border-color: rgba(77,187,122,0.3); }
+.dossier .chip.nexus   { color: var(--sig-nexus);   border-color: rgba(94,123,163,0.3); }
+.dossier .chip.db      { color: var(--sig-db);      border-color: rgba(57,154,142,0.3); }
+.dossier .chip.arena   { color: var(--sig-arena);   border-color: rgba(124,95,199,0.3); }
+.dossier .chip.api     { color: var(--sig-api);     border-color: rgba(196,80,110,0.3); }
+.dossier .chip.fs      { color: var(--sig-fs);      border-color: rgba(138,120,73,0.3); }
+
+.dossier .actions {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-top: 4px;
+}
+.dossier .action {
+  background: transparent;
+  border: 1px solid var(--rivet);
+  color: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dossier .action:hover { color: var(--ink); border-color: var(--rivet-hi); background: var(--console); }
+.dossier .action.danger { color: var(--bad); border-color: rgba(196,80,110,0.4); }
+.dossier .action.danger:hover { background: rgba(196,80,110,0.1); border-color: var(--bad); }
+.dossier .action.primary { color: var(--sig-eidolon); border-color: rgba(77,187,122,0.4); }
+.dossier .action.primary:hover { background: rgba(77,187,122,0.1); border-color: var(--sig-eidolon); }
+
+.dossier section {
+  border-top: 1px dashed var(--ink-4);
+  padding-top: 10px;
+}
+.dossier section h3 {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.dossier .recent {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  font-size: 10.5px;
+  font-family: var(--f-mono);
+  color: var(--ink-2);
+  max-height: 160px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rivet) transparent;
+}
+.dossier .recent .r-line {
+  display: flex; gap: 6px;
+  padding: 2px 0;
+  border-bottom: 1px dashed var(--ink-4);
+}
+.dossier .recent .r-time { color: var(--ink-3); width: 50px; flex-shrink: 0; }
+.dossier .recent .r-msg  { color: var(--ink); }
+
+.metric-bar {
+  height: 4px;
+  background: var(--ink-4);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.metric-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--sig-eidolon);
+  border-radius: 2px;
+  transition: width 0.4s;
+}
+
+/* lineage tree — proper visual genealogy */
+.lineage-tree {
+  width: 100%;
+  margin: 4px 0 8px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid var(--ink-4);
+  padding: 8px 4px 4px;
+  position: relative;
+}
+.lineage-tree svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.lt-node {
+  cursor: pointer;
+}
+.lt-node rect {
+  fill: var(--bulkhead);
+  stroke: var(--rivet);
+  transition: stroke 0.15s, fill 0.15s;
+}
+.lt-node:hover rect { stroke: var(--ink); }
+.lt-node.self rect {
+  fill: var(--console-hi);
+  stroke: var(--sig-vibe);
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 6px rgba(201,146,10,0.4));
+}
+.lt-node.foreign-stub rect {
+  stroke-dasharray: 3 3;
+  opacity: 0.72;
+}
+.lt-node.foreign-stub text { opacity: 0.78; }
+.lt-node text.lt-name {
+  fill: var(--ink);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  text-anchor: middle;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+.lt-node.self text.lt-name { fill: var(--ink); }
+.lt-node text.lt-type {
+  fill: var(--ink-3);
+  font-family: var(--f-mono);
+  font-size: 6.8px;
+  letter-spacing: 0.18em;
+  text-anchor: middle;
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+}
+.lt-node.creature   text.lt-type { fill: var(--sig-eidolon); }
+.lt-node.environment text.lt-type{ fill: var(--sig-fs); }
+.lt-node.attack     text.lt-type { fill: var(--bad); }
+.lt-node.kin        text.lt-type { fill: var(--sig-arena); }
+.lt-node.battle     text.lt-type { fill: var(--sig-nexus); }
+.lt-node.world      text.lt-type { fill: var(--sig-vibe); }
+.lt-edge {
+  fill: none;
+  stroke: var(--ink-3);
+  cursor: pointer;
+  stroke-width: 1;
+  stroke-opacity: 0.55;
+  stroke-linecap: round;
+}
+.lt-edge.up  { stroke: var(--ink-3); stroke-dasharray: 2 3; }
+.lt-edge.down{ stroke: var(--ink-2); }
+.lt-edge:hover{ stroke: var(--sig-vibe); stroke-opacity: 1; stroke-width: 1.6; }
+.lt-empty {
+  font-family: var(--f-script);
+  font-style: italic;
+  color: var(--ink-3);
+  font-size: 12px;
+  text-align: center;
+  padding: 16px 4px;
+}
+
+/* battle ribbon — last N auto-battles as a sparkline of glyphs */
+.battle-ribbon {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  background: rgba(12,14,19,0.85);
+  border: 1px solid var(--rivet);
+  padding: 5px 8px;
+  backdrop-filter: blur(4px);
+  cursor: help;
+  max-width: calc(100% - 200px);
+  overflow: hidden;
+}
+.battle-ribbon .lbl {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.battle-ribbon .glyphs {
+  display: flex;
+  gap: 1px;
+  overflow: hidden;
+  flex: 1;
+}
+.battle-ribbon .g {
+  width: 4px;
+  height: 12px;
+  background: var(--ink-4);
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+.battle-ribbon .g.auto-w   { background: var(--sig-eidolon); }
+.battle-ribbon .g.auto-l   { background: var(--ink-3); }
+.battle-ribbon .g.player-w { background: var(--sig-vibe); height: 14px; margin-top: -1px; }
+.battle-ribbon .g.player-l { background: var(--bad); height: 14px; margin-top: -1px; }
+.battle-ribbon .count {
+  margin-left: 6px;
+  color: var(--ink-2);
+  font-size: 9.5px;
+  font-feature-settings: 'tnum';
+}
+
+/* cascade preview block */
+.cascade {
+  background: var(--bulkhead);
+  border: 1px solid rgba(196,80,110,0.4);
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+.cascade .h {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bad);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.cascade .h::before {
+  content: '⚠'; font-size: 11px;
+}
+.cascade .row { font-size: 11px; color: var(--ink-2); padding: 3px 0; display: flex; gap: 8px; }
+.cascade .row b { color: var(--ink); font-weight: 500; min-width: 28px; text-align: right; font-feature-settings: 'tnum'; }
+.cascade .footer { display: flex; justify-content: flex-end; gap: 6px; margin-top: 10px; }
+
+/* ── STATUSBAR / COMMAND BAR ────────────────────────────── */
+.statusbar {
+  height: var(--statusbar-h);
+  display: flex;
+  align-items: center;
+  background: var(--bulkhead);
+  border-top: 1px solid var(--rivet);
+  padding: 0 12px;
+  gap: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  position: relative;
+  flex-shrink: 0;
+}
+.statusbar::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sig-eidolon) 50%, transparent);
+  opacity: 0.3;
+}
+
+.cmd-group {
+  display: flex; align-items: center;
+  gap: 4px;
+  border-right: 1px solid var(--rivet);
+  padding-right: 10px;
+}
+.cmd-group:last-of-type { border-right: 0; }
+
+.cmd-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.cmd-select, .cmd-input {
+  background: var(--hull);
+  border: 1px solid var(--rivet);
+  color: var(--ink);
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  padding: 4px 8px;
+  outline: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.cmd-select:hover, .cmd-input:focus { border-color: var(--rivet-hi); }
+.cmd-input { cursor: text; min-width: 220px; }
+.cmd-input::placeholder { color: var(--ink-3); }
+
+.live-pill {
+  margin-left: auto;
+  display: flex; align-items: center;
+  gap: 6px;
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.live-pill .led {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--sig-eidolon);
+  box-shadow: 0 0 5px var(--sig-eidolon);
+  animation: led-blink 1.4s ease-in-out infinite;
+}
+.live-pill.disconnected .led { background: var(--bad); box-shadow: 0 0 5px var(--bad); animation: none; }
+.live-pill.disconnected { color: var(--bad); }
+@keyframes led-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ── SPECIMEN TAG (the meta-explain layer) ──────────────────────── */
+.tag {
+  position: fixed;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,250,0.04) 0%, rgba(0,0,0,0.06) 100%),
+    var(--paper);
+  color: #2a2820;
+  font-family: var(--f-script);
+  font-size: 12.5px;
+  line-height: 1.5;
+  padding: 12px 16px 14px;
+  width: 320px;
+  max-width: 90vw;
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.1),
+    0 18px 36px var(--paper-shadow),
+    0 4px 12px rgba(0,0,0,0.4);
+  border-radius: 1px;
+  transform-origin: top left;
+  transform: rotate(-1.2deg) translateY(8px);
+  opacity: 0;
+  transition: opacity 0.18s ease-out, transform 0.22s cubic-bezier(0.2, 0.6, 0.2, 1);
+  z-index: 1000;
+  letter-spacing: 0.005em;
+}
+.tag.show {
+  opacity: 1;
+  transform: rotate(-1.2deg) translateY(0);
+}
+.tag.right { transform-origin: top right; transform: rotate(1.2deg) translateY(8px); }
+.tag.right.show { transform: rotate(1.2deg) translateY(0); }
+.tag::before {
+  /* twine */
+  content: '';
+  position: absolute;
+  top: -8px; left: 18px;
+  width: 8px; height: 8px;
+  background: #5c4a2e;
+  border-radius: 50%;
+  box-shadow:
+    0 4px 0 -1px #4a3a22,
+    0 0 0 1px rgba(0,0,0,0.4);
+}
+.tag.right::before { left: auto; right: 18px; }
+.tag .tag-kind {
+  font-family: var(--f-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #6e5e3a;
+  margin-bottom: 6px;
+  font-style: normal;
+  border-bottom: 1px dashed rgba(110,94,58,0.4);
+  padding-bottom: 3px;
+}
+.tag .tag-what {
+  color: #1c1a14;
+  margin-bottom: 8px;
+}
+.tag .tag-row {
+  display: flex; gap: 6px;
+  margin-top: 4px;
+  font-style: normal;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.tag .tag-row .tag-key {
+  color: #6e5e3a;
+  letter-spacing: 0.08em;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  width: 64px;
+  padding-top: 1px;
+}
+.tag .tag-row .tag-val {
+  color: #2a2820;
+  flex: 1;
+  font-family: var(--f-script);
+  font-size: 12px;
+  font-style: italic;
+}
+.tag .tag-meta {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dotted rgba(110,94,58,0.45);
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  color: #6e5e3a;
+  cursor: help;
+  pointer-events: auto;
+}
+.tag .tag-meta:hover { color: #2a2820; }
+
+/* meta-tag (tag of a tag) — slightly different colour */
+.tag.meta {
+  background:
+    linear-gradient(180deg, rgba(255,255,250,0.05) 0%, rgba(0,0,0,0.08) 100%),
+    #d7cdb5;
+  width: 360px;
+  font-size: 12px;
+}
+.tag.meta::before { background: #4a3a22; }
+.tag.meta .tag-kind { color: #4a3a22; }
+
+/* ── COMMAND DROPDOWN ─────────────────────────────────────── */
+.cmd-popover {
+  position: fixed;
+  background: var(--bulkhead);
+  border: 1px solid var(--rivet-hi);
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  min-width: 240px;
+  max-height: 60vh;
+  overflow-y: auto;
+  z-index: 500;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rivet) transparent;
+}
+.cmd-popover::-webkit-scrollbar { width: 6px; }
+.cmd-popover::-webkit-scrollbar-thumb { background: var(--rivet); }
+.cmd-popover .cmd-item {
+  padding: 7px 10px;
+  display: flex; align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border-bottom: 1px dashed var(--ink-4);
+  transition: background 0.1s;
+}
+.cmd-popover .cmd-item:hover { background: var(--console); }
+.cmd-popover .cmd-item .icn { color: var(--sig-vibe); width: 16px; text-align: center; font-size: 13px; }
+.cmd-popover .cmd-item .ttl { color: var(--ink); flex: 1; }
+.cmd-popover .cmd-item .desc { color: var(--ink-3); font-size: 10px; }
+
+/* selectable highlight in lineage */
+.t-node.dim { opacity: 0.25; }
+
+/* CHANNEL HUBS — channels with 2+ producers or 2+ consumers get promoted to nodes */
+.t-hub {
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.t-hub rect {
+  fill: var(--bulkhead);
+  stroke: var(--rivet-hi);
+  stroke-width: 1;
+  transition: stroke 0.2s, stroke-width 0.2s;
+}
+.t-hub:hover rect { stroke-width: 1.6; }
+.t-hub.selected rect { stroke: var(--ink); stroke-width: 1.8; }
+.t-hub text {
+  fill: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
+  text-anchor: middle;
+  pointer-events: none;
+  user-select: none;
+}
+.t-hub.selected text { fill: var(--ink); }
+.t-hub circle.hub-pulse {
+  fill: none;
+  stroke-width: 1.5;
+  opacity: 0;
+}
+.t-hub.emitting circle.hub-pulse { animation: hub-emit-ring 700ms ease-out; }
+@keyframes hub-emit-ring {
+  0%   { r: 6; opacity: 0.8; }
+  100% { r: 18; opacity: 0; }
+}
+
+/* STEWARDSHIP — gauge in empty inspector */
+.steward {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 0 4px;
+  width: 100%;
+}
+.steward-arc {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: help;
+}
+.steward-arc svg {
+  width: 180px;
+  height: 100px;
+  overflow: visible;
+}
+.steward-arc .score-num {
+  position: absolute;
+  bottom: 22px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--f-display);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  font-feature-settings: 'tnum';
+  line-height: 1;
+}
+.steward-arc .score-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.steward-arc .score-verdict {
+  font-family: var(--f-script);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.steward-bars {
+  display: flex; flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  font-family: var(--f-mono);
+  font-size: 10px;
+}
+.steward-bars .row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: center;
+  cursor: help;
+}
+.steward-bars .row .lbl {
+  color: var(--ink-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.steward-bars .row .pct {
+  color: var(--ink); font-feature-settings: 'tnum';
+  font-size: 10.5px;
+}
+.steward-bars .bar {
+  grid-column: 1 / -1;
+  height: 3px;
+  background: var(--ink-4);
+  position: relative;
+  overflow: hidden;
+}
+.steward-bars .bar > span {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--sig-eidolon);
+  transition: width 0.5s, background 0.4s;
+}
+.steward-bars .row.warn .bar > span { background: var(--warn); }
+.steward-bars .row.bad .bar > span  { background: var(--bad); }
+
+/* TIME CURSOR — retrospective inspection */
+.timecursor-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 7px;
+  background: var(--bulkhead);
+  border-top: 1px solid var(--rivet);
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  flex-shrink: 0;
+}
+.timecursor-bar .lbl {
+  color: var(--ink-3);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.timecursor-bar .live-tag {
+  background: var(--sig-eidolon);
+  color: var(--void);
+  font-weight: 600;
+  padding: 1px 6px;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  font-size: 9px;
+}
+.timecursor-bar .anchor-tag {
+  background: var(--sig-vibe);
+  color: var(--void);
+  font-weight: 600;
+  padding: 1px 6px;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  font-size: 9px;
+}
+.timecursor-bar input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 14px;
+  margin: 0;
+}
+.timecursor-bar input[type=range]::-webkit-slider-runnable-track {
+  height: 2px; background: var(--rivet);
+}
+.timecursor-bar input[type=range]::-moz-range-track {
+  height: 2px; background: var(--rivet);
+}
+.timecursor-bar input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px; height: 10px;
+  background: var(--sig-vibe);
+  border-radius: 50%;
+  margin-top: -4px;
+  box-shadow: 0 0 6px var(--sig-vibe);
+  cursor: grab;
+}
+.timecursor-bar input[type=range]::-moz-range-thumb {
+  width: 10px; height: 10px;
+  background: var(--sig-vibe);
+  border-radius: 50%;
+  border: 0;
+  box-shadow: 0 0 6px var(--sig-vibe);
+}
+.timecursor-bar .ts {
+  color: var(--ink); font-feature-settings: 'tnum';
+  font-size: 10px;
+  min-width: 80px; text-align: right;
+}
+.timecursor-bar.anchored .live-tag { background: var(--rivet-hi); color: var(--ink-3); }
+.timecursor-bar:not(.anchored) .anchor-tag { display: none; }
+
+/* dim feed entries outside the cursor's focus */
+#feed-list.anchored .fe { opacity: 0.32; transition: opacity 0.2s; }
+#feed-list.anchored .fe.in-focus { opacity: 1; background: var(--bulkhead); }
+
+/* keyboard hint strip */
+kbd {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(110,94,58,0.4);
+  padding: 1px 5px;
+  border-radius: 2px;
+  color: #2a2820;
+  letter-spacing: 0.04em;
+}
+.tag.help {
+  background:
+    linear-gradient(180deg, rgba(255,255,250,0.05) 0%, rgba(0,0,0,0.06) 100%),
+    var(--paper);
+  width: 380px;
+}
+.tag.help .help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  font-family: var(--f-mono);
+  font-style: normal;
+  font-size: 11px;
+  color: #2a2820;
+  margin-top: 6px;
+}
+.tag.help .help-grid kbd { justify-self: end; }
+
+/* toast */
+.toast-stack {
+  position: fixed;
+  right: 18px;
+  bottom: calc(var(--statusbar-h) + 14px);
+  display: flex; flex-direction: column;
+  gap: 6px;
+  z-index: 600;
+  pointer-events: none;
+}
+.toast {
+  background: var(--bulkhead);
+  border-left: 2px solid var(--sig-eidolon);
+  color: var(--ink);
+  padding: 8px 12px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  pointer-events: auto;
+  animation: toast-in 0.25s ease-out;
+}
+.toast.warn { border-left-color: var(--warn); }
+.toast.bad  { border-left-color: var(--bad); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* boot screen */
+#boot-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--void);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  font-family: var(--f-display);
+  letter-spacing: 0.4em;
+  font-size: 14px;
+  color: var(--ink);
+  text-transform: uppercase;
+  transition: opacity 0.5s ease 0.3s;
+}
+#boot-overlay.gone { opacity: 0; pointer-events: none; }
+#boot-overlay .scan {
+  width: 200px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sig-eidolon), transparent);
+  animation: bootscan 1.4s ease-in-out infinite;
+}
+#boot-overlay .stamp {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--ink-3);
+}
+@keyframes bootscan {
+  0% { transform: translateX(-100px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100px); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div id="boot-overlay">
+  <div>MISSION CONTROL</div>
+  <div class="scan"></div>
+  <div class="stamp" id="boot-stamp">awaiting kernel handshake…</div>
+</div>
+
+<div class="frame">
+  <header class="topbar">
+    <div class="brand"><span class="pip"></span> MISSION&nbsp;CONTROL</div>
+    <div class="callsign">CALLSIGN <b id="cs-id">—</b> · UPTIME <b id="cs-uptime">00:00:00</b></div>
+    <div class="topbar-spacer"></div>
+    <div class="quickbar">
+      <button class="qbtn" data-launch="blocks/world/atlas.html"           data-title="Atlas"          data-icon="⊕">
+        <span class="glyph">⊕</span>ATLAS
+      </button>
+      <button class="qbtn" data-launch="blocks/vibes/vibes-library.html"   data-title="Vibes Library"  data-icon="◈">
+        <span class="glyph">◈</span>LIBRARY
+      </button>
+      <button class="qbtn" data-launch="blocks/vibes/vibes-crucible.html"  data-title="Crucible"       data-icon="⚒">
+        <span class="glyph">⚒</span>CRUCIBLE
+      </button>
+      <button class="qbtn" data-launch="blocks/vibes/vibes-arena.html"     data-title="Arena"          data-icon="⚔">
+        <span class="glyph">⚔</span>ARENA
+      </button>
+      <button class="qbtn" data-launch="blocks/eidolon/eidolon-router.html"  data-title="Router"         data-icon="◉">
+        <span class="glyph">◉</span>ROUTER
+      </button>
+      <button class="qbtn" data-launch="blocks/eidolon/eidolon-os.html"      data-title="Eidolon OS"     data-icon="⚙">
+        <span class="glyph">⚙</span>BATTLE
+      </button>
+      <button class="qbtn" data-launch="./nexus-db.html"        data-title="NexusDB"        data-icon="💽" data-legacy="false">
+        <span class="glyph">▦</span>DB
+      </button>
+    </div>
+  </header>
+
+  <div class="theatre">
+    <!-- TOPOLOGY -->
+    <section class="bay">
+      <div class="bay-head">
+        <span class="marker eidolon"></span>
+        Topology
+        <span class="crumb" id="topo-crumb">— blocks active</span>
+      </div>
+      <div class="bay-body">
+        <div class="topology" id="topo-pane">
+          <svg id="topo-svg" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="topo-empty" id="topo-empty">
+            <div class="scan-line"></div>
+            <div>scanning kernel for traffic…</div>
+            <div style="font-size:10px;opacity:0.6;">topology builds from observed emissions</div>
+          </div>
+          <div class="topo-meta" id="topo-meta"></div>
+          <div class="battle-ribbon" id="battle-ribbon" style="display:none;">
+            <span class="lbl">BATTLES</span>
+            <span class="glyphs" id="ribbon-glyphs"></span>
+            <span class="count" id="ribbon-count">0</span>
+          </div>
+          <div class="topo-legend" id="topo-legend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE FEED -->
+    <section class="bay">
+      <div class="bay-head">
+        <span class="marker"></span>
+        Live Feed
+        <span class="crumb" id="feed-crumb">0 events</span>
+      </div>
+      <div class="bay-body">
+        <div class="feed-tools">
+          <button class="tog system on" data-filter="system"><span class="dot"></span>SYS</button>
+          <button class="tog channel on" data-filter="channel"><span class="dot"></span>CH</button>
+          <button class="tog world on" data-filter="world"><span class="dot"></span>WORLD</button>
+          <input type="text" id="feed-search" placeholder="filter…">
+        </div>
+        <div id="feed-list"></div>
+        <div class="timecursor-bar" id="timecursor">
+          <span class="lbl">CURSOR</span>
+          <span class="live-tag" id="tc-live">LIVE</span>
+          <span class="anchor-tag" id="tc-anchor">ANCHORED</span>
+          <input type="range" id="tc-range" min="0" max="100" value="100">
+          <span class="ts" id="tc-ts">— —:—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSPECTOR -->
+    <section class="bay">
+      <div class="bay-head">
+        <span class="marker bone"></span>
+        Inspector
+        <span class="crumb" id="insp-crumb">no specimen</span>
+      </div>
+      <div class="bay-body">
+        <div id="inspector"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="statusbar">
+    <div class="cmd-group">
+      <span class="cmd-label">OPEN</span>
+      <button class="cmd-select" id="cmd-open">▾ launch app</button>
+    </div>
+    <div class="cmd-group">
+      <span class="cmd-label">QUERY</span>
+      <input type="text" class="cmd-input" id="cmd-query" placeholder="vibe.list type=creature  ·  block=router  ·  channel=eidolon.*">
+    </div>
+    <div class="cmd-group">
+      <span class="cmd-label">SIM</span>
+      <button class="cmd-select" id="cmd-speed" data-current="600">▾ 1× normal</button>
+    </div>
+    <div class="live-pill" id="live-pill"><span class="led"></span><span id="live-text">LIVE</span></div>
+  </footer>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════════════
+   MISSION CONTROL  ·  Section 0  ·  Identity & IPC adapter
+   ════════════════════════════════════════════════════════════════════
+   This block speaks ONLY through the Nexus channel system. It never
+   imports or inspects internals of any other block. The kernel feed
+   (channel: nexus.kernel.log) is its primary source of truth — all
+   topology and stats are derived from observed emissions.
+*/
+const APP = {
+  id: null,
+  mounted: false,
+  bootAt: Date.now(),
+  client: null
+};
+
+const MANIFEST = {
+  emits: [
+    'vibe.list','vibe.load','vibe.lineage','vibe.delete',
+    'nexus.launch','eidolon.sim.speed',
+    'db.query','db.subscribe','api.call',
+    'mc.inspect'
+  ],
+  consumes: [
+    'nexus.kernel.log',
+    'eidolon.world.tick','eidolon.battle.auto','eidolon.challenger.appears','eidolon.battle.result',
+    'vibe.notify','vibe.result',
+    'system.block_ready',
+    'db.notify','db.result',
+    'arena.play',
+    'api.result',
+    'mc.inspect'
+  ],
+  app: {
+    title: 'Mission Control',
+    icon: '⊚',
+    description: 'Live nervous system of the Eidolon stack — observe, query, command',
+    visible: true
+  }
+};
+
+function emit(channel, payload) {
+  if (APP.client && APP.mounted) APP.client.emit(channel, payload);
+}
+
+const PENDING = new Map(); // retained for legacy diagnostics; requests use NexusBlockClient.
+function call(channel, payload, timeoutMs = 6000) {
+  if (!APP.client) return Promise.reject(new Error('not connected to Nexus'));
+  return APP.client.request(channel, payload, { timeout: timeoutMs });
+}
+
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'BOOT') return;
+  APP.id = e.data.blockId || 'mission-control';
+  const idEl = document.getElementById('cs-id');
+  if (idEl) idEl.textContent = APP.id;
+});
+
+APP.client = window.NexusBlockClient?.bootBlock({
+  manifest: MANIFEST,
+  onMessage({ channel, payload, src }) {
+    onIncoming(channel, payload || {}, src);
+  }
+});
+
+if (APP.client) {
+  APP.client.ready.then(() => {
+    APP.mounted = true;
+    onMounted();
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 1  ·  State (the only state — everything else is derived)
+   ════════════════════════════════════════════════════════════════════
+   - EVENTS: capped ring buffer of structured events (max 2000)
+   - GRAPH:  derived topology (blocks ↔ channels) — rebuilt from EVENTS
+   - VIBES:  in-memory mirror of library inventory (live via vibe.notify)
+   - STATS:  rolling counters
+*/
+const STATE = {
+  events: [],           // structured { id, t, kind, level, raw, parsed, explain }
+  blocks: new Map(),    // id → { id, lastSeen, emits:Set<channel>, consumes:Set<channel>, evictedAt, declared, mountedAt, status }
+  channels: new Map(),  // channel → { name, family, srcs:Set<blockId>, dsts:Set<blockId>, count, recent:[t…] }
+  emissions: [],        // {t, src, channel} — last 60s for rate calc
+  vibes: new Map(),     // id → summary
+  worlds: [],           // recent eidolon.world.tick payloads
+  battles: { auto:0, player:0, recent: [] },   // recent: [{kind:'auto'|'player', winner, loser?, t, turns?}]
+  lastTick: null,
+  population: 0,        // derived best-effort
+  filters: { system:true, channel:true, world:true, search:'' },
+  inspector: null,      // { kind, ref }
+  selectedBlockId: null,
+  selectedChannel: null,
+  simSpeed: 600,
+};
+
+const EVENT_CAP = 2000;
+const EMISSION_WINDOW_MS = 10000;
+
+function nowTs() { return Date.now(); }
+
+/* Family classification — single source of truth for colour mapping */
+function family(channel) {
+  if (!channel) return 'unknown';
+  if (channel.startsWith('vibe.'))     return 'vibe';
+  if (channel.startsWith('eidolon.'))  return 'eidolon';
+  if (channel.startsWith('nexus.'))    return 'nexus';
+  if (channel.startsWith('db.'))       return 'db';
+  if (channel.startsWith('arena.'))    return 'arena';
+  if (channel.startsWith('api.'))      return 'api';
+  if (channel.startsWith('fs.'))       return 'fs';
+  if (channel.startsWith('system.'))   return 'system';
+  if (channel.startsWith('mc.'))       return 'system';
+  return 'unknown';
+}
+function familyColor(fam) {
+  return ({
+    vibe:'var(--sig-vibe)', eidolon:'var(--sig-eidolon)', nexus:'var(--sig-nexus)',
+    db:'var(--sig-db)',     arena:'var(--sig-arena)',     api:'var(--sig-api)',
+    fs:'var(--sig-fs)',     system:'var(--sig-system)',   unknown:'var(--ink-3)'
+  })[fam] || 'var(--ink-3)';
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 2  ·  Hover-explain rules (the meta-explain layer)
+   ════════════════════════════════════════════════════════════════════
+   Every structured event carries an `explain` payload:
+     { what, why, so_what, action?, rule? }
+   When the user hovers `why`, we surface the underlying rule —
+   the explanation of the explanation. Each rule is grounded in
+   actual kernel constants so it can never lie.
+*/
+const RULES = {
+  RATE_STRIKE: {
+    threshold: 'controlLimiterCapacity = 10 tokens, refilled at 5/sec',
+    consequence: 'rateStrike counter++; at maxRateStrikes (8) the block is evicted',
+    if_raised:   'block tolerates larger control bursts; widens potential abuse window',
+    if_removed:  'no rate limit on control plane — runaway block can starve neighbours',
+    source:      'kernel SETTINGS.controlLimiterCapacity / maxRateStrikes'
+  },
+  VIOLATION: {
+    threshold: '6 violations triggers eviction',
+    consequence: 'block is evicted from BLOCKS map and its iframe destroyed',
+    if_raised:   'misbehaving blocks survive longer; investigators get more signal',
+    if_removed:  'malformed blocks remain mounted indefinitely — protocol drift compounds',
+    source:      'kernel violation()/evictBlock() in Section 1'
+  },
+  WATCHDOG: {
+    threshold: 'watchdogMs without DECLARE triggers reload',
+    consequence: 'block is reloaded; lifetime reload counter increments',
+    if_raised:   'slow-booting blocks get more grace; failures take longer to surface',
+    if_removed:  'silent failures persist indefinitely',
+    source:      'kernel armWatchdog() in Section 1'
+  },
+  EMIT: {
+    threshold: 'block must declare channel in manifest.emits',
+    consequence: 'undeclared emit raises a violation',
+    if_raised:   'n/a — this is structural, not a tunable',
+    if_removed:  'manifest stops being load-bearing',
+    source:      'kernel handleEmit() — manifest check on line ~987'
+  },
+  SUB: {
+    threshold: 'maxSubscriptionsPerBlock = 48',
+    consequence: 'further SUB calls raise a violation',
+    if_raised:   'blocks can listen to more channels at once; more memory per block',
+    if_removed:  'blocks could subscribe to every channel — diagnostic chaos',
+    source:      'kernel SETTINGS.maxSubscriptionsPerBlock / handleSub()'
+  },
+  RELOAD_CAP: {
+    threshold: 'maxLifetimeReloads = 4 (session-scoped)',
+    consequence: 'block is permanently evicted on the 5th reload',
+    if_raised:   'flaky blocks get more recovery attempts',
+    if_removed:  'broken blocks could thrash forever, consuming reload budget',
+    source:      'kernel SETTINGS.maxLifetimeReloads'
+  },
+  EVICTION: {
+    threshold: 'final state — block is gone',
+    consequence: 'all subscriptions removed; iframe destroyed; persisted state forgotten',
+    if_raised:   'n/a',
+    if_removed:  'n/a',
+    source:      'kernel evictBlock() / cleanupBlock()'
+  }
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 3  ·  Event ingestion & structured parsing
+   ════════════════════════════════════════════════════════════════════
+   The kernel's pushFeed() entries are plain strings, but they follow
+   strict patterns. We parse them back into structured form so the
+   feed, topology, and explanations all share one canonical shape.
+*/
+const PATTERNS = [
+  { re: /^([a-z0-9-]+) → (\S+)$/i,
+    kind: 'EMIT',
+    parse: m => ({ src: m[1], channel: m[2] }) },
+  { re: /^([a-z0-9-]+) sub (\S+)$/i,
+    kind: 'SUB',
+    parse: m => ({ src: m[1], channel: m[2] }) },
+  { re: /^([a-z0-9-]+) declared \[(.*?)\] \/ \[(.*?)\]$/i,
+    kind: 'DECLARED',
+    parse: m => ({
+      src: m[1],
+      emits:    (m[2] || '').split(',').map(s => s.trim()).filter(s => s && s !== '∅'),
+      consumes: (m[3] || '').split(',').map(s => s.trim()).filter(s => s && s !== '∅'),
+    }) },
+  { re: /^([a-z0-9-]+) mounted$/i,
+    kind: 'MOUNTED',
+    parse: m => ({ src: m[1] }) },
+  { re: /^spawn ([a-z0-9-]+) → (\S+)/i,
+    kind: 'SPAWN',
+    parse: m => ({ src: m[1], url: m[2] }) },
+  { re: /^([a-z0-9-]+) evicted: (.+)$/i,
+    kind: 'EVICTED',
+    parse: m => ({ src: m[1], reason: m[2] }) },
+  { re: /^([a-z0-9-]+) reloading \(([^)]+)\),\s*retry (\d+)\/(\d+),\s*lifetime (\d+)\/(\d+)$/i,
+    kind: 'RELOADING',
+    parse: m => ({ src: m[1], reason: m[2], retry: +m[3], retryMax: +m[4], lifetime: +m[5], lifetimeMax: +m[6] }) },
+  { re: /^([a-z0-9-]+) violation: (.+)$/i,
+    kind: 'VIOLATION',
+    parse: m => ({ src: m[1], reason: m[2] }) },
+  { re: /^([a-z0-9-]+) rate limited: (.+)$/i,
+    kind: 'RATE_LIMIT',
+    parse: m => ({ src: m[1], reason: m[2] }) },
+  { re: /^([a-z0-9-]+) watchdog triggered$/i,
+    kind: 'WATCHDOG',
+    parse: m => ({ src: m[1] }) },
+  { re: /^([a-z0-9-]+) loaded \(legacy mode\)$/i,
+    kind: 'MOUNTED',
+    parse: m => ({ src: m[1], legacy: true }) },
+  { re: /^([a-z0-9-]+) ← DECLARE received/i,
+    kind: 'DECLARE_IN',
+    parse: m => ({ src: m[1] }) },
+  { re: /^([a-z0-9-]+) ← MOUNT_ACK received/i,
+    kind: 'MOUNTACK_IN',
+    parse: m => ({ src: m[1] }) },
+];
+
+function parseKernelLog(entry) {
+  const msg = entry.message || '';
+  for (const p of PATTERNS) {
+    const m = msg.match(p.re);
+    if (m) return Object.assign({ kind: p.kind }, p.parse(m));
+  }
+  return { kind: 'OTHER', raw: msg };
+}
+
+function classifyLevel(entry, parsed) {
+  if (entry.level === 'BAD')  return 'bad';
+  if (entry.level === 'WARN') return 'warn';
+  if (parsed.kind === 'EMIT' || parsed.kind === 'SUB') return 'channel';
+  if (parsed.kind === 'EVICTED' || parsed.kind === 'RELOADING') return 'system';
+  return 'system';
+}
+function classifyKind(parsed) {
+  if (parsed.kind === 'EMIT' || parsed.kind === 'SUB') return 'channel';
+  return 'system';
+}
+
+function makeExplanation(parsed, raw) {
+  switch (parsed.kind) {
+    case 'EMIT':
+      return {
+        what: `${parsed.src} emitted on ${parsed.channel}`,
+        why:  `block declared ${parsed.channel} in its manifest emits, payload sanitized & rate-limited`,
+        so_what: `routed to all blocks subscribed to ${parsed.channel}`,
+        rule: 'EMIT'
+      };
+    case 'SUB':
+      return {
+        what: `${parsed.src} subscribed to ${parsed.channel}`,
+        why:  `channel was in the block's declared consumes; subscription is now active`,
+        so_what: `future emissions on ${parsed.channel} will be delivered to this block`,
+        rule: 'SUB'
+      };
+    case 'DECLARED':
+      return {
+        what: `${parsed.src} declared its manifest`,
+        why:  `block sent DECLARE within first-pong grace; manifest validated against caps`,
+        so_what: `kernel issued mount challenge; emits=[${parsed.emits.length}] consumes=[${parsed.consumes.length}]`,
+      };
+    case 'MOUNTED':
+      return {
+        what: `${parsed.src} reached MOUNTED state`,
+        why:  parsed.legacy ? `legacy iframe finished loading — no protocol handshake required` : `block answered MOUNT_CHALLENGE with valid nonce; subscriptions activated`,
+        so_what: `block can now emit, consume, and respond to PINGs`,
+      };
+    case 'EVICTED':
+      return {
+        what: `${parsed.src} was evicted: ${parsed.reason}`,
+        why:  `kernel determined the block crossed a survival threshold`,
+        so_what: `subscriptions removed; iframe destroyed; persisted state forgotten`,
+        rule: 'EVICTION',
+        action: { label: 'Respawn', kind: 'respawn', target: parsed.src }
+      };
+    case 'RELOADING':
+      return {
+        what: `${parsed.src} reloading (retry ${parsed.retry}/${parsed.retryMax}, lifetime ${parsed.lifetime}/${parsed.lifetimeMax})`,
+        why:  `${parsed.reason} — kernel salvaging the block instead of evicting`,
+        so_what: parsed.lifetime >= parsed.lifetimeMax - 1 ? `one reload remaining before permanent eviction` : `subscriptions carried over; new iframe spawning`,
+        rule: 'RELOAD_CAP'
+      };
+    case 'VIOLATION':
+      return {
+        what: `${parsed.src} violation: ${parsed.reason}`,
+        why:  `block sent a malformed or out-of-state protocol message`,
+        so_what: `violations counter incremented; 6 violations triggers eviction`,
+        rule: 'VIOLATION'
+      };
+    case 'RATE_LIMIT':
+      return {
+        what: `${parsed.src} rate limited (${parsed.reason})`,
+        why:  `block exceeded token bucket capacity for ${parsed.reason} plane`,
+        so_what: `message dropped; rateStrikes++; 8 strikes triggers eviction`,
+        rule: 'RATE_STRIKE'
+      };
+    case 'WATCHDOG':
+      return {
+        what: `${parsed.src} watchdog triggered`,
+        why:  `block did not reach MOUNTED state within watchdogMs`,
+        so_what: `block being reloaded — see RELOADING event for outcome`,
+        rule: 'WATCHDOG'
+      };
+    case 'SPAWN':
+      return {
+        what: `kernel spawned ${parsed.src}`,
+        why:  `block creation requested via spawnBlock(); URL passed isAllowedBlockUrl() check`,
+        so_what: `iframe attached; BOOT message dispatched with MessagePort`,
+      };
+    default:
+      return { what: raw || parsed.raw || 'system event', why: 'kernel internal', so_what: '' };
+  }
+}
+
+function ingestKernelEntry(entry) {
+  const parsed = parseKernelLog(entry);
+  const explain = makeExplanation(parsed, entry.message);
+  const ev = {
+    id: 'e_' + (entry.at || Date.now()) + '_' + (STATE.events.length & 0xFFFF),
+    t: entry.at || Date.now(),
+    kind: classifyKind(parsed),
+    level: classifyLevel(entry, parsed),
+    raw: entry.message,
+    parsed,
+    explain
+  };
+  pushEvent(ev);
+  applyEventToTopology(parsed, ev.t);
+  return ev;
+}
+
+function pushEvent(ev) {
+  STATE.events.push(ev);
+  if (STATE.events.length > EVENT_CAP) STATE.events.splice(0, STATE.events.length - EVENT_CAP);
+  scheduleFeedRender();
+  scheduleStatsRender();
+}
+
+/* derive blocks/channels/emissions from a parsed event */
+function applyEventToTopology(p, t) {
+  if (!p || !p.src) return;
+  const b = touchBlock(p.src, t);
+
+  switch (p.kind) {
+    case 'DECLARED':
+      for (const c of p.emits)    b.emits.add(c);
+      for (const c of p.consumes) b.consumes.add(c);
+      b.declared = true;
+      for (const c of p.emits)    touchChannel(c).srcs.add(p.src);
+      for (const c of p.consumes) touchChannel(c).dsts.add(p.src);
+      break;
+    case 'MOUNTED':
+      b.status = 'MOUNTED';
+      b.mountedAt = t;
+      break;
+    case 'EVICTED':
+      b.status = 'EVICTED';
+      b.evictedAt = t;
+      b.evictReason = p.reason;
+      break;
+    case 'RELOADING':
+      b.status = 'RELOADING';
+      break;
+    case 'EMIT': {
+      b.emits.add(p.channel);
+      const ch = touchChannel(p.channel);
+      ch.srcs.add(p.src);
+      ch.count++;
+      ch.lastT = t;
+      STATE.emissions.push({ t, src: p.src, channel: p.channel });
+      const cutoff = t - EMISSION_WINDOW_MS;
+      while (STATE.emissions.length && STATE.emissions[0].t < cutoff) STATE.emissions.shift();
+      flashNode(p.src);
+      flashHub(p.channel);
+      break;
+    }
+    case 'SUB': {
+      b.consumes.add(p.channel);
+      touchChannel(p.channel).dsts.add(p.src);
+      break;
+    }
+    case 'VIOLATION':
+    case 'RATE_LIMIT':
+    case 'WATCHDOG':
+      b.lastIncident = { kind: p.kind, t, reason: p.reason };
+      break;
+  }
+}
+
+function touchBlock(id, t) {
+  let b = STATE.blocks.get(id);
+  if (!b) {
+    b = {
+      id, firstSeen: t, lastSeen: t,
+      emits: new Set(), consumes: new Set(),
+      status: 'OBSERVED', declared: false, mountedAt: null,
+      evictedAt: null, evictReason: null, lastIncident: null
+    };
+    STATE.blocks.set(id, b);
+    scheduleTopoRender(true);
+  }
+  b.lastSeen = t;
+  return b;
+}
+function touchChannel(name) {
+  let c = STATE.channels.get(name);
+  if (!c) {
+    c = { name, family: family(name), srcs: new Set(), dsts: new Set(), count: 0, lastT: 0 };
+    STATE.channels.set(name, c);
+  }
+  return c;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 4  ·  Live channel handlers
+   ════════════════════════════════════════════════════════════════════ */
+function onIncoming(channel, payload, src) {
+  // resolve any pending request (vibe.result, db.result, api.result)
+  if (payload && payload._reqId && PENDING.has(payload._reqId)) {
+    const slot = PENDING.get(payload._reqId);
+    clearTimeout(slot.timer);
+    PENDING.delete(payload._reqId);
+    slot.resolve(payload);
+    // continue — some channels (vibe.notify) carry no _reqId and still need processing
+  }
+
+  switch (channel) {
+    case 'nexus.kernel.log':
+      ingestKernelEntry(payload);
+      break;
+    case 'eidolon.world.tick':
+      STATE.lastTick = payload;
+      STATE.worlds.push({ t: nowTs(), p: payload });
+      if (STATE.worlds.length > 32) STATE.worlds.shift();
+      STATE.population = payload.population || STATE.population;
+      pushStructured('world', 'info',
+        `world ${fmtSeed(payload.seed)} tick — pop ${payload.population} battles ${payload.battles}`,
+        { what: `world tick on seed 0x${(payload.seed>>>0).toString(16).padStart(8,'0')}`,
+          why:  `router emitted eidolon.world.tick on world spawn or epoch change`,
+          so_what: `population ${payload.population} · battles total ${payload.battles}` },
+        payload);
+      scheduleStatsRender();
+      break;
+    case 'eidolon.battle.auto':
+      STATE.battles.auto++;
+      STATE.battles.recent.push({
+        kind: 'auto', t: nowTs(),
+        winner: (payload.winner||{}).name || '?',
+        loser:  (payload.loser ||{}).name || '?',
+        turns:  payload.turns || 0,
+        playerSide: false
+      });
+      if (STATE.battles.recent.length > 32) STATE.battles.recent.shift();
+      pushStructured('world', 'info',
+        `${(payload.winner||{}).name||'?'} ⚔ ${(payload.loser||{}).name||'?'} → win in ${payload.turns}t`,
+        { what: `auto-battle resolved in ${payload.turns} turns`,
+          why:  `router's tick loop selected two encountered creatures and ran headless combat`,
+          so_what: `winner banked a win, loser HP reduced; if losses≥3 the loser despawns` },
+        payload);
+      renderBattleRibbon();
+      break;
+    case 'eidolon.challenger.appears':
+      pushStructured('world', 'info',
+        `→ challenger ${payload.name} dispatched (${payload.wins}W ${payload.losses}L)`,
+        { what: `${payload.name} routed to Eidolon OS as player challenger`,
+          why:  `every Nth auto-battle the router sends the winner to OS for cinematic combat`,
+          so_what: `OS will emit eidolon.battle.result when player engages` },
+        payload);
+      break;
+    case 'eidolon.battle.result':
+      STATE.battles.player++;
+      STATE.battles.recent.push({
+        kind: 'player', t: nowTs(),
+        winner: payload.winner === 'player' ? (payload.playerName||'player') : (payload.enemyName||'enemy'),
+        loser:  payload.winner === 'player' ? (payload.enemyName||'enemy')   : (payload.playerName||'player'),
+        playerSide: true,
+        playerWon: payload.winner === 'player'
+      });
+      if (STATE.battles.recent.length > 32) STATE.battles.recent.shift();
+      pushStructured('world', payload.winner === 'player' ? 'info' : 'warn',
+        `OS battle: ${payload.winner} wins (${payload.playerName} vs ${payload.enemyName})`,
+        { what: `Eidolon OS reported battle outcome — ${payload.winner} victorious`,
+          why:  `player issued final attack or HP reached zero in OS battle`,
+          so_what: `router will reconcile challenger record on next tick` },
+        payload);
+      renderBattleRibbon();
+      break;
+    case 'vibe.notify':
+      handleVibeNotify(payload);
+      break;
+    case 'system.block_ready':
+      pushStructured('system', 'info',
+        `block_ready: ${payload.blockId} ${payload.status||''}`,
+        { what: `${payload.blockId} announced itself ready`,
+          why:  `block finished its own internal boot sequence (DB open, fs check, etc.)`,
+          so_what: `peer blocks waiting on this signal can now begin requests` },
+        payload);
+      break;
+    case 'arena.play':
+      pushStructured('world', 'info',
+        `arena.play received`,
+        { what: `arena was instructed to play a battle`,
+          why:  `crucible or another block emitted arena.play to schedule a match`,
+          so_what: `arena will load vibes and run the battle headlessly` },
+        payload);
+      break;
+    case 'db.notify':
+      pushStructured('system', 'info',
+        `db.notify ${payload.table||''}`,
+        { what: `NexusDB notified subscribers of a row change in ${payload.table}`,
+          why:  `a subscribing block had registered interest via db.subscribe`,
+          so_what: `subscribers may issue follow-up SELECTs to refresh their views` },
+        payload);
+      break;
+  }
+}
+
+function handleVibeNotify(payload) {
+  if (!payload || !payload.envelope) return;
+  const env = payload.envelope;
+  const op = payload.op;
+  if (op === 'delete') {
+    STATE.vibes.delete(env.id);
+  } else {
+    STATE.vibes.set(env.id, env);
+  }
+  pushStructured('world', op === 'delete' ? 'warn' : 'info',
+    `vibe.${op} ${env.type} · ${env.name||env.id}`,
+    { what: `${op === 'save' ? 'saved' : op === 'delete' ? 'deleted' : 'updated'} ${env.type} "${env.name||env.id}"`,
+      why:  op === 'save'
+              ? 'a producer block called vibe.save with a complete envelope'
+              : op === 'delete'
+                ? 'a block requested vibe.delete by id'
+                : 'tags or metadata changed via vibe.tag',
+      so_what: op === 'save'
+                ? 'envelope written to library IndexedDB and lineage edges indexed'
+                : op === 'delete'
+                  ? 'envelope removed from cache and on-disk store; lineage stale'
+                  : 'envelope updated in cache; subscribers notified' },
+    env);
+  scheduleStatsRender();
+  if (STATE.inspector && STATE.inspector.kind === 'vibe' && STATE.inspector.ref === env.id) {
+    renderInspector();
+  }
+}
+
+/* push a structured event of our own (not from the kernel feed) */
+function pushStructured(kind, level, raw, explain, source) {
+  const ev = {
+    id: 'e_' + Date.now() + '_' + (STATE.events.length & 0xFFFF),
+    t: Date.now(),
+    kind,
+    level,
+    raw,
+    parsed: { kind: 'STRUCTURED', source },
+    explain
+  };
+  pushEvent(ev);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 5  ·  Topology — damped force-directed graph
+   ════════════════════════════════════════════════════════════════════
+   Nodes settle to rest. Edges pulse on emission rate. No jitter.
+*/
+const TOPO = {
+  svg: null,
+  nodes: new Map(),    // id → { x, y, vx, vy, r, label, glyph, el, _flashUntil }
+  edges: [],           // { src, dst, channel, family, count, el, lastT }
+  width: 0, height: 0,
+  raf: null,
+  running: false,
+  ke: 0,               // kinetic energy — sleep when low
+  ticks: 0,
+};
+
+const APP_GLYPHS = {
+  'mission-control':'⊚',
+  'router':'◉','eidolon-router':'◉',
+  'os':'⚙','eidolon-os':'⚙','battle':'⚙',
+  'atlas':'⊕','vibes-library':'◈','library':'◈',
+  'crucible':'⚒','vibes-crucible':'⚒',
+  'arena':'⚔','vibes-arena':'⚔',
+  'nexusdb':'▦','nexus-db':'▦',
+  'social':'◇','wallet':'◎',
+  'witness':'◐','nexus-witness':'◐',
+};
+function glyphFor(id) {
+  const lower = id.toLowerCase();
+  for (const k of Object.keys(APP_GLYPHS)) if (lower.startsWith(k)) return APP_GLYPHS[k];
+  return '◆';
+}
+
+function initTopology() {
+  TOPO.svg = document.getElementById('topo-svg');
+  const pane = document.getElementById('topo-pane');
+  const ro = new ResizeObserver(() => layoutTopology());
+  ro.observe(pane);
+  layoutTopology();
+  TOPO.svg.addEventListener('click', e => {
+    if (e.target === TOPO.svg) {
+      // background click — clear selection
+      STATE.selectedBlockId = null;
+      STATE.selectedChannel = null;
+      STATE.inspector = null;
+      renderInspector();
+      renderTopologyHard();
+    }
+  });
+  scheduleTopoRender(true);
+}
+
+function layoutTopology() {
+  const pane = document.getElementById('topo-pane');
+  const r = pane.getBoundingClientRect();
+  TOPO.width = r.width; TOPO.height = r.height;
+  TOPO.svg.setAttribute('viewBox', `0 0 ${r.width} ${r.height}`);
+  TOPO.svg.setAttribute('width',  r.width);
+  TOPO.svg.setAttribute('height', r.height);
+  if (TOPO.nodes.size === 0) seedNodePositions();
+  renderTopologyHard();
+}
+
+function seedNodePositions() {
+  const cx = TOPO.width / 2, cy = TOPO.height / 2;
+  // place mission-control at center later when it appears
+  const ids = Array.from(STATE.blocks.keys());
+  for (let i = 0; i < ids.length; i++) {
+    const a = (i / Math.max(ids.length, 1)) * Math.PI * 2;
+    const id = ids[i];
+    if (!TOPO.nodes.has(id)) {
+      TOPO.nodes.set(id, {
+        x: cx + Math.cos(a) * Math.min(TOPO.width,TOPO.height) * 0.28,
+        y: cy + Math.sin(a) * Math.min(TOPO.width,TOPO.height) * 0.28,
+        vx: 0, vy: 0, r: 18,
+        _flashUntil: 0, el: null
+      });
+    }
+  }
+}
+
+let topoHardTimer = null;
+function scheduleTopoRender(hard) {
+  if (hard) {
+    if (topoHardTimer) return;
+    topoHardTimer = setTimeout(() => { topoHardTimer = null; renderTopologyHard(); }, 80);
+  } else {
+    if (!TOPO.running) startTopoSim();
+  }
+}
+
+function emissionRateFor(src, channel) {
+  if (!STATE.emissions.length) return 0;
+  const cutoff = nowTs() - EMISSION_WINDOW_MS;
+  let n = 0;
+  for (const e of STATE.emissions) {
+    if (e.t >= cutoff && e.src === src && e.channel === channel) n++;
+  }
+  return n / (EMISSION_WINDOW_MS / 1000);
+}
+
+function rebuildEdges() {
+  // CHANNEL HUB PROMOTION
+  // Channels with 2+ producers OR 2+ consumers get promoted to a hub node.
+  // Otherwise they remain as direct (src→dst) edges.
+  // This converts the topology from a wiring diagram into a nervous system —
+  // shared channels become visible focal points instead of N×M tangles.
+  const edges = [];
+  const hubs = new Map(); // channel name → hub state
+  for (const ch of STATE.channels.values()) {
+    if (!ch.srcs.size || !ch.dsts.size) continue;
+    const promote = ch.srcs.size >= 2 || ch.dsts.size >= 2;
+    if (promote) {
+      hubs.set(ch.name, {
+        name: ch.name, family: ch.family,
+        srcs: Array.from(ch.srcs).filter(s => STATE.blocks.has(s)),
+        dsts: Array.from(ch.dsts).filter(s => STATE.blocks.has(s)),
+        count: ch.count, lastT: ch.lastT
+      });
+      // hub edges: src → hub, hub → dst (each as half-edges)
+      for (const s of ch.srcs) {
+        if (!STATE.blocks.has(s)) continue;
+        edges.push({ src: s, dst: '#' + ch.name, channel: ch.name, family: ch.family,
+                     count: ch.count, lastT: ch.lastT, half: 'in' });
+      }
+      for (const d of ch.dsts) {
+        if (!STATE.blocks.has(d)) continue;
+        edges.push({ src: '#' + ch.name, dst: d, channel: ch.name, family: ch.family,
+                     count: ch.count, lastT: ch.lastT, half: 'out' });
+      }
+    } else {
+      for (const s of ch.srcs) {
+        for (const d of ch.dsts) {
+          if (s === d) continue;
+          if (!STATE.blocks.has(s) || !STATE.blocks.has(d)) continue;
+          edges.push({
+            src: s, dst: d, channel: ch.name, family: ch.family,
+            count: ch.count, lastT: ch.lastT
+          });
+        }
+      }
+    }
+  }
+  TOPO.edges = edges;
+  TOPO.hubs = hubs;
+}
+
+function startTopoSim() {
+  if (TOPO.running) return;
+  TOPO.running = true;
+  const step = () => {
+    if (!TOPO.running) return;
+    simStep();
+    paintTopology();
+    if (TOPO.ke < 0.05 && TOPO.ticks > 60) {
+      TOPO.running = false; // sleep until perturbation
+      return;
+    }
+    TOPO.ticks++;
+    TOPO.raf = requestAnimationFrame(step);
+  };
+  TOPO.ticks = 0;
+  TOPO.raf = requestAnimationFrame(step);
+}
+
+function perturbTopo() {
+  TOPO.ticks = 0;
+  if (!TOPO.running) startTopoSim();
+}
+
+function simStep() {
+  // Damped Verlet — gentle.
+  const W = TOPO.width, H = TOPO.height;
+  if (!W || !H) return;
+  const cx = W/2, cy = H/2;
+  // Constants tuned for a calm, small graph
+  const REPEL = 1400, DAMP = 0.78, CENTER = 0.0014, SPRING = 0.012, REST = 110;
+  const HUB_REPEL = 600, HUB_REST = 60;
+  const nodes = TOPO.nodes;
+  const hubNodes = TOPO.hubNodes || (TOPO.hubNodes = new Map());
+  // ensure all blocks have nodes
+  for (const id of STATE.blocks.keys()) {
+    if (!nodes.has(id)) {
+      const a = Math.random() * Math.PI * 2;
+      nodes.set(id, {
+        x: cx + Math.cos(a) * Math.min(W,H) * 0.3,
+        y: cy + Math.sin(a) * Math.min(W,H) * 0.3,
+        vx: 0, vy: 0, r: 18, _flashUntil: 0, el: null
+      });
+    }
+  }
+  // ensure all hubs have nodes (positioned near average of their srcs/dsts)
+  if (TOPO.hubs) {
+    for (const [hubName, hub] of TOPO.hubs) {
+      const hubKey = '#' + hubName;
+      if (!hubNodes.has(hubKey)) {
+        // place near centroid of connected blocks
+        let sx = 0, sy = 0, n = 0;
+        for (const b of [...hub.srcs, ...hub.dsts]) {
+          const bn = nodes.get(b);
+          if (bn) { sx += bn.x; sy += bn.y; n++; }
+        }
+        const px = n ? sx/n : cx + (Math.random()-0.5) * 60;
+        const py = n ? sy/n : cy + (Math.random()-0.5) * 60;
+        hubNodes.set(hubKey, { x: px, y: py, vx: 0, vy: 0, _flashUntil: 0, el: null, name: hubName });
+      }
+    }
+  }
+  // remove orphan nodes
+  for (const id of Array.from(nodes.keys())) {
+    if (!STATE.blocks.has(id)) nodes.delete(id);
+  }
+  for (const k of Array.from(hubNodes.keys())) {
+    if (!TOPO.hubs || !TOPO.hubs.has(k.slice(1))) hubNodes.delete(k);
+  }
+  // forces — block on block
+  for (const [id, n] of nodes) {
+    let fx = (cx - n.x) * CENTER;
+    let fy = (cy - n.y) * CENTER;
+    if (id === APP.id) { fx *= 6; fy *= 6; }
+    for (const [oid, o] of nodes) {
+      if (oid === id) continue;
+      const dx = n.x - o.x, dy = n.y - o.y;
+      const d2 = dx*dx + dy*dy + 0.01;
+      const f = REPEL / d2;
+      fx += (dx / Math.sqrt(d2)) * f;
+      fy += (dy / Math.sqrt(d2)) * f;
+    }
+    // hub repulsion (lighter so hubs settle between blocks)
+    for (const [, h] of hubNodes) {
+      const dx = n.x - h.x, dy = n.y - h.y;
+      const d2 = dx*dx + dy*dy + 0.01;
+      const f = HUB_REPEL / d2;
+      fx += (dx / Math.sqrt(d2)) * f;
+      fy += (dy / Math.sqrt(d2)) * f;
+    }
+    n._fx = fx; n._fy = fy;
+  }
+  // forces on hubs — light center pull, light block repulsion
+  for (const [hk, h] of hubNodes) {
+    let fx = (cx - h.x) * CENTER * 0.4;
+    let fy = (cy - h.y) * CENTER * 0.4;
+    for (const [, o] of nodes) {
+      const dx = h.x - o.x, dy = h.y - o.y;
+      const d2 = dx*dx + dy*dy + 0.01;
+      const f = HUB_REPEL / d2;
+      fx += (dx / Math.sqrt(d2)) * f;
+      fy += (dy / Math.sqrt(d2)) * f;
+    }
+    for (const [, oh] of hubNodes) {
+      if (oh === h) continue;
+      const dx = h.x - oh.x, dy = h.y - oh.y;
+      const d2 = dx*dx + dy*dy + 0.01;
+      const f = HUB_REPEL * 0.6 / d2;
+      fx += (dx / Math.sqrt(d2)) * f;
+      fy += (dy / Math.sqrt(d2)) * f;
+    }
+    h._fx = fx; h._fy = fy;
+  }
+  // springs along edges (block → block, block → hub, hub → block)
+  for (const e of TOPO.edges) {
+    const a = nodes.get(e.src) || hubNodes.get(e.src);
+    const b = nodes.get(e.dst) || hubNodes.get(e.dst);
+    if (!a || !b) continue;
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const d = Math.sqrt(dx*dx + dy*dy) || 0.01;
+    const rest = (e.src.startsWith('#') || e.dst.startsWith('#')) ? HUB_REST : REST;
+    const f = SPRING * (d - rest);
+    a._fx += (dx / d) * f;
+    a._fy += (dy / d) * f;
+    b._fx -= (dx / d) * f;
+    b._fy -= (dy / d) * f;
+  }
+  // integrate blocks
+  let ke = 0;
+  for (const [, n] of nodes) {
+    n.vx = (n.vx + (n._fx||0)) * DAMP;
+    n.vy = (n.vy + (n._fy||0)) * DAMP;
+    const speed = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
+    if (speed > 6) { n.vx *= 6/speed; n.vy *= 6/speed; }
+    n.x += n.vx;
+    n.y += n.vy;
+    const M = 28;
+    if (n.x < M) { n.x = M; n.vx *= -0.3; }
+    if (n.x > W - M) { n.x = W - M; n.vx *= -0.3; }
+    if (n.y < M) { n.y = M; n.vy *= -0.3; }
+    if (n.y > H - M) { n.y = H - M; n.vy *= -0.3; }
+    ke += n.vx*n.vx + n.vy*n.vy;
+  }
+  // integrate hubs
+  for (const [, h] of hubNodes) {
+    h.vx = (h.vx + (h._fx||0)) * DAMP;
+    h.vy = (h.vy + (h._fy||0)) * DAMP;
+    const speed = Math.sqrt(h.vx*h.vx + h.vy*h.vy);
+    if (speed > 5) { h.vx *= 5/speed; h.vy *= 5/speed; }
+    h.x += h.vx; h.y += h.vy;
+    const M = 18;
+    if (h.x < M) { h.x = M; h.vx *= -0.3; }
+    if (h.x > W - M) { h.x = W - M; h.vx *= -0.3; }
+    if (h.y < M) { h.y = M; h.vy *= -0.3; }
+    if (h.y > H - M) { h.y = H - M; h.vy *= -0.3; }
+    ke += h.vx*h.vx + h.vy*h.vy;
+  }
+  TOPO.ke = ke;
+}
+
+function flashNode(blockId) {
+  const n = TOPO.nodes.get(blockId);
+  if (n) {
+    n._flashUntil = nowTs() + 700;
+    perturbTopo();
+  }
+}
+function flashHub(channelName) {
+  if (!TOPO.hubNodes) return;
+  const h = TOPO.hubNodes.get('#' + channelName);
+  if (h) {
+    h._flashUntil = nowTs() + 700;
+    perturbTopo();
+  }
+}
+
+/* full DOM rebuild — only on structural changes */
+function renderTopologyHard() {
+  rebuildEdges();
+  if (!TOPO.svg) return;
+  // clear
+  while (TOPO.svg.firstChild) TOPO.svg.removeChild(TOPO.svg.firstChild);
+
+  const empty = document.getElementById('topo-empty');
+  if (STATE.blocks.size === 0) {
+    if (empty) empty.style.display = 'flex';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  const defs = svgEl('defs');
+  TOPO.svg.appendChild(defs);
+
+  const edgeLayer = svgEl('g', { 'data-layer':'edges' });
+  TOPO.svg.appendChild(edgeLayer);
+  const hubLayer = svgEl('g', { 'data-layer':'hubs' });
+  TOPO.svg.appendChild(hubLayer);
+  const nodeLayer = svgEl('g', { 'data-layer':'nodes' });
+  TOPO.svg.appendChild(nodeLayer);
+
+  // Group edges that share their endpoint pair (regardless of direction in the
+  // hub case, since hub→block edges all share the hub endpoint).
+  const grouped = new Map();
+  for (const e of TOPO.edges) {
+    const k = `${e.src}>>${e.dst}`;
+    if (!grouped.has(k)) grouped.set(k, []);
+    grouped.get(k).push(e);
+  }
+  for (const [k, list] of grouped) {
+    const g = svgEl('g', { class: 't-edge-group' });
+    edgeLayer.appendChild(g);
+    list._g = g;
+    list._paths = [];
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      const path = svgEl('path', {
+        class: 't-edge',
+        stroke: familyColor(e.family),
+        'stroke-width': 1,
+        'stroke-opacity': 0.45,
+      });
+      path.addEventListener('click', () => selectChannel(e.channel));
+      path.addEventListener('mouseenter', ev => showChannelTag(ev, e));
+      path.addEventListener('mouseleave', hideTag);
+      g.appendChild(path);
+      list._paths.push(path);
+      e._path = path;
+    }
+    const lbl = svgEl('text', { class: 't-channel-label' });
+    g.appendChild(lbl);
+    list._lbl = lbl;
+  }
+  TOPO._groupedEdges = grouped;
+
+  // hubs (channel nodes) — diamonds
+  if (TOPO.hubs) {
+    for (const [hubName, hub] of TOPO.hubs) {
+      const hk = '#' + hubName;
+      const hn = TOPO.hubNodes && TOPO.hubNodes.get(hk);
+      if (!hn) continue;
+      const g = svgEl('g', { class: 't-hub' + (STATE.selectedChannel === hubName ? ' selected' : '') });
+      g.dataset.channel = hubName;
+      const fc = familyColor(hub.family);
+      // pulse ring
+      const pulse = svgEl('circle', { class:'hub-pulse', cx: 0, cy: 0, r: 6, stroke: fc });
+      // diamond rect rotated
+      const r = svgEl('rect', { x: -7, y: -7, width: 14, height: 14, rx: 1.5, transform: 'rotate(45)', stroke: fc, 'stroke-opacity': 0.7 });
+      // label below
+      const lbl = svgEl('text', { y: 22 });
+      lbl.textContent = shorten(hubName, 18);
+      g.appendChild(pulse);
+      g.appendChild(r);
+      g.appendChild(lbl);
+      g.addEventListener('click', () => selectChannel(hubName));
+      g.addEventListener('mouseenter', ev => showChannelTag(ev, { channel: hubName, family: hub.family, src: hub.srcs[0] || '' }));
+      g.addEventListener('mouseleave', hideTag);
+      hubLayer.appendChild(g);
+      hn.el = g;
+    }
+  }
+
+  // build block nodes
+  for (const [id, n] of TOPO.nodes) {
+    const block = STATE.blocks.get(id);
+    if (!block) continue;
+    const g = svgEl('g', { class: 't-node' + (block.status === 'EVICTED' ? ' evicted' : '') });
+    g.dataset.blockId = id;
+    if (id === APP.id) g.classList.add('is-self');
+    if (id === STATE.selectedBlockId) g.classList.add('selected');
+    const pulse = svgEl('circle', { class:'pulse', r: 12, cx: 0, cy: 0 });
+    const body = svgEl('circle', {
+      class: 'body', r: id === APP.id ? 22 : 17, cx: 0, cy: 0,
+      fill: id === APP.id ? 'var(--bulkhead)' : 'var(--console)',
+      stroke: id === APP.id ? 'var(--sig-vibe)' : undefined
+    });
+    const glyph = svgEl('text', { class:'glyph', y: 4.5 });
+    glyph.textContent = glyphFor(id);
+    const label = svgEl('text', { y: id === APP.id ? 38 : 32 });
+    label.textContent = shorten(id, 14);
+    g.appendChild(pulse);
+    g.appendChild(body);
+    g.appendChild(glyph);
+    g.appendChild(label);
+    g.addEventListener('click', () => selectBlock(id));
+    g.addEventListener('mouseenter', ev => showBlockTag(ev, id));
+    g.addEventListener('mouseleave', hideTag);
+    nodeLayer.appendChild(g);
+    n.el = g;
+  }
+
+  paintTopology();
+  perturbTopo();
+  renderTopologyMeta();
+}
+
+/* per-frame paint — moves existing elements */
+function paintTopology() {
+  for (const [id, n] of TOPO.nodes) {
+    if (!n.el) continue;
+    n.el.setAttribute('transform', `translate(${n.x.toFixed(1)},${n.y.toFixed(1)})`);
+    if (n._flashUntil > nowTs()) n.el.classList.add('emitting'); else n.el.classList.remove('emitting');
+  }
+  if (TOPO.hubNodes) {
+    for (const [, h] of TOPO.hubNodes) {
+      if (!h.el) continue;
+      h.el.setAttribute('transform', `translate(${h.x.toFixed(1)},${h.y.toFixed(1)})`);
+      if (h._flashUntil > nowTs()) h.el.classList.add('emitting'); else h.el.classList.remove('emitting');
+    }
+  }
+  if (!TOPO._groupedEdges) return;
+  for (const [k, list] of TOPO._groupedEdges) {
+    const a = TOPO.nodes.get(list[0].src) || (TOPO.hubNodes && TOPO.hubNodes.get(list[0].src));
+    const b = TOPO.nodes.get(list[0].dst) || (TOPO.hubNodes && TOPO.hubNodes.get(list[0].dst));
+    if (!a || !b) continue;
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const len = Math.sqrt(dx*dx + dy*dy) || 1;
+    const nx = -dy / len, ny = dx / len;
+    const baseOff = -((list.length - 1) * 8) / 2;
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      const off = baseOff + i * 8;
+      const mx = (a.x + b.x)/2 + nx * off;
+      const my = (a.y + b.y)/2 + ny * off;
+      const path = e._path;
+      path.setAttribute('d', `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`);
+      const rate = emissionRateFor(e.src.startsWith('#') ? '' : e.src, e.channel);
+      // hub-leg edges read aggregate rate
+      const hubRate = e.src.startsWith('#') || e.dst.startsWith('#') ? aggregateChannelRate(e.channel) : rate;
+      const useRate = Math.max(rate, hubRate);
+      const w = Math.min(3.6, 0.6 + useRate * 1.2);
+      const op = Math.min(1, 0.32 + useRate * 0.18);
+      path.setAttribute('stroke-width', w.toFixed(2));
+      path.setAttribute('stroke-opacity', op.toFixed(2));
+      if (useRate < 0.05) path.setAttribute('stroke-dasharray', '3 4');
+      else path.removeAttribute('stroke-dasharray');
+    }
+    // labels suppressed near hubs (the hub itself shows the channel name)
+    if (list[0].src.startsWith('#') || list[0].dst.startsWith('#')) {
+      list._lbl.textContent = '';
+    } else {
+      const top = list.reduce((m, e) => emissionRateFor(e.src, e.channel) > emissionRateFor(m.src, m.channel) ? e : m, list[0]);
+      const off = baseOff + (list.indexOf(top)) * 8;
+      const mx = (a.x + b.x)/2 + nx * off;
+      const my = (a.y + b.y)/2 + ny * off;
+      list._lbl.setAttribute('x', mx.toFixed(1));
+      list._lbl.setAttribute('y', (my - 4).toFixed(1));
+      list._lbl.textContent = top.channel;
+    }
+  }
+}
+
+function aggregateChannelRate(channelName) {
+  if (!STATE.emissions.length) return 0;
+  const cutoff = nowTs() - EMISSION_WINDOW_MS;
+  let n = 0;
+  for (const e of STATE.emissions) if (e.t >= cutoff && e.channel === channelName) n++;
+  return n / (EMISSION_WINDOW_MS / 1000);
+}
+
+function renderBattleRibbon() {
+  const ribbon = document.getElementById('battle-ribbon');
+  const glyphs = document.getElementById('ribbon-glyphs');
+  const count  = document.getElementById('ribbon-count');
+  if (!ribbon || !glyphs || !count) return;
+  const recent = STATE.battles.recent.slice(-24);
+  if (recent.length === 0) {
+    ribbon.style.display = 'none';
+    return;
+  }
+  ribbon.style.display = 'flex';
+  glyphs.innerHTML = '';
+  for (const b of recent) {
+    const g = document.createElement('span');
+    g.className = 'g ';
+    if (b.kind === 'auto')   g.className += 'auto-w';
+    else if (b.playerWon)    g.className += 'player-w';
+    else                     g.className += 'player-l';
+    g.title = `${fmtTime(b.t)} · ${b.kind} · ${b.winner} ⚔ ${b.loser}${b.turns?` (${b.turns}t)`:''}`;
+    glyphs.appendChild(g);
+  }
+  const total = STATE.battles.auto + STATE.battles.player;
+  count.textContent = `${total} total · ${STATE.battles.player} OS`;
+
+  // hover-explain on the ribbon
+  ribbon.onmouseenter = (e) => {
+    const auto = recent.filter(b => b.kind === 'auto').length;
+    const player = recent.filter(b => b.kind === 'player').length;
+    const playerW = recent.filter(b => b.kind === 'player' && b.playerWon).length;
+    showTag(e, 'BATTLE RIBBON', {
+      what: `last ${recent.length} battle${recent.length!==1?'s':''} — ${auto} auto, ${player} OS`,
+      why:  `derived from eidolon.battle.auto and eidolon.battle.result emissions; oldest at left`,
+      so_what: player > 0 ? `OS record ${playerW}/${player}; viridian = auto wins, amber = player wins, rose = player losses` : `no OS battles yet — tall bars will appear when challengers reach the cartridge`,
+    });
+  };
+  ribbon.onmouseleave = hideTag;
+}
+
+function renderTopologyMeta() {
+  const meta = document.getElementById('topo-meta');
+  if (!meta) return;
+  const blocks = STATE.blocks.size;
+  const channels = STATE.channels.size;
+  const mounted = Array.from(STATE.blocks.values()).filter(b => b.status === 'MOUNTED').length;
+  const active = STATE.emissions.length;
+  meta.innerHTML = '';
+  meta.appendChild(metaRow('BLOCKS', `<b>${mounted}</b>/${blocks}`));
+  meta.appendChild(metaRow('CHANNELS', `<b>${channels}</b>`));
+  meta.appendChild(metaRow('TRAFFIC/10s', `<b>${active}</b>`));
+  // legend
+  const legend = document.getElementById('topo-legend');
+  legend.innerHTML = '';
+  const fams = [
+    ['vibe.*','vibe'],['eidolon.*','eidolon'],['nexus.*','nexus'],
+    ['db.*','db'],['arena.*','arena'],['api.*','api'],['fs.*','fs']
+  ];
+  for (const [lbl,fam] of fams) {
+    const row = document.createElement('div');
+    row.className = 'swatch-row';
+    row.innerHTML = `<span class="swatch" style="background:${familyColor(fam)}"></span>${lbl}`;
+    legend.appendChild(row);
+  }
+  document.getElementById('topo-crumb').textContent = `${blocks} block${blocks!==1?'s':''} · ${channels} channel${channels!==1?'s':''}`;
+}
+
+function metaRow(label, value) {
+  const d = document.createElement('div');
+  d.className = 'row';
+  d.innerHTML = `${label} ${value}`;
+  return d;
+}
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  if (attrs) for (const k in attrs) if (attrs[k] !== undefined) el.setAttribute(k, attrs[k]);
+  return el;
+}
+
+function shorten(s, n) {
+  if (!s) return '';
+  if (s.length <= n) return s;
+  return s.slice(0, n - 1) + '…';
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 6  ·  Feed render
+   ════════════════════════════════════════════════════════════════════ */
+let feedRenderQueued = false;
+function scheduleFeedRender() {
+  if (feedRenderQueued) return;
+  feedRenderQueued = true;
+  requestAnimationFrame(() => { feedRenderQueued = false; renderFeed(); });
+}
+
+function renderFeed() {
+  const list = document.getElementById('feed-list');
+  const filt = STATE.filters;
+  const q = filt.search.toLowerCase();
+  const allowed = STATE.events.filter(ev => {
+    if (ev.kind === 'system'  && !filt.system)  return false;
+    if (ev.kind === 'channel' && !filt.channel) return false;
+    if (ev.kind === 'world'   && !filt.world)   return false;
+    if (q) {
+      const hay = (ev.raw || '') + ' ' + (ev.explain && ev.explain.what || '');
+      if (!hay.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+  const visible = allowed.slice(-220);
+  list.innerHTML = '';
+  for (let i = visible.length - 1; i >= 0; i--) {
+    list.appendChild(renderFeedEntry(visible[i]));
+  }
+  document.getElementById('feed-crumb').textContent =
+    `${STATE.events.length} total · ${visible.length} shown`;
+}
+
+function renderFeedEntry(ev) {
+  const row = document.createElement('div');
+  row.className = `fe ${ev.kind} ${ev.level}`;
+  row.dataset.eventId = ev.id;
+  row.innerHTML = `
+    <span class="bar"></span>
+    <span class="icon">${iconFor(ev)}</span>
+    <span class="body"></span>
+    <span class="ts" title="">${fmtTime(ev.t)}</span>
+  `;
+  // body
+  const body = row.querySelector('.body');
+  body.appendChild(formatBody(ev));
+  // hover-explain on the body
+  body.classList.add('explain-trigger');
+  body.addEventListener('mouseenter', e => showEventTag(e, ev));
+  body.addEventListener('mouseleave', hideTag);
+  return row;
+}
+
+function iconFor(ev) {
+  const k = ev.parsed && ev.parsed.kind;
+  if (k === 'EMIT')      return '→';
+  if (k === 'SUB')       return '⊂';
+  if (k === 'DECLARED')  return '⊞';
+  if (k === 'MOUNTED')   return '◉';
+  if (k === 'EVICTED')   return '✕';
+  if (k === 'RELOADING') return '↻';
+  if (k === 'VIOLATION') return '!';
+  if (k === 'RATE_LIMIT')return '⌬';
+  if (k === 'WATCHDOG')  return '⌗';
+  if (k === 'SPAWN')     return '+';
+  if (ev.kind === 'world') return '◇';
+  return '·';
+}
+
+function formatBody(ev) {
+  const f = document.createDocumentFragment();
+  const p = ev.parsed;
+  if (p && (p.kind === 'EMIT' || p.kind === 'SUB')) {
+    const src = mkSrc(p.src);
+    const arrow = document.createElement('span');
+    arrow.className = 'tok';
+    arrow.textContent = p.kind === 'EMIT' ? ' → ' : ' subs ';
+    const ch = mkCh(p.channel);
+    f.appendChild(src); f.appendChild(arrow); f.appendChild(ch);
+    return f;
+  }
+  if (p && p.kind === 'DECLARED') {
+    f.appendChild(mkSrc(p.src));
+    const t = document.createElement('span'); t.className = 'tok';
+    t.textContent = ` declared (emits ${p.emits.length}, consumes ${p.consumes.length})`;
+    f.appendChild(t);
+    return f;
+  }
+  if (p && p.kind === 'MOUNTED') {
+    f.appendChild(mkSrc(p.src));
+    const t = document.createElement('span'); t.className = 'tok'; t.textContent = ' mounted';
+    f.appendChild(t);
+    return f;
+  }
+  if (p && p.kind === 'EVICTED') {
+    f.appendChild(mkSrc(p.src));
+    const t = document.createElement('span'); t.className = 'tok'; t.textContent = ` evicted: ${p.reason}`;
+    f.appendChild(t);
+    return f;
+  }
+  if (p && p.kind === 'RELOADING') {
+    f.appendChild(mkSrc(p.src));
+    const t = document.createElement('span'); t.className = 'tok';
+    t.textContent = ` reloading (${p.reason}) · ${p.lifetime}/${p.lifetimeMax}`;
+    f.appendChild(t);
+    return f;
+  }
+  if (p && (p.kind === 'VIOLATION' || p.kind === 'RATE_LIMIT' || p.kind === 'WATCHDOG')) {
+    f.appendChild(mkSrc(p.src));
+    const t = document.createElement('span'); t.className = 'tok';
+    t.textContent = ' ' + (ev.raw.replace(p.src, '').trim());
+    f.appendChild(t);
+    return f;
+  }
+  // structured / unparsed
+  const t = document.createElement('span');
+  t.textContent = ev.raw;
+  f.appendChild(t);
+  return f;
+}
+
+function mkSrc(id) {
+  const el = document.createElement('span');
+  el.className = 'src';
+  el.textContent = id;
+  el.addEventListener('click', e => { e.stopPropagation(); selectBlock(id); });
+  return el;
+}
+function mkCh(name) {
+  const fam = family(name);
+  const el = document.createElement('span');
+  el.className = 'ch ' + fam;
+  el.textContent = name;
+  el.addEventListener('click', e => { e.stopPropagation(); selectChannel(name); });
+  return el;
+}
+
+function fmtTime(t) {
+  const d = new Date(t);
+  return `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+function pad2(n) { return String(n).padStart(2,'0'); }
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 7  ·  Specimen tag (the meta-explain layer)
+   ════════════════════════════════════════════════════════════════════
+   A tag is a label tied to a thing. Hovering a tag's "why" line
+   reveals the second-order tag — the rule that produced the
+   explanation. Every hover terminates in something inspectable.
+*/
+let activeTag = null;
+let metaTag = null;
+let tagHideTimer = null;
+
+function ensureTagDom() {
+  if (activeTag) return activeTag;
+  const t = document.createElement('div');
+  t.className = 'tag';
+  document.body.appendChild(t);
+  activeTag = t;
+  return t;
+}
+function ensureMetaTagDom() {
+  if (metaTag) return metaTag;
+  const t = document.createElement('div');
+  t.className = 'tag meta';
+  document.body.appendChild(t);
+  metaTag = t;
+  return t;
+}
+
+function placeTag(t, ev, side) {
+  const r = (ev.target || ev).getBoundingClientRect ? (ev.target || ev).getBoundingClientRect() : { left: ev.clientX, top: ev.clientY, right: ev.clientX, bottom: ev.clientY };
+  const w = window.innerWidth;
+  const padding = 14;
+  let left = (ev.clientX || r.left) + 18;
+  let top  = (ev.clientY || r.top)  + 18;
+  let isRight = false;
+  if (left + 340 > w - padding) { left = (ev.clientX || r.left) - 340; isRight = true; }
+  if (top + 200 > window.innerHeight - padding) top = (ev.clientY || r.top) - 200;
+  t.style.left = Math.max(padding, left) + 'px';
+  t.style.top  = Math.max(padding, top)  + 'px';
+  t.classList.toggle('right', isRight);
+}
+
+function showTag(ev, kindLabel, explain, opts = {}) {
+  if (tagHideTimer) { clearTimeout(tagHideTimer); tagHideTimer = null; }
+  const t = ensureTagDom();
+  t.innerHTML = '';
+  const k = document.createElement('div'); k.className = 'tag-kind'; k.textContent = kindLabel;
+  t.appendChild(k);
+  const what = document.createElement('div'); what.className = 'tag-what';
+  what.textContent = explain.what || '';
+  t.appendChild(what);
+
+  if (explain.why) {
+    const row = document.createElement('div'); row.className = 'tag-row';
+    row.innerHTML = `<div class="tag-key">why</div><div class="tag-val"></div>`;
+    row.querySelector('.tag-val').textContent = explain.why;
+    if (explain.rule && RULES[explain.rule]) {
+      row.querySelector('.tag-val').classList.add('explain-trigger');
+      row.querySelector('.tag-val').style.borderBottom = '1px dotted rgba(110,94,58,0.5)';
+      row.querySelector('.tag-val').style.cursor = 'help';
+      row.querySelector('.tag-val').addEventListener('mouseenter', e2 => showMetaTag(e2, explain.rule));
+      row.querySelector('.tag-val').addEventListener('mouseleave', hideMetaTag);
+    }
+    t.appendChild(row);
+  }
+  if (explain.so_what) {
+    const row = document.createElement('div'); row.className = 'tag-row';
+    row.innerHTML = `<div class="tag-key">consequence</div><div class="tag-val"></div>`;
+    row.querySelector('.tag-val').textContent = explain.so_what;
+    t.appendChild(row);
+  }
+  if (explain.rule && RULES[explain.rule]) {
+    const meta = document.createElement('div'); meta.className = 'tag-meta';
+    meta.textContent = `▿ hover "why" to inspect the rule (${explain.rule})`;
+    t.appendChild(meta);
+  }
+
+  placeTag(t, ev);
+  requestAnimationFrame(() => t.classList.add('show'));
+}
+
+function showMetaTag(ev, ruleKey) {
+  const rule = RULES[ruleKey];
+  if (!rule) return;
+  const t = ensureMetaTagDom();
+  t.innerHTML = '';
+  const k = document.createElement('div'); k.className = 'tag-kind'; k.textContent = `RULE · ${ruleKey}`;
+  t.appendChild(k);
+  const rows = [
+    ['threshold',   rule.threshold],
+    ['consequence', rule.consequence],
+    ['if raised',   rule.if_raised],
+    ['if removed',  rule.if_removed],
+    ['source',      rule.source]
+  ];
+  for (const [k1,v] of rows) {
+    if (!v) continue;
+    const row = document.createElement('div'); row.className = 'tag-row';
+    row.innerHTML = `<div class="tag-key">${k1}</div><div class="tag-val"></div>`;
+    row.querySelector('.tag-val').textContent = v;
+    t.appendChild(row);
+  }
+  placeTag(t, ev);
+  requestAnimationFrame(() => t.classList.add('show'));
+}
+function hideMetaTag() {
+  if (metaTag) metaTag.classList.remove('show');
+}
+
+function showEventTag(ev, eventObj) {
+  showTag(ev, `EVENT · ${(eventObj.parsed && eventObj.parsed.kind) || eventObj.kind.toUpperCase()}`, eventObj.explain || {});
+}
+function showBlockTag(ev, blockId) {
+  const b = STATE.blocks.get(blockId);
+  if (!b) return;
+  const explain = {
+    what: `${blockId} — ${b.status}, last seen ${fmtAgo(b.lastSeen)}`,
+    why:  `block declared with ${b.emits.size} emit channel${b.emits.size!==1?'s':''} and ${b.consumes.size} consume channel${b.consumes.size!==1?'s':''}`,
+    so_what: b.lastIncident ? `most recent incident: ${b.lastIncident.kind} (${b.lastIncident.reason||''})` : `no incidents in observed window`,
+  };
+  showTag(ev, 'BLOCK', explain);
+}
+function showChannelTag(ev, edge) {
+  const ch = STATE.channels.get(edge.channel);
+  const rate = emissionRateFor(edge.src, edge.channel);
+  const explain = {
+    what: `${edge.channel} — ${ch ? ch.srcs.size : 1} producer${(ch && ch.srcs.size!==1)?'s':''} → ${ch ? ch.dsts.size : 1} consumer${(ch && ch.dsts.size!==1)?'s':''}`,
+    why:  `at least one block declared this channel in its manifest emits AND another in its consumes; kernel routed accordingly`,
+    so_what: `current rate ${rate.toFixed(2)}/s · total observed ${ch ? ch.count : 0} emission${(ch && ch.count!==1)?'s':''}`,
+  };
+  showTag(ev, `CHANNEL · ${family(edge.channel)}`, explain);
+}
+function hideTag() {
+  if (activeTag) activeTag.classList.remove('show');
+  if (metaTag) metaTag.classList.remove('show');
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 8  ·  Inspector (context-sensitive dossier)
+   ════════════════════════════════════════════════════════════════════ */
+let statsRenderQueued = false;
+function scheduleStatsRender() {
+  if (statsRenderQueued) return;
+  statsRenderQueued = true;
+  requestAnimationFrame(() => {
+    statsRenderQueued = false;
+    if (!STATE.inspector) renderInspectorEmpty();
+    renderTopologyMeta();
+  });
+}
+
+function renderInspector() {
+  const root = document.getElementById('inspector');
+  const crumb = document.getElementById('insp-crumb');
+  if (!STATE.inspector) {
+    renderInspectorEmpty();
+    crumb.textContent = 'no specimen';
+    return;
+  }
+  const i = STATE.inspector;
+  if (i.kind === 'block')   { renderBlockDossier(i.ref);   crumb.textContent = `block · ${i.ref}`;   return; }
+  if (i.kind === 'channel') { renderChannelDossier(i.ref); crumb.textContent = `channel · ${i.ref}`; return; }
+  if (i.kind === 'vibe')    { renderVibeDossier(i.ref);    crumb.textContent = `vibe · ${shorten(i.ref,18)}`; return; }
+  renderInspectorEmpty();
+}
+
+function renderInspectorEmpty() {
+  const root = document.getElementById('inspector');
+  // Stewardship — a derived score grading the system's current health
+  const s = computeStewardship();
+
+  root.innerHTML = `
+    <div class="inspector-empty">
+      <div class="heading">Stewardship</div>
+      <div class="steward">
+        <div class="steward-arc" id="steward-arc-host"></div>
+        <div class="steward-bars">
+          ${s.factors.map(f => `
+            <div class="row ${f.tier}" data-factor="${escapeHtml(f.key)}">
+              <span class="lbl">${escapeHtml(f.label)}</span>
+              <span class="pct">${f.pct}</span>
+              <div class="bar"><span style="width:${Math.max(2, Math.min(100, f.pct))}%"></span></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div style="font-family:var(--f-script); font-style:italic; color:var(--ink-2); font-size:12.5px; line-height:1.6; padding-top:6px;">
+        ${escapeHtml(s.verdict)}
+      </div>
+      <div style="font-family:var(--f-mono); font-size:9.5px; letter-spacing:0.1em; color:var(--ink-3); padding-top:4px; line-height:1.7;">
+        ${escapeHtml(`Mission Control rebuilds itself from the kernel each session.`)}<br>
+        Press <kbd style="background:rgba(255,255,255,0.04); border-color:var(--rivet); color:var(--ink-2);">?</kbd> for shortcuts.
+      </div>
+    </div>
+  `;
+
+  // Render the arc gauge into its host
+  const host = document.getElementById('steward-arc-host');
+  host.appendChild(stewardArcSvg(s.score, s.tier));
+  // Hover-explain rows — show the formula on hover
+  host.addEventListener('mouseenter', e => {
+    showTag(e, 'STEWARDSHIP', {
+      what: `${s.score}/100 — ${s.tierLabel}`,
+      why:  `composite of mounted-block ratio, eviction count, library activity, battle balance, topology breadth`,
+      so_what: `${s.verdict}`,
+    });
+  });
+  host.addEventListener('mouseleave', hideTag);
+  root.querySelectorAll('.steward-bars .row[data-factor]').forEach(row => {
+    row.addEventListener('mouseenter', e => {
+      const k = row.dataset.factor;
+      const f = s.factors.find(x => x.key === k);
+      if (!f) return;
+      showTag(e, 'FACTOR · ' + f.label.toUpperCase(), {
+        what: f.detail,
+        why:  f.reading,
+        so_what: f.so_what,
+      });
+    });
+    row.addEventListener('mouseleave', hideTag);
+  });
+}
+
+function computeStewardship() {
+  const blocks   = STATE.blocks.size;
+  const mounted  = Array.from(STATE.blocks.values()).filter(b => b.status === 'MOUNTED').length;
+  const channels = STATE.channels.size;
+  const vibes    = STATE.vibes.size;
+  const battles  = STATE.battles.auto + STATE.battles.player;
+  const evictions= STATE.events.filter(e => e.parsed && e.parsed.kind === 'EVICTED').length;
+  const violations = STATE.events.filter(e => e.parsed && e.parsed.kind === 'VIOLATION').length;
+  const playerWins = STATE.battles.recent.filter(b => b.kind === 'player' && b.playerWon).length;
+  const playerLosses = STATE.battles.recent.filter(b => b.kind === 'player' && !b.playerWon).length;
+
+  const factors = [
+    {
+      key: 'health',
+      label: 'block health',
+      pct: blocks ? Math.round((mounted / blocks) * 100) : 100,
+      weight: 0.30,
+      reading: `${mounted} of ${blocks} observed blocks are MOUNTED`,
+      detail:  blocks ? `${mounted}/${blocks} blocks mounted — the rest evicted, reloading, or never declared` : `no blocks observed yet`,
+      so_what: blocks && mounted < blocks ? `unmounted blocks aren't routing — restart them or accept the gap` : `every observed block is alive and routing`,
+      tier: function() { const p = blocks ? mounted/blocks : 1; return p > 0.85 ? 'ok' : p > 0.5 ? 'warn' : 'bad'; }(),
+    },
+    {
+      key: 'stability',
+      label: 'stability',
+      pct: Math.max(0, Math.round((1 - Math.min(1, evictions / 6)) * 100)),
+      weight: 0.25,
+      reading: `${evictions} eviction${evictions!==1?'s':''}, ${violations} violation${violations!==1?'s':''} this session`,
+      detail:  evictions === 0 ? `no evictions — every block held its ground` : `${evictions} eviction${evictions!==1?'s':''} so far`,
+      so_what: evictions > 3 ? `something is unstable — inspect the most recent EVICTED event for cause` : evictions > 0 ? `one block lost its footing; investigate via the feed` : `clean ledger`,
+      tier: evictions === 0 ? 'ok' : evictions <= 2 ? 'warn' : 'bad',
+    },
+    {
+      key: 'breadth',
+      label: 'topology breadth',
+      pct: Math.min(100, Math.round((channels / 18) * 100)),
+      weight: 0.15,
+      reading: `${channels} channel${channels!==1?'s':''} observed across ${blocks} block${blocks!==1?'s':''}`,
+      detail:  `each channel is a declared communication path; breadth indicates wired-up subsystems`,
+      so_what: channels < 8 ? `topology is sparse — not all subsystems are loaded yet` : `topology is well-populated; the system is talking to itself`,
+      tier: channels >= 12 ? 'ok' : channels >= 6 ? 'warn' : 'bad',
+    },
+    {
+      key: 'corpus',
+      label: 'library corpus',
+      pct: Math.min(100, Math.round((vibes / 24) * 100)),
+      weight: 0.15,
+      reading: `${vibes} vibe${vibes!==1?'s':''} cached from library`,
+      detail:  `creatures, environments, attacks, kin — anything saved as a vibe envelope`,
+      so_what: vibes === 0 ? `library is empty or unreachable; nothing to compose with` : vibes < 8 ? `a thin corpus — let the router run, it'll fill` : `healthy corpus available for composition`,
+      tier: vibes >= 16 ? 'ok' : vibes >= 4 ? 'warn' : 'bad',
+    },
+    {
+      key: 'tempo',
+      label: 'world tempo',
+      pct: Math.min(100, Math.round((battles / 30) * 100)),
+      weight: 0.15,
+      reading: `${battles} battle${battles!==1?'s':''} witnessed (auto ${STATE.battles.auto}, OS ${STATE.battles.player})`,
+      detail:  `battles are the heartbeat of the world engine`,
+      so_what: battles === 0 ? `the world hasn't engaged yet — open the router` : battles < 6 ? `world tempo is slow; raise sim speed if you want signal` : `world is active`,
+      tier: battles >= 12 ? 'ok' : battles >= 4 ? 'warn' : 'bad',
+    },
+  ];
+
+  let score = 0, totalW = 0;
+  for (const f of factors) { score += f.pct * f.weight; totalW += f.weight; }
+  score = Math.round(score / Math.max(0.01, totalW));
+
+  let tier = 'bad', tierLabel = 'failing';
+  if (score >= 75)      { tier = 'ok';   tierLabel = 'steady hand'; }
+  else if (score >= 50) { tier = 'warn'; tierLabel = 'workable'; }
+  else                  { tier = 'bad';  tierLabel = 'attention required'; }
+
+  let verdict = '';
+  if (blocks === 0)            verdict = 'No blocks observed yet — the kernel is awake but the world is empty. Open the router or library to begin.';
+  else if (score >= 75)        verdict = 'The system is in good order. You could do worse than leave it alone.';
+  else if (score >= 50)        verdict = 'Some friction, nothing alarming. Notable factors are flagged below.';
+  else                         verdict = 'Several factors below threshold. The breakdown points to where attention is most urgent.';
+
+  return { score, tier, tierLabel, verdict, factors };
+}
+
+function stewardArcSvg(score, tier) {
+  const wrap = document.createElement('div');
+  wrap.style.position = 'relative';
+  wrap.style.display = 'flex';
+  wrap.style.flexDirection = 'column';
+  wrap.style.alignItems = 'center';
+  wrap.style.gap = '0px';
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 200 110');
+  svg.setAttribute('width', 200); svg.setAttribute('height', 110);
+  // background arc
+  const bg = document.createElementNS(NS, 'path');
+  bg.setAttribute('d', 'M 12 100 A 88 88 0 0 1 188 100');
+  bg.setAttribute('fill', 'none');
+  bg.setAttribute('stroke', 'var(--ink-4)');
+  bg.setAttribute('stroke-width', '6');
+  bg.setAttribute('stroke-linecap', 'butt');
+  svg.appendChild(bg);
+  // progress arc
+  const fg = document.createElementNS(NS, 'path');
+  // arc length: half-circle at r=88 → π*88 ≈ 276.46
+  const arcLen = Math.PI * 88;
+  const dash = (score / 100) * arcLen;
+  fg.setAttribute('d', 'M 12 100 A 88 88 0 0 1 188 100');
+  fg.setAttribute('fill', 'none');
+  const col = tier === 'ok' ? 'var(--sig-eidolon)' : tier === 'warn' ? 'var(--sig-vibe)' : 'var(--bad)';
+  fg.setAttribute('stroke', col);
+  fg.setAttribute('stroke-width', '6');
+  fg.setAttribute('stroke-linecap', 'round');
+  fg.setAttribute('stroke-dasharray', `${dash.toFixed(2)} ${arcLen.toFixed(2)}`);
+  fg.style.filter = `drop-shadow(0 0 4px ${col})`;
+  svg.appendChild(fg);
+  // tick marks
+  for (let i = 0; i <= 10; i++) {
+    const t = i / 10;
+    const ang = Math.PI * (1 - t);
+    const x1 = 100 + Math.cos(ang) * 76;
+    const y1 = 100 - Math.sin(ang) * 76;
+    const x2 = 100 + Math.cos(ang) * (i % 5 === 0 ? 70 : 73);
+    const y2 = 100 - Math.sin(ang) * (i % 5 === 0 ? 70 : 73);
+    const tk = document.createElementNS(NS, 'line');
+    tk.setAttribute('x1', x1); tk.setAttribute('y1', y1);
+    tk.setAttribute('x2', x2); tk.setAttribute('y2', y2);
+    tk.setAttribute('stroke', i % 5 === 0 ? 'var(--ink-3)' : 'var(--ink-4)');
+    tk.setAttribute('stroke-width', i % 5 === 0 ? '1' : '0.6');
+    svg.appendChild(tk);
+  }
+  // big number
+  const num = document.createElementNS(NS, 'text');
+  num.setAttribute('x', '100'); num.setAttribute('y', '88');
+  num.setAttribute('text-anchor', 'middle');
+  num.setAttribute('font-family', 'var(--f-display)');
+  num.setAttribute('font-weight', '700');
+  num.setAttribute('font-size', '34');
+  num.setAttribute('fill', 'var(--ink)');
+  num.setAttribute('letter-spacing', '0.02em');
+  num.textContent = String(score);
+  svg.appendChild(num);
+  // small "/ 100"
+  const sub = document.createElementNS(NS, 'text');
+  sub.setAttribute('x', '100'); sub.setAttribute('y', '102');
+  sub.setAttribute('text-anchor', 'middle');
+  sub.setAttribute('font-family', 'var(--f-mono)');
+  sub.setAttribute('font-size', '8');
+  sub.setAttribute('fill', 'var(--ink-3)');
+  sub.setAttribute('letter-spacing', '0.32em');
+  sub.textContent = 'STEWARDSHIP';
+  svg.appendChild(sub);
+  wrap.appendChild(svg);
+  return wrap;
+}
+
+function renderBlockDossier(id) {
+  const root = document.getElementById('inspector');
+  const b = STATE.blocks.get(id);
+  if (!b) {
+    root.innerHTML = `<div class="inspector-empty"><div class="heading">Lost specimen</div><div>Block ${id} no longer in observation window.</div></div>`;
+    return;
+  }
+  const recent = STATE.events.filter(e => e.parsed && e.parsed.src === id).slice(-12).reverse();
+  const emitsList = Array.from(b.emits).sort();
+  const consumesList = Array.from(b.consumes).sort();
+  const incident = b.lastIncident;
+
+  root.innerHTML = `
+    <div class="dossier">
+      <h2><span class="pin ${b.status === 'EVICTED' ? 'bad' : 'eidolon'}"></span>BLOCK</h2>
+      <div class="title">${escapeHtml(id)}</div>
+      <div class="subtitle">${glyphFor(id)}  ·  ${escapeHtml(b.status)}  ·  ${incident ? 'incident: ' + incident.kind : 'healthy'}</div>
+      <div class="grid2">
+        <div class="field"><label>first seen</label><div class="val">${fmtAgo(b.firstSeen)}</div></div>
+        <div class="field"><label>last seen</label><div class="val">${fmtAgo(b.lastSeen)}</div></div>
+        <div class="field"><label>emit channels</label><div class="val">${b.emits.size}</div></div>
+        <div class="field"><label>consume channels</label><div class="val">${b.consumes.size}</div></div>
+      </div>
+      <div class="actions">
+        ${id === APP.id ? '' : `
+          <button class="action" data-act="focus">FOCUS WINDOW</button>
+          <button class="action" data-act="bump">PING TRAFFIC</button>
+          <button class="action danger" data-act="evict">REQUEST EVICTION</button>
+        `}
+      </div>
+      <section>
+        <h3>EMITS (${emitsList.length})</h3>
+        <div class="chiplist">${emitsList.map(c => `<span class="chip ${family(c)}" data-ch="${escapeHtml(c)}">${escapeHtml(c)}</span>`).join('') || '<span style="color:var(--ink-3); font-style:italic;">none observed</span>'}</div>
+      </section>
+      <section>
+        <h3>CONSUMES (${consumesList.length})</h3>
+        <div class="chiplist">${consumesList.map(c => `<span class="chip ${family(c)}" data-ch="${escapeHtml(c)}">${escapeHtml(c)}</span>`).join('') || '<span style="color:var(--ink-3); font-style:italic;">none observed</span>'}</div>
+      </section>
+      ${incident ? `
+      <section>
+        <h3>LATEST INCIDENT</h3>
+        <div style="color:var(--warn); font-size:11px; font-family:var(--f-mono);">${escapeHtml(incident.kind)} · ${escapeHtml(incident.reason||'')}</div>
+        <div style="color:var(--ink-3); font-size:10px; margin-top:4px;">${fmtAgo(incident.t)}</div>
+      </section>` : ''}
+      <section>
+        <h3>RECENT ACTIVITY</h3>
+        <div class="recent">
+          ${recent.map(ev => `<div class="r-line"><div class="r-time">${fmtTime(ev.t)}</div><div class="r-msg">${escapeHtml(ev.raw)}</div></div>`).join('') || '<span style="color:var(--ink-3); font-style:italic;">no activity in window</span>'}
+        </div>
+      </section>
+    </div>
+  `;
+
+  // wire actions
+  root.querySelectorAll('.chip[data-ch]').forEach(c => c.addEventListener('click', () => selectChannel(c.dataset.ch)));
+  const evictBtn = root.querySelector('.action[data-act="evict"]');
+  if (evictBtn) evictBtn.addEventListener('click', () => toast(`mission control cannot evict directly — open the block's window and close it (kernel-only privilege)`, 'warn'));
+  const focusBtn = root.querySelector('.action[data-act="focus"]');
+  if (focusBtn) focusBtn.addEventListener('click', () => {
+    // we don't know the path; emit nexus.launch will spawn duplicate. Instead just toast.
+    toast(`focus is a kernel privilege — click the taskbar entry`, 'warn');
+  });
+}
+
+function renderChannelDossier(name) {
+  const root = document.getElementById('inspector');
+  const ch = STATE.channels.get(name);
+  const fam = family(name);
+  if (!ch) {
+    root.innerHTML = `<div class="inspector-empty"><div class="heading">Unknown channel</div></div>`;
+    return;
+  }
+  const srcs = Array.from(ch.srcs).sort();
+  const dsts = Array.from(ch.dsts).sort();
+  const totalRate = srcs.reduce((s, src) => s + emissionRateFor(src, name), 0);
+  const recent = STATE.events.filter(e => e.parsed && e.parsed.channel === name).slice(-12).reverse();
+
+  root.innerHTML = `
+    <div class="dossier">
+      <h2><span class="pin" style="background:${familyColor(fam)}"></span>CHANNEL</h2>
+      <div class="title" style="word-break:break-all;">${escapeHtml(name)}</div>
+      <div class="subtitle">${fam} family  ·  ${ch.count} emissions observed  ·  ${totalRate.toFixed(2)}/s now</div>
+      <div class="grid2">
+        <div class="field"><label>producers</label><div class="val">${srcs.length}</div></div>
+        <div class="field"><label>consumers</label><div class="val">${dsts.length}</div></div>
+        <div class="field"><label>last emit</label><div class="val">${ch.lastT ? fmtAgo(ch.lastT) : 'never'}</div></div>
+        <div class="field"><label>throughput</label><div class="val">${totalRate.toFixed(2)}/s</div></div>
+      </div>
+      <section>
+        <h3>PRODUCERS</h3>
+        <div class="chiplist">${srcs.map(s => `<span class="chip" data-block="${escapeHtml(s)}">${escapeHtml(s)}</span>`).join('') || '<span style="color:var(--ink-3); font-style:italic;">none</span>'}</div>
+      </section>
+      <section>
+        <h3>CONSUMERS</h3>
+        <div class="chiplist">${dsts.map(s => `<span class="chip" data-block="${escapeHtml(s)}">${escapeHtml(s)}</span>`).join('') || '<span style="color:var(--ink-3); font-style:italic;">none</span>'}</div>
+      </section>
+      <section>
+        <h3>RECENT MESSAGES</h3>
+        <div class="recent">
+          ${recent.map(ev => `<div class="r-line"><div class="r-time">${fmtTime(ev.t)}</div><div class="r-msg">${escapeHtml(ev.raw)}</div></div>`).join('') || '<span style="color:var(--ink-3); font-style:italic;">no activity in window</span>'}
+        </div>
+      </section>
+    </div>
+  `;
+  root.querySelectorAll('.chip[data-block]').forEach(c => c.addEventListener('click', () => selectBlock(c.dataset.block)));
+}
+
+let cascadeCache = new Map();
+async function renderVibeDossier(id) {
+  const root = document.getElementById('inspector');
+  const cached = STATE.vibes.get(id);
+  // we may need to fetch the full envelope for parents/payload
+  let env = cached;
+  try {
+    const r = await call('vibe.load', { id }, 4000);
+    if (r && r.ok && r.envelope) env = r.envelope;
+  } catch (_) { /* keep cached summary */ }
+
+  if (!env) {
+    root.innerHTML = `<div class="inspector-empty"><div class="heading">Lost specimen</div><div>Vibe ${escapeHtml(id)} could not be loaded.</div></div>`;
+    return;
+  }
+
+  // attempt lineage fetch
+  let lineage = null;
+  try {
+    const r = await call('vibe.lineage', { id, depth: 3 }, 3000);
+    if (r && r.ok) lineage = r.data;
+  } catch (_) {}
+
+  const tags = (env.tags || []);
+  // Build the full lineage data set: ancestors above, descendants below, the current vibe in the middle.
+  // Library returns {ancestors, descendants} as flat lists of summaries — we need parent links to draw edges.
+  // The summaries carry .parents[]; we use that to layer ancestors by generation.
+  let lineageNodes = null;
+  if (lineage) {
+    lineageNodes = buildLineageGraph(env, lineage);
+  }
+
+  root.innerHTML = `
+    <div class="dossier">
+      <h2><span class="pin"></span>VIBE · ${escapeHtml(env.type || '?')}</h2>
+      <div class="title">${escapeHtml(env.name || env.id)}</div>
+      <div class="subtitle">${escapeHtml(env.subFormat || env.format || '')}  ·  ${escapeHtml(env.source || '')}</div>
+      <div class="grid2">
+        <div class="field"><label>id</label><div class="val" style="word-break:break-all;">${escapeHtml(env.id)}</div></div>
+        <div class="field"><label>created</label><div class="val">${env.createdAt ? fmtAgo(new Date(env.createdAt).getTime()) : '—'}</div></div>
+        <div class="field"><label>parents</label><div class="val">${(env.parents||[]).length}</div></div>
+        <div class="field"><label>tags</label><div class="val">${tags.length}</div></div>
+      </div>
+      ${tags.length ? `
+      <section>
+        <h3>TAGS</h3>
+        <div class="chiplist">${tags.map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}</div>
+      </section>` : ''}
+      <section>
+        <h3>LINEAGE</h3>
+        <div class="lineage-tree" id="lineage-tree-host"></div>
+      </section>
+      <div class="actions">
+        <button class="action danger" data-act="delete-preview">PREVIEW DELETE CASCADE</button>
+      </div>
+      <div id="cascade-slot"></div>
+    </div>
+  `;
+  // mount the lineage svg
+  const treeHost = document.getElementById('lineage-tree-host');
+  if (lineageNodes) {
+    treeHost.appendChild(buildLineageSvg(lineageNodes));
+  } else {
+    treeHost.innerHTML = '<div class="lt-empty">no recorded kin</div>';
+  }
+  const del = root.querySelector('.action[data-act="delete-preview"]');
+  if (del) del.addEventListener('click', () => previewDelete(env));
+}
+
+function buildLineageGraph(self, lineage) {
+  const ancestorList   = lineage.ancestors   || [];
+  const descendantList = lineage.descendants || [];
+  if (ancestorList.length === 0 && descendantList.length === 0) return null;
+
+  // Group ancestors by their depth from self.
+  // We have direct parents in self.parents[]; their parents (grandparents) appear in ancestorList
+  // with their own .parents[] field. We trace backwards: for each parent of self, find them in
+  // ancestorList; each of their parents that's also in ancestorList is one level deeper.
+  const aIndex = new Map(); // id → summary
+  for (const a of ancestorList) aIndex.set(a.id, a);
+
+  const ancestorLevels = []; // [ [gen1], [gen2], [gen3] ]
+  let currentGen = (self.parents || []).map(id => aIndex.get(id) || { id, name: shorten(id, 14), type: '?' });
+  const seen = new Set([self.id]);
+  while (currentGen.length) {
+    // dedupe
+    currentGen = currentGen.filter(p => p && !seen.has(p.id));
+    if (!currentGen.length) break;
+    for (const p of currentGen) seen.add(p.id);
+    ancestorLevels.push(currentGen);
+    // next generation: parents of everyone in current
+    const nextGen = [];
+    for (const p of currentGen) {
+      for (const gpId of (p.parents || [])) {
+        const gp = aIndex.get(gpId);
+        if (gp && !seen.has(gp.id)) nextGen.push(gp);
+      }
+    }
+    currentGen = nextGen;
+    if (ancestorLevels.length >= 4) break;
+  }
+
+  // Group descendants by depth: direct children first (those whose parents include self.id),
+  // then their children, etc.
+  const dIndex = new Map();
+  for (const d of descendantList) dIndex.set(d.id, d);
+  const descendantLevels = [];
+  let dCurrent = descendantList.filter(d => (d.parents || []).includes(self.id));
+  const dSeen = new Set([self.id, ...dCurrent.map(d => d.id)]);
+  while (dCurrent.length) {
+    descendantLevels.push(dCurrent);
+    const next = [];
+    for (const d of descendantList) {
+      if (dSeen.has(d.id)) continue;
+      // child of any node in dCurrent?
+      if ((d.parents || []).some(pid => dCurrent.some(c => c.id === pid))) {
+        next.push(d);
+        dSeen.add(d.id);
+      }
+    }
+    dCurrent = next;
+    if (descendantLevels.length >= 4) break;
+  }
+
+  return { self, ancestorLevels, descendantLevels };
+}
+
+function buildLineageSvg(graph) {
+  const wrap = document.createElement('div');
+  const NS = 'http://www.w3.org/2000/svg';
+  const ROW_H = 52;
+  const NODE_W = 124, NODE_H = 38;
+  const PAD_X = 8, PAD_Y = 10;
+
+  const rows = [];
+  for (let i = graph.ancestorLevels.length - 1; i >= 0; i--) rows.push({ side: 'up', nodes: graph.ancestorLevels[i] });
+  rows.push({ side: 'self', nodes: [graph.self] });
+  for (let i = 0; i < graph.descendantLevels.length; i++) rows.push({ side: 'down', nodes: graph.descendantLevels[i] });
+
+  const maxRow = rows.reduce((m, r) => Math.max(m, r.nodes.length), 1);
+  const W = Math.max(320, maxRow * (NODE_W + 10) + PAD_X * 2);
+  const H = rows.length * ROW_H + PAD_Y * 2;
+
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  const placed = new Map();
+  rows.forEach((row, ri) => {
+    const totalW = row.nodes.length * NODE_W + (row.nodes.length - 1) * 10;
+    const startX = (W - totalW) / 2;
+    const y = PAD_Y + ri * ROW_H;
+    row.nodes.forEach((n, ni) => {
+      const x = startX + ni * (NODE_W + 10);
+      placed.set(n.id, { x, y, node: n, side: row.side });
+    });
+  });
+
+  const edgeLayer = document.createElementNS(NS, 'g');
+  svg.appendChild(edgeLayer);
+
+  for (const [childId, childPos] of placed) {
+    const child = childPos.node;
+    for (const parentId of (child.parents || [])) {
+      const parentPos = placed.get(parentId);
+      if (!parentPos || parentPos.y >= childPos.y) continue;
+      edgeLayer.appendChild(curveEdge(
+        parentPos.x + NODE_W/2, parentPos.y + NODE_H,
+        childPos.x + NODE_W/2, childPos.y,
+        childPos.side === 'up' ? 'up' : 'down',
+        parentPos.node,
+        child
+      ));
+    }
+  }
+
+  const nodeLayer = document.createElementNS(NS, 'g');
+  svg.appendChild(nodeLayer);
+  for (const [id, info] of placed) {
+    const foreign = isForeignStub(info.node);
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'lt-node ' + (info.side === 'self' ? 'self ' : '') + (foreign ? 'foreign-stub ' : '') + escapeAttr(info.node.type || ''));
+    g.setAttribute('transform', `translate(${info.x},${info.y})`);
+    const rect = document.createElementNS(NS, 'rect');
+    rect.setAttribute('width', NODE_W);
+    rect.setAttribute('height', NODE_H);
+    rect.setAttribute('rx', 2);
+    g.appendChild(rect);
+
+    const tName = document.createElementNS(NS, 'text');
+    tName.setAttribute('class', 'lt-name');
+    tName.setAttribute('x', NODE_W / 2);
+    tName.setAttribute('y', 12);
+    tName.textContent = shorten(info.node.name || info.node.id, 17);
+    g.appendChild(tName);
+
+    const tMeta = document.createElementNS(NS, 'text');
+    tMeta.setAttribute('class', 'lt-type');
+    tMeta.setAttribute('x', NODE_W / 2);
+    tMeta.setAttribute('y', 23);
+    tMeta.textContent = `g${nodeGeneration(info.node)} · ${shorten(info.node.realm || 'no-realm', 12)}`;
+    g.appendChild(tMeta);
+
+    const tSrc = document.createElementNS(NS, 'text');
+    tSrc.setAttribute('class', 'lt-type');
+    tSrc.setAttribute('x', NODE_W / 2);
+    tSrc.setAttribute('y', 34);
+    tSrc.textContent = `${foreign ? 'foreign-stub' : 'local'} · ${shorten(info.node.type || '?', 18)}`;
+    g.appendChild(tSrc);
+
+    g.style.cursor = 'pointer';
+    g.addEventListener('click', () => selectVibe(info.node.id));
+    g.addEventListener('mouseenter', e => showTag(e, 'KIN · ' + (info.side === 'self' ? 'self' : info.side === 'up' ? 'ancestor' : 'descendant'), {
+      what: `${info.node.name || info.node.id}`,
+      why:  info.side === 'self' ? `the vibe currently inspected` : info.side === 'up'
+              ? `appears in this vibe's parents chain — earlier generations contributed to its birthHash`
+              : `lists this vibe in its parents — derived from it via the library's lineage edges`,
+      so_what: `${foreign ? 'foreign stub: attested but no local artifact' : 'local artifact/record'} · ${getAttestationCount(info.node)} attestation${getAttestationCount(info.node)===1?'':'s'}`,
+    }));
+    g.addEventListener('mouseleave', hideTag);
+    nodeLayer.appendChild(g);
+  }
+
+  wrap.appendChild(svg);
+  return wrap;
+}
+
+function isForeignStub(node) {
+  return !!(node && (node.foreign_stub || node.full_artifact === false || String(node.type || '').startsWith('creature-stub')));
+}
+function nodeGeneration(node) {
+  const n = Number(node && node.generation);
+  if (Number.isFinite(n) && n >= 0) return n;
+  return Math.max(1, ((node && node.parents) || []).length + 1);
+}
+function getAttestationCount(node) {
+  const n = Number(node && node.attestations);
+  if (Number.isFinite(n)) return n;
+  if (Array.isArray(node && node.payload && node.payload.attestations)) return node.payload.attestations.length;
+  if (Array.isArray(node && node.attestations)) return node.attestations.length;
+  return 0;
+}
+
+function curveEdge(x1, y1, x2, y2, dir, parentNode, childNode) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('class', 'lt-edge ' + (dir || ''));
+  const my = (y1 + y2) / 2;
+  path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`);
+  path.addEventListener('click', e => {
+    e.stopPropagation();
+    const count = getAttestationCount(childNode);
+    showTag(e, 'LINEAGE EDGE', {
+      what: `${parentNode && (parentNode.name || parentNode.id)} → ${childNode && (childNode.name || childNode.id)}`,
+      why: `child lists parent id ${parentNode && parentNode.id} in its parents[] array`,
+      so_what: `${count} attestation${count===1?'':'s'} attached to the child record`
+    });
+    setTimeout(hideTag, 1800);
+  });
+  return path;
+}
+
+function escapeAttr(s) {
+  return String(s || '').replace(/[^a-z0-9_-]/gi, '');
+}
+
+async function previewDelete(env) {
+  const slot = document.getElementById('cascade-slot');
+  if (!slot) return;
+  slot.innerHTML = `
+    <div class="cascade">
+      <div class="h">delete cascade preview</div>
+      <div class="row"><b>—</b><span>computing…</span></div>
+    </div>
+  `;
+  // streaming: surface counts as we resolve them
+  const cs = slot.querySelector('.cascade');
+  cs.innerHTML = `<div class="h">delete cascade preview</div>`;
+
+  function row(b, label) {
+    const r = document.createElement('div'); r.className = 'row';
+    r.innerHTML = `<b>${b}</b><span>${escapeHtml(label)}</span>`;
+    cs.appendChild(r);
+    return r;
+  }
+  const rWorlds   = row('—', `worlds where this ${env.type} appeared`);
+  const rRefs     = row('—', `events that referenced it`);
+  const rChildren = row('—', `descendants in observed lineage`);
+  const rArchive  = row('—', `last activity`);
+
+  // queries that this MC can actually answer:
+  // 1. count events in our buffer that mention env.id or env.name
+  const refs = STATE.events.filter(e => (e.raw || '').includes(env.id) || (env.name && (e.raw||'').includes(env.name))).length;
+  rRefs.firstChild.textContent = String(refs);
+  // 2. lineage descendants (we already fetched lineage — refetch quick)
+  let desc = 0;
+  try {
+    const r = await call('vibe.lineage', { id: env.id, depth: 6 }, 3000);
+    if (r && r.ok) desc = (r.data.descendants || []).length;
+  } catch (_) {}
+  rChildren.firstChild.textContent = String(desc);
+  // 3. worlds: from world.tick history, count distinct seeds since this vibe was created
+  const created = env.createdAt ? new Date(env.createdAt).getTime() : 0;
+  const worldSeeds = new Set();
+  for (const w of STATE.worlds) if (w.t >= created && w.p && w.p.seed != null) worldSeeds.add(w.p.seed);
+  rWorlds.firstChild.textContent = String(worldSeeds.size);
+  // 4. last activity
+  let lastT = 0;
+  for (const e of STATE.events) {
+    if ((e.raw||'').includes(env.id)) lastT = Math.max(lastT, e.t);
+  }
+  rArchive.firstChild.textContent = lastT ? fmtAgo(lastT) : 'never';
+  rArchive.lastChild.textContent = `last reference in event window`;
+
+  const footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = `
+    <button class="action" data-act="cancel">CANCEL</button>
+    <button class="action danger" data-act="confirm">CONFIRM DELETE</button>
+  `;
+  cs.appendChild(footer);
+  footer.querySelector('[data-act="cancel"]').addEventListener('click', () => { slot.innerHTML = ''; });
+  footer.querySelector('[data-act="confirm"]').addEventListener('click', async () => {
+    try {
+      const r = await call('vibe.delete', { id: env.id });
+      if (r.ok) {
+        toast(`deleted ${env.name||env.id}`);
+        slot.innerHTML = '';
+        STATE.inspector = null;
+        renderInspector();
+      } else toast(`delete failed: ${r.error||'unknown'}`, 'bad');
+    } catch (e) { toast(`delete failed: ${e.message}`, 'bad'); }
+  });
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+function fmtAgo(t) {
+  if (!t) return 'never';
+  const d = nowTs() - t;
+  if (d < 1500) return 'now';
+  if (d < 60000) return `${Math.floor(d/1000)}s ago`;
+  if (d < 3600000) return `${Math.floor(d/60000)}m ago`;
+  return `${Math.floor(d/3600000)}h ago`;
+}
+function fmtSeed(s) {
+  if (s == null) return '?';
+  return '0x' + ((s>>>0).toString(16).padStart(8,'0'));
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 9  ·  Selection helpers
+   ════════════════════════════════════════════════════════════════════ */
+function selectBlock(id) {
+  STATE.selectedBlockId = id;
+  STATE.selectedChannel = null;
+  STATE.inspector = { kind: 'block', ref: id };
+  renderInspector();
+  renderTopologyHard();
+}
+function selectChannel(name) {
+  STATE.selectedChannel = name;
+  STATE.selectedBlockId = null;
+  STATE.inspector = { kind: 'channel', ref: name };
+  renderInspector();
+}
+function selectVibe(id) {
+  STATE.inspector = { kind: 'vibe', ref: id };
+  renderInspector();
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 10  ·  Command bar
+   ════════════════════════════════════════════════════════════════════ */
+const CATALOG = [
+  { path:'./atlas.html',          title:'Atlas',           icon:'⊕', desc:'Worlds & releases' },
+  { path:'./vibes-library.html',  title:'Vibes Library',   icon:'◈', desc:'Asset library & lineage' },
+  { path:'./vibes-crucible.html', title:'Crucible',        icon:'⚒', desc:'Compose battles' },
+  { path:'./vibes-arena.html',    title:'Arena',           icon:'⚔', desc:'Run battles' },
+  { path:'./eidolon-router.html', title:'Eidolon Router',  icon:'◉', desc:'World engine' },
+  { path:'blocks/eidolon/eidolon-os.html',     title:'Eidolon OS',      icon:'⚙', desc:'Battle cartridge' },
+  { path:'./nexus-db.html',       title:'NexusDB',         icon:'▦', desc:'Persistence layer' },
+  { path:'./nexus-witness.html',  title:'Nexus Witness',   icon:'◐', desc:'Provenance' },
+];
+
+function initCommandBar() {
+  document.querySelectorAll('.qbtn[data-launch]').forEach(b => {
+    b.addEventListener('click', () => {
+      emit('nexus.launch', {
+        path: b.dataset.launch,
+        title: b.dataset.title,
+        icon: b.dataset.icon,
+        legacy: b.dataset.legacy === 'true' ? true : false
+      });
+      toast(`launching ${b.dataset.title}`);
+    });
+  });
+
+  const openBtn = document.getElementById('cmd-open');
+  openBtn.addEventListener('click', e => {
+    showCmdPopover(e.target, CATALOG.map(a => ({
+      icn: a.icon, ttl: a.title, desc: a.desc,
+      onClick: () => emit('nexus.launch', { path: a.path, title: a.title, icon: a.icon, legacy: false })
+    })));
+  });
+
+  const speedBtn = document.getElementById('cmd-speed');
+  speedBtn.addEventListener('click', e => {
+    const opts = [
+      { ms: 1200, label: '0.5×  drowsy' },
+      { ms: 600,  label: '1×    normal' },
+      { ms: 200,  label: '3×    fast' },
+      { ms: 50,   label: '12×   turbo' },
+      { ms: 10,   label: '60×   sim preview' },
+    ];
+    showCmdPopover(e.target, opts.map(o => ({
+      icn: '◑', ttl: o.label,
+      desc: o.ms === STATE.simSpeed ? 'current' : `tick = ${o.ms}ms`,
+      onClick: () => {
+        STATE.simSpeed = o.ms;
+        speedBtn.textContent = '▾ ' + o.label.split(' ').slice(0,2).join(' ');
+        emit('eidolon.sim.speed', { tickIntervalMs: o.ms });
+        toast(`sim speed → ${o.label.trim()}`);
+      }
+    })));
+  });
+
+  // Query bar
+  const qInput = document.getElementById('cmd-query');
+  qInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') runQuery(qInput.value);
+  });
+
+  // feed filters
+  document.querySelectorAll('.tog[data-filter]').forEach(t => {
+    t.addEventListener('click', () => {
+      const k = t.dataset.filter;
+      STATE.filters[k] = !STATE.filters[k];
+      t.classList.toggle('on', STATE.filters[k]);
+      renderFeed();
+    });
+  });
+  document.getElementById('feed-search').addEventListener('input', e => {
+    STATE.filters.search = e.target.value || '';
+    renderFeed();
+  });
+}
+
+let popover = null;
+function showCmdPopover(anchor, items) {
+  hideCmdPopover();
+  popover = document.createElement('div');
+  popover.className = 'cmd-popover';
+  for (const it of items) {
+    const row = document.createElement('div');
+    row.className = 'cmd-item';
+    row.innerHTML = `<span class="icn">${it.icn||'◆'}</span><span class="ttl">${escapeHtml(it.ttl)}</span><span class="desc">${escapeHtml(it.desc||'')}</span>`;
+    row.addEventListener('click', () => { it.onClick && it.onClick(); hideCmdPopover(); });
+    popover.appendChild(row);
+  }
+  document.body.appendChild(popover);
+  const r = anchor.getBoundingClientRect();
+  popover.style.left = r.left + 'px';
+  popover.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+  setTimeout(() => document.addEventListener('mousedown', outsideClose, true), 0);
+}
+function outsideClose(e) {
+  if (popover && !popover.contains(e.target)) hideCmdPopover();
+}
+function hideCmdPopover() {
+  if (popover) {
+    popover.remove(); popover = null;
+    document.removeEventListener('mousedown', outsideClose, true);
+  }
+}
+
+async function runQuery(q) {
+  q = (q||'').trim();
+  if (!q) return;
+  toast(`query: ${q}`);
+  // simple parser: "vibe.list type=creature", "block=router", "channel=eidolon.world.tick"
+  if (/^vibe\.list/i.test(q)) {
+    const type = (q.match(/type=(\S+)/) || [])[1];
+    try {
+      const r = await call('vibe.list', { type });
+      if (r.ok) {
+        const data = r.data || [];
+        const root = document.getElementById('inspector');
+        root.innerHTML = `
+          <div class="dossier">
+            <h2><span class="pin"></span>QUERY · vibe.list</h2>
+            <div class="subtitle">${data.length} result${data.length!==1?'s':''}${type?' · type='+escapeHtml(type):''}</div>
+            <section>
+              <div class="recent">
+                ${data.slice(0,40).map(v => `<div class="r-line" data-vibe="${escapeHtml(v.id)}" style="cursor:pointer;"><div class="r-time">${escapeHtml(v.type)}</div><div class="r-msg">${escapeHtml(v.name||v.id)}</div></div>`).join('') || '<span style="color:var(--ink-3); font-style:italic;">empty</span>'}
+              </div>
+            </section>
+          </div>
+        `;
+        root.querySelectorAll('[data-vibe]').forEach(r => r.addEventListener('click', () => selectVibe(r.dataset.vibe)));
+        document.getElementById('insp-crumb').textContent = `query · vibe.list`;
+        STATE.inspector = { kind: 'query', ref: q };
+      } else toast('query failed: ' + (r.error||'unknown'), 'bad');
+    } catch (e) { toast('query failed: ' + e.message, 'bad'); }
+    return;
+  }
+  const mb = q.match(/^block=(\S+)/i);
+  if (mb) { selectBlock(mb[1]); return; }
+  const mc = q.match(/^channel=(\S+)/i);
+  if (mc) { selectChannel(mc[1]); return; }
+  toast('unknown query syntax', 'warn');
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 11  ·  Toasts
+   ════════════════════════════════════════════════════════════════════ */
+function toast(message, level = 'info', ttl = 3000) {
+  const stack = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast' + (level !== 'info' ? ' ' + level : '');
+  t.textContent = message;
+  stack.appendChild(t);
+  setTimeout(() => {
+    t.style.transition = 'opacity 0.4s';
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 400);
+  }, ttl);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 12  ·  Boot orchestration
+   ════════════════════════════════════════════════════════════════════ */
+async function onMounted() {
+  document.getElementById('boot-stamp').textContent = 'channels active — loading inventory…';
+
+  // Fetch initial vibe inventory (live query, satisfies constraint #2: this isn't cached state, it's a derived view of the canonical store)
+  try {
+    const r = await call('vibe.list', {}, 5000);
+    if (r && r.ok && Array.isArray(r.data)) {
+      for (const v of r.data) STATE.vibes.set(v.id, v);
+      pushStructured('system', 'info',
+        `loaded ${r.data.length} vibes from library`,
+        { what: `library inventory mirrored to mission-control index`,
+          why:  `MC issued vibe.list on mount; library responded with envelope summaries`,
+          so_what: `population/coverage stats now derive from this index plus live vibe.notify deltas` },
+        null);
+    }
+  } catch (e) {
+    pushStructured('system', 'warn',
+      `library not reachable: ${e.message}`,
+      { what: `vibe.list timed out`,
+        why:  `vibes-library block isn't mounted, or hasn't subscribed yet`,
+        so_what: `MC will keep retrying via vibe.notify; library stats degraded`,
+        action: { label: 'launch library', kind: 'launch', target: './vibes-library.html' } });
+  }
+
+  // Show frame
+  setTimeout(() => {
+    document.getElementById('boot-overlay').classList.add('gone');
+    setTimeout(() => document.getElementById('boot-overlay').remove(), 800);
+  }, 350);
+
+  // Once a second, refresh time-sensitive UI
+  setInterval(() => {
+    const up = Math.floor((Date.now() - APP.bootAt) / 1000);
+    const hh = pad2(Math.floor(up/3600));
+    const mm = pad2(Math.floor(up/60) % 60);
+    const ss = pad2(up % 60);
+    document.getElementById('cs-uptime').textContent = `${hh}:${mm}:${ss}`;
+    // also expire old emissions
+    const cutoff = nowTs() - EMISSION_WINDOW_MS;
+    while (STATE.emissions.length && STATE.emissions[0].t < cutoff) STATE.emissions.shift();
+    if (TOPO.svg) {
+      // mild perturbation so edges that decay redraw their dash
+      paintTopology();
+    }
+    if (!STATE.inspector) renderInspectorEmpty();
+  }, 1000);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 13  ·  Keyboard shortcuts + help tag
+   ════════════════════════════════════════════════════════════════════ */
+const SHORTCUTS = [
+  ['/',         'focus query / search bar'],
+  ['?',         'show this help'],
+  ['Esc',       'clear selection / close popovers'],
+  ['Space',     'toggle live ↔ anchored time cursor'],
+  ['j / k',     'feed cursor down / up'],
+  ['1 2 3',     'toggle SYS / CH / WORLD filters'],
+  ['o',         'open launch menu'],
+  ['s',         'open sim-speed menu'],
+];
+
+function showHelpTag() {
+  if (tagHideTimer) { clearTimeout(tagHideTimer); tagHideTimer = null; }
+  if (!activeTag) ensureTagDom();
+  const t = activeTag;
+  t.classList.add('help');
+  t.innerHTML = '';
+  const k = document.createElement('div'); k.className = 'tag-kind'; k.textContent = 'KEYBOARD · MISSION CONTROL';
+  t.appendChild(k);
+  const what = document.createElement('div'); what.className = 'tag-what';
+  what.textContent = 'Built for one-handed use with the left hand on the keys.';
+  t.appendChild(what);
+  const grid = document.createElement('div'); grid.className = 'help-grid';
+  for (const [key, desc] of SHORTCUTS) {
+    const kEl = document.createElement('kbd'); kEl.textContent = key;
+    const dEl = document.createElement('span');
+    dEl.style.fontFamily = 'var(--f-script)';
+    dEl.style.fontStyle = 'italic';
+    dEl.style.color = '#2a2820';
+    dEl.textContent = desc;
+    grid.appendChild(kEl); grid.appendChild(dEl);
+  }
+  t.appendChild(grid);
+  // place center-screen
+  const w = window.innerWidth, h = window.innerHeight;
+  t.style.left = (w/2 - 190) + 'px';
+  t.style.top  = (h/2 - 200) + 'px';
+  t.classList.remove('right');
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('help'); }, 8000);
+}
+
+let feedCursorIdx = -1;
+function moveFeedCursor(delta) {
+  const list = document.getElementById('feed-list');
+  const items = Array.from(list.querySelectorAll('.fe'));
+  if (!items.length) return;
+  feedCursorIdx = Math.max(0, Math.min(items.length - 1, feedCursorIdx + delta));
+  if (feedCursorIdx < 0) feedCursorIdx = 0;
+  items.forEach((el, i) => el.style.background = i === feedCursorIdx ? 'var(--bulkhead)' : '');
+  items[feedCursorIdx].scrollIntoView({ block: 'nearest', behavior: 'instant' });
+  // synthetic hover-explain
+  const ev = STATE.events.find(e => e.id === items[feedCursorIdx].dataset.eventId);
+  if (ev) {
+    const r = items[feedCursorIdx].getBoundingClientRect();
+    showEventTag({ clientX: r.left + 80, clientY: r.top, target: items[feedCursorIdx] }, ev);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  // ignore when typing in an input
+  const tag = (e.target && e.target.tagName) || '';
+  const inField = tag === 'INPUT' || tag === 'TEXTAREA';
+
+  if (e.key === 'Escape') {
+    if (popover) { hideCmdPopover(); return; }
+    hideTag();
+    if (STATE.inspector) { STATE.inspector = null; STATE.selectedBlockId = null; STATE.selectedChannel = null; renderInspector(); renderTopologyHard(); }
+    if (inField) e.target.blur();
+    return;
+  }
+
+  if (inField) return;
+
+  if (e.key === '/') {
+    e.preventDefault();
+    document.getElementById('cmd-query').focus();
+    return;
+  }
+  if (e.key === '?') {
+    e.preventDefault();
+    showHelpTag();
+    return;
+  }
+  if (e.key === ' ') {
+    e.preventDefault();
+    toggleAnchor();
+    return;
+  }
+  if (e.key === 'j') { moveFeedCursor(1); return; }
+  if (e.key === 'k') { moveFeedCursor(-1); return; }
+  if (e.key === '1') { document.querySelector('.tog[data-filter="system"]').click(); return; }
+  if (e.key === '2') { document.querySelector('.tog[data-filter="channel"]').click(); return; }
+  if (e.key === '3') { document.querySelector('.tog[data-filter="world"]').click(); return; }
+  if (e.key === 'o') { document.getElementById('cmd-open').click(); return; }
+  if (e.key === 's') { document.getElementById('cmd-speed').click(); return; }
+});
+
+/* ════════════════════════════════════════════════════════════════════
+   Section 14  ·  Time cursor — retrospective inspection
+   ════════════════════════════════════════════════════════════════════
+   This is a reading device, not a debugger. Drag the cursor to a moment,
+   the feed dims everything outside that moment's vicinity, the topology
+   meta line shows the snapshot, hover-explanations carry "as of" timestamps.
+   Releasing or pressing LIVE returns to the present.
+*/
+const ANCHOR = {
+  active: false,
+  t: null,            // anchored timestamp
+  windowMs: 4000,     // events within ±2s of t are "in focus"
+};
+
+function initTimeCursor() {
+  const range = document.getElementById('tc-range');
+  const liveBtn = document.getElementById('tc-live');
+  const anchorBtn = document.getElementById('tc-anchor');
+  const tsEl = document.getElementById('tc-ts');
+  const bar = document.getElementById('timecursor');
+  const list = document.getElementById('feed-list');
+
+  function refreshLive() {
+    if (!ANCHOR.active) {
+      range.value = 100;
+      tsEl.textContent = 'LIVE  ' + fmtTime(nowTs());
+    }
+  }
+  setInterval(refreshLive, 800);
+
+  range.addEventListener('input', () => {
+    if (STATE.events.length === 0) return;
+    ANCHOR.active = true;
+    bar.classList.add('anchored');
+    list.classList.add('anchored');
+    const minT = STATE.events[0].t;
+    const maxT = STATE.events[STATE.events.length - 1].t;
+    const v = parseInt(range.value, 10);
+    ANCHOR.t = minT + (maxT - minT) * (v / 100);
+    tsEl.textContent = 'AT  ' + fmtTime(ANCHOR.t);
+    applyAnchor();
+  });
+
+  liveBtn.addEventListener('click', () => snapToLive());
+  anchorBtn.addEventListener('click', () => snapToLive());
+}
+
+function toggleAnchor() {
+  if (ANCHOR.active) snapToLive();
+  else {
+    if (STATE.events.length === 0) return;
+    ANCHOR.active = true;
+    document.getElementById('timecursor').classList.add('anchored');
+    document.getElementById('feed-list').classList.add('anchored');
+    ANCHOR.t = STATE.events[STATE.events.length - 1].t;
+    document.getElementById('tc-range').value = 100;
+    document.getElementById('tc-ts').textContent = 'AT  ' + fmtTime(ANCHOR.t);
+    applyAnchor();
+  }
+}
+
+function snapToLive() {
+  ANCHOR.active = false;
+  ANCHOR.t = null;
+  document.getElementById('timecursor').classList.remove('anchored');
+  document.getElementById('feed-list').classList.remove('anchored');
+  document.getElementById('tc-range').value = 100;
+  document.getElementById('tc-ts').textContent = 'LIVE  ' + fmtTime(nowTs());
+  Array.from(document.querySelectorAll('#feed-list .fe.in-focus')).forEach(el => el.classList.remove('in-focus'));
+}
+
+function applyAnchor() {
+  const half = ANCHOR.windowMs / 2;
+  const list = document.getElementById('feed-list');
+  Array.from(list.querySelectorAll('.fe')).forEach(el => {
+    const ev = STATE.events.find(e => e.id === el.dataset.eventId);
+    if (!ev) return;
+    if (Math.abs(ev.t - ANCHOR.t) <= half) el.classList.add('in-focus');
+    else el.classList.remove('in-focus');
+  });
+  // jump first in-focus event into view
+  const firstFocus = list.querySelector('.fe.in-focus');
+  if (firstFocus) firstFocus.scrollIntoView({ block: 'center', behavior: 'instant' });
+}
+
+initTopology();
+initCommandBar();
+renderInspectorEmpty();
+initTimeCursor();
+
+/* status pill */
+setInterval(() => {
+  const pill = document.getElementById('live-pill');
+  const t = document.getElementById('live-text');
+  if (APP.mounted) { pill.classList.remove('disconnected'); t.textContent = 'LIVE'; }
+  else { pill.classList.add('disconnected'); t.textContent = 'NO KERNEL'; }
+}, 1500);
+</script>
+</body>
+</html>

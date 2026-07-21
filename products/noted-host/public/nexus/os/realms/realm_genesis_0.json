@@ -1,0 +1,33 @@
+{
+  "format": "vibe/1",
+  "id": "v_realm_c85fe8b5cb6941eb",
+  "type": "realm-charter/1",
+  "name": "Genesis Realm",
+  "tags": [
+    "realm",
+    "genesis",
+    "season:s0",
+    "ruleset:eidolon-core@1.2"
+  ],
+  "parents": [],
+  "birthHash": "sha256:c85fe8b5cb6941eba828ae7b633207fa788c97770594d529da6d032e7a426ee9",
+  "createdAt": "2026-05-04T00:00:00.000Z",
+  "source": "builtin",
+  "payload": {
+    "realm_id": "realm_genesis_0",
+    "season": "s0",
+    "ruleset": {
+      "id": "eidolon-core",
+      "version": "1.2"
+    },
+    "ruleset_hash": "sha256:d2d9728ead1542f1b216b988bd93a8dc4e678b0e3ea6350661b8674cd212ec39",
+    "engine_hash": "sha256:79cd0f7ce56120d4aee1aa6616e94c1adbda58d164ffd444e4201e2215ef65a9",
+    "substrate_epoch": 1,
+    "gen1_policy": {
+      "method": "open",
+      "notes": "open Gen-1 admission for genesis season"
+    },
+    "created_at": "2026-05-04T00:00:00.000Z",
+    "notes": "Canonical genesis realm. Open admission. Ruleset: eidolon-core v1.2 with PHANTIVEX-verified platform battle engine."
+  }
+}

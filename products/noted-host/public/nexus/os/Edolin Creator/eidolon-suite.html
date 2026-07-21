@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eidolon Suite</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --suite-bg:      #030306;
+    --suite-sidebar: #060609;
+    --suite-bar:     #080810;
+    --suite-line:    #141420;
+    --suite-text:    #6a6a7a;
+    --suite-text-hi: #c0bcd0;
+    --suite-mono:    'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    --sidebar-w:     48px;
+    --settings-panel-w: 340px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--suite-bg);
+    font-family: var(--suite-mono);
+    font-size: 11px;
+    color: var(--suite-text);
+  }
+
+  /* ─── LAYOUT GRID ─── */
+  #layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: 1fr 28px;
+    height: 100vh;
+    transition: grid-template-columns 180ms ease;
+  }
+
+  #layout.sidebar-expanded {
+    --sidebar-w: 220px;
+    grid-template-columns: 220px 1fr;
+  }
+
+  /* ─── SIDEBAR ─── */
+  #sidebar {
+    grid-row: 1 / 3;
+    grid-column: 1;
+    background: var(--suite-sidebar);
+    border-right: 1px solid var(--suite-line);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+    position: relative;
+  }
+
+  #sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 8px 8px 8px;
+    border-bottom: 1px solid var(--suite-line);
+    min-height: 38px;
+    flex-shrink: 0;
+  }
+
+  #suite-logo {
+    font-size: 16px;
+    color: #8877cc;
+    flex-shrink: 0;
+    line-height: 1;
+    opacity: 0.9;
+  }
+
+  #suite-title-text {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--suite-text);
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    flex: 1;
+    padding: 0 6px;
+  }
+
+  #layout.sidebar-expanded #suite-title-text {
+    opacity: 1;
+  }
+
+  #pin-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--suite-text);
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 120ms ease, color 0.1s, background 0.1s;
+    line-height: 1;
+  }
+
+  #layout.sidebar-expanded #pin-btn {
+    opacity: 1;
+  }
+
+  #pin-btn:hover { color: var(--suite-text-hi); background: rgba(255,255,255,0.05); }
+  #pin-btn.pinned { color: #8877cc; opacity: 1; }
+
+  /* ─── SIDEBAR ITEMS ─── */
+  #sidebar-items {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 0;
+    scrollbar-width: thin;
+    scrollbar-color: #1a1a2a transparent;
+  }
+
+  #sidebar-items::-webkit-scrollbar { width: 3px; }
+  #sidebar-items::-webkit-scrollbar-thumb { background: #1a1a2a; border-radius: 2px; }
+
+  .suite-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 8px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+    white-space: nowrap;
+    user-select: none;
+    position: relative;
+  }
+
+  .suite-item:hover { background: rgba(255,255,255,0.04); }
+
+  .suite-item.active {
+    background: rgba(255,255,255,0.06);
+  }
+
+  .suite-icon {
+    font-size: 15px;
+    width: 30px;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: transform 0.15s ease;
+  }
+
+  .suite-item:hover .suite-icon {
+    transform: scale(1.15);
+  }
+
+  .suite-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    flex: 1;
+    min-width: 0;
+  }
+
+  #layout.sidebar-expanded .suite-item-text {
+    opacity: 1;
+  }
+
+  .suite-item-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--suite-text-hi);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .suite-item-desc {
+    font-size: 8.5px;
+    color: var(--suite-text);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .suite-item-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    margin-left: auto;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    box-shadow: 0 0 4px currentColor;
+  }
+
+  /* Tooltip for collapsed state */
+  .suite-item::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 52px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0e0e18;
+    border: 1px solid var(--suite-line);
+    color: var(--suite-text-hi);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+  }
+
+  #layout:not(.sidebar-expanded) .suite-item:hover::after {
+    opacity: 1;
+  }
+
+  /* ─── SIDEBAR FOOTER ─── */
+  #sidebar-footer {
+    border-top: 1px solid var(--suite-line);
+    padding: 6px 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+  }
+
+  #sidebar-kbd-hint {
+    font-size: 8px;
+    color: #333342;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    text-align: center;
+  }
+
+  #layout.sidebar-expanded #sidebar-kbd-hint {
+    opacity: 1;
+  }
+
+  /* ─── FRAME CONTAINER ─── */
+  #frame-container {
+    position: relative;
+    overflow: hidden;
+    grid-column: 2;
+    grid-row: 1;
+    background: var(--suite-bg);
+  }
+
+  .tool-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+    background: transparent;
+  }
+
+  /* Welcome screen shown when no tool loaded yet */
+  #welcome-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: var(--suite-bg);
+    color: var(--suite-text);
+    pointer-events: none;
+  }
+
+  #welcome-screen .ws-logo {
+    font-size: 36px;
+    color: #4433aa;
+    opacity: 0.4;
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-logo {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+  }
+
+  #welcome-screen .ws-text {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #2a2a3a;
+  }
+
+  /* Loading overlay inside frame container */
+  .frame-loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--suite-bg);
+    z-index: 5;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .frame-loading-overlay.done {
+    opacity: 0;
+  }
+
+  .loading-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #1a1a2a;
+    border-top-color: #4433aa;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-tool-name {
+    font-size: 9px;
+    color: #333342;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── BOTTOM BAR ─── */
+  #bottom-bar {
+    background: var(--suite-bar);
+    border-top: 1px solid var(--suite-line);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+    grid-column: 2;
+    grid-row: 2;
+    user-select: none;
+  }
+
+  #active-tool-name {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s;
+  }
+
+  #bar-divider {
+    flex: 1;
+  }
+
+  .bar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--suite-text);
+    font-size: 14px;
+    padding: 3px 6px;
+    border-radius: 3px;
+    transition: color 0.1s, background 0.1s;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bar-btn:hover {
+    color: var(--suite-text-hi);
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* ─── SETTINGS PANEL ─── */
+  #settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  #settings-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  #settings-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--settings-panel-w);
+    height: 100vh;
+    background: #09090f;
+    border-left: 1px solid var(--suite-line);
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  #settings-panel.open {
+    transform: translateX(0);
+  }
+
+  #settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--suite-line);
+    flex-shrink: 0;
+  }
+
+  #settings-header h2 {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--suite-text-hi);
+  }
+
+  #settings-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--suite-text);
+    font-size: 16px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    line-height: 1;
+    transition: color 0.1s, background 0.1s;
+  }
+
+  #settings-close:hover {
+    color: var(--suite-text-hi);
+    background: rgba(255,255,255,0.06);
+  }
+
+  #settings-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    scrollbar-width: thin;
+    scrollbar-color: #1a1a2a transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  #settings-body::-webkit-scrollbar { width: 3px; }
+  #settings-body::-webkit-scrollbar-thumb { background: #1a1a2a; }
+
+  .settings-section-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #333342;
+    margin-bottom: 10px;
+    margin-top: 18px;
+  }
+
+  .settings-section-label:first-child {
+    margin-top: 0;
+  }
+
+  .settings-hint {
+    font-size: 8.5px;
+    color: #333342;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .path-row {
+    margin-bottom: 8px;
+  }
+
+  .path-row-label {
+    font-size: 9px;
+    color: var(--suite-text);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .path-row-icon {
+    font-size: 10px;
+  }
+
+  .path-input {
+    width: 100%;
+    background: #0d0d16;
+    border: 1px solid var(--suite-line);
+    border-radius: 3px;
+    color: var(--suite-text-hi);
+    font-family: var(--suite-mono);
+    font-size: 9px;
+    padding: 5px 7px;
+    outline: none;
+    transition: border-color 0.15s;
+    letter-spacing: 0.3px;
+  }
+
+  .path-input:focus {
+    border-color: #2a2a44;
+  }
+
+  .path-input::placeholder {
+    color: #252530;
+  }
+
+  .settings-btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .settings-action-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--suite-line);
+    border-radius: 3px;
+    color: var(--suite-text);
+    font-family: var(--suite-mono);
+    font-size: 9px;
+    padding: 6px 10px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: color 0.1s, border-color 0.1s, background 0.1s;
+  }
+
+  .settings-action-btn:hover {
+    color: var(--suite-text-hi);
+    border-color: #2a2a44;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .settings-action-btn.primary {
+    border-color: #3a3a66;
+    color: #9988dd;
+  }
+
+  .settings-action-btn.primary:hover {
+    background: rgba(100,80,200,0.08);
+    border-color: #5544aa;
+    color: #bbaaff;
+  }
+
+  .settings-divider {
+    border: none;
+    border-top: 1px solid var(--suite-line);
+    margin: 14px 0;
+  }
+
+  /* Sidebar pin row */
+  .sidebar-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+
+  .sidebar-toggle-label {
+    font-size: 9px;
+    color: var(--suite-text);
+    letter-spacing: 0.3px;
+  }
+
+  .toggle-btn {
+    background: #0d0d16;
+    border: 1px solid var(--suite-line);
+    border-radius: 3px;
+    color: var(--suite-text);
+    font-family: var(--suite-mono);
+    font-size: 9px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: color 0.1s, border-color 0.1s;
+  }
+
+  .toggle-btn:hover {
+    color: var(--suite-text-hi);
+    border-color: #2a2a44;
+  }
+
+  .toggle-btn.active {
+    color: #9988dd;
+    border-color: #3a3a66;
+  }
+
+  /* Companion / Environment Status */
+  .status-block {
+    background: #0a0a14;
+    border: 1px solid var(--suite-line);
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-top: 4px;
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 3px 0;
+  }
+
+  .status-icon {
+    font-size: 11px;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+  }
+
+  .status-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--suite-text-hi);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .status-source {
+    font-size: 8px;
+    color: var(--suite-text);
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+
+  .status-empty {
+    font-size: 9px;
+    color: #252530;
+    letter-spacing: 0.3px;
+    font-style: italic;
+  }
+
+  /* Save confirmation toast */
+  #toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #141422;
+    border: 1px solid #2a2a44;
+    color: #9988dd;
+    font-family: var(--suite-mono);
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 300;
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Error state inside frame */
+  .frame-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: #03030a;
+    color: #444;
+    font-family: monospace;
+  }
+
+  .frame-error code {
+    color: #ff5566;
+    font-size: 12px;
+  }
+
+  .frame-error p {
+    font-size: 11px;
+    color: #555;
+  }
+
+  .frame-error button {
+    border: 1px solid #333;
+    background: transparent;
+    color: #888;
+    font-family: monospace;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 10px;
+    border-radius: 3px;
+    transition: color 0.1s, border-color 0.1s;
+  }
+
+  .frame-error button:hover {
+    color: #aaa;
+    border-color: #555;
+  }
+
+  /* Keyboard shortcuts badge */
+  .kbd {
+    display: inline-block;
+    background: #0d0d16;
+    border: 1px solid #1a1a28;
+    border-radius: 2px;
+    font-size: 8px;
+    padding: 1px 4px;
+    color: #333342;
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+  }
+
+  /* Drag reorder hint */
+  .reorder-hint {
+    font-size: 8px;
+    color: #252530;
+    text-align: center;
+    padding: 4px 0;
+    letter-spacing: 0.5px;
+  }
+
+  /* Tool index badge */
+  .suite-item-index {
+    font-size: 7.5px;
+    color: #1e1e2a;
+    margin-left: auto;
+    margin-right: 4px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  #layout.sidebar-expanded .suite-item-index {
+    opacity: 1;
+  }
+
+  /* Scrollbar for settings body */
+  #settings-body::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+<div id="layout">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <span id="suite-logo">✦</span>
+      <span id="suite-title-text">EIDOLON</span>
+      <button id="pin-btn" title="Pin sidebar open" onclick="togglePin()">◫</button>
+    </div>
+
+    <div id="sidebar-items">
+      <!-- Populated by JS -->
+    </div>
+
+    <div id="sidebar-footer">
+      <span id="sidebar-kbd-hint"><span class="kbd">Ctrl+1–9</span> switch tools · <span class="kbd">Ctrl+F</span> fullscreen</span>
+    </div>
+  </div>
+
+  <!-- FRAME CONTAINER -->
+  <div id="frame-container">
+    <div id="welcome-screen">
+      <div class="ws-logo">✦</div>
+      <div class="ws-text">Loading…</div>
+    </div>
+    <!-- iframes injected here dynamically -->
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="bottom-bar">
+    <span id="active-tool-name">—</span>
+    <div id="bar-divider"></div>
+    <button class="bar-btn" id="settings-btn" title="Settings" onclick="openSettings()">≡</button>
+    <button class="bar-btn" id="fullscreen-btn" title="Enter fullscreen" onclick="toggleFullscreen()">⛶</button>
+  </div>
+</div>
+
+<!-- SETTINGS OVERLAY -->
+<div id="settings-overlay" onclick="closeSettings()"></div>
+
+<!-- SETTINGS PANEL -->
+<div id="settings-panel">
+  <div id="settings-header">
+    <h2>Suite Settings</h2>
+    <button id="settings-close" onclick="closeSettings()" title="Close">×</button>
+  </div>
+  <div id="settings-body">
+    <!-- TOOL PATHS -->
+    <div class="settings-section-label">Tool Paths</div>
+    <div class="settings-hint">Edit paths if your files are in a different location.</div>
+
+    <div id="path-fields">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="settings-btn-row">
+      <button class="settings-action-btn" onclick="resetPaths()">reset to defaults</button>
+      <button class="settings-action-btn primary" onclick="savePaths()">save paths</button>
+    </div>
+
+    <hr class="settings-divider">
+
+    <!-- SIDEBAR -->
+    <div class="settings-section-label">Sidebar</div>
+    <div class="sidebar-toggle-row">
+      <span class="sidebar-toggle-label">◫ pin sidebar open</span>
+      <button class="toggle-btn" id="pin-toggle-btn" onclick="togglePin()">off</button>
+    </div>
+    <div class="reorder-hint" style="margin-top:6px; font-size:8px; color:#1e1e28;">Tool order follows the manifest definition.</div>
+
+    <hr class="settings-divider">
+
+    <!-- ACTIVE COMPANION -->
+    <div class="settings-section-label">Active Companion</div>
+    <div style="font-size:8px;color:#252530;margin-bottom:6px;letter-spacing:0.3px;">reads nexus:selected-companion:v1</div>
+    <div class="status-block" id="companion-status">
+      <div class="status-empty">No companion selected</div>
+    </div>
+
+    <hr class="settings-divider">
+
+    <!-- ACTIVE ENVIRONMENT -->
+    <div class="settings-section-label">Active Environment</div>
+    <div style="font-size:8px;color:#252530;margin-bottom:6px;letter-spacing:0.3px;">reads nexus:selected-environment:v1</div>
+    <div class="status-block" id="environment-status">
+      <div class="status-empty">No environment selected</div>
+    </div>
+
+    <hr class="settings-divider">
+
+    <!-- KEYBOARD SHORTCUTS -->
+    <div class="settings-section-label">Keyboard Shortcuts</div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:9px;color:var(--suite-text);">Switch tool</span>
+        <span class="kbd">Ctrl+1</span> <span style="font-size:8px;color:#252530;">–</span> <span class="kbd">Ctrl+9</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:9px;color:var(--suite-text);">Fullscreen</span>
+        <span class="kbd">Ctrl+F</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:9px;color:var(--suite-text);">Settings</span>
+        <span class="kbd">Ctrl+,</span>
+      </div>
+    </div>
+
+    <hr class="settings-divider">
+
+    <!-- ABOUT -->
+    <div class="settings-section-label">About</div>
+    <div style="font-size:8.5px;color:var(--suite-text);line-height:1.7;">
+      Eidolon Suite — unified launcher<br>
+      <span style="color:#252530;">Tools share localStorage (same-origin).<br>Switching preserves all tool state.</span>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ─── TOOL MANIFEST ───────────────────────────────────────────────────────────
+
+const TOOLS = [
+  { id: 'forge-pro',        label: 'Forge',     icon: '◆',  desc: 'Creature creator — seed-based, full axis control', path: 'eidolon-forge-pro.html',          color: '#ffcc44' },
+  { id: 'multiforge',       label: 'Multiforge', icon: '❉', desc: 'Grid generator — race system, 9-cell randomizer',  path: 'eidolon-multiforge-races.html',   color: '#aaeeff' },
+  { id: 'creature-sheet',   label: 'Creature',  icon: '◈',  desc: 'Creature sheet — assign moves, stats, types',      path: 'eidolon-creature-sheet.html',     color: '#cc44ff' },
+  { id: 'attack-forge',     label: 'Attacks',   icon: '⚡', desc: 'Attack forge — visual physics editor',             path: 'eidolon-attack-forge.html',       color: '#ff8844' },
+  { id: 'world-builder',    label: 'World',     icon: '🌍', desc: 'World builder — gyms, routes, registry',           path: 'eidolon-world-builder.html',      color: '#44cc77' },
+  { id: 'battle-theatre',   label: 'Theatre',   icon: '⚔', desc: 'Battle theatre — visual battle with physics',      path: 'eidolon-battle-theatre.html',     color: '#ff5566' },
+  { id: 'battle-system',    label: 'Battle',    icon: '◉',  desc: 'Battle system — full RPG engine',                  path: 'eidolon-battle-system.html',      color: '#ff3344' },
+  { id: 'environment-forge', label: 'Environ',  icon: '⛰', desc: 'Environment forge — world backgrounds',            path: 'eidolon-environment-forge.html',  color: '#55aaff' },
+  { id: 'vibes-library',    label: 'Library',   icon: '◇',  desc: 'Vibes library — minted creature browser',          path: 'eidolon-asset-bay-v2.html',       color: '#aabb44' },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+
+const iframes  = {};   // id → iframe element
+const loaded   = {};   // id → boolean
+const timers   = {};   // id → error-check timeout
+let activeId   = null;
+let sidebarPinned = false;
+let sidebarHoverTimer = null;
+let settingsOpen = false;
+
+const KEY_PATHS    = 'eidolon:suite:paths';
+const KEY_LAST     = 'eidolon:suite:last';
+const KEY_PINNED   = 'eidolon:suite:pinned';
+const KEY_COMPANION  = 'nexus:selected-companion:v1';
+const KEY_ENVIRONMENT = 'nexus:selected-environment:v1';
+
+// ─── LOCAL STORAGE HELPERS ───────────────────────────────────────────────────
+
+function sharedRead(key) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch { return null; }
+}
+function sharedWrite(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+function getPathOverrides() {
+  return sharedRead(KEY_PATHS) || {};
+}
+function savePathOverrides(overrides) {
+  sharedWrite(KEY_PATHS, overrides);
+}
+
+function resolvePath(path) {
+  const overrides = getPathOverrides();
+  return overrides[path] || path;
+}
+
+// ─── ESCAPE HTML ─────────────────────────────────────────────────────────────
+
+function escHTML(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ─── SIDEBAR RENDERING ────────────────────────────────────────────────────────
+
+function buildSidebar() {
+  const container = document.getElementById('sidebar-items');
+  container.innerHTML = '';
+  TOOLS.forEach((tool, i) => {
+    const el = document.createElement('div');
+    el.className = 'suite-item';
+    el.dataset.id = tool.id;
+    el.dataset.tooltip = `${tool.label} — ${tool.desc.split('—')[0].trim()}`;
+    el.title = `${tool.label} (Ctrl+${i+1})`;
+    el.addEventListener('click', () => switchTo(tool.id));
+
+    el.innerHTML = `
+      <span class="suite-icon" style="color:${escHTML(tool.color)}">${escHTML(tool.icon)}</span>
+      <div class="suite-item-text">
+        <span class="suite-item-label">${escHTML(tool.label)}</span>
+        <span class="suite-item-desc">${escHTML(tool.desc)}</span>
+      </div>
+      <span class="suite-item-index">${i+1}</span>
+      <span class="suite-item-dot" id="dot-${escHTML(tool.id)}"></span>
+    `;
+
+    container.appendChild(el);
+  });
+}
+
+function updateDot(id) {
+  const dot = document.getElementById('dot-' + id);
+  if (!dot) return;
+  const tool = TOOLS.find(t => t.id === id);
+  if (!tool) return;
+  dot.style.background = tool.color;
+  dot.style.color = tool.color;
+  dot.style.opacity = loaded[id] ? '1' : '0';
+}
+
+// ─── IFRAME MANAGEMENT ────────────────────────────────────────────────────────
+
+function showErrorState(frame, tool) {
+  // Replace iframe with error div
+  const errDiv = document.createElement('div');
+  errDiv.className = 'frame-error';
+  errDiv.id = 'error-' + tool.id;
+  errDiv.innerHTML = `
+    <code>${escHTML(resolvePath(tool.path))}</code>
+    <p>File not found. Check the path in Suite Settings.</p>
+    <button onclick="openSettings()">open settings</button>
+  `;
+  frame.parentNode.insertBefore(errDiv, frame);
+  frame.style.display = 'none';
+  errDiv.style.display = frame.id === 'frame-' + activeId ? 'flex' : 'none';
+}
+
+function switchTo(id) {
+  const tool = TOOLS.find(t => t.id === id);
+  if (!tool) return;
+
+  // Hide all frames and error states
+  Object.keys(iframes).forEach(fid => {
+    iframes[fid].style.display = 'none';
+    const err = document.getElementById('error-' + fid);
+    if (err) err.style.display = 'none';
+  });
+
+  // Hide welcome screen
+  const welcome = document.getElementById('welcome-screen');
+  if (welcome) welcome.style.display = 'none';
+
+  // Create iframe if first visit
+  if (!iframes[id]) {
+    const frame = document.createElement('iframe');
+    frame.id = 'frame-' + id;
+    frame.className = 'tool-frame';
+    frame.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-pointer-lock allow-modals allow-presentation';
+
+    // Loading overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'frame-loading-overlay';
+    overlay.id = 'overlay-' + id;
+    overlay.innerHTML = `
+      <div class="loading-spinner"></div>
+      <div class="loading-tool-name">${escHTML(tool.label)}</div>
+    `;
+    document.getElementById('frame-container').appendChild(overlay);
+
+    frame.onload = () => {
+      loaded[id] = true;
+      updateDot(id);
+      clearTimeout(timers[id]);
+
+      // Dismiss loading overlay
+      const ov = document.getElementById('overlay-' + id);
+      if (ov) {
+        ov.classList.add('done');
+        setTimeout(() => ov.remove(), 350);
+      }
+
+      // Attempt to detect if the frame landed on an error doc
+      try {
+        const doc = frame.contentDocument;
+        if (doc && (doc.title === '404' || doc.body.innerHTML.trim() === '')) {
+          showErrorState(frame, tool);
+        }
+      } catch (_) {
+        // Cross-origin — frame loaded fine
+      }
+    };
+
+    // 3-second error fallback
+    timers[id] = setTimeout(() => {
+      if (!loaded[id]) {
+        const ov = document.getElementById('overlay-' + id);
+        if (ov) ov.remove();
+        showErrorState(frame, tool);
+      }
+    }, 3000);
+
+    const path = resolvePath(tool.path);
+    frame.src = path;
+    document.getElementById('frame-container').appendChild(frame);
+    iframes[id] = frame;
+  }
+
+  // Show this frame (or its error state if present)
+  const errDiv = document.getElementById('error-' + id);
+  if (errDiv) {
+    errDiv.style.display = 'flex';
+  } else {
+    iframes[id].style.display = 'block';
+  }
+
+  activeId = id;
+
+  // Update sidebar active state
+  document.querySelectorAll('.suite-item').forEach(el => {
+    const isActive = el.dataset.id === id;
+    el.classList.toggle('active', isActive);
+    if (isActive) {
+      el.style.borderLeftColor = tool.color;
+    } else {
+      el.style.borderLeftColor = 'transparent';
+    }
+  });
+
+  // Update bottom bar
+  const nameEl = document.getElementById('active-tool-name');
+  nameEl.textContent = tool.label;
+  nameEl.style.color = tool.color;
+
+  // Persist
+  try { localStorage.setItem(KEY_LAST, id); } catch {}
+}
+
+// ─── SIDEBAR EXPAND / COLLAPSE ────────────────────────────────────────────────
+
+const layout  = document.getElementById('layout');
+const sidebar = document.getElementById('sidebar');
+
+function expandSidebar() {
+  layout.classList.add('sidebar-expanded');
+}
+function collapseSidebar() {
+  if (!sidebarPinned) layout.classList.remove('sidebar-expanded');
+}
+
+sidebar.addEventListener('mouseenter', () => {
+  clearTimeout(sidebarHoverTimer);
+  sidebarHoverTimer = setTimeout(expandSidebar, 200);
+});
+
+sidebar.addEventListener('mouseleave', () => {
+  clearTimeout(sidebarHoverTimer);
+  collapseSidebar();
+});
+
+function togglePin() {
+  sidebarPinned = !sidebarPinned;
+  const pinBtn = document.getElementById('pin-btn');
+  const pinToggleBtn = document.getElementById('pin-toggle-btn');
+
+  if (sidebarPinned) {
+    pinBtn.classList.add('pinned');
+    pinBtn.title = 'Unpin sidebar';
+    if (pinToggleBtn) { pinToggleBtn.textContent = 'on'; pinToggleBtn.classList.add('active'); }
+    expandSidebar();
+  } else {
+    pinBtn.classList.remove('pinned');
+    pinBtn.title = 'Pin sidebar open';
+    if (pinToggleBtn) { pinToggleBtn.textContent = 'off'; pinToggleBtn.classList.remove('active'); }
+    collapseSidebar();
+  }
+
+  try { localStorage.setItem(KEY_PINNED, sidebarPinned ? '1' : '0'); } catch {}
+}
+
+// ─── SETTINGS PANEL ──────────────────────────────────────────────────────────
+
+function buildPathFields() {
+  const container = document.getElementById('path-fields');
+  container.innerHTML = '';
+  const overrides = getPathOverrides();
+
+  TOOLS.forEach(tool => {
+    const row = document.createElement('div');
+    row.className = 'path-row';
+    const currentVal = overrides[tool.path] || tool.path;
+    row.innerHTML = `
+      <div class="path-row-label">
+        <span class="path-row-icon" style="color:${escHTML(tool.color)}">${escHTML(tool.icon)}</span>
+        <span>${escHTML(tool.label)}</span>
+      </div>
+      <input
+        class="path-input"
+        type="text"
+        value="${escHTML(currentVal)}"
+        placeholder="${escHTML(tool.path)}"
+        data-default="${escHTML(tool.path)}"
+        id="path-input-${escHTML(tool.id)}"
+        spellcheck="false"
+        autocomplete="off"
+      />
+    `;
+    container.appendChild(row);
+  });
+}
+
+function savePaths() {
+  const overrides = {};
+  TOOLS.forEach(tool => {
+    const input = document.getElementById('path-input-' + tool.id);
+    if (input) {
+      const val = input.value.trim();
+      if (val && val !== tool.path) {
+        overrides[tool.path] = val;
+      }
+    }
+  });
+  savePathOverrides(overrides);
+  showToast('Paths saved');
+}
+
+function resetPaths() {
+  savePathOverrides({});
+  buildPathFields();
+  showToast('Paths reset to defaults');
+}
+
+function updateSharedStatus() {
+  // Companion
+  const companionBlock = document.getElementById('companion-status');
+  try {
+    const companion = sharedRead(KEY_COMPANION);
+    if (companion && (companion.name || companion.label || companion.id)) {
+      const name   = companion.name || companion.label || companion.id;
+      const icon   = companion.icon || '◆';
+      const source = companion.source || companion.toolId || '';
+      companionBlock.innerHTML = `
+        <div class="status-row">
+          <span class="status-icon" style="color:${escHTML(companion.color || '#9988dd')}">${escHTML(icon)}</span>
+          <span class="status-name">${escHTML(name)}</span>
+          ${source ? `<span class="status-source">${escHTML(source)}</span>` : ''}
+        </div>
+      `;
+    } else {
+      companionBlock.innerHTML = '<div class="status-empty">No companion selected</div>';
+    }
+  } catch {
+    companionBlock.innerHTML = '<div class="status-empty">No companion selected</div>';
+  }
+
+  // Environment
+  const envBlock = document.getElementById('environment-status');
+  try {
+    const env = sharedRead(KEY_ENVIRONMENT);
+    if (env && (env.name || env.label || env.id)) {
+      const name   = env.name || env.label || env.id;
+      const icon   = env.icon || '⛰';
+      const source = env.source || env.toolId || '';
+      envBlock.innerHTML = `
+        <div class="status-row">
+          <span class="status-icon" style="color:${escHTML(env.color || '#55aaff')}">${escHTML(icon)}</span>
+          <span class="status-name">${escHTML(name)}</span>
+          ${source ? `<span class="status-source">${escHTML(source)}</span>` : ''}
+        </div>
+      `;
+    } else {
+      envBlock.innerHTML = '<div class="status-empty">No environment selected</div>';
+    }
+  } catch {
+    envBlock.innerHTML = '<div class="status-empty">No environment selected</div>';
+  }
+}
+
+function openSettings() {
+  buildPathFields();
+  updateSharedStatus();
+  document.getElementById('settings-panel').classList.add('open');
+  document.getElementById('settings-overlay').classList.add('open');
+  settingsOpen = true;
+}
+
+function closeSettings() {
+  document.getElementById('settings-panel').classList.remove('open');
+  document.getElementById('settings-overlay').classList.remove('open');
+  settingsOpen = false;
+}
+
+// ─── FULLSCREEN ───────────────────────────────────────────────────────────────
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const isFS = !!document.fullscreenElement;
+  const btn = document.getElementById('fullscreen-btn');
+  btn.title = isFS ? 'Exit fullscreen' : 'Enter fullscreen';
+});
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── KEYBOARD SHORTCUTS ───────────────────────────────────────────────────────
+
+window.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+    const idx = parseInt(e.key) - 1;
+    if (TOOLS[idx]) switchTo(TOOLS[idx].id);
+    e.preventDefault();
+    return;
+  }
+  if (e.ctrlKey && e.key === 'f') {
+    toggleFullscreen();
+    e.preventDefault();
+    return;
+  }
+  if (e.ctrlKey && e.key === ',') {
+    settingsOpen ? closeSettings() : openSettings();
+    e.preventDefault();
+    return;
+  }
+  if (e.key === 'Escape' && settingsOpen) {
+    closeSettings();
+    e.preventDefault();
+  }
+});
+
+// ─── STORAGE EVENT (live status refresh) ─────────────────────────────────────
+
+window.addEventListener('storage', e => {
+  if (e.key === KEY_COMPANION || e.key === KEY_ENVIRONMENT) {
+    if (settingsOpen) updateSharedStatus();
+  }
+});
+
+// ─── NEXUS OS INTEGRATION ─────────────────────────────────────────────────────
+
+const MANIFEST = {
+  emits:    ['nexus.notify', 'nexus.launch'],
+  consumes: [],
+  app: {
+    title:       'Eidolon Suite',
+    icon:        '✦',
+    description: 'Complete Eidolon toolset — forge, battle, world builder',
+    visible:     true,
+    preferredSize: { width: 1400, height: 900 },
+  }
+};
+
+let _kernelPort = null;
+
+window.addEventListener('message', e => {
+  if (e.data?.type !== 'BOOT') return;
+  _kernelPort = e.ports[0];
+  _kernelPort.onmessage = onKernelMsg;
+  _kernelPort.postMessage({ type: 'DECLARE', manifest: MANIFEST });
+  _kernelPort.postMessage({ type: 'MOUNT_ACK' });
+});
+
+function onKernelMsg(e) {
+  if (e.data?.type === 'PING') {
+    _kernelPort.postMessage({ type: 'PONG', nonce: e.data.nonce });
+  }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', () => {
+  buildSidebar();
+
+  // Restore pinned state
+  const wasPinned = localStorage.getItem(KEY_PINNED) === '1';
+  if (wasPinned) {
+    sidebarPinned = false; // let togglePin set it
+    togglePin();
+  }
+
+  // Switch to last active tool (or default)
+  const last = localStorage.getItem(KEY_LAST) || 'forge-pro';
+  const valid = TOOLS.find(t => t.id === last);
+  switchTo(valid ? last : TOOLS[0].id);
+});
+</script>
+</body>
+</html>

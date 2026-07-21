@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus · Genesis Verifier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #09090c;
+  --s1: #111116;
+  --s2: #18181f;
+  --border: #2a2a3a;
+  --border-hi: #3d3d58;
+  --amber: #c9920a;
+  --amber-dim: rgba(201,146,10,0.10);
+  --amber-glow: rgba(201,146,10,0.05);
+  --green: #2a9d5c;
+  --green-dim: rgba(42,157,92,0.10);
+  --rose: #c0392b;
+  --rose-dim: rgba(192,57,43,0.10);
+  --ink: #ddd8cc;
+  --ink-2: #999084;
+  --ink-3: #524e48;
+  --display: 'Syne', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:var(--void);color:var(--ink);font-family:var(--mono);font-size:13px}
+body{
+  background-image:radial-gradient(circle at 1px 1px,var(--border) .5px,transparent .5px);
+  background-size:32px 32px;
+  background-attachment:fixed;
+}
+.wrap{max-width:740px;margin:0 auto;padding:56px 24px 96px}
+header{text-align:center;margin-bottom:52px}
+.seal{
+  font-size:52px;display:block;margin-bottom:20px;opacity:.6;
+  font-family:var(--display);color:var(--amber);
+}
+h1{
+  font-family:var(--display);font-size:11px;font-weight:700;
+  letter-spacing:.25em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;
+}
+.subtitle{font-size:9px;color:var(--ink-3);letter-spacing:.15em;text-transform:uppercase}
+hr{border:none;border-top:1px solid var(--border);margin:36px 0}
+label{display:block;font-size:9px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px}
+textarea{
+  width:100%;background:var(--s1);border:1px solid var(--border);
+  border-radius:3px;color:var(--ink);font-family:var(--mono);font-size:10px;
+  padding:14px;resize:vertical;min-height:148px;outline:none;
+  transition:border-color .15s;line-height:1.65;
+}
+textarea:focus{border-color:var(--amber)}
+textarea::placeholder{color:var(--ink-3)}
+.drop-active{border-color:var(--amber)!important;background:var(--amber-dim)!important}
+.actions{margin-top:10px;display:flex;gap:8px;align-items:center}
+button{
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:7px 18px;border-radius:2px;cursor:pointer;border:1px solid;
+  transition:all .12s;letter-spacing:.04em;
+}
+.btn-primary{background:var(--amber);border-color:var(--amber);color:#09090c}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;border-color:var(--border);color:var(--ink-2)}
+.btn-ghost:hover{border-color:var(--border-hi);color:var(--ink)}
+.status{font-size:9px;color:var(--ink-3);margin-left:auto}
+#results{display:none}
+.verdict{
+  text-align:center;padding:36px 24px;border-radius:3px;
+  border:1px solid var(--border);margin-bottom:28px;
+}
+.verdict.verified{border-color:var(--amber);background:var(--amber-glow)}
+.verdict.invalid{border-color:var(--rose);background:var(--rose-dim)}
+.verdict-word{
+  font-family:var(--display);font-size:48px;font-weight:800;
+  letter-spacing:.04em;display:block;margin-bottom:6px;
+}
+.verdict.verified .verdict-word{color:var(--amber)}
+.verdict.invalid .verdict-word{color:var(--rose)}
+.verdict-sub{font-size:9px;color:var(--ink-3);letter-spacing:.15em;text-transform:uppercase}
+.share-row{
+  margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.share-id{
+  font-size:9px;color:var(--ink-2);font-family:var(--mono);
+  background:var(--s2);border:1px solid var(--border);border-radius:2px;
+  padding:4px 10px;letter-spacing:.04em;
+}
+.section{margin-bottom:28px}
+.section-title{
+  font-size:9px;color:var(--ink-3);letter-spacing:.2em;text-transform:uppercase;
+  margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.row{
+  display:flex;gap:16px;padding:7px 0;
+  border-bottom:1px solid rgba(42,42,58,.4);align-items:flex-start;
+}
+.row:last-child{border-bottom:none}
+.row-label{font-size:9px;color:var(--ink-3);min-width:170px;flex-shrink:0;padding-top:2px;letter-spacing:.04em}
+.row-value{font-size:10px;color:var(--ink);word-break:break-all;flex:1;line-height:1.6}
+.row-value.hash{color:var(--ink-2);font-size:9px}
+.tag{
+  display:inline-block;font-size:8px;padding:2px 7px;border-radius:2px;
+  letter-spacing:.06em;font-weight:500;text-transform:uppercase;
+}
+.tag.ok{background:var(--green-dim);color:var(--green);border:1px solid rgba(42,157,92,.25)}
+.tag.fail{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(192,57,43,.25)}
+.tag.info{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(201,146,10,.25)}
+.out-card{
+  padding:12px 14px;background:var(--s1);border:1px solid var(--border);
+  border-radius:2px;margin-bottom:6px;
+}
+.out-amount{font-size:18px;color:var(--amber);font-weight:500;margin-bottom:4px}
+.out-meta{font-size:9px;color:var(--ink-3);word-break:break-all;line-height:1.7}
+.total-bar{
+  padding:12px 14px;background:var(--amber-dim);border:1px solid rgba(201,146,10,.2);
+  border-radius:2px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;
+}
+.total-label{font-size:9px;color:var(--ink-2);letter-spacing:.12em;text-transform:uppercase}
+.total-amount{font-size:20px;color:var(--amber);font-weight:500}
+.err-box{
+  background:var(--rose-dim);border:1px solid rgba(192,57,43,.25);
+  border-radius:2px;padding:12px 16px;font-size:10px;color:var(--rose);
+  margin-bottom:20px;line-height:1.7;
+}
+.loading{
+  text-align:center;padding:52px;color:var(--amber);
+  font-size:10px;letter-spacing:.12em;
+  animation:pulse 1.4s ease-in-out infinite;
+  display:none;
+}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.footnote{
+  margin-top:52px;padding-top:24px;border-top:1px solid var(--border);
+  font-size:9px;color:var(--ink-3);line-height:1.9;letter-spacing:.04em;
+}
+.cp{cursor:pointer;opacity:.6;font-size:9px;padding:2px 6px;vertical-align:middle}
+.cp:hover{opacity:1}
+
+/* Sweep I/J genesis verifier polish */
+:root{--cyan:#67e8f9;--cyan-dim:rgba(103,232,249,.09);--motion-enter:240ms cubic-bezier(.2,.8,.2,1);--motion-reduce:1ms}
+body{background-image:radial-gradient(circle at 20% 0%,rgba(201,146,10,.12),transparent 34%),radial-gradient(circle at 84% 8%,rgba(103,232,249,.08),transparent 30%),radial-gradient(circle at 1px 1px,var(--border) .5px,transparent .5px);background-size:auto,auto,32px 32px;background-attachment:fixed}
+.wrap{max-width:880px}.hero-card{border:1px solid rgba(201,146,10,.28);border-radius:24px;padding:28px;background:radial-gradient(circle at 50% 0%,rgba(201,146,10,.14),transparent 48%),linear-gradient(180deg,rgba(17,17,22,.98),rgba(9,9,12,.98));box-shadow:0 28px 88px rgba(0,0,0,.38);margin-bottom:28px}.hero-card header{margin-bottom:20px}.seal{filter:drop-shadow(0 0 26px rgba(201,146,10,.22))}.subtitle{line-height:1.8}.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}.trust-cell{border:1px solid var(--border);border-radius:14px;background:rgba(0,0,0,.18);padding:13px;text-align:left}.trust-cell .k{font-size:8px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase}.trust-cell .v{font-family:var(--display);font-size:18px;color:var(--amber);margin-top:4px}.verifier-input-card,.verifier-results-card{border:1px solid var(--border);border-radius:18px;background:rgba(17,17,22,.92);padding:18px;box-shadow:0 18px 56px rgba(0,0,0,.24)}textarea{border-radius:14px;background:linear-gradient(180deg,rgba(24,24,31,.94),rgba(17,17,22,.94));min-height:190px}.actions{flex-wrap:wrap}.btn-primary,.btn-ghost{border-radius:999px}.btn-primary{box-shadow:0 0 22px rgba(201,146,10,.16)}.verdict{border-radius:20px;position:relative;overflow:hidden}.verdict::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.035),transparent);animation:genesis-sheen 1400ms ease 1}.verdict-word{font-size:clamp(38px,8vw,72px)}.section{border:1px solid rgba(42,42,58,.72);border-radius:16px;padding:14px;background:rgba(0,0,0,.12)}.section-title{border-bottom:0;color:var(--amber)}.row{border-bottom-color:rgba(42,42,58,.55)}.out-card{border-radius:14px;background:linear-gradient(180deg,rgba(24,24,31,.92),rgba(17,17,22,.92))}.total-bar{border-radius:14px}.loading{border:1px solid rgba(201,146,10,.22);border-radius:18px;background:var(--amber-dim)}@keyframes genesis-sheen{from{transform:translateX(-100%)}to{transform:translateX(100%)}}@media(max-width:720px){.trust-grid{grid-template-columns:1fr}.wrap{padding:28px 14px 72px}.actions{align-items:stretch}.actions button{flex:1}.status{width:100%;margin-left:0}}@media(prefers-reduced-motion:reduce){.verdict::before,.loading{animation-duration:var(--motion-reduce)!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero-card">
+    <header>
+      <span class="seal">⬡</span>
+      <h1>Nexus Genesis Verifier</h1>
+      <div class="subtitle">cryptographic proof of origin &nbsp;·&nbsp; NX4 protocol &nbsp;·&nbsp; runs entirely in your browser</div>
+    </header>
+    <div class="trust-grid" aria-label="Genesis verification checkpoints">
+      <div class="trust-cell"><div class="k">Authority</div><div class="v">P-256</div></div>
+      <div class="trust-cell"><div class="k">Event</div><div class="v">Nostr</div></div>
+      <div class="trust-cell"><div class="k">Result</div><div class="v">Local</div></div>
+    </div>
+  </section>
+
+  <div class="verifier-input-card">
+    <label>Paste genesis event &nbsp;—&nbsp; Nostr event JSON or raw genesis output</label>
+    <textarea id="inp" placeholder='{"id":"...","pubkey":"...","created_at":...,"kind":1,"tags":[],"content":"{genesis transaction}","sig":"..."}
+
+— or paste a raw genesis output directly —
+
+{"id":"...","source_id":"GENESIS_ROOT","genesis_authority_pub":{...},"sig":"...","amount":...}'></textarea>
+    <div class="actions">
+      <button class="btn-primary" onclick="run()" id="vBtn">Verify</button>
+      <button class="btn-ghost" onclick="demo()">Load demo</button>
+      <span class="status" id="st"></span>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">verifying signatures&hellip;</div>
+
+  <div id="results" class="verifier-results-card">
+    <div id="verdict" class="verdict"></div>
+    <div id="errBox" class="err-box" style="display:none"></div>
+    <div id="details"></div>
+
+    <div class="footnote">
+      Verification is fully local. No data leaves your browser.<br>
+      Cryptography: Web Crypto API (P-256 ECDSA) for the genesis authority signature &nbsp;·&nbsp; @noble/curves (secp256k1 Schnorr) for the Nostr event signature.<br>
+      The genesis authority public key is embedded in the genesis output and is the global trust anchor. Any output whose ancestry traces to a genesis signed by a different key is invalid regardless of all other fields.<br><br>
+      To independently verify: reconstruct the sigBody as canonical JSON (keys sorted recursively, undefined values dropped), hash with SHA-256, verify the ECDSA-P256 signature against the genesis_authority_pub. Source: NX4 wallet protocol.
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { schnorr } from 'https://esm.sh/@noble/curves@1.3.0/secp256k1';
+
+const enc = s => new TextEncoder().encode(s);
+const b64u = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const b64uDec = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+const hexArr = s => Uint8Array.from(s.match(/.{2}/g).map(b=>parseInt(b,16)));
+
+async function sha256hex(str){
+  const b = await crypto.subtle.digest('SHA-256',enc(str));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+function canonicalize(obj){
+  if(obj===null||typeof obj!=='object') return JSON.stringify(obj);
+  if(Array.isArray(obj)) return '['+obj.map(canonicalize).join(',')+']';
+  const keys=Object.keys(obj).sort().filter(k=>obj[k]!==undefined);
+  return '{'+keys.map(k=>JSON.stringify(k)+':'+canonicalize(obj[k])).join(',')+'}';
+}
+
+async function verifyP256(pub,data,sig){
+  try{
+    const k=await crypto.subtle.importKey('jwk',{kty:pub.kty,crv:pub.crv,x:pub.x,y:pub.y},{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
+    const payload=enc(typeof data==='string'?data:canonicalize(data));
+    return await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},k,b64uDec(sig),payload);
+  }catch{return false;}
+}
+
+async function verifyNostr(ev){
+  try{
+    const serial=JSON.stringify([0,ev.pubkey,ev.created_at,ev.kind,ev.tags,ev.content]);
+    const expId=await sha256hex(serial);
+    if(expId!==ev.id) return {ok:false,r:'Event ID mismatch — content was altered after signing'};
+    const ok=schnorr.verify(hexArr(ev.sig),hexArr(ev.id),hexArr(ev.pubkey));
+    return ok?{ok:true}:{ok:false,r:'Schnorr signature invalid'};
+  }catch(e){return {ok:false,r:e.message};}
+}
+
+async function verifyGenesis(g){
+  if(!g?.genesis_authority_pub||!g.sig) return {ok:false,r:'Missing genesis_authority_pub or sig'};
+  const body={id:g.id,source_id:g.source_id,owner_sid:g.owner_sid,owner_pubkey:g.owner_pubkey,
+    amount:g.amount,symbol:g.symbol,salt:g.salt,type:g.type};
+  const ok=await verifyP256(g.genesis_authority_pub,body,g.sig);
+  return ok?{ok:true}:{ok:false,r:'P-256 genesis authority signature invalid'};
+}
+
+function toTokens(u){return (u/100000000).toLocaleString(undefined,{maximumFractionDigits:8});}
+function fmtTs(u){return new Date(u*1000).toUTCString();}
+function short(h,n=20){if(!h||h.length<=n+3)return h;return h.slice(0,n)+'…'+h.slice(-8);}
+function tag(cls,t){return `<span class="tag ${cls}">${t}</span>`;}
+function row(label,val){return `<div class="row"><div class="row-label">${label}</div><div class="row-value">${val}</div></div>`;}
+function cp(text){return `<button class="btn-ghost cp" onclick="navigator.clipboard.writeText(${JSON.stringify(text)}).then(()=>{this.textContent='copied';setTimeout(()=>this.textContent='copy',1200)})">copy</button>`;}
+
+function setSt(m){document.getElementById('st').textContent=m;}
+
+async function run(){
+  const raw=document.getElementById('inp').value.trim();
+  if(!raw){setSt('paste an event first');return;}
+  document.getElementById('loading').style.display='block';
+  document.getElementById('results').style.display='none';
+  document.getElementById('vBtn').disabled=true;
+  setSt('');
+  await new Promise(r=>setTimeout(r,60));
+  try{await doVerify(JSON.parse(raw));}
+  catch(e){showErr('JSON parse error: '+e.message);}
+  document.getElementById('loading').style.display='none';
+  document.getElementById('vBtn').disabled=false;
+}
+
+async function doVerify(input){
+  let ev=null,genesis=null,isNostr=false;
+
+  if(input.pubkey!==undefined&&input.sig!==undefined&&input.content!==undefined){
+    isNostr=true; ev=input;
+    try{genesis=typeof input.content==='string'?JSON.parse(input.content):input.content;}catch{}
+  } else if(input.genesis_authority_pub||input.source_id==='GENESIS_ROOT'||input.type==='genesis'){
+    genesis=input;
+  } else if(input.genesis_output){
+    genesis=input.genesis_output;
+  } else if(input.creates&&input.type==='GENESIS'){
+    genesis=input.creates?.[0];
+    if(genesis&&input.genesis_authority_pub) genesis.genesis_authority_pub=input.genesis_authority_pub;
+  }
+
+  const errs=[];
+  let nostrOk=null,p256Ok=null;
+
+  if(isNostr&&ev){
+    const nr=await verifyNostr(ev);
+    nostrOk=nr.ok;
+    if(!nr.ok) errs.push('Nostr event: '+nr.r);
+  }
+
+  if(genesis){
+    const gr=await verifyGenesis(genesis);
+    p256Ok=gr.ok;
+    if(!gr.ok) errs.push('Genesis signature: '+gr.r);
+  } else if(isNostr){
+    errs.push('Could not extract genesis output from event content');
+  }
+
+  const outputs=[];
+  if(genesis?.amount!==undefined) outputs.push(genesis);
+  if(genesis?.creates) outputs.push(...genesis.creates);
+  const total=outputs.reduce((s,o)=>s+(o.amount||0),0);
+
+  const verified=errs.length===0&&(p256Ok===true)&&(nostrOk!==false);
+  render({ev,genesis,isNostr,nostrOk,p256Ok,outputs,total,errs,verified});
+}
+
+function render({ev,genesis,isNostr,nostrOk,p256Ok,outputs,total,errs,verified}){
+  const vEl=document.getElementById('verdict');
+  const eEl=document.getElementById('errBox');
+  const dEl=document.getElementById('details');
+
+  vEl.className='verdict '+(verified?'verified':'invalid');
+  const evId=ev?.id||genesis?.id||'';
+  vEl.innerHTML=`
+    <span class="verdict-word">${verified?'VERIFIED':'INVALID'}</span>
+    <div class="verdict-sub">${verified?'genesis authority signature confirmed &nbsp;·&nbsp; NX4 protocol':'verification failed — see error details below'}</div>
+    ${evId?`<div class="share-row"><span class="share-id">${short(evId,24)}</span>${cp(evId)}</div>`:''}
+  `;
+
+  if(errs.length){
+    eEl.style.display='block';
+    eEl.innerHTML=errs.map(e=>`✗ &nbsp;${e}`).join('<br>');
+  } else {eEl.style.display='none';}
+
+  let h='';
+
+  if(isNostr&&ev){
+    h+=`<div class="section"><div class="section-title">Nostr Event</div>`;
+    h+=row('Event ID',`<span class="hash">${ev.id}</span>${cp(ev.id)}`);
+    h+=row('Author pubkey',`<span class="hash">${ev.pubkey}</span>`);
+    h+=row('Timestamp UTC',fmtTs(ev.created_at)+` &nbsp;<span style="color:var(--ink-3);font-size:9px">(unix ${ev.created_at})</span>`);
+    h+=row('Kind',`${ev.kind}`);
+    h+=row('Schnorr signature',nostrOk===true?tag('ok','✓ valid'):nostrOk===false?tag('fail','✗ invalid'):tag('info','not checked'));
+    h+=`</div>`;
+  }
+
+  if(genesis){
+    const auth=genesis.genesis_authority_pub;
+    h+=`<div class="section"><div class="section-title">Genesis Authority</div>`;
+    h+=row('Signature algorithm','ECDSA · P-256 (secp256r1) · SHA-256');
+    if(auth){
+      h+=row('Authority pubkey x',`<span class="hash">${auth.x||'—'}</span>${cp(auth.x||'')}`);
+      h+=row('Authority pubkey y',`<span class="hash">${auth.y||'—'}</span>`);
+    }
+    h+=row('P-256 signature',p256Ok===true?tag('ok','✓ valid'):p256Ok===false?tag('fail','✗ invalid'):tag('info','not checked'));
+    h+=row('Token symbol',`<span style="color:var(--amber);font-weight:500">${genesis.symbol||'—'}</span>`);
+    h+=row('Source ID',`<span class="hash">${genesis.source_id||'—'}</span>`);
+    if(genesis.id) h+=row('Output ID',`<span class="hash">${genesis.id}</span>${cp(genesis.id)}`);
+    h+=`</div>`;
+  }
+
+  if(outputs.length){
+    h+=`<div class="section"><div class="section-title">Genesis Outputs &nbsp;(${outputs.length})</div>`;
+    for(const o of outputs){
+      h+=`<div class="out-card">`;
+      h+=`<div class="out-amount">${toTokens(o.amount)} <span style="font-size:12px;color:var(--ink-2)">${o.symbol||''}</span></div>`;
+      if(o.owner_sid) h+=`<div class="out-meta">recipient SID &nbsp;&nbsp;${o.owner_sid}</div>`;
+      if(o.owner_pubkey?.x) h+=`<div class="out-meta">owner pubkey x &nbsp;&nbsp;${short(o.owner_pubkey.x)}</div>`;
+      if(o.id) h+=`<div class="out-meta">output ID &nbsp;&nbsp;${short(o.id)}</div>`;
+      h+=`</div>`;
+    }
+    h+=`<div class="total-bar"><span class="total-label">total genesis supply</span><span class="total-amount">${toTokens(total)} <span style="font-size:13px;color:var(--ink-2)">${outputs[0]?.symbol||''}</span></span></div>`;
+    h+=`</div>`;
+  }
+
+  dEl.innerHTML=h;
+  document.getElementById('results').style.display='block';
+}
+
+function showErr(msg){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('results').style.display='block';
+  const v=document.getElementById('verdict');
+  v.className='verdict invalid';
+  v.innerHTML=`<span class="verdict-word">ERROR</span><div class="verdict-sub">${msg}</div>`;
+  document.getElementById('errBox').style.display='none';
+  document.getElementById('details').innerHTML='';
+}
+
+async function demo(){
+  setSt('generating live example…');
+  try{
+    const authKP=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);
+    const authPub=await crypto.subtle.exportKey('jwk',authKP.publicKey);
+    const ownerKP=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);
+    const ownerPub=await crypto.subtle.exportKey('jwk',ownerKP.publicKey);
+    const ownerSid=Math.random().toString(36).slice(2,10);
+    const salt=b64u(crypto.getRandomValues(new Uint8Array(12)));
+    const SUPPLY=21000000*100000000;
+
+    const rawId=`NX4_OUT:GENESIS_ROOT:${ownerPub.x}:${SUPPLY}:ATT:${salt}:genesis`;
+    const idHash=await sha256hex(rawId);
+
+    const auth={kty:authPub.kty,crv:authPub.crv,x:authPub.x,y:authPub.y};
+    const owner={kty:ownerPub.kty,crv:ownerPub.crv,x:ownerPub.x,y:ownerPub.y};
+
+    const gOut={
+      id:idHash,source_id:'GENESIS_ROOT',owner_sid:ownerSid,
+      owner_pubkey:owner,amount:SUPPLY,symbol:'ATT',salt,type:'genesis',
+      genesis_authority_pub:auth
+    };
+
+    const body={id:gOut.id,source_id:gOut.source_id,owner_sid:gOut.owner_sid,
+      owner_pubkey:gOut.owner_pubkey,amount:gOut.amount,symbol:gOut.symbol,salt:gOut.salt,type:gOut.type};
+    const sigBytes=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},authKP.privateKey,enc(canonicalize(body)));
+    gOut.sig=b64u(sigBytes);
+
+    document.getElementById('inp').value=JSON.stringify(gOut,null,2);
+    setSt('live demo loaded — hit verify');
+  }catch(e){setSt('demo error: '+e.message);}
+}
+
+// Drag and drop
+const ta=document.getElementById('inp');
+ta.addEventListener('dragover',e=>{e.preventDefault();ta.classList.add('drop-active');});
+ta.addEventListener('dragleave',()=>ta.classList.remove('drop-active'));
+ta.addEventListener('drop',e=>{
+  e.preventDefault();ta.classList.remove('drop-active');
+  const f=e.dataTransfer.files[0];
+  if(f){const r=new FileReader();r.onload=ev=>{ta.value=ev.target.result;setSt('file loaded');};r.readAsText(f);}
+});
+
+window.run=run;
+window.demo=demo;
+</script>
+</body>
+</html>

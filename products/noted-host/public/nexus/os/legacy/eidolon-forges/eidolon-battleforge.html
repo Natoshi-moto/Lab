@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · BATTLEFORGE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0e;--bg2:#13131a;--bg3:#1a1a23;
+  --line:#2a2a36;--line2:#3a3a4a;
+  --text:#e8e8ee;--dim:#7a7a88;--dim2:#4a4a58;
+  --accent:#ffcc44;--accent2:#ff8844;
+  --phase-ant:#7a7aaa;--phase-str:#aaffcc;--phase-imp:#ffcc44;--phase-rec:#aaeeff;--phase-idle:#2a2a36;
+  --red:#ff5566;
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono','SF Mono',Menlo,Consolas,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;overflow:hidden;-webkit-font-smoothing:antialiased}
+#app{display:grid;grid-template-columns:1fr 310px;height:100vh}
+
+/* ── Stage ── */
+#stage{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden}
+#topbar{display:flex;align-items:center;gap:12px;padding:0 14px;height:36px;border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg2)}
+#brand{font-size:11px;letter-spacing:3px;font-weight:600}
+#brand b{color:var(--accent)}
+#phase-indicator{font-size:10px;letter-spacing:1.5px;color:var(--dim2);padding:2px 8px;border:1px solid var(--dim2);border-radius:2px;text-transform:uppercase;min-width:80px;text-align:center}
+#phase-indicator.ant{color:var(--phase-ant);border-color:var(--phase-ant)}
+#phase-indicator.str{color:var(--phase-str);border-color:var(--phase-str)}
+#phase-indicator.imp{color:var(--phase-imp);border-color:var(--phase-imp)}
+#phase-indicator.rec{color:var(--phase-rec);border-color:var(--phase-rec)}
+#status{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:1px;white-space:nowrap}
+
+#grid-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg);min-height:0;padding:12px;overflow:hidden}
+#grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:4px;flex-shrink:0}
+
+.cell{position:relative;cursor:pointer;border:2px solid transparent;border-radius:2px;overflow:hidden;transition:border-color .1s;background:#060609}
+.cell:hover{border-color:var(--line2)}
+.cell.selected{border-color:var(--accent)}
+.cell canvas{display:block;width:100%;height:100%}
+.cell-badge{position:absolute;top:4px;left:5px;font-size:9px;color:var(--dim2);letter-spacing:.5px;pointer-events:none}
+.cell.selected .cell-badge{color:var(--accent)}
+
+#stage-foot{height:40px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--bg2);flex-shrink:0}
+#sel-info{font-size:10px;color:var(--dim);letter-spacing:.5px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tpl-name-wrap{display:none;align-items:center;gap:6px}
+#tpl-name-wrap.show{display:flex}
+#tpl-name-input{background:var(--bg3);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:11px;padding:3px 8px;border-radius:2px;outline:none;width:130px}
+#tpl-name-input:focus{border-color:var(--accent)}
+
+.btn{font-family:inherit;font-size:11px;letter-spacing:1px;color:var(--dim);background:transparent;border:1px solid var(--line);padding:5px 11px;cursor:pointer;transition:all .1s;border-radius:2px;text-transform:lowercase;white-space:nowrap;flex-shrink:0}
+.btn:hover{color:var(--text);border-color:var(--line2);background:var(--bg3)}
+.btn:disabled{opacity:.3;cursor:default;pointer-events:none}
+.btn.primary{color:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{background:rgba(255,204,68,.08)}
+.btn.full{width:100%}
+.btn.active{color:var(--bg);background:var(--accent);border-color:var(--accent)}
+
+/* ── Panel ── */
+#panel{display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;flex-shrink:0}
+#panel-body{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:14px}
+#panel-body::-webkit-scrollbar{width:4px}
+#panel-body::-webkit-scrollbar-thumb{background:var(--line2)}
+
+.section-label{font-size:9px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.ctrl-section{display:flex;flex-direction:column;gap:8px}
+.ctrl-row{display:grid;grid-template-columns:52px 1fr 32px;align-items:center;gap:8px;font-size:10px;color:var(--dim)}
+.ctrl-row input[type=range]{width:100%;height:4px;appearance:none;background:var(--bg);border:1px solid var(--line);cursor:pointer;border-radius:0;outline:none}
+.ctrl-row input[type=range]::-webkit-slider-thumb{appearance:none;width:10px;height:14px;background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.ctrl-row span{font-size:10px;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+
+/* Scrubber */
+#scrubber-wrap{display:flex;flex-direction:column;gap:5px}
+#phase-bar-panel{height:8px;width:100%;border-radius:1px;overflow:hidden;display:flex;cursor:pointer;border:1px solid var(--line)}
+.pb-seg{height:100%;transition:none}
+#scrubber{width:100%;height:4px;appearance:none;background:transparent;cursor:pointer;outline:none;margin-top:2px}
+#scrubber::-webkit-slider-thumb{appearance:none;width:12px;height:16px;background:var(--text);border:none;cursor:pointer;border-radius:1px}
+#scrubber::-webkit-slider-runnable-track{background:var(--bg3);border:1px solid var(--line);height:4px}
+.playback-row{display:flex;gap:4px;align-items:center}
+.spd-btn{font-family:inherit;font-size:10px;letter-spacing:.5px;color:var(--dim);background:transparent;border:1px solid var(--line);padding:3px 8px;cursor:pointer;border-radius:2px;transition:all .1s}
+.spd-btn:hover{color:var(--text);border-color:var(--line2)}
+.spd-btn.active{color:var(--bg);background:var(--dim2);border-color:var(--dim2)}
+#scrub-mode-btn{margin-left:auto}
+.scrub-label{font-size:10px;color:var(--dim);letter-spacing:.5px}
+
+/* Phase legend */
+.phase-legend{display:flex;gap:8px;flex-wrap:wrap}
+.pl-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--dim);letter-spacing:.5px}
+.pl-dot{width:6px;height:6px;border-radius:1px;flex-shrink:0}
+
+/* Templates */
+.tpl-section{display:flex;flex-direction:column;gap:7px}
+#templates-list{display:flex;flex-direction:column;gap:5px;min-height:20px}
+.tpl-empty{font-size:10px;color:var(--dim2);line-height:1.7;font-style:italic}
+.tpl-item{display:flex;gap:4px;align-items:stretch}
+.tpl-btn{flex:1;font-family:inherit;font-size:10px;letter-spacing:.5px;color:var(--text);background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--accent);padding:6px 9px;cursor:pointer;border-radius:2px;text-align:left;display:flex;align-items:center;gap:7px;transition:all .1s;min-width:0}
+.tpl-btn:hover{border-color:var(--line2);background:var(--bg)}
+.tpl-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.tpl-dur{font-size:9px;color:var(--dim2);flex-shrink:0}
+.tpl-del{font-family:inherit;font-size:14px;line-height:1;color:var(--dim2);background:transparent;border:1px solid transparent;width:26px;cursor:pointer;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .1s}
+.tpl-del:hover{color:var(--red);border-color:var(--red);background:rgba(255,85,102,.08)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <div id="topbar">
+      <span id="brand"><b>⚔</b>&nbsp;BATTLEFORGE</span>
+      <span id="phase-indicator">—</span>
+      <span id="status">ready</span>
+    </div>
+    <div id="grid-wrap"><div id="grid"></div></div>
+    <div id="stage-foot">
+      <span id="sel-info">randomize to begin · click any cell to select</span>
+      <div id="tpl-name-wrap">
+        <input id="tpl-name-input" type="text" maxlength="32" spellcheck="false" placeholder="attack name…">
+        <button class="btn primary" id="btn-save-tpl" onclick="saveTemplate()">save attack</button>
+      </div>
+    </div>
+  </div>
+  <div id="panel">
+    <div class="panel-head">battleforge</div>
+    <div id="panel-body">
+
+      <!-- Playback -->
+      <div class="ctrl-section">
+        <div class="section-label">playback</div>
+        <div id="scrubber-wrap">
+          <div id="phase-bar-panel"></div>
+          <input type="range" id="scrubber" min="0" max="1000" value="0" oninput="onScrub(this.value)">
+        </div>
+        <div class="playback-row">
+          <button class="btn" onclick="replayAll()">⟳ replay</button>
+          <button class="spd-btn" onclick="setSpeed(0.5)">0.5×</button>
+          <button class="spd-btn active" id="spd-1" onclick="setSpeed(1)">1×</button>
+          <button class="spd-btn" onclick="setSpeed(2)">2×</button>
+          <button class="btn" id="scrub-mode-btn" onclick="toggleScrubMode()">scrub</button>
+        </div>
+        <div class="phase-legend">
+          <div class="pl-item"><div class="pl-dot" style="background:var(--phase-ant)"></div>anticipation</div>
+          <div class="pl-item"><div class="pl-dot" style="background:var(--phase-str)"></div>strike</div>
+          <div class="pl-item"><div class="pl-dot" style="background:var(--phase-imp)"></div>impact</div>
+          <div class="pl-item"><div class="pl-dot" style="background:var(--phase-rec)"></div>recovery</div>
+        </div>
+      </div>
+
+      <!-- Jitter -->
+      <div class="ctrl-section">
+        <div class="section-label">generation</div>
+        <div class="ctrl-row">
+          <label>jitter</label>
+          <input type="range" id="jitter-slider" min="0" max="255" value="80" oninput="onJitter(this.value)">
+          <span id="jitter-val">80</span>
+        </div>
+        <button class="btn primary full" onclick="randomizeGrid()">randomize grid</button>
+      </div>
+
+      <!-- Templates -->
+      <div class="tpl-section">
+        <div class="section-label">attack templates</div>
+        <div id="templates-list">
+          <div class="tpl-empty">select a cell · name it · save it.<br>each template becomes its own<br>custom randomize button.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════
+   BATTLE AXES  — 42 axes across 7 groups
+   ════════════════════════════════════════════════════════ */
+const BATTLE_AXES = [
+  // timing (the spine)
+  {id:'duration',           group:'timing',    default:120, label:'duration'},
+  {id:'anticipation_time',  group:'timing',    default: 80, label:'anticipation time'},
+  {id:'strike_time',        group:'timing',    default: 90, label:'strike time'},
+  {id:'impact_hold',        group:'timing',    default: 80, label:'impact hold'},
+  {id:'recovery_time',      group:'timing',    default:120, label:'recovery time'},
+  {id:'hitstop',            group:'timing',    default: 90, label:'hitstop'},
+  // attacker motion
+  {id:'lunge_distance',     group:'attacker',  default:140, label:'lunge distance'},
+  {id:'lunge_arc',          group:'attacker',  default:128, label:'lunge arc'},
+  {id:'windup_pullback',    group:'attacker',  default: 80, label:'windup pullback'},
+  {id:'attacker_squash',    group:'attacker',  default: 80, label:'attacker squash'},
+  {id:'attacker_stretch',   group:'attacker',  default:110, label:'attacker stretch'},
+  {id:'recoil_distance',    group:'attacker',  default: 70, label:'recoil distance'},
+  // attack shape
+  {id:'attack_type',        group:'attack',    default: 80, label:'attack type blend'},
+  {id:'arc_width',          group:'attack',    default:160, label:'arc width'},
+  {id:'arc_height',         group:'attack',    default:110, label:'arc height'},
+  {id:'trail_length',       group:'attack',    default:150, label:'trail length'},
+  {id:'trail_thickness',    group:'attack',    default:120, label:'trail thickness'},
+  {id:'trail_curve',        group:'attack',    default:120, label:'trail curve'},
+  // impact
+  {id:'impact_flash_size',  group:'impact',    default:140, label:'impact flash size'},
+  {id:'impact_flash_brightness',group:'impact',default:170, label:'impact brightness'},
+  {id:'spark_count',        group:'impact',    default:120, label:'spark count'},
+  {id:'spark_spread',       group:'impact',    default:150, label:'spark spread'},
+  {id:'shockwave_radius',   group:'impact',    default:110, label:'shockwave radius'},
+  {id:'screen_shake',       group:'impact',    default: 80, label:'screen shake'},
+  // defender / damage response
+  {id:'knockback_distance', group:'damage',    default:120, label:'knockback distance'},
+  {id:'knockback_angle',    group:'damage',    default:110, label:'knockback angle'},
+  {id:'defender_squash',    group:'damage',    default:100, label:'defender squash'},
+  {id:'defender_stretch',   group:'damage',    default:100, label:'defender stretch'},
+  {id:'stagger_wobble',     group:'damage',    default:100, label:'stagger wobble'},
+  {id:'damage_flash',       group:'damage',    default:160, label:'damage flash'},
+  {id:'damage_flash_decay', group:'damage',    default:120, label:'flash decay'},
+  // debris / particles
+  {id:'debris_count',       group:'particles', default: 90, label:'debris count'},
+  {id:'debris_speed',       group:'particles', default:120, label:'debris speed'},
+  {id:'debris_gravity',     group:'particles', default:120, label:'debris gravity'},
+  {id:'debris_lifetime',    group:'particles', default:120, label:'debris lifetime'},
+  {id:'dust_amount',        group:'particles', default: 70, label:'dust amount'},
+  {id:'dust_spread',        group:'particles', default: 90, label:'dust spread'},
+  // color / style
+  {id:'attack_hue',         group:'color',     default: 10, label:'attack hue'},
+  {id:'impact_hue',         group:'color',     default: 40, label:'impact hue'},
+  {id:'damage_hue',         group:'color',     default:  0, label:'damage hue'},
+  {id:'saturation',         group:'color',     default:180, label:'saturation'},
+  {id:'lightness',          group:'color',     default:150, label:'lightness'},
+  {id:'afterimage_opacity', group:'color',     default: 90, label:'afterimage opacity'},
+];
+const BID = Object.fromEntries(BATTLE_AXES.map((a,i)=>[a.id,i]));
+
+/* ════════════════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════════════════ */
+let cells       = [];   // {canvas, values, t0}
+let templates   = [];   // {name, values, totalMs}
+let jitter      = 80;
+let selectedIdx = -1;
+let scrubMode   = false;
+let scrubT      = 0;    // 0–1
+let speed       = 1;
+let autoNum     = 0;
+
+/* ════════════════════════════════════════════════════════
+   PHASE SYSTEM — the load-bearing spine
+   ════════════════════════════════════════════════════════ */
+function getPhases(vals){
+  const v = id => vals[BID[id]]/255;
+  const totalMs = 400 + v('duration') * 1600;          // 400–2000ms
+
+  const ant = 0.09 + v('anticipation_time') * 0.21;   // 9–30%
+  const str = 0.09 + v('strike_time')       * 0.19;   // 9–28%
+  const imp = 0.03 + v('impact_hold')       * 0.09
+                   + v('hitstop')           * 0.07;   // 3–19%
+  const rec = 0.14 + v('recovery_time')     * 0.24;   // 14–38%
+  const idleStart = ant + str + imp + rec;
+  const idleLen   = Math.max(0.05, 1 - idleStart);
+
+  return {
+    anticipation: [0,          ant],
+    strike:       [ant,        ant+str],
+    impact:       [ant+str,    ant+str+imp],
+    recovery:     [ant+str+imp,ant+str+imp+rec],
+    idle:         [idleStart,  1],
+    totalMs,
+  };
+}
+
+function phaseAt(phases, lt){
+  if(lt < phases.anticipation[1]) return {name:'anticipation',t:lt/phases.anticipation[1]};
+  if(lt < phases.strike[1])       return {name:'strike',t:(lt-phases.strike[0])/(phases.strike[1]-phases.strike[0])};
+  if(lt < phases.impact[1])       return {name:'impact',t:(lt-phases.impact[0])/(phases.impact[1]-phases.impact[0])};
+  if(lt < phases.recovery[1])     return {name:'recovery',t:(lt-phases.recovery[0])/(phases.recovery[1]-phases.recovery[0])};
+  const id=phases.idle[1]-phases.idle[0]; return {name:'idle',t:id>0?(lt-phases.idle[0])/id:0};
+}
+
+/* ════════════════════════════════════════════════════════
+   EASING
+   ════════════════════════════════════════════════════════ */
+const easeOut  = t=>1-(1-t)*(1-t);
+const easeIn   = t=>t*t;
+const smooth   = t=>t*t*(3-2*t);
+const easeBack = t=>{ const c1=1.70158,c3=c1+1; return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2); };
+
+/* ════════════════════════════════════════════════════════
+   UTILITY
+   ════════════════════════════════════════════════════════ */
+function mulberry32(seed){
+  let s=seed>>>0;
+  return()=>{s=(s+0x6D2B79F5)>>>0;let r=s;r=Math.imul(r^(r>>>15),r|1);r^=r+Math.imul(r^(r>>>7),r|61);return((r^(r>>>14))>>>0)/4294967296;};
+}
+function lerp(a,b,t){return a+(b-a)*t;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function rRect(ctx,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ════════════════════════════════════════════════════════
+   ENTITY DRAWERS
+   ════════════════════════════════════════════════════════ */
+function drawAttacker(ctx,w,h,scX,scY,hue,sat,light){
+  ctx.save(); ctx.scale(scX,scY);
+  ctx.strokeStyle='rgba(0,0,0,0.88)'; ctx.lineJoin='round';
+
+  // Body: forward wedge
+  ctx.fillStyle=`hsl(${hue},${sat}%,${light}%)`;
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(-w*0.4, 0);
+  ctx.lineTo( w*0.35, h*0.20);
+  ctx.lineTo( w*0.30, h);
+  ctx.lineTo(-w*0.5,  h*0.85);
+  ctx.lineTo(-w*0.5,  h*0.08);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  // Weapon arm extending right
+  ctx.fillStyle=`hsl(${(hue+25)%360},${Math.min(100,sat+10)}%,${Math.min(90,light+18)}%)`;
+  ctx.beginPath();
+  ctx.moveTo(w*0.30, h*0.18);
+  ctx.lineTo(w*1.70, h*0.32);
+  ctx.lineTo(w*1.55, h*0.46);
+  ctx.lineTo(w*0.22, h*0.38);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  // Highlight sheen
+  ctx.fillStyle=`hsla(${hue},${sat}%,${Math.min(96,light+35)}%,0.35)`;
+  ctx.beginPath();
+  ctx.moveTo(-w*0.3, h*0.06); ctx.lineTo(w*0.25, h*0.22);
+  ctx.lineTo(w*0.10, h*0.50); ctx.lineTo(-w*0.3, h*0.35);
+  ctx.closePath(); ctx.fill();
+
+  ctx.restore();
+}
+
+function drawDefender(ctx,w,h,scX,scY,flashAmt,flashHue){
+  ctx.save(); ctx.scale(scX,scY);
+  ctx.lineWidth=1.5; ctx.strokeStyle='rgba(0,0,0,0.88)'; ctx.lineJoin='round';
+
+  const c = flashAmt>0.05
+    ? `hsl(${flashHue},55%,${52+flashAmt*38}%)`
+    : 'hsl(215,18%,50%)';
+
+  // Head
+  ctx.fillStyle=c;
+  ctx.beginPath(); ctx.arc(0,h*0.13,w*0.44,0,Math.PI*2);
+  ctx.fill(); ctx.stroke();
+
+  // Body
+  rRect(ctx,-w*0.48,h*0.26,w*0.96,h*0.48,w*0.14);
+  ctx.fillStyle=c; ctx.fill(); ctx.stroke();
+
+  // Legs
+  rRect(ctx,-w*0.44,h*0.71,w*0.36,h*0.29,w*0.10);
+  ctx.fillStyle=c; ctx.fill(); ctx.stroke();
+  rRect(ctx,w*0.08,h*0.71,w*0.36,h*0.29,w*0.10);
+  ctx.fill(); ctx.stroke();
+
+  // Flash overlay
+  if(flashAmt>0.05){
+    ctx.globalAlpha=flashAmt*0.72;
+    ctx.fillStyle=`hsl(${flashHue},35%,92%)`;
+    ctx.beginPath(); ctx.arc(0,h*0.13,w*0.44,0,Math.PI*2); ctx.fill();
+    rRect(ctx,-w*0.48,h*0.26,w*0.96,h*0.48,w*0.14); ctx.fill();
+    rRect(ctx,-w*0.44,h*0.71,w*0.36,h*0.29,w*0.10); ctx.fill();
+    rRect(ctx,w*0.08,h*0.71,w*0.36,h*0.29,w*0.10); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  ctx.restore();
+}
+
+/* ════════════════════════════════════════════════════════
+   BATTLE RENDERER
+   The single function that reads the axis vector and draws one frame.
+   localT ∈ [0,1] — normalized position in the animation cycle.
+   ════════════════════════════════════════════════════════ */
+function renderBattle(canvas, vals, localT){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+
+  // ── Axis helpers ──
+  const v01 = id=>vals[BID[id]]/255;
+  const vR  = (id,a,b)=>a+(vals[BID[id]]/255)*(b-a);
+
+  // ── Phases ──
+  const phases=getPhases(vals);
+  const {name:phase, t:phaseT}=phaseAt(phases,localT);
+  const totalSec=phases.totalMs/1000;
+  const elapsedSec=localT*totalSec;
+  const impactStartSec=phases.impact[0]*totalSec;
+  const timeFromImpact=elapsedSec-impactStartSec;
+
+  // ── Color axes ──
+  const attackHue=Math.round(v01('attack_hue')*359);
+  const impactHue=Math.round(v01('impact_hue')*359);
+  const damageHue=Math.round(v01('damage_hue')*359);
+  const sat      =Math.round(vR('saturation',35,100));
+  const light    =Math.round(vR('lightness',35,82));
+
+  // ── Attack shape axes ──
+  const attackType  =v01('attack_type');     // 0=slash, 1=projectile
+  const arcW        =vR('arc_width',  W*0.07, W*0.30);
+  const arcH_       =vR('arc_height', H*0.04, H*0.26);
+  const trailThick  =vR('trail_thickness',2,18);
+  const trailLen_   =vR('trail_length',0.2,1.0);
+  const afterOp     =vR('afterimage_opacity',0,0.42);
+
+  // ── Motion axes ──
+  const lungeD  =vR('lunge_distance',W*0.06,W*0.36);
+  const lungeArc_=vR('lunge_arc',0,H*0.20);
+  const windBack=vR('windup_pullback',0,W*0.08);
+  const attSqsh =vR('attacker_squash',0,0.38);
+  const attStr_ =vR('attacker_stretch',0,0.48);
+  const recoilD =vR('recoil_distance',0,W*0.07);
+
+  // ── Impact axes ──
+  const flashSz   =vR('impact_flash_size',W*0.04,W*0.22);
+  const flashBri  =vR('impact_flash_brightness',0.4,1.0);
+  const sparkN    =Math.floor(vR('spark_count',2,28));
+  const sparkSpd  =vR('spark_spread',30,160);
+  const shockR    =vR('shockwave_radius',W*0.03,W*0.22);
+  const shakeAmt  =vR('screen_shake',0,11);
+
+  // ── Damage axes ──
+  const knockD  =vR('knockback_distance',0,W*0.22);
+  const knockA  =vR('knockback_angle',-0.15,0.50);
+  const defSqsh =vR('defender_squash',0,0.42);
+  const defStr_ =vR('defender_stretch',0,0.42);
+  const stagger =vR('stagger_wobble',0,11);
+  const dmgFlash=v01('damage_flash');
+  const flashDec=vR('damage_flash_decay',1,9);
+
+  // ── Particle axes ──
+  const debrisN   =Math.floor(vR('debris_count',0,28));
+  const debrisSpd =vR('debris_speed',40,360);
+  const debrisGrav=vR('debris_gravity',60,700);
+  const debrisLife=vR('debris_lifetime',0.12,0.60);
+  const dustAmt   =Math.floor(vR('dust_amount',0,18));
+  const dustSpd   =vR('dust_spread',W*0.05,W*0.22);
+
+  // ── Layout ──
+  const groundY =H*0.70;
+  const attBaseX=W*0.22;
+  const contactX=W*0.60;
+  const defBaseX=W*0.76;
+  const attW=W*0.055, attH=H*0.30;
+  const defW=W*0.050, defH=H*0.34;
+
+  // ── Compute attacker state ──
+  let attX=attBaseX, attY=groundY-attH/2;
+  let attScX=1, attScY=1;
+  const strikeSrcX=attBaseX-windBack;
+
+  if(phase==='idle'){
+    attX=attBaseX;
+    attY=groundY-attH/2+Math.sin(elapsedSec*1.1)*2;
+  } else if(phase==='anticipation'){
+    attX=attBaseX - windBack*easeIn(phaseT);
+    attScX=1 - attSqsh*phaseT;
+    attScY=1 + attSqsh*0.5*phaseT;
+    attY=groundY-attH/2 + attH*0.04*phaseT;
+  } else if(phase==='strike'){
+    const blendLunge = attackType>0.65 ? lerp(lungeD,0,(attackType-0.65)/0.35) : lungeD;
+    attX=strikeSrcX + (contactX-strikeSrcX-(lungeD-blendLunge))*easeOut(phaseT);
+    attY=groundY-attH/2 - Math.sin(phaseT*Math.PI)*lungeArc_;
+    attScX=1+attStr_*Math.sin(phaseT*Math.PI);
+    attScY=1-attStr_*0.3*Math.sin(phaseT*Math.PI);
+  } else if(phase==='impact'){
+    attX=contactX-windBack*0.05;
+    attScX=1+attStr_*0.25*(1-phaseT);
+    attY=groundY-attH/2;
+  } else if(phase==='recovery'){
+    attX=lerp(contactX-windBack*0.05, attBaseX, easeOut(phaseT));
+    attX-=recoilD*Math.sin(phaseT*Math.PI*1.8)*(1-phaseT)*0.6;
+    attY=groundY-attH/2;
+    attScX=lerp(1+attStr_*0.25,1,smooth(phaseT));
+  }
+
+  // ── Compute defender state ──
+  let defX=defBaseX, defY=groundY-defH/2;
+  let defScX=1, defScY=1, defFlashAmt=0;
+
+  if(phase==='idle'){
+    defY=groundY-defH/2+Math.sin(elapsedSec*0.85+0.9)*2;
+  } else if(phase==='impact'){
+    defScX=1-defSqsh*(1-phaseT);
+    defScY=1+defStr_*(1-phaseT);
+    defFlashAmt=dmgFlash*(1-phaseT);
+    defX=defBaseX+knockD*0.12*easeOut(phaseT);
+    defY=groundY-defH/2;
+  } else if(phase==='recovery'){
+    defX=defBaseX+knockD*easeOut(phaseT);
+    defY=groundY-defH/2 - Math.abs(Math.sin(phaseT*Math.PI))*knockD*knockA;
+    defX+=Math.sin(phaseT*18)*stagger*(1-phaseT);
+    const fDecay=clamp(1-phaseT*flashDec,0,1);
+    defFlashAmt=dmgFlash*fDecay;
+    defScX=1-defSqsh*Math.max(0,1-phaseT*4)*0.3;
+    defScY=1+defStr_*Math.max(0,1-phaseT*4)*0.3;
+  }
+
+  // ── Screen shake ──
+  let shakeX=0, shakeY=0;
+  if(phase==='impact' && shakeAmt>0){
+    const sr=mulberry32(Math.floor(localT*300)*13);
+    shakeX=(sr()*2-1)*shakeAmt*(1-phaseT*0.7);
+    shakeY=(sr()*2-1)*shakeAmt*0.45*(1-phaseT*0.7);
+  }
+
+  // ══ DRAW ══════════════════════════════════════════════
+
+  // Background
+  ctx.fillStyle='#07070e'; ctx.fillRect(0,0,W,H);
+
+  // Ground plane
+  const groundG=ctx.createLinearGradient(0,groundY,0,H);
+  groundG.addColorStop(0,'#18182a'); groundG.addColorStop(1,'#09090f');
+  ctx.fillStyle=groundG; ctx.fillRect(0,groundY,W,H-groundY);
+  ctx.strokeStyle='#30304a'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(W,groundY); ctx.stroke();
+
+  // Subtle ground glow at contact (during impact/recovery)
+  if((phase==='impact'||phase==='recovery')&&timeFromImpact>0){
+    const gDecay=clamp(1-timeFromImpact*2,0,1);
+    if(gDecay>0.01){
+      const gg=ctx.createRadialGradient(contactX,groundY,0,contactX,groundY,W*0.18);
+      gg.addColorStop(0,`hsla(${impactHue},80%,55%,${gDecay*0.25})`);
+      gg.addColorStop(1,'transparent');
+      ctx.fillStyle=gg; ctx.fillRect(0,groundY-4,W,H-groundY+4);
+    }
+  }
+
+  ctx.save();
+  ctx.translate(shakeX,shakeY);
+
+  // ── Afterimages (during strike) ──
+  if(phase==='strike' && afterOp>0.02){
+    const steps=5;
+    for(let i=1;i<=steps;i++){
+      const pastT=Math.max(0,phaseT-i*0.10);
+      const blendLunge=attackType>0.65?lerp(lungeD,0,(attackType-0.65)/0.35):lungeD;
+      const pastX=strikeSrcX+(contactX-strikeSrcX-(lungeD-blendLunge))*easeOut(pastT);
+      const pastY=groundY-attH/2-Math.sin(pastT*Math.PI)*lungeArc_;
+      const alpha=afterOp*(1-i/steps)*phaseT;
+      ctx.save();
+      ctx.translate(pastX,pastY);
+      ctx.globalAlpha=alpha;
+      drawAttacker(ctx,attW,attH,1+attStr_*Math.sin(pastT*Math.PI),1-attStr_*0.3*Math.sin(pastT*Math.PI),attackHue,sat,light);
+      ctx.restore();
+    }
+  }
+
+  // ── Attack trail / projectile ──
+  const showTrail = phase==='strike' || (phase==='impact' && phaseT<0.45);
+  if(showTrail){
+    const trailAlpha = phase==='strike' ? 0.8 : 0.8*(1-phaseT/0.45);
+    const trailEndX  = phase==='strike' ? attX : contactX;
+    const trailEndY  = phase==='strike' ? attY+attH*0.3 : groundY-attH*0.3;
+
+    if(attackType < 0.65){
+      // Slash: tapered arc trail
+      drawSlashTrail(ctx,
+        strikeSrcX, groundY-attH*0.28,
+        trailEndX,  trailEndY,
+        arcW, arcH_, trailThick*trailLen_,
+        trailAlpha, attackHue, sat, light, attackType
+      );
+    } else {
+      // Projectile: bolt moving along strike
+      const boltT = phase==='strike' ? phaseT : 1;
+      const boltX = strikeSrcX+(contactX-strikeSrcX-W*0.02)*easeOut(boltT);
+      const boltY = groundY-attH*0.28;
+      drawProjectile(ctx, boltX, boltY, trailThick, trailAlpha, attackHue, sat, light, boltT);
+    }
+  }
+
+  // ── Dust (lunge + impact) ──
+  if(dustAmt>0){
+    if(phase==='strike' && phaseT<0.35){
+      drawDust(ctx,attBaseX,groundY,dustAmt,dustSpd,phaseT/0.35,attackHue,sat);
+    }
+    if((phase==='impact')||(phase==='recovery'&&phaseT<0.35)){
+      const dT=phase==='impact'?phaseT:phaseT/0.35;
+      drawDust(ctx,contactX,groundY,dustAmt,dustSpd*1.3,dT,impactHue,sat);
+    }
+  }
+
+  // ── Debris (physics-based, from impact time) ──
+  if(debrisN>0 && timeFromImpact>0 && timeFromImpact<debrisLife*1.2){
+    const rng=mulberry32(vals[0]*7+vals[5]*3+31);
+    for(let i=0;i<debrisN;i++){
+      const angle=-Math.PI*(0.1+rng()*0.95);
+      const spd=debrisSpd*(0.35+rng()*0.75);
+      const life=debrisLife*(0.55+rng()*0.55);
+      const age=timeFromImpact;
+      if(age>life){continue;}
+      const t_=age/life;
+      const px=contactX+Math.cos(angle)*spd*age;
+      const py=(groundY-attH*0.25)+Math.sin(angle)*spd*age+0.5*debrisGrav*age*age;
+      if(py>H+10)continue;
+      const sz=(1.4+rng()*2.5)*(1-t_);
+      ctx.fillStyle=`hsla(${impactHue},${sat}%,${light}%,${(1-t_)*0.85})`;
+      ctx.beginPath(); ctx.arc(px,py,sz,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ── Shockwave ──
+  if((phase==='impact')||(phase==='recovery'&&phaseT<0.55)){
+    const shockT=phase==='impact'?phaseT*0.65:0.65+phaseT*0.35;
+    const r=shockR*easeOut(shockT);
+    const a=(1-shockT)*0.6;
+    if(r>1&&a>0.01){
+      ctx.beginPath(); ctx.arc(contactX,groundY,r,0,Math.PI*2);
+      ctx.strokeStyle=`hsla(${impactHue},${sat}%,${Math.min(100,light+22)}%,${a})`;
+      ctx.lineWidth=3*(1-shockT)+0.5; ctx.stroke();
+    }
+  }
+
+  // ── Impact flash ──
+  if(phase==='impact'){
+    const fAmt=flashBri*(1-easeOut(phaseT*0.8));
+    const r=flashSz*(0.25+easeOut(phaseT)*0.75);
+    if(fAmt>0.02&&r>0.5){
+      const fg=ctx.createRadialGradient(contactX,groundY-attH*0.15,0,contactX,groundY-attH*0.15,r);
+      fg.addColorStop(0,`hsla(${impactHue},15%,97%,${fAmt})`);
+      fg.addColorStop(0.3,`hsla(${impactHue},${sat}%,${Math.min(90,light+20)}%,${fAmt*0.75})`);
+      fg.addColorStop(1,'transparent');
+      ctx.fillStyle=fg; ctx.beginPath(); ctx.arc(contactX,groundY-attH*0.15,r,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ── Sparks ──
+  if(sparkN>0&&((phase==='impact')||(phase==='recovery'&&phaseT<0.40))){
+    const rng=mulberry32(vals[2]*11+vals[3]*5+7);
+    const baseAge=phase==='impact'?phaseT*0.14:0.14+phaseT*0.22;
+    for(let i=0;i<sparkN;i++){
+      const angle=rng()*Math.PI*2;
+      const spd=sparkSpd*(0.3+rng()*0.8);
+      const age=baseAge*(0.4+rng()*0.6);
+      const sx=contactX+Math.cos(angle)*spd*age;
+      const sy=(groundY-attH*0.25)+Math.sin(angle)*spd*age+60*age*age;
+      const a=clamp(1-baseAge*4.5,0,1)*0.9;
+      if(a<0.01)continue;
+      ctx.fillStyle=`hsla(${impactHue},90%,86%,${a})`;
+      ctx.beginPath(); ctx.arc(sx,sy,1.8,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=`hsla(${impactHue},75%,70%,${a*0.45})`;
+      ctx.lineWidth=1; ctx.beginPath();
+      ctx.moveTo(sx,sy);
+      ctx.lineTo(contactX+Math.cos(angle)*spd*age*0.25,(groundY-attH*0.25)+Math.sin(angle)*spd*age*0.25+60*age*0.25*age*0.25);
+      ctx.stroke();
+    }
+  }
+
+  // ── Defender ──
+  ctx.save();
+  ctx.translate(defX,defY);
+  drawDefender(ctx,defW,defH,defScX,defScY,defFlashAmt,damageHue);
+  ctx.restore();
+
+  // ── Attacker ──
+  ctx.save();
+  ctx.translate(attX,attY);
+  drawAttacker(ctx,attW,attH,attScX,attScY,attackHue,sat,light);
+  ctx.restore();
+
+  ctx.restore(); // end shake
+
+  // ── Phase bar (per-cell timeline) ──
+  drawPhaseBar(ctx,W,H,phases,localT);
+}
+
+/* ════════════════════════════════════════════════════════
+   TRAIL / PROJECTILE HELPERS
+   ════════════════════════════════════════════════════════ */
+function drawSlashTrail(ctx,x0,y0,x1,y1,arcW,arcH,thickness,alpha,hue,sat,light,typeBias){
+  ctx.save();
+  // Control point: above the midpoint for arc, inline for stab
+  const mx=(x0+x1)/2, my=(y0+y1)/2;
+  const cpx=mx, cpy=my-arcH*(1-typeBias*0.8);
+
+  // Draw in passes: wide soft glow → narrow bright core
+  const passes=[
+    {wMul:2.2, aMul:0.20},
+    {wMul:1.4, aMul:0.40},
+    {wMul:0.8, aMul:0.70},
+    {wMul:0.4, aMul:0.90},
+  ];
+  for(const {wMul,aMul} of passes){
+    ctx.strokeStyle=`hsla(${hue},${sat}%,${light}%,${alpha*aMul})`;
+    ctx.lineWidth=thickness*wMul;
+    ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x0,y0);
+    ctx.quadraticCurveTo(cpx,cpy,x1,y1);
+    ctx.stroke();
+  }
+  // Bright tip at x1
+  ctx.fillStyle=`hsla(${hue},${sat}%,${Math.min(96,light+22)}%,${alpha*0.85})`;
+  ctx.beginPath(); ctx.arc(x1,y1,thickness*0.35,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawProjectile(ctx,boltX,boltY,thickness,alpha,hue,sat,light,progressT){
+  ctx.save();
+  const len=thickness*3.5+progressT*thickness*2;
+  // Glow
+  const gg=ctx.createRadialGradient(boltX,boltY,0,boltX,boltY,thickness*2);
+  gg.addColorStop(0,`hsla(${hue},${sat}%,90%,${alpha*0.9})`);
+  gg.addColorStop(1,'transparent');
+  ctx.fillStyle=gg; ctx.beginPath(); ctx.arc(boltX,boltY,thickness*2,0,Math.PI*2); ctx.fill();
+  // Bolt body
+  ctx.strokeStyle=`hsla(${hue},${sat}%,${light}%,${alpha})`;
+  ctx.lineWidth=thickness*0.6; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(boltX-len,boltY); ctx.lineTo(boltX,boltY); ctx.stroke();
+  ctx.restore();
+}
+
+function drawDust(ctx,cx,groundY,amount,spread,phaseT,hue,sat){
+  const rng=mulberry32(Math.floor(phaseT*40)*cx|0);
+  ctx.save();
+  for(let i=0;i<amount;i++){
+    const ox=(rng()-0.5)*spread*2;
+    const rise=phaseT*32*(0.4+rng()*0.8);
+    const r=3+rng()*6;
+    const a=(1-phaseT)*0.22*(0.4+rng()*0.7);
+    ctx.fillStyle=`hsla(${hue},${sat*0.35}%,68%,${a})`;
+    ctx.beginPath(); ctx.arc(cx+ox,groundY-rise,r*(1-phaseT*0.4),0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ════════════════════════════════════════════════════════
+   PHASE BAR — per-cell timeline indicator
+   ════════════════════════════════════════════════════════ */
+function drawPhaseBar(ctx,W,H,phases,localT){
+  const bh=4, by=H-bh;
+  const colors={anticipation:'#5a5a8a',strike:'#66bb88',impact:'#bb9922',recovery:'#5588aa',idle:'#1e1e28'};
+  // Draw background
+  ctx.fillStyle='#0e0e18'; ctx.fillRect(0,by,W,bh);
+  // Draw phase segments
+  for(const [name,color] of Object.entries(colors)){
+    if(!phases[name]) continue;
+    const [s,e]=phases[name];
+    if(e<=s) continue;
+    ctx.fillStyle=color;
+    ctx.fillRect(s*W,by,(e-s)*W,bh);
+  }
+  // Playhead
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.fillRect(localT*W-1,by-1,2,bh+1);
+}
+
+/* ════════════════════════════════════════════════════════
+   GRID
+   ════════════════════════════════════════════════════════ */
+function buildGrid(){
+  const grid=document.getElementById('grid');
+  grid.innerHTML=''; cells=[];
+  for(let i=0;i<9;i++){
+    const cell=document.createElement('div');
+    cell.className='cell'; cell.dataset.idx=i;
+    cell.onclick=()=>selectCell(i);
+
+    const canvas=document.createElement('canvas');
+    canvas.width=640; canvas.height=360;
+
+    const badge=document.createElement('div');
+    badge.className='cell-badge';
+    badge.textContent=String.fromCharCode(65+i);
+
+    cell.appendChild(canvas); cell.appendChild(badge);
+    grid.appendChild(cell);
+
+    const defaultT0=performance.now()/1000-(i/9)*1.2;
+    cells.push({canvas, values:BATTLE_AXES.map(a=>a.default), t0:defaultT0, localT:0});
+  }
+  resizeGrid();
+}
+
+function resizeGrid(){
+  const wrap=document.getElementById('grid-wrap');
+  const grid=document.getElementById('grid');
+  if(!wrap||!grid||!cells.length)return;
+  const pw=wrap.clientWidth-20, ph=wrap.clientHeight-20;
+  const a=16/9;
+  let w,h;
+  if(pw/ph>a){h=ph;w=h*a;}else{w=pw;h=w/a;}
+  grid.style.width=w+'px'; grid.style.height=h+'px';
+}
+window.addEventListener('resize',resizeGrid);
+
+/* ════════════════════════════════════════════════════════
+   SELECTION
+   ════════════════════════════════════════════════════════ */
+function selectCell(idx){
+  if(selectedIdx===idx){deselectAll();return;}
+  selectedIdx=idx;
+  document.querySelectorAll('.cell').forEach((c,i)=>{
+    c.classList.toggle('selected',i===idx);
+  });
+  const letter=String.fromCharCode(65+idx);
+  document.getElementById('sel-info').textContent=`cell ${letter} selected — name it & save`;
+  autoNum++;
+  document.getElementById('tpl-name-input').value=`Strike ${autoNum}`;
+  document.getElementById('tpl-name-wrap').classList.add('show');
+  setTimeout(()=>{document.getElementById('tpl-name-input').select();},10);
+
+  // Show the selected cell's phase in topbar
+  updatePhaseIndicator(cells[idx].localT, cells[idx].values);
+}
+
+function deselectAll(){
+  selectedIdx=-1;
+  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('sel-info').textContent='click any cell to select it';
+  document.getElementById('tpl-name-wrap').classList.remove('show');
+  document.getElementById('phase-indicator').className='';
+  document.getElementById('phase-indicator').textContent='—';
+}
+
+function updatePhaseIndicator(localT, vals){
+  if(selectedIdx<0)return;
+  const phases=getPhases(vals);
+  const {name}=phaseAt(phases,localT);
+  const el=document.getElementById('phase-indicator');
+  const cls={anticipation:'ant',strike:'str',impact:'imp',recovery:'rec',idle:''}[name]||'';
+  el.className=cls;
+  el.textContent=name;
+}
+
+/* ════════════════════════════════════════════════════════
+   RANDOMIZE
+   ════════════════════════════════════════════════════════ */
+function fullRandom(){
+  return BATTLE_AXES.map(()=>Math.floor(Math.random()*256));
+}
+
+function jittered(anchor,amt){
+  return anchor.map(v=>{
+    const d=Math.round((Math.random()*2-1)*amt);
+    return Math.max(0,Math.min(255,v+d));
+  });
+}
+
+function randomizeGrid(){
+  const now=performance.now()/1000;
+  cells.forEach((cell,i)=>{
+    cell.values=fullRandom();
+    const phases=getPhases(cell.values);
+    cell.t0=now-(i/9)*(phases.totalMs/1000);
+  });
+  deselectAll();
+  document.getElementById('sel-info').textContent='randomized · click any cell to select';
+  setStatus('randomized');
+  updatePhaseLegend();
+}
+
+function randomizeFromTemplate(idx){
+  const tpl=templates[idx];
+  if(!tpl)return;
+  const now=performance.now()/1000;
+  cells.forEach((cell,i)=>{
+    cell.values=jitter===0?[...tpl.values]:jittered(tpl.values,jitter);
+    const phases=getPhases(cell.values);
+    cell.t0=now-(i/9)*(phases.totalMs/1000);
+  });
+  deselectAll();
+  document.getElementById('sel-info').textContent=`"${tpl.name}" · jitter ${jitter}`;
+  setStatus(`from "${tpl.name}"`);
+  updatePhaseLegend();
+}
+
+/* ════════════════════════════════════════════════════════
+   TEMPLATES
+   ════════════════════════════════════════════════════════ */
+function saveTemplate(){
+  if(selectedIdx<0)return;
+  const raw=(document.getElementById('tpl-name-input').value||'').trim();
+  const name=raw||`Strike ${templates.length+1}`;
+  const cell=cells[selectedIdx];
+  const phases=getPhases(cell.values);
+  templates.push({name,values:[...cell.values],totalMs:phases.totalMs});
+  rebuildTemplateList();
+  deselectAll();
+  setStatus(`"${name}" saved`);
+}
+
+function deleteTemplate(idx){
+  const name=templates[idx].name;
+  templates.splice(idx,1);
+  rebuildTemplateList();
+  setStatus(`"${name}" removed`);
+}
+
+function rebuildTemplateList(){
+  const list=document.getElementById('templates-list');
+  if(!templates.length){
+    list.innerHTML='<div class="tpl-empty">select a cell · name it · save it.<br>each template becomes its own<br>custom randomize button.</div>';
+    return;
+  }
+  list.innerHTML='';
+  templates.forEach((tpl,i)=>{
+    const ms=Math.round(tpl.totalMs);
+    const item=document.createElement('div');
+    item.className='tpl-item';
+    item.innerHTML=`
+      <button class="tpl-btn" onclick="randomizeFromTemplate(${i})">
+        <span class="tpl-name">${esc(tpl.name)}</span>
+        <span class="tpl-dur">${ms}ms</span>
+      </button>
+      <button class="tpl-del" onclick="deleteTemplate(${i})" title="delete">×</button>`;
+    list.appendChild(item);
+  });
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ════════════════════════════════════════════════════════
+   PLAYBACK CONTROLS
+   ════════════════════════════════════════════════════════ */
+function replayAll(){
+  const now=performance.now()/1000;
+  cells.forEach((cell,i)=>{
+    const phases=getPhases(cell.values);
+    cell.t0=now-(i/9)*(phases.totalMs/1000)*0.15;
+  });
+  if(scrubMode)toggleScrubMode();
+  setStatus('replay');
+}
+
+function toggleScrubMode(){
+  scrubMode=!scrubMode;
+  const btn=document.getElementById('scrub-mode-btn');
+  btn.classList.toggle('active',scrubMode);
+  btn.textContent=scrubMode?'■ scrub':'scrub';
+  if(!scrubMode){
+    // Resume from current scrub position
+    const now=performance.now()/1000;
+    cells.forEach((cell,i)=>{
+      const phases=getPhases(cell.values);
+      cell.t0=now-scrubT*(phases.totalMs/1000);
+    });
+  }
+}
+
+function onScrub(val){
+  scrubT=parseInt(val)/1000;
+  if(!scrubMode)toggleScrubMode();
+  updatePhaseLegend();
+}
+
+function setSpeed(s){
+  speed=s;
+  document.querySelectorAll('.spd-btn').forEach(b=>{
+    b.classList.toggle('active',parseFloat(b.textContent)===s);
+  });
+}
+
+function onJitter(val){
+  jitter=parseInt(val);
+  document.getElementById('jitter-val').textContent=jitter;
+}
+
+/* Update the phase bar legend in the panel (based on first cell) */
+function updatePhaseLegend(){
+  if(!cells.length)return;
+  const phases=getPhases(cells[0].values);
+  const bar=document.getElementById('phase-bar-panel');
+  const segments=[
+    {name:'anticipation',color:'var(--phase-ant)'},
+    {name:'strike',      color:'var(--phase-str)'},
+    {name:'impact',      color:'var(--phase-imp)'},
+    {name:'recovery',    color:'var(--phase-rec)'},
+    {name:'idle',        color:'var(--phase-idle)'},
+  ];
+  bar.innerHTML='';
+  for(const {name,color} of segments){
+    if(!phases[name])continue;
+    const [s,e]=phases[name];
+    if(e<=s)continue;
+    const seg=document.createElement('div');
+    seg.className='pb-seg';
+    seg.style.width=((e-s)*100)+'%';
+    seg.style.background=color;
+    bar.appendChild(seg);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   STATUS
+   ════════════════════════════════════════════════════════ */
+function setStatus(msg){
+  const el=document.getElementById('status');
+  el.textContent=msg;
+  clearTimeout(setStatus._t);
+  setStatus._t=setTimeout(()=>{el.textContent='ready';},2400);
+}
+
+/* ════════════════════════════════════════════════════════
+   KEYBOARD
+   ════════════════════════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if(document.activeElement.tagName==='INPUT')return;
+  if(e.key===' '){e.preventDefault();replayAll();}
+  if(e.key==='Escape')deselectAll();
+  if(e.key==='s'&&!e.ctrlKey)toggleScrubMode();
+});
+document.getElementById('tpl-name-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter')saveTemplate();
+  if(e.key==='Escape'){e.stopPropagation();deselectAll();}
+});
+
+/* ════════════════════════════════════════════════════════
+   ANIMATION LOOP
+   ════════════════════════════════════════════════════════ */
+function loop(){
+  const now=performance.now()/1000;
+
+  cells.forEach(cell=>{
+    if(scrubMode){
+      cell.localT=scrubT;
+    } else {
+      const phases=getPhases(cell.values);
+      const cycleSec=(phases.totalMs/1000)/speed;
+      const elapsed=((now-cell.t0)%cycleSec+cycleSec)%cycleSec;
+      cell.localT=elapsed/cycleSec;
+    }
+    if(cell.canvas.width>0){
+      renderBattle(cell.canvas,cell.values,cell.localT);
+    }
+  });
+
+  // Update phase indicator for selected cell
+  if(selectedIdx>=0&&cells[selectedIdx]){
+    updatePhaseIndicator(cells[selectedIdx].localT,cells[selectedIdx].values);
+  }
+
+  // Keep scrubber in sync when auto-playing
+  if(!scrubMode&&selectedIdx>=0&&cells[selectedIdx]){
+    document.getElementById('scrubber').value=Math.round(cells[selectedIdx].localT*1000);
+  }
+
+  requestAnimationFrame(loop);
+}
+
+/* ════════════════════════════════════════════════════════
+   BOOT
+   ════════════════════════════════════════════════════════ */
+buildGrid();
+randomizeGrid();
+updatePhaseLegend();
+loop();
+</script>
+</body>
+</html>

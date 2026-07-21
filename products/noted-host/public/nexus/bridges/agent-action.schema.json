@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agent-action.schema.json",
+  "type": "object",
+  "required": [
+    "id",
+    "proposedBy",
+    "actionType",
+    "capability",
+    "input",
+    "risk",
+    "approval",
+    "state",
+    "preview",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "proposedBy": {
+      "type": "object"
+    },
+    "actionType": {
+      "type": "string"
+    },
+    "capability": {
+      "type": "string"
+    },
+    "target": {
+      "type": "object"
+    },
+    "input": {},
+    "risk": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "approval": {
+      "enum": [
+        "none",
+        "ask-once",
+        "always",
+        "human-only"
+      ]
+    },
+    "state": {
+      "type": "string"
+    },
+    "preview": {
+      "type": "object"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    }
+  }
+}

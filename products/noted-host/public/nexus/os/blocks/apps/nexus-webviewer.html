@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Web Viewer</title>
+<style>
+:root { color-scheme: dark; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 12px; background: #111116; color: #ddd8cc; }
+
+/* URL Bar */
+#url-bar {
+  display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+  background: #18181f; border-bottom: 1px solid #2a2a3a; flex-shrink: 0;
+}
+#url-bar button {
+  background: none; border: none; color: #999084; cursor: pointer;
+  font-size: 14px; width: 24px; height: 24px; display: flex; align-items: center;
+  justify-content: center; border-radius: 4px; transition: all .1s; flex-shrink: 0;
+}
+#url-bar button:hover { background: #222230; color: #ddd8cc; }
+#url-bar button:disabled { opacity: 0.26; cursor: default; filter:grayscale(1); }#url-bar button:disabled:hover{background:none;color:#999084}
+#url-input {
+  flex: 1; background: #0d0d12; border: 1px solid #2a2a3a; border-radius: 4px;
+  color: #ddd8cc; font-family: inherit; font-size: 11px; padding: 4px 8px; outline: none;
+  transition: border-color .12s;
+}
+#url-input:focus { border-color: #4dbb7a; }
+#go-btn {
+  padding: 4px 10px; background: #1a7a4a; border: none; border-radius: 4px;
+  color: #ddd8cc; font-family: inherit; font-size: 11px; cursor: pointer;
+  transition: background .12s;
+}
+#go-btn:hover { background: #4dbb7a; color: #09090c; }
+
+/* Tiles / content area */
+#content { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+#tiles { flex: 1; overflow-y: auto; padding: 12px; }
+
+.tile-filter { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.tile-filter button {
+  padding: 2px 8px; background: #18181f; border: 1px solid #2a2a3a;
+  border-radius: 10px; color: #999084; font-family: inherit; font-size: 10px;
+  cursor: pointer; transition: all .12s;
+}
+.tile-filter button.active { border-color: #4dbb7a; color: #4dbb7a; background: rgba(77,187,122,.1); }
+.tile-filter button:hover:not(.active) { color: #ddd8cc; border-color: #3d3d58; }
+
+.state-card{margin-bottom:12px;padding:14px;border:1px solid #2a2a3a;border-radius:10px;background:#18181f;color:#999084;line-height:1.55}.state-card strong{display:block;color:#ddd8cc;margin-bottom:4px}.state-card span{font-size:11px}.tiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
+.tile {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 4px; border: 1px solid #2a2a3a; border-radius: 6px;
+  background: #18181f; cursor: pointer; transition: all .12s; text-align: center;
+}
+.tile:hover { background: #222230; border-color: #4dbb7a; }
+.tile-icon { font-size: 20px; }
+.tile-label { font-size: 9px; color: #999084; line-height: 1.2; word-break: break-word; }
+.tile:hover .tile-label { color: #ddd8cc; }
+
+/* States */
+#loading-state, #blocked-state, #companion-state {
+  flex: 1; display: none; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; padding: 24px; text-align: center;
+}
+#loading-state.active, #blocked-state.active, #companion-state.active { display: flex; }
+
+.state-icon { font-size: 32px; }
+.state-title { font-size: 13px; color: #ddd8cc; }
+.state-desc { font-size: 11px; color: #999084; max-width: 280px; line-height: 1.5; }
+
+.btn-primary {
+  padding: 7px 16px; background: #4dbb7a; border: none; border-radius: 4px;
+  color: #09090c; font-family: inherit; font-size: 11px; cursor: pointer;
+  transition: all .12s; font-weight: 600;
+}
+.btn-primary:hover { background: #6bcf94; }
+.btn-secondary {
+  padding: 7px 16px; background: #18181f; border: 1px solid #2a2a3a;
+  border-radius: 4px; color: #999084; font-family: inherit; font-size: 11px;
+  cursor: pointer; transition: all .12s;
+}
+.btn-secondary:hover { color: #ddd8cc; border-color: #3d3d58; }
+
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.back-link { font-size: 10px; color: #524e48; cursor: pointer; text-decoration: underline; }
+.back-link:hover { color: #999084; }
+
+/* iframe */
+#view-iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+  background: #09090c;
+}
+
+/* Status bar */
+#status-bar {
+  display: flex; align-items: center; gap: 8px; padding: 3px 8px;
+  background: #0d0d12; border-top: 1px solid #2a2a3a; font-size: 9px;
+  color: #524e48; flex-shrink: 0;
+}
+#status-bar .indicator { width: 6px; height: 6px; border-radius: 50%; background: #524e48; }
+#status-bar .indicator.ok { background: #4dbb7a; }
+#status-bar .indicator.loading { background: #c9920a; animation: pulse 1s ease-in-out infinite; }
+#status-bar .indicator.blocked { background: #9b2335; }
+@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+.clip-btn {
+  margin-left: auto; background: none; border: 1px solid #2a2a3a; border-radius: 3px;
+  color: #524e48; cursor: pointer; font-family: inherit; font-size: 9px;
+  padding: 1px 6px; transition: all .12s;
+}
+.clip-btn:hover { color: #4dbb7a; border-color: #4dbb7a; }
+</style>
+</head>
+<body>
+<div style="height:100%;display:flex;flex-direction:column;">
+
+  <!-- URL Bar -->
+  <div id="url-bar">
+    <button id="btn-home" title="Home / Quick launch">⌂</button>
+    <button id="btn-back" title="Back" disabled>←</button>
+    <button id="btn-fwd"  title="Forward" disabled>→</button>
+    <button id="btn-reload" title="Reload">↺</button>
+    <input  id="url-input" type="text" placeholder="Enter URL or search… (Enter to go)" autocomplete="off">
+    <button id="go-btn">Go</button>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+    <!-- Tiles (home screen) -->
+    <div id="tiles"><section class="state-card" id="browser-empty-state"><strong>Enter a URL or search term.</strong><span>Back and forward track this window’s local history. Some sites block embedded browsers; when that happens, use “open external.”</span></section>
+      <div class="tile-filter" id="filter-row"></div>
+      <div class="tiles-grid" id="tiles-grid"></div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-state">
+      <div class="state-icon">⏳</div>
+      <div class="state-title">Loading…</div>
+      <div class="state-desc" id="loading-url-text"></div>
+    </div>
+
+    <!-- Blocked -->
+    <div id="blocked-state">
+      <div class="state-icon">🔒</div>
+      <div class="state-title">Site blocks embedding</div>
+      <div class="state-desc">This site uses X-Frame-Options to prevent embedding. Open it as a companion window (stays linked to this block) or in a new tab.</div>
+      <div class="btn-row">
+        <button class="btn-primary" id="btn-companion">Open companion window</button>
+        <button class="btn-secondary" id="btn-newtab">New tab ↗</button>
+      </div>
+      <div class="back-link" id="btn-back-tiles">← Back to quick-launch</div>
+    </div>
+
+    <!-- Companion open -->
+    <div id="companion-state">
+      <div class="state-icon">🪟</div>
+      <div class="state-title">Companion window open</div>
+      <div class="state-desc" id="companion-url-text"></div>
+      <div class="btn-row">
+        <button class="btn-primary" id="btn-focus-companion">Focus window</button>
+        <button class="btn-secondary" id="btn-close-companion">Close companion</button>
+      </div>
+    </div>
+
+    <!-- The actual iframe -->
+    <iframe id="view-iframe" style="display:none;"
+      allow="camera; microphone; geolocation; payment; clipboard-read; clipboard-write; fullscreen; autoplay; encrypted-media"
+      allowfullscreen
+      sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-pointer-lock allow-top-navigation-by-user-activation"
+    ></iframe>
+  </div>
+
+  <!-- Status bar -->
+  <div id="status-bar">
+    <div class="indicator" id="status-dot"></div>
+    <span id="status-text">Ready</span>
+    <button class="clip-btn" id="btn-clip" style="display:none" title="Clip URL to Notes block">📎 Clip URL</button>
+  </div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════
+   Nexus Web Viewer — Managed block (protocol-aware).
+   Channels:
+     emits:    web.navigation, web.clip, nexus.launch
+     consumes: web.open, nexus.kernel.log
+   Uses engines/nexus-block-client.js for the kernel handshake.
+   ══════════════════════════════════════════════════════════════ */
+
+const QUICK_LINKS = [
+  // Music
+  { label:'Lofi Girl',    url:'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1', icon:'🎵', cat:'Music' },
+  { label:'SoundCloud',   url:'https://w.soundcloud.com/player/?url=https://soundcloud.com/discover&color=%234dbb7a&auto_play=false&visual=true', icon:'☁️', cat:'Music' },
+  { label:'Spotify',      url:'https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYpdgoIcn6', icon:'💚', cat:'Music' },
+  { label:'Radio Garden', url:'https://radio.garden/visit/amsterdam/OzWGLLiS', icon:'📡', cat:'Music' },
+  { label:'Poolsuite FM', url:'https://poolsuite.net', icon:'🌴', cat:'Music' },
+  // AI
+  { label:'Claude',       url:'https://claude.ai',      icon:'🔮', cat:'AI' },
+  { label:'ChatGPT',      url:'https://chatgpt.com',    icon:'🤖', cat:'AI' },
+  { label:'Perplexity',   url:'https://perplexity.ai',  icon:'🔍', cat:'AI' },
+  { label:'Gemini',       url:'https://gemini.google.com', icon:'✧', cat:'AI' },
+  // Finance / Crypto
+  { label:'CoinGecko',    url:'https://www.coingecko.com', icon:'🦎', cat:'Finance' },
+  { label:'Etherscan',    url:'https://etherscan.io',      icon:'🔷', cat:'Finance' },
+  { label:'DeFi Llama',   url:'https://defillama.com',     icon:'🦙', cat:'Finance' },
+  { label:'TradingView',  url:'https://www.tradingview.com/chart/', icon:'📈', cat:'Finance' },
+  // Social / News
+  { label:'Hacker News',  url:'https://news.ycombinator.com', icon:'🟠', cat:'News' },
+  { label:'Lobsters',     url:'https://lobste.rs',            icon:'🦞', cat:'News' },
+  { label:'Bluesky',      url:'https://bsky.app',             icon:'🦋', cat:'Social' },
+  { label:'Nostr Web',    url:'https://coracle.social',       icon:'⚡', cat:'Social' },
+  // Reference / Dev
+  { label:'Wikipedia',    url:'https://en.wikipedia.org/wiki/Special:Random', icon:'📚', cat:'Ref' },
+  { label:'DevDocs',      url:'https://devdocs.io',   icon:'📋', cat:'Dev' },
+  { label:'GitHub',       url:'https://github.com',   icon:'🐙', cat:'Dev' },
+  { label:'CodePen',      url:'https://codepen.io',   icon:'✏️', cat:'Dev' },
+  // Creative
+  { label:'Are.na',       url:'https://www.are.na',   icon:'🌊', cat:'Creative' },
+  { label:'Coolors',      url:'https://coolors.co',   icon:'🎨', cat:'Creative' },
+  { label:'Unsplash',     url:'https://unsplash.com', icon:'📷', cat:'Creative' },
+];
+
+const CATS = [...new Set(QUICK_LINKS.map(l => l.cat))];
+
+// ── State ──
+let nx         = null;  // NexusBlockClient handle (assigned at boot)
+let currentUrl = '';
+let companion  = null;
+let viewState  = 'tiles'; // tiles | loading | loaded | blocked | companion
+let activeFilter = null;
+let loadTimer  = null;
+
+// ── History (Sweep 15 repair: real back/forward stack) ──
+const HISTORY_KEY = 'nx-webviewer-history-v2';
+let history_ = [];
+let histIdx  = -1;
+
+function normalizeUrl(input) {
+  let full = String(input || '').trim();
+  if (!full) return '';
+  if (/^[^\s@]+\.[^\s@]+/.test(full) && !/^https?:\/\//i.test(full)) full = 'https://' + full;
+  if (!/^https?:\/\//i.test(full)) full = 'https://duckduckgo.com/?q=' + encodeURIComponent(full);
+  return full;
+}
+
+function loadHistory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(HISTORY_KEY) || 'null');
+    if (saved && Array.isArray(saved.entries)) {
+      history_ = saved.entries.filter(Boolean).slice(-80);
+      histIdx = Math.max(-1, Math.min(Number(saved.index) || -1, history_.length - 1));
+    }
+  } catch (_) { history_ = []; histIdx = -1; }
+  updateNavButtons();
+}
+function saveHistory() {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify({ entries: history_.slice(-80), index: histIdx })); } catch (_) {}
+}
+function pushHistory(url) {
+  if (!url) return;
+  if (history_[histIdx] === url) { updateNavButtons(); return; }
+  history_.splice(histIdx + 1);
+  history_.push(url);
+  if (history_.length > 80) history_.shift();
+  histIdx = history_.length - 1;
+  saveHistory();
+  updateNavButtons();
+}
+function goToHistory(nextIdx) {
+  if (nextIdx < 0 || nextIdx >= history_.length) return;
+  histIdx = nextIdx;
+  saveHistory();
+  updateNavButtons();
+  navigate(history_[histIdx], { pushHist:false, fromHistory:true });
+}
+function updateNavButtons() {
+  const back=document.getElementById('btn-back'), fwd=document.getElementById('btn-fwd');
+  back.disabled = histIdx <= 0;
+  fwd.disabled  = histIdx < 0 || histIdx >= history_.length - 1;
+  back.title = back.disabled ? 'No previous page' : 'Back';
+  fwd.title = fwd.disabled ? 'No next page' : 'Forward';
+}
+
+// ── UI helpers ──
+function setState(state) {
+  viewState = state;
+  document.getElementById('tiles').style.display          = state === 'tiles'     ? 'block' : 'none';
+  document.getElementById('loading-state').className      = state === 'loading'   ? 'active' : '';
+  document.getElementById('blocked-state').className      = state === 'blocked'   ? 'active' : '';
+  document.getElementById('companion-state').className    = state === 'companion' ? 'active' : '';
+  const iframe = document.getElementById('view-iframe');
+  iframe.style.display = (state === 'loaded' || state === 'loading') ? 'block' : 'none';
+
+  const dot  = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  const clipBtn = document.getElementById('btn-clip');
+  if (state === 'tiles') { dot.className = 'indicator'; text.textContent = 'Ready'; clipBtn.style.display = 'none'; }
+  if (state === 'loading') { dot.className = 'indicator loading'; text.textContent = 'Loading…'; clipBtn.style.display = 'none'; }
+  if (state === 'loaded')  { dot.className = 'indicator ok'; text.textContent = currentUrl; clipBtn.style.display = 'block'; }
+  if (state === 'blocked') { dot.className = 'indicator blocked'; text.textContent = 'Blocked'; clipBtn.style.display = 'block'; }
+  if (state === 'companion') { dot.className = 'indicator ok'; text.textContent = 'Companion open'; clipBtn.style.display = 'block'; }
+}
+
+function navigate(url, options = true) {
+  const pushHist = typeof options === 'object' ? options.pushHist !== false : options !== false;
+  const full = normalizeUrl(url);
+  if (!full) return;
+  currentUrl = full;
+  document.getElementById('url-input').value = full;
+  if (pushHist) pushHistory(full); else updateNavButtons();
+  setState('loading');
+  document.getElementById('loading-url-text').textContent = full;
+
+  if (loadTimer) clearTimeout(loadTimer);
+  loadTimer = setTimeout(() => {
+    if (viewState === 'loading') setState('blocked');
+  }, 5000);
+
+  const iframe = document.getElementById('view-iframe');
+  iframe.src = 'about:blank';
+  setTimeout(() => { iframe.src = full; }, 0);
+
+  // Emit navigation event to other blocks
+  emit('web.navigation', { url: full, historyIndex: histIdx, historyLength: history_.length });
+}
+
+// ── Tiles ──
+function renderTiles() {
+  const filterRow = document.getElementById('filter-row');
+  filterRow.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'All';
+  if (!activeFilter) allBtn.classList.add('active');
+  allBtn.onclick = () => { activeFilter = null; renderTiles(); };
+  filterRow.appendChild(allBtn);
+  CATS.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.textContent = cat;
+    if (activeFilter === cat) btn.classList.add('active');
+    btn.onclick = () => { activeFilter = cat === activeFilter ? null : cat; renderTiles(); };
+    filterRow.appendChild(btn);
+  });
+
+  const grid = document.getElementById('tiles-grid');
+  grid.innerHTML = '';
+  const links = activeFilter ? QUICK_LINKS.filter(l => l.cat === activeFilter) : QUICK_LINKS;
+  links.forEach(link => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.innerHTML = `<div class="tile-icon">${link.icon}</div><div class="tile-label">${link.label}</div>`;
+    tile.onclick = () => navigate(link.url);
+    grid.appendChild(tile);
+  });
+}
+
+// ── iframe events ──
+document.getElementById('view-iframe').addEventListener('load', () => {
+  if (loadTimer) clearTimeout(loadTimer);
+  if (viewState === 'loading') setState('loaded');
+});
+document.getElementById('view-iframe').addEventListener('error', () => {
+  if (loadTimer) clearTimeout(loadTimer);
+  setState('blocked');
+});
+
+// ── Controls ──
+document.getElementById('btn-home').onclick = () => { setState('tiles'); updateNavButtons(); };
+
+document.getElementById('btn-back').onclick = () => goToHistory(histIdx - 1);
+document.getElementById('btn-fwd').onclick = () => goToHistory(histIdx + 1);
+document.getElementById('btn-reload').onclick = () => {
+  if (currentUrl) navigate(currentUrl, { pushHist:false });
+};
+
+document.getElementById('go-btn').onclick = () => navigate(document.getElementById('url-input').value);
+document.getElementById('url-input').addEventListener('keydown', e => {
+  if (e.key === 'Delete' || e.key === 'Backspace') e.stopPropagation();
+  if (e.key === 'Enter') navigate(document.getElementById('url-input').value);
+});
+
+document.getElementById('btn-companion').onclick = () => {
+  const w = companion && !companion.closed ? companion : null;
+  if (w) { w.focus(); return; }
+  companion = window.open(currentUrl, `nx-companion-web`, 'width=1100,height=750,menubar=no,toolbar=yes,location=yes,status=yes');
+  setState('companion');
+  document.getElementById('companion-url-text').textContent = currentUrl;
+};
+document.getElementById('btn-newtab').onclick = () => window.open(currentUrl, '_blank', 'noopener');
+document.getElementById('btn-back-tiles').onclick = () => setState('tiles');
+
+document.getElementById('btn-focus-companion').onclick = () => {
+  if (companion && !companion.closed) companion.focus();
+};
+document.getElementById('btn-close-companion').onclick = () => {
+  if (companion && !companion.closed) companion.close();
+  companion = null;
+  setState('blocked');
+};
+
+document.getElementById('btn-clip').onclick = () => {
+  emit('web.clip', { url: currentUrl, text: `[${currentUrl}](${currentUrl})` });
+  const btn = document.getElementById('btn-clip');
+  const orig = btn.textContent;
+  btn.textContent = '✓ Clipped';
+  setTimeout(() => btn.textContent = orig, 1500);
+};
+
+// ── Nexus OS Protocol ──
+function emit(channel, payload) {
+  if (nx) nx.emit(channel, payload);
+}
+
+nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ['web.navigation', 'web.clip', 'nexus.launch'],
+    consumes: ['web.open', 'nexus.kernel.log'],
+    app: {
+      title:       'Web Viewer',
+      icon:        '◉',
+      visible:     true,
+      description: 'Embedded browser — music, social, finance, AI',
+      defaultWidth: 900, defaultHeight: 600
+    }
+  },
+  onMessage({ channel, payload }) {
+    if (channel === 'web.open' && payload && payload.url) navigate(payload.url);
+  }
+});
+
+if (nx) {
+  nx.ready.then(() => {
+    nx.subscribe('web.open');
+    nx.subscribe('nexus.kernel.log');
+  });
+}
+
+window.onerror = (m) => { emit('web.clip', { error: String(m) }); };
+
+// ── Init ──
+loadHistory();
+renderTiles();
+setState('tiles');
+</script>
+</body>
+</html>

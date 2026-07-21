@@ -1,0 +1,34 @@
+{
+  "version": "0.04",
+  "loadBearing": true,
+  "blocks": [
+    {
+      "id": "nexus-agent",
+      "title": "Nexus Agent",
+      "path": "/nexus/os/blocks/apps/nexus-agent-v0.12.html",
+      "mode": "legacyIframe",
+      "future": "managedBlock"
+    },
+    {
+      "id": "prompt-studio-v3",
+      "title": "Prompt Studio v3",
+      "path": "/nexus/os/blocks/apps/prompt-studio-v3.html",
+      "mode": "legacyIframe",
+      "future": "managedBlock"
+    },
+    {
+      "id": "pokemon-engine-test",
+      "title": "Pokemon Engine Test",
+      "path": "/nexus/os/pokemon-engine-test.html",
+      "mode": "legacyIframe",
+      "future": "engineBlock"
+    },
+    {
+      "id": "nexus-lattice",
+      "title": "Nexus Lattice",
+      "path": "/nexus/os/blocks/nexus-lattice(1).html",
+      "mode": "legacyIframe",
+      "future": "managedBlock"
+    }
+  ]
+}

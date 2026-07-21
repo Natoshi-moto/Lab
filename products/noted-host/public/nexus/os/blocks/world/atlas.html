@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="nexus-block" content="managed">
+<meta name="nexus-emits" content="vibe.save vibe.load vibe.list vibe.delete vibe.tag vibe.lineage nexus.launch">
+<meta name="nexus-consumes" content="vibe.result vibe.notify">
+<title>Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+═══════════════════════════════════════════════════════════════════════════
+  ATLAS · Round 1 — World creator surface, scaffolded
+═══════════════════════════════════════════════════════════════════════════
+
+  A managed Nexus block. The cartographer's atelier — where you author the
+  worlds that creators witness against and the ROMs that release as
+  sovereign cartridges.
+
+  This round establishes:
+    • Kernel handshake (BOOT → DECLARE → MOUNT_ACK → SUB → PING/PONG)
+    • New vibe type: "world" with format 'atlas-world/1'
+    • Three-pane layout: catalog (left) · editor (center) · moots (right)
+    • Persistence via Vibes Library (vibe.save/load/list/delete/tag)
+    • Honest scope flags for Round 2 and Round 3 surfaces
+
+  This round does NOT yet:
+    • Render live previews of the world's substrate (Round 2)
+    • Witness moots by simulating exploration (Round 3)
+    • Bundle a world + its witnesses into a release cartridge (Round 3)
+
+  To install:
+    1. Drop this file at the same level as Nexus_OS.html, vibes-library.html.
+    2. In Nexus_OS.html, find BUILTIN_CATALOG (around line 1716).
+    3. Add this entry next to the Vibes engine block:
+         { id:"atlas", path:"./atlas.html", icon:"⊕",
+           title:"Atlas", desc:"Worlds, moots, releases" },
+    4. Reload Nexus. Atlas appears in the launcher. Open it.
+    5. Make sure Vibes Library is also running — Atlas brokers through it.
+
+  Why a separate vibe type ("world") rather than reusing existing types:
+    A world is not a creature, environment, attack, or battle. It is the
+    substrate function those things live inside. Conflating it with any of
+    them would break the type-as-allowlist guarantee that lets Crucible
+    safely list "all environments" without accidentally pulling worlds.
+    The Library's TYPES array gets one new entry; everything else composes.
+
+═══════════════════════════════════════════════════════════════════════════ -->
+<style>
+:root {
+  color-scheme: dark;
+
+  /* ── Nexus OS shared tokens ── */
+  --void:       #09090c;
+  --surface-1:  #111116;
+  --surface-2:  #18181f;
+  --surface-3:  #222230;
+  --border:     #2a2a3a;
+  --border-hi:  #3d3d58;
+
+  --ink:    #ddd8cc;
+  --ink-2:  #999084;
+  --ink-3:  #524e48;
+  --ink-4:  #2e2c28;
+
+  --amber:      #c9920a;
+  --amber-hi:   #e6a51a;
+  --amber-dim:  rgba(201,146,10,0.10);
+  --amber-glow: rgba(201,146,10,0.06);
+
+  --steel:      #3d5a80;
+  --steel-hi:   #5b7ba8;
+  --steel-dim:  rgba(61,90,128,0.14);
+
+  --green:      #2a9d5c;
+  --green-hi:   #3dd47b;
+  --rose:       #9b2335;
+
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'Lora', serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  --pulse: 2.4s;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; width: 100%;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cartographer's grain — very subtle vellum texture, *not* CRT scanlines.
+   This block lives in the system-chrome register, not the forge register. */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background-image: radial-gradient(circle at 1px 1px, rgba(201,146,10,0.03) 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  mix-blend-mode: overlay;
+}
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 2;
+  background: radial-gradient(ellipse at 50% 30%, transparent 60%, rgba(0,0,0,0.45) 100%);
+}
+
+/* ──────────────────────────────────────────────────────────
+   APP SHELL
+   ────────────────────────────────────────────────────────── */
+#app {
+  position: relative; z-index: 3;
+  display: grid;
+  grid-template-rows: 50px 1fr 26px;
+  height: 100vh;
+}
+
+/* ── Topbar ────────────────────────────────────────────────── */
+#topbar {
+  display: flex; align-items: center; gap: 18px;
+  padding: 0 20px;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+}
+#brand {
+  display: flex; align-items: baseline; gap: 14px;
+}
+#brand-glyph {
+  font-family: var(--font-display);
+  font-size: 24px; line-height: 1;
+  color: var(--amber);
+  text-shadow: 0 0 12px var(--amber-glow);
+}
+#brand-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  font-size: 13px;
+  color: var(--ink);
+}
+#brand-tag {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+#topbar .actions {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 14px;
+}
+.live-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  box-shadow: 0 0 0 0 var(--ink-4);
+  transition: background 200ms, box-shadow 200ms;
+}
+.live-dot.connected {
+  background: var(--green-hi);
+  box-shadow: 0 0 6px var(--green-hi);
+  animation: pulse var(--pulse) ease-in-out infinite;
+}
+.live-dot.standalone {
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber);
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+#status-text {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ──────────────────────────────────────────────────────────
+   MAIN — three-pane workspace
+   ────────────────────────────────────────────────────────── */
+main {
+  display: grid;
+  grid-template-columns: 240px 1fr 260px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Pane shell ──────────────────────────────────────────── */
+.pane {
+  display: flex; flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface-1);
+}
+.pane:last-child { border-right: none; }
+
+.pane-head {
+  flex-shrink: 0;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: baseline; gap: 10px;
+}
+.pane-head h2 {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.pane-head .meta {
+  margin-left: auto;
+  font-size: 9px;
+  color: var(--ink-3);
+  letter-spacing: 0.12em;
+}
+.pane-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px 16px;
+}
+
+/* ── Catalog (left pane) ─────────────────────────────────── */
+#new-world-btn {
+  width: 100%;
+  margin: 6px 0 12px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px dashed var(--border-hi);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 120ms, color 120ms, background 120ms;
+}
+#new-world-btn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: var(--amber-dim);
+}
+
+.world-row {
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+  margin-bottom: 4px;
+  transition: background 120ms, border-color 120ms;
+}
+.world-row:hover { background: var(--surface-2); }
+.world-row.selected {
+  background: var(--steel-dim);
+  border-color: var(--steel);
+}
+.world-row .name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.world-row .meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--ink-3);
+  letter-spacing: 0.06em;
+}
+.world-row.selected .meta { color: var(--steel-hi); }
+
+.empty-list {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── Editor (center pane) ────────────────────────────────── */
+#editor-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 100%;
+  gap: 14px;
+  padding: 40px;
+  color: var(--ink-3);
+  text-align: center;
+}
+#editor-empty .glyph {
+  font-family: var(--font-display);
+  font-size: 64px;
+  color: var(--amber-dim);
+  line-height: 1;
+}
+#editor-empty .msg {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 14px;
+  max-width: 320px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+#editor {
+  display: none;
+  padding: 22px 32px 32px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+#editor.active { display: block; }
+
+#editor-name {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 6px 0 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  outline: none;
+  margin-bottom: 4px;
+}
+#editor-name:focus { border-bottom-color: var(--amber); }
+#editor-name::placeholder { color: var(--ink-4); font-style: italic; font-weight: 400; }
+
+#editor-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-bottom: 28px;
+  letter-spacing: 0.02em;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 24px;
+  margin-bottom: 24px;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+.field label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.field-input-row {
+  display: flex; align-items: stretch; gap: 6px;
+}
+.field input[type="text"],
+.field input[type="number"],
+.field select,
+.field textarea {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 120ms, background 120ms;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--amber);
+  background: var(--surface-1);
+}
+.field textarea {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.dim-pair {
+  display: grid; grid-template-columns: 1fr 12px 1fr;
+  gap: 6px; align-items: center;
+}
+.dim-x {
+  text-align: center;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.icon-btn {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+  cursor: pointer;
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  transition: all 120ms;
+}
+.icon-btn:hover {
+  color: var(--amber);
+  border-color: var(--amber);
+  background: var(--amber-dim);
+}
+
+.density-row { display: flex; align-items: center; gap: 12px; }
+.density-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--amber);
+  height: 4px;
+}
+.density-readout {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  min-width: 44px;
+  text-align: right;
+}
+
+.field-help {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+/* ── Preview placeholder (Round 2) ───────────────────────── */
+.future-block {
+  margin: 28px 0;
+  padding: 28px 22px;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-hi);
+  border-radius: 2px;
+  text-align: center;
+}
+.future-tag {
+  display: inline-block;
+  background: var(--amber-dim);
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.future-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+.future-desc {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* ── Action row ──────────────────────────────────────────── */
+.action-row {
+  display: flex; gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.btn {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 10px 18px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.btn:hover { background: var(--surface-2); border-color: var(--border-hi); }
+.btn.primary {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--void);
+}
+.btn.primary:hover {
+  background: var(--amber-hi);
+  border-color: var(--amber-hi);
+  box-shadow: 0 4px 14px var(--amber-glow);
+}
+.btn.danger {
+  color: var(--rose);
+  border-color: var(--rose);
+}
+.btn.danger:hover {
+  background: rgba(155,35,53,0.10);
+}
+.btn:disabled, .btn.future {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border-color: var(--border);
+  box-shadow: none;
+}
+.btn.future::before {
+  content: "R3 · ";
+  color: var(--amber);
+  opacity: 0.7;
+}
+.action-row .spacer { flex: 1; }
+
+/* ── Moots pane (right) ──────────────────────────────────── */
+#moots-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--ink-3);
+}
+#moots-empty .glyph {
+  font-family: var(--font-display);
+  font-size: 36px;
+  color: var(--amber-dim);
+  margin-bottom: 14px;
+}
+#moots-empty .msg {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1.6;
+}
+#moots-empty .future-tag {
+  margin-top: 16px;
+  display: inline-block;
+}
+
+/* ── Footer status ───────────────────────────────────────── */
+#footer {
+  background: var(--surface-1);
+  border-top: 1px solid var(--border);
+  padding: 0 16px;
+  display: flex; align-items: center; gap: 16px;
+  font-size: 9px;
+  color: var(--ink-3);
+  letter-spacing: 0.12em;
+}
+#footer .sep { color: var(--ink-4); }
+#footer .right { margin-left: auto; }
+
+/* ── Toast ───────────────────────────────────────────────── */
+#toast {
+  position: fixed;
+  bottom: 38px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface-3);
+  border: 1px solid var(--amber);
+  color: var(--ink);
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms, transform 200ms;
+  z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Detail readouts (after save, beneath name) ──────────── */
+.world-meta-strip {
+  display: flex; gap: 14px;
+  padding: 8px 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  border-bottom: 1px dotted var(--border);
+}
+.world-meta-strip .k { color: var(--ink-4); }
+.world-meta-strip .v { color: var(--ink-2); }
+.world-meta-strip .v.amber { color: var(--amber); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ─── TOPBAR ─────────────────────────────────────── -->
+  <div id="topbar">
+    <div id="brand">
+      <span id="brand-glyph">⊕</span>
+      <span id="brand-name">ATLAS</span>
+      <span id="brand-tag">the worlds you weave</span>
+    </div>
+    <div class="actions">
+      <span class="live-dot" id="live-dot"></span>
+      <span id="status-text">booting…</span>
+      <span style="color:var(--ink-4);font-size:9px;letter-spacing:.12em;margin-left:8px">last:</span>
+      <span id="last-event" style="font-family:var(--font-mono);font-size:9px;color:var(--ink-3);letter-spacing:.08em;min-width:48px">—</span>
+    </div>
+  </div>
+
+  <!-- ─── MAIN ───────────────────────────────────────── -->
+  <main>
+
+    <!-- CATALOG -->
+    <section class="pane" id="pane-catalog">
+      <div class="pane-head">
+        <h2>Catalog</h2>
+        <span class="meta" id="catalog-count">0</span>
+      </div>
+      <div class="pane-body">
+        <button id="new-world-btn">+ new world</button>
+        <div id="catalog-list">
+          <div class="empty-list">
+            no worlds yet.<br>
+            weave one.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITOR -->
+    <section class="pane" id="pane-editor">
+      <div class="pane-head">
+        <h2>Editor</h2>
+        <span class="meta" id="editor-meta"></span>
+      </div>
+      <div class="pane-body" style="padding: 0;">
+
+        <!-- Empty state -->
+        <div id="editor-empty">
+          <div class="glyph">⊕</div>
+          <div class="msg">
+            Select a world from the catalog,<br>
+            or weave a new one to begin.
+          </div>
+        </div>
+
+        <!-- Active editor -->
+        <div id="editor">
+          <input type="text" id="editor-name" placeholder="name your world…" maxlength="64" autocomplete="off" spellcheck="false">
+          <div id="editor-subtitle" class="hidden">a deterministic substrate, addressed by seed</div>
+
+          <div class="world-meta-strip" id="world-meta-strip" style="display:none;">
+            <span><span class="k">id</span> <span class="v" id="meta-id">—</span></span>
+            <span><span class="k">birthHash</span> <span class="v" id="meta-hash">—</span></span>
+            <span><span class="k">created</span> <span class="v" id="meta-created">—</span></span>
+          </div>
+
+          <div class="field-grid">
+
+            <div class="field">
+              <label>Seed</label>
+              <div class="field-input-row">
+                <input type="text" id="f-seed" inputmode="numeric" autocomplete="off" spellcheck="false">
+                <button class="icon-btn" id="seed-shuffle" title="randomize seed">🎲</button>
+              </div>
+              <div class="field-help">A 32-bit number. Names this world uniquely. Same seed, same world, forever.</div>
+            </div>
+
+            <div class="field">
+              <label>Epoch</label>
+              <input type="number" id="f-epoch" min="1" max="9999" value="1">
+              <div class="field-help">Bump when you change the substrate function. Old witnesses against earlier epochs become stale.</div>
+            </div>
+
+            <div class="field">
+              <label>Dimensions</label>
+              <div class="dim-pair">
+                <input type="number" id="f-width" min="4" max="200" value="20">
+                <span class="dim-x">×</span>
+                <input type="number" id="f-height" min="4" max="200" value="15">
+              </div>
+              <div class="field-help">Width × height in tiles.</div>
+            </div>
+
+            <div class="field">
+              <label>Density</label>
+              <div class="density-row">
+                <input type="range" id="f-density" min="0" max="100" step="1" value="14">
+                <span class="density-readout" id="density-readout">14%</span>
+              </div>
+              <div class="field-help">Probability that any given tile holds a moot.</div>
+            </div>
+
+            <div class="field">
+              <label>Rarity tiers</label>
+              <input type="number" id="f-rarity-tiers" min="1" max="8" value="4">
+              <div class="field-help">How many bands of rarity exist on this world.</div>
+            </div>
+
+            <div class="field">
+              <label>Palette generator</label>
+              <select id="f-palette">
+                <option value="type-coupled">type-coupled — visual telegraphs type</option>
+                <option value="triadic">triadic — designed, math-cohesive</option>
+                <option value="random">random — chaos, characterful</option>
+                <option value="shiny">shiny — rare alt-form bias</option>
+                <option value="environment">environment — biome-locked</option>
+              </select>
+              <div class="field-help">Round 2 wires these to actual generator vibes; for now they save as named identifiers.</div>
+            </div>
+
+            <div class="field full">
+              <label>Notes</label>
+              <textarea id="f-notes" placeholder="describe the world's character — its weather, its silence, its myths…"></textarea>
+            </div>
+
+          </div>
+
+          <!-- Round 2 placeholder -->
+          <div class="future-block">
+            <span class="future-tag">Round 2</span>
+            <div class="future-title">Live tile sampling</div>
+            <div class="future-desc">
+              The substrate function rendered as you tune. Sample creatures appear here in real time —
+              same renderer family as PHANTIVEX, byte-compatible with the witness substrate.
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn primary" id="save-btn">Save world</button>
+            <button class="btn danger" id="delete-btn" style="display:none;">Delete</button>
+            <div class="spacer"></div>
+            <button class="btn future" id="bundle-btn" disabled>Bundle for release</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOOTS -->
+    <section class="pane" id="pane-moots">
+      <div class="pane-head">
+        <h2>Moots</h2>
+        <span class="meta" id="moots-count">—</span>
+      </div>
+      <div class="pane-body">
+        <div id="moots-empty">
+          <div class="glyph">◐</div>
+          <div class="msg">
+            Witnessed moots will collect here<br>
+            once you explore your world.
+          </div>
+          <div class="future-tag">Round 3</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── FOOTER ─────────────────────────────────────── -->
+  <div id="footer">
+    <span id="footer-state">round 1 · scaffolded</span>
+    <span class="sep">·</span>
+    <span id="footer-channel">vibe.* via library</span>
+    <span class="right" id="footer-version">atlas/1.0</span>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════════════
+   ATLAS — the worlds you weave
+   Round 1.1: kernel-aware scaffolding, schema, persistence via Vibes Library
+
+   Patch notes (1.1):
+   • Kernel handshake registered at the top of the script — if any UI wiring
+     below throws, the handshake still attaches and BOOT can land.
+   • Standalone fallback bumped 1200ms → 2500ms, gated on !port not just
+     !mounted (so we don't false-flag during MOUNT_CHALLENGE roundtrip).
+   • Standalone toast uses amber (info) not rose (error) — it's not a bug.
+   • Footer-channel and status text reset on MOUNTED to clear stale
+     standalone-mode copy.
+   ════════════════════════════════════════════════════════════════════════ */
+
+// ── Kernel I/O — shared Nexus block client.
+let mounted = false;
+let port = null; // legacy standalone sentinel retained for fallback check.
+window.addEventListener('message', e => { if (e.data && e.data.type === 'BOOT') port = {}; });
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ['vibe.save', 'vibe.load', 'vibe.list', 'vibe.delete', 'vibe.tag', 'vibe.lineage', 'nexus.launch', 'system.environment.selected'],
+    consumes: ['vibe.result', 'vibe.notify'],
+    app: { title: 'Atlas', icon: '⊕', description: 'Worlds, moots, releases', visible: true }
+  },
+  onMessage({ channel, payload }) {
+    setLastEvent(channel);
+    if (channel === 'vibe.notify') {
+      const p = payload || {};
+      if (!p.envelope || p.envelope.type === 'world') {
+        loadAllWorlds().catch(err => console.error('[atlas] notify-driven reload failed', err));
+      }
+    }
+  }
+});
+
+if (nx) {
+  nx.ready.then(async () => {
+    mounted = true;
+    setLastEvent('MOUNTED');
+    try { setConnected(); } catch (err) { console.error('[atlas] setConnected failed', err); }
+    try { await loadAllWorlds(); } catch (err) { console.error('[atlas] initial loadAllWorlds failed', err); }
+  });
+}
+
+// Tiny diagnostic: surface the last kernel event in the status text. If the
+// dot stays amber and this never updates from "—", the catalog entry is
+// almost certainly missing from BUILTIN_CATALOG and Nexus is spawning Atlas
+// in legacy mode (no BOOT). If it updates to BOOT but never reaches MOUNTED,
+// something is failing in the handshake itself — check the kernel feed.
+function setLastEvent(name) {
+  const el = document.getElementById('last-event');
+  if (el) el.textContent = name;
+}
+
+function emit(channel, payload) {
+  if (nx) nx.emit(channel, payload);
+}
+function call(channel, payload, timeoutMs = 8000) {
+  if (!nx) return Promise.reject(new Error('not connected to Nexus'));
+  return nx.request(channel, payload, { timeout: timeoutMs });
+}
+
+// ── Canonical hash (matches the rest of the stack) ──────────────────────
+function canonical(v) {
+  if (v === null || v === undefined) return JSON.stringify(v);
+  if (typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';
+  return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canonical(v[k])).join(',') + '}';
+}
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ── State ───────────────────────────────────────────────────────────────
+const ATLAS_LOCAL_KEY = 'atlas:worlds:fallback:v1';
+function readLocalWorlds() {
+  try { const arr = JSON.parse(localStorage.getItem(ATLAS_LOCAL_KEY) || '[]'); return Array.isArray(arr) ? arr : []; } catch { return []; }
+}
+function writeLocalWorlds(worlds) {
+  try { localStorage.setItem(ATLAS_LOCAL_KEY, JSON.stringify(worlds.slice(-80))); } catch (_) {}
+}
+function upsertLocalWorld(envelope) {
+  const worlds = readLocalWorlds().filter(w => w.id !== envelope.id);
+  worlds.push(envelope);
+  writeLocalWorlds(worlds);
+}
+function deleteLocalWorld(id) { writeLocalWorlds(readLocalWorlds().filter(w => w.id !== id)); }
+
+const state = {
+  worlds: [],         // [{id, name, payload, createdAt, birthHash, ...}]
+  selectedId: null,   // id of currently-edited world (null → new/blank)
+  dirty: false        // editor has unsaved changes
+};
+
+const $ = id => document.getElementById(id);
+const escHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+function showToast(msg, isError = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.style.borderColor = isError ? 'var(--rose)' : 'var(--amber)';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── World schema & defaults ─────────────────────────────────────────────
+const WORLD_FORMAT = 'atlas-world/1';
+
+function defaultWorldPayload() {
+  // Random 32-bit seed, friendly defaults
+  const seed = Math.floor(Math.random() * 0xFFFFFFFF) >>> 0;
+  return {
+    format: WORLD_FORMAT,
+    name: '',                                // user fills in
+    seed,                                    // 32-bit unsigned
+    epoch: 1,                                // bump on substrate-fn change
+    width: 20, height: 15,
+    density: 0.14,                           // 0..1
+    rarityTiers: 4,                          // count
+    paletteGenerator: 'type-coupled',        // identifier
+    encounterBias: null,                     // R2: ref to encounter-table vibe
+    notes: ''
+  };
+}
+
+// Read editor → payload
+function readEditor() {
+  const seedRaw = $('f-seed').value.trim();
+  // accept hex (0x...) or decimal
+  let seed = 0;
+  if (/^0x/i.test(seedRaw)) seed = parseInt(seedRaw, 16);
+  else seed = parseInt(seedRaw, 10);
+  if (!Number.isFinite(seed)) seed = 0;
+  seed = seed >>> 0;
+
+  return {
+    format: WORLD_FORMAT,
+    name: $('editor-name').value.trim(),
+    seed,
+    epoch: Math.max(1, parseInt($('f-epoch').value, 10) || 1),
+    width: clampInt($('f-width').value, 4, 200, 20),
+    height: clampInt($('f-height').value, 4, 200, 15),
+    density: clamp01(parseInt($('f-density').value, 10) / 100),
+    rarityTiers: clampInt($('f-rarity-tiers').value, 1, 8, 4),
+    paletteGenerator: $('f-palette').value,
+    encounterBias: state.selectedId
+      ? (state.worlds.find(w => w.id === state.selectedId)?.payload?.encounterBias ?? null)
+      : null,
+    notes: $('f-notes').value
+  };
+}
+
+function clampInt(v, min, max, fallback) {
+  const n = parseInt(v, 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
+}
+function clamp01(n) {
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(1, n));
+}
+
+// Write payload → editor
+function writeEditor(payload) {
+  $('editor-name').value = payload.name || '';
+  $('f-seed').value = '0x' + (payload.seed >>> 0).toString(16).padStart(8, '0');
+  $('f-epoch').value = payload.epoch ?? 1;
+  $('f-width').value = payload.width ?? 20;
+  $('f-height').value = payload.height ?? 15;
+  $('f-density').value = Math.round((payload.density ?? 0.14) * 100);
+  $('density-readout').textContent = Math.round((payload.density ?? 0.14) * 100) + '%';
+  $('f-rarity-tiers').value = payload.rarityTiers ?? 4;
+  $('f-palette').value = payload.paletteGenerator ?? 'type-coupled';
+  $('f-notes').value = payload.notes ?? '';
+}
+
+// ── Editor lifecycle ────────────────────────────────────────────────────
+function openEmpty() {
+  state.selectedId = null;
+  state.dirty = false;
+  $('editor-empty').style.display = 'flex';
+  $('editor').classList.remove('active');
+  $('editor-meta').textContent = '';
+  document.querySelectorAll('.world-row.selected').forEach(el => el.classList.remove('selected'));
+}
+
+function openNew() {
+  state.selectedId = null;
+  state.dirty = false;
+  writeEditor(defaultWorldPayload());
+  $('editor-empty').style.display = 'none';
+  $('editor').classList.add('active');
+  $('editor-meta').textContent = 'unsaved';
+  $('world-meta-strip').style.display = 'none';
+  $('delete-btn').style.display = 'none';
+  document.querySelectorAll('.world-row.selected').forEach(el => el.classList.remove('selected'));
+  setTimeout(() => $('editor-name').focus(), 50);
+}
+
+function openWorld(env) {
+  state.selectedId = env.id;
+  state.dirty = false;
+  writeEditor(env.payload);
+  $('editor-empty').style.display = 'none';
+  $('editor').classList.add('active');
+  $('editor-meta').textContent = env.id.slice(-12);
+  $('world-meta-strip').style.display = 'flex';
+  $('meta-id').textContent = env.id;
+  $('meta-hash').textContent = (env.birthHash || '').slice(0, 12) + '…';
+  $('meta-created').textContent = formatDate(env.createdAt);
+  $('delete-btn').style.display = 'inline-block';
+
+  document.querySelectorAll('.world-row').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === env.id);
+  });
+}
+
+function formatDate(s) {
+  if (!s) return '—';
+  try {
+    const d = new Date(s);
+    return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch { return '—'; }
+}
+
+// ── Catalog rendering ───────────────────────────────────────────────────
+function renderCatalog() {
+  const list = $('catalog-list');
+  $('catalog-count').textContent = state.worlds.length;
+
+  if (state.worlds.length === 0) {
+    list.innerHTML = `<div class="empty-list">No worlds yet.<br>The shelf is quiet. Weave one, then walk it.</div>`;
+    return;
+  }
+
+  // Sort: most recent first
+  const sorted = [...state.worlds].sort((a, b) => {
+    const ta = new Date(a.createdAt || 0).getTime();
+    const tb = new Date(b.createdAt || 0).getTime();
+    return tb - ta;
+  });
+
+  list.innerHTML = sorted.map(w => {
+    const name = escHtml(w.name || w.payload?.name || 'untitled');
+    const seed = (w.payload?.seed >>> 0).toString(16).padStart(8, '0');
+    const dim = `${w.payload?.width ?? '?'}×${w.payload?.height ?? '?'}`;
+    return `
+      <div class="world-row${w.id === state.selectedId ? ' selected' : ''}" data-id="${escHtml(w.id)}">
+        <div class="name">${name}</div>
+        <div class="meta">0x${seed} · ${dim} · e${w.payload?.epoch ?? 1}</div>
+      </div>
+    `;
+  }).join('');
+
+  list.querySelectorAll('.world-row').forEach(row => {
+    row.addEventListener('click', async () => {
+      const id = row.dataset.id;
+      const summary = state.worlds.find(x => x.id === id);
+      if (!summary) return;
+      let env = summary;
+      if (!env.payload || !Object.keys(env.payload).length) {
+        const full = await loadWorldFull(id);
+        if (!full) { showToast('load failed: world payload unavailable', true); return; }
+        env = full;
+        state.worlds = state.worlds.map(w => w.id === id ? { ...w, ...full } : w);
+      }
+      openWorld(env);
+    });
+  });
+}
+
+// ── Load / save world via Vibes Library ─────────────────────────────────
+async function loadAllWorlds() {
+  if (!mounted) return;
+  try {
+    const res = await call('vibe.list', { type: 'world' });
+    if (!res.ok) {
+      showToast(`load failed: ${res.error || 'unknown'}`, true);
+      return;
+    }
+    // vibe.list returns summaries only. Row click lazily hydrates via vibe.load.
+    state.worlds = (res.data || []).map(d => ({
+      id: d.id,
+      name: d.name,
+      type: d.type,
+      createdAt: d.createdAt,
+      birthHash: d.birthHash,
+      payload: d.payload || {}
+    }));
+    renderCatalog();
+  } catch (e) {
+    console.error('[atlas] list failed', e);
+    const local = readLocalWorlds();
+    state.worlds = local;
+    renderCatalog();
+    showToast(local.length ? `library asleep · showing ${local.length} local world${local.length===1?'':'s'}` : 'library asleep · local world shelf ready');
+    emit('nexus.launch', { path:'./blocks/vibes/vibes-library.html', title:'Vibes Library', icon:'◈' });
+  }
+}
+
+async function loadWorldFull(id) {
+  // If a summary lacks payload, fetch the full envelope.
+  try {
+    const res = await call('vibe.load', { id });
+    if (res.ok && res.envelope) return res.envelope;
+  } catch (e) {
+    console.error('[atlas] load failed', e);
+  }
+  return null;
+}
+
+async function saveCurrent() {
+  const payload = readEditor();
+  if (!payload.name) {
+    showToast('name your world before saving', true);
+    $('editor-name').focus();
+    return;
+  }
+
+  // Compute content-addressed id (matches Library convention: v_<type>_<16hex>)
+  const hash = await sha256Hex(canonical(payload));
+  const id = `v_world_${hash.slice(0, 16)}`;
+  const birthHash = `sha256:${hash}`;
+  const createdAt = new Date().toISOString();
+
+  const envelope = {
+    format: 'vibe/1',
+    id,
+    type: 'world',
+    subFormat: WORLD_FORMAT,
+    name: payload.name,
+    tags: [],
+    parents: state.selectedId ? [state.selectedId] : [],
+    birthHash,
+    createdAt,
+    source: 'atlas',
+    payload
+  };
+
+  try {
+    let res = null;
+    try { res = await call('vibe.save', { envelope }); } catch (err) { res = { ok:false, error:err.message, localFallback:true }; }
+    if (!res.ok) {
+      upsertLocalWorld(envelope);
+      showToast(`saved locally · ${payload.name}`);
+    } else {
+      upsertLocalWorld(envelope);
+      showToast(`saved · ${payload.name}`);
+    }
+    try { localStorage.setItem('nexus:selected-environment:v1', JSON.stringify(payload)); } catch (_) {}
+    emit('system.environment.selected', payload);
+    state.dirty = false;
+
+    // Reload list and re-select
+    await loadAllWorlds();
+    const justSaved = state.worlds.find(w => w.id === id);
+    if (justSaved) openWorld(justSaved);
+  } catch (e) {
+    console.error('[atlas] save failed', e);
+    showToast(`save failed: ${e.message}`, true);
+  }
+}
+
+async function deleteCurrent() {
+  if (!state.selectedId) return;
+  const w = state.worlds.find(x => x.id === state.selectedId);
+  if (!w) return;
+  if (!confirm(`Delete "${w.name}"? This cannot be undone.`)) return;
+
+  try {
+    let res = null;
+    try { res = await call('vibe.delete', { id: state.selectedId }); } catch (err) { res = { ok:false, error:err.message, localFallback:true }; }
+    deleteLocalWorld(state.selectedId);
+    if (!res.ok) showToast(`deleted locally · ${w.name}`);
+    else showToast(`deleted · ${w.name}`);
+    state.worlds = state.worlds.filter(x => x.id !== state.selectedId);
+    openEmpty();
+    renderCatalog();
+  } catch (e) {
+    showToast(`delete failed: ${e.message}`, true);
+  }
+}
+
+// ── UI wiring (defensive) ───────────────────────────────────────────────
+// Each listener attachment is independent — a broken element can't poison
+// the rest. The kernel handshake is already attached above and unaffected.
+function wireUI() {
+  const safeOn = (id, ev, fn) => {
+    const el = $(id);
+    if (!el) { console.warn(`[atlas] missing element: #${id}`); return; }
+    el.addEventListener(ev, fn);
+  };
+
+  safeOn('new-world-btn', 'click', () => openNew());
+  safeOn('save-btn',      'click', () => saveCurrent());
+  safeOn('delete-btn',    'click', () => deleteCurrent());
+
+  safeOn('seed-shuffle', 'click', () => {
+    const s = Math.floor(Math.random() * 0xFFFFFFFF) >>> 0;
+    $('f-seed').value = '0x' + s.toString(16).padStart(8, '0');
+    state.dirty = true;
+  });
+
+  safeOn('f-density', 'input', e => {
+    $('density-readout').textContent = e.target.value + '%';
+    state.dirty = true;
+  });
+
+  // Mark editor dirty on any field change
+  ['editor-name', 'f-seed', 'f-epoch', 'f-width', 'f-height',
+   'f-rarity-tiers', 'f-palette', 'f-notes'].forEach(id => {
+    safeOn(id, 'input', () => { state.dirty = true; });
+  });
+
+  // Cmd/Ctrl+S to save
+  window.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      if ($('editor').classList.contains('active')) saveCurrent();
+    }
+  });
+}
+
+try { wireUI(); }
+catch (err) { console.error('[atlas] wireUI failed', err); }
+
+// ── Connection state UI ─────────────────────────────────────────────────
+function setConnected() {
+  $('live-dot').classList.remove('standalone');
+  $('live-dot').classList.add('connected');
+  $('status-text').textContent = 'connected · library';
+  $('footer-channel').textContent = 'vibe.* via library';
+  $('footer-state').textContent = 'round 1 · live';
+}
+function setStandalone() {
+  $('live-dot').classList.remove('connected');
+  $('live-dot').classList.add('standalone');
+  $('status-text').textContent = 'standalone';
+  $('footer-channel').textContent = 'no library — open Vibes Library to persist';
+}
+
+// ── Standalone fallback ─────────────────────────────────────────────────
+// If no port arrives within ~2.5s, we're outside Nexus or the kernel never
+// sent BOOT. Show standalone state with an info-toned (amber) toast, not
+// an error toast — running standalone is a valid mode, not a bug.
+//
+// Bumped from 1200ms because Atlas does an immediate vibe.list on MOUNTED;
+// on a cold-start with the kernel still wiring iframes, MOUNT_CHALLENGE
+// can take longer than 1200ms to round-trip.
+setTimeout(() => {
+  if (!port) {
+    setStandalone();
+    showToast('running standalone — open inside Nexus OS to persist worlds');
+  }
+}, 2500);
+
+// Init render
+openEmpty();
+</script>
+</body>
+</html>

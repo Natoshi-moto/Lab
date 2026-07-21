@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexus.products-registry/v1",
+  "title": "Nexus Lab product registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status_authority", "packages"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema": {"const": "nexus.products-registry/v1"},
+    "status_authority": {"const": "NONE"},
+    "packages": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/package"}
+    }
+  },
+  "$defs": {
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "kind", "ring", "status", "status_authority", "parent_programme", "checkpoint_bind", "nested_git", "ai_default_seat", "fat_drop_include", "synthetic_economy_surface", "real_world_value_forbidden", "readme"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "path": {"type": "string", "pattern": "^products/[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "kind": {"enum": ["host", "blocks", "engine", "tool", "drop-slice"]},
+        "ring": {"type": "integer", "minimum": 0, "maximum": 3},
+        "status": {"enum": ["scaffold", "build", "runtime-pending", "drop-ready"]},
+        "status_authority": {"const": "NONE"},
+        "parent_programme": {"const": "NOTED_PROJECT_OS_001"},
+        "checkpoint_bind": {"const": "BGEN-CANONICAL-CHECKPOINT-001"},
+        "nested_git": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "remote", "pinned_commit"],
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "remote": {"type": ["string", "null"]},
+            "pinned_commit": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"}
+          }
+        },
+        "ai_default_seat": {"enum": ["codex", "claude", "grok", "any"]},
+        "fat_drop_include": {"type": "boolean"},
+        "synthetic_economy_surface": {"type": "boolean"},
+        "real_world_value_forbidden": {"const": true},
+        "readme": {"type": "string", "pattern": "^products/.+/README\\.md$"}
+      }
+    }
+  }
+}

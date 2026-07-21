@@ -1,0 +1,1042 @@
+{
+  "version": "canvas-exchange/1",
+  "exportedAt": "2026-05-27T21:30:00.000Z",
+  "records": [
+    {
+      "id": "mpiebq4w-sjrs5nly",
+      "tileType": "document",
+      "title": "Nexus Mobile",
+      "body": "Private messaging app for Android (will be ported to web).\n\nThe thesis: your conversations are part of your knowledge graph. Not a separate silo. Nexus Mobile is the encrypted channel through which you move information between your own devices, between collaborators, and eventually between Noted workspaces \u2014 without surrendering any of it to a platform.\n\nAndroid-first because Android gives you real filesystem access, sideloading, and the user base that actually cares about not being surveilled. Web port follows once the protocol is stable.\n\nThis is not a Signal replacement. It is what you use when you need Signal-grade encryption AND you need the thing you're discussing to land inside your private knowledge system.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpizxt6e-0w8d4k8y",
+      "tileType": "note",
+      "title": "Encryption tools",
+      "body": "Full possible suite. Working definition:\n\n\u2014 End-to-end encryption on all message content (Double Ratchet or equivalent)\n\u2014 Forward secrecy: compromising today's key doesn't expose yesterday's messages\n\u2014 Sealed sender: the relay can't see who is messaging whom, only that a message exists\n\u2014 Local encryption at rest: device storage encrypted with user-controlled key, not platform key\n\u2014 Metadata minimisation: no persistent contact graph on the server side\n\nThe ambition is: an attacker with full access to the relay server learns nothing about the content or the participants. That's the bar.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpizuisd-9efdou3z",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Military encryption \u2014 this means FIPS 140-2 / 140-3 validated cryptographic modules. AES-256-GCM for symmetric, Curve25519 for key exchange, SHA-3 for hashing. Not marketing language \u2014 specific algorithm choices that survive scrutiny. Worth building in from the start because retrofitting cryptographic choices later is a nightmare.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-enc-signal-protocol",
+      "tileType": "note",
+      "title": "Signal Protocol reference",
+      "body": "The Double Ratchet algorithm (Signal Protocol) is the current gold standard for asynchronous E2E messaging. Key properties:\n\n\u2014 Combines a Diffie-Hellman ratchet (forward secrecy) with a symmetric key ratchet (break-in recovery)\n\u2014 Each message uses a derived key; past keys are deleted after use\n\u2014 Handles out-of-order delivery and offline scenarios gracefully\n\nOptions: use Signal's open-source libsignal directly, implement Double Ratchet from spec, or evaluate MLS (Message Layer Security \u2014 the IETF standard, designed for group messaging at scale).\n\nMLS is probably the right long-term bet if group collab on Noted workspaces is in scope \u2014 it handles membership changes (add/remove from a workspace) more cleanly than Double Ratchet.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-enc-metadata-privacy",
+      "tileType": "note",
+      "title": "Metadata privacy \u2014 the hard problem",
+      "body": "Content encryption is solved. Metadata is where most surveillance actually happens.\n\nWhat leaks even with perfect E2E encryption:\n\u2014 Who is talking to whom (the social graph)\n\u2014 When they talk (timing patterns)\n\u2014 How much they're saying (message volume and size)\n\u2014 Whether they're online\n\nSignal's sealed sender partially addresses the social graph. Tor-style routing addresses timing. Most consumer apps ignore this entirely.\n\nFor Nexus Mobile: minimum bar is sealed sender. Stretch goal is something like private contact discovery (you can find a contact without the server learning who you looked up). This is an active research area \u2014 see Signal's private contact discovery using Intel SGX and the alternatives being built on ZK proofs.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-enc-key-management",
+      "tileType": "note",
+      "title": "Key management on device",
+      "body": "The weakest link in most encrypted apps is key storage, not the encryption algorithm.\n\nKey decisions:\n\u2014 Identity key: generated on device, never leaves device, not backed up to cloud\n\u2014 Registration: no phone number. Identity is a public key. Discovery is a solved problem with QR code or direct link exchange.\n\u2014 Key backup: user-controlled encrypted backup (export to file, decrypt with passphrase). No vendor escrow.\n\u2014 Device linking: linked devices get a sub-key derived from the identity key. Revocation of a linked device is instant and local.\n\u2014 Compromise recovery: if identity key is compromised, a new identity is the answer. There is no account recovery in the traditional sense. This is the right design.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-enc-no-phone-number",
+      "tileType": "scrap",
+      "title": "",
+      "body": "No phone number required to register. This is a hard line. Phone number = real identity traceable to you. Identity should be a public key, shared via QR code or short invite link. Contact discovery via hash comparison (never upload your contacts plaintext). First-run generates the key pair, shows a QR, done.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-enc-forward-secrecy",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Forward secrecy is non-negotiable. If someone steals my device in five years and breaks my key, they should not be able to read conversations from today. Every message derives a fresh encryption key from a ratchet. Old keys are deleted immediately after use. This is what makes Signal messages safe even after key compromise \u2014 and it's table stakes.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpizytym-mvq04mmr",
+      "tileType": "note",
+      "title": "Nested messengers",
+      "body": "Nexus Mobile as an aggregator shell for other encrypted apps. The insight: people who care about privacy already use 3-4 messengers. They context-switch constantly. A unified inbox for privacy-conscious messaging is genuinely useful \u2014 not as a way to replace those apps, but as a way to make living with them less friction-heavy.\n\nCandidate integrations:\n\u2014 Pidgeon (Signal wrapper for Android)\n\u2014 ProtonMail (encrypted email as messages)\n\u2014 Briar (P2P, works without internet via Bluetooth/WiFi)\n\u2014 Session (no phone number, decentralised)\n\u2014 Matrix/Element (federated, self-hostable)\n\nTechnical model: each nested app runs in its own sandboxed context. Nexus Mobile reads notifications, presents a unified timeline, but routes send actions back to the source app. No plaintext ever passes through the Nexus layer \u2014 it reads sealed notifications only.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-nest-protonmail",
+      "tileType": "note",
+      "title": "ProtonMail bridge",
+      "body": "Encrypted email as a first-class messaging format inside Nexus Mobile.\n\nProton has an official Bridge app for desktop (IMAP/SMTP over local encrypted tunnel) but nothing clean for Android. A Nexus Mobile ProtonMail integration would:\n\u2014 Use Proton's official mobile API (they have one)\n\u2014 Show ProtonMail threads in the unified inbox\n\u2014 Allow compose/reply without leaving Nexus\n\u2014 Strip tracking pixels on inbound\n\u2014 Never cache decrypted content outside the app's encrypted storage\n\nThis is a differentiator. The power user who has moved to Proton but still wants a unified view doesn't have a good solution right now.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-nest-unified-inbox",
+      "tileType": "note",
+      "title": "Unified inbox design",
+      "body": "The unified inbox is a triage surface, not a feed. Key design principle: you come to it, it doesn't interrupt you.\n\nLayout model:\n\u2014 Source-labelled thread rows (Signal thread, ProtonMail thread, Briar contact)\n\u2014 Sorted by recency within a priority tier (priority = contacts you've manually elevated)\n\u2014 No algorithmic ranking. No read receipts surfaced unless you opt in.\n\u2014 Swipe to archive. Archive is not delete.\n\u2014 Quick reply without leaving the inbox surface for short responses\n\nThe visual language: each nested source has a colour tag. The colour is semantic \u2014 you define what it means (like Nexus Notes Semantic Color Engine). Your Signal contacts might be one colour, ProtonMail another. The inbox reads as a field of meaning, not a notification list.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-nest-contact-graph",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Contact import from nested apps must never upload contact graphs. Private contact discovery: hash your local contacts, compare hashes against other users' hashed contacts on the server, learn only the intersection. The server never sees plaintext names or numbers. This is how Signal does it. Copy it exactly.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-nest-notification-strategy",
+      "tileType": "note",
+      "title": "Notification strategy",
+      "body": "Notifications are a surveillance surface. Android notifications can be read by other apps, by the manufacturer, by Google. Options:\n\n1. Local-only notifications: content never appears in the Android notification shade. Nexus Mobile uses a persistent foreground service that shows a simple 'New messages' count with no preview. User must open the app to read.\n\n2. Encrypted push via UnifiedPush (privacy-respecting alternative to FCM/GCM). The push notification contains only an encrypted token; content is fetched over the secure channel after the app decrypts the token.\n\n3. No push at all: polling mode. Battery-inefficient but maximally private.\n\nDefault: option 2 (UnifiedPush). Option 1 as user-selectable for highest-security mode. Option 3 for users who run their own server.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpj009x3-5du5vl9b",
+      "tileType": "note",
+      "title": "Collaborate on Noted projects",
+      "body": "The most interesting feature in the whole product and the least defined. The thesis: a conversation inside Nexus Mobile should be able to reference a Noted workspace node directly. Not a screenshot, not a copy-paste \u2014 a live pointer to a record in your Noted graph.\n\nWhat this enables:\n\u2014 'I'm working on this argument, here's the node, comment on it'\n\u2014 Real-time co-editing of a Noted canvas section inside a conversation\n\u2014 A shared project workspace where the conversation IS the annotation layer over the knowledge graph\n\nThe hard design question: how much of your Noted workspace does the other person see? The answer has to be: exactly what you explicitly share, nothing more. The sharing model must be as granular as the Noted node model \u2014 you share a record, not a workspace.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-collab-sync-architecture",
+      "tileType": "note",
+      "title": "Sync architecture for shared workspaces",
+      "body": "CRDTs (Conflict-free Replicated Data Types) are the right foundation for real-time collaborative editing in a local-first, encrypted system.\n\nWhy CRDTs:\n\u2014 They merge concurrent edits without a central coordinator\n\u2014 Changes can be encrypted and exchanged peer-to-peer\n\u2014 They work offline: you edit locally, sync when the other person is reachable\n\u2014 No server needs to see the plaintext to resolve conflicts\n\nYjs is the mature TypeScript CRDT library. It powers linear.app, Notion's offline mode, and several collaborative editors. It can be encrypted before transmission and decrypted locally. This is the right dependency to evaluate.\n\nScope gate: real-time collab is a Phase 2+ feature. Phase 1 is share-a-node-read-only. Don't build Yjs integration until the messaging core is stable.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-collab-permission-model",
+      "tileType": "note",
+      "title": "Permission model \u2014 who sees what",
+      "body": "Share granularity must match the Noted node model:\n\n\u2014 Share a single record: recipient sees title + body + tags. No lineage, no backlinks, no project context unless explicitly included.\n\u2014 Share a record with lineage: recipient sees the conversion chain (where this record came from). Useful for showing your thinking process.\n\u2014 Share a canvas patch: a signed, structured subset of the workspace (a Noted Packet). Recipient can import it through their own quarantine.\n\u2014 Share a live project: real-time sync on a defined project boundary. Both parties see additions; deletions require both to agree.\n\nPrivacy invariant: the sharing UI must make the boundary visible before you share. Not a settings page \u2014 the share modal shows exactly what the recipient will receive, in the same structure they'll see it.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-collab-noted-packet",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Sharing a Noted canvas inside a conversation is sharing your thinking process, not just your conclusion. That's a different kind of communication. It should feel like opening a door into a room, not attaching a file. The moment you send a Noted Packet over Nexus Mobile, the recipient's Nexus Mobile shows it as a structured preview \u2014 nodes visible, links visible \u2014 before they decide whether to import it into their own Noted.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpj04krn-vl3wk9v2",
+      "tileType": "note",
+      "title": "Gamify",
+      "body": "Gamification in a privacy app is a genuine design puzzle. The instinct is right \u2014 delight and surprise matter \u2014 but the typical gamification toolkit (streaks, badges, leaderboards, notifications) is mostly dark pattern territory.\n\nThe right frame: rewards for *presence* rather than *volume*. You shouldn't be rewarded for messaging more. You should be rewarded for messaging with intention, or for showing up in ways that feel genuine.\n\nAreas to explore:\n\u2014 Contextual surprises (an Easter egg when you hit a certain sequence of actions)\n\u2014 Earned unlocks (a feature appears after consistent use \u2014 not a paywall, a discovery)\n\u2014 Ambient delight (the app occasionally does something small and unexpected that has no purpose except to be pleasing)\n\u2014 Ritual mechanics (recurring events between two users that feel special rather than obligatory)",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpj04a84-4nefgboy",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Emoji only mode forced for a time limit unless you click something repeatedly that takes some effort. \u2014 This is a genuinely good mechanic. The friction of breaking out of emoji mode makes staying in it feel like a shared joke or a challenge between two people. Variations: emoji-only for the next 10 messages (mutual agreement); emoji-only until one person taps through 5 confirmation screens; random activation as a surprise from the app. The key is that it's mutual and the effort to escape is *legible* \u2014 both parties can see the other trying to get out.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-game-streaks",
+      "tileType": "note",
+      "title": "Streaks \u2014 done right",
+      "body": "Snapchat streaks are addictive because they create anxiety about breaking them. That's the wrong design.\n\nA streak mechanic done right:\n\u2014 Opt-in between two specific users, not global\n\u2014 Celebrates consistency without punishing gaps\n\u2014 No notification when a streak is about to break (that's the anxiety mechanic \u2014 don't do it)\n\u2014 The streak is a visible artifact only when you're *in* the conversation, not a badge on the app icon\n\u2014 When a streak ends, it becomes a memory: 'You and [contact] had a 47-day streak in March.' That's pleasant, not guilt-inducing.\n\nStretch: the streak could unlock a shared aesthetic (a subtle visual theme that only applies in that specific conversation for the duration of the streak).",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-game-easter-eggs",
+      "tileType": "note",
+      "title": "Easter eggs and hidden mechanics",
+      "body": "The app should have at least five things in it that the user discovers accidentally and never sees documented anywhere. Examples of the right kind:\n\n\u2014 A specific sequence of taps that changes the visual theme for 60 seconds\n\u2014 Typing a particular phrase that makes the interface respond in an unexpected way (once, then it won't do it again for a week)\n\u2014 A hidden room accessible only from a specific interaction pattern \u2014 a conversation with yourself, essentially a private journal mode\n\u2014 The app says something to you unprompted, once, and never again. Not a notification. A message from the product itself.\n\u2014 A contact you haven't messaged in a long time silently changes appearance \u2014 not an alert, just a subtle visual shift that you might notice or might not\n\nDesign principle: Easter eggs should be found, not earned. They're not rewards. They're gifts from the people who built the thing.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-game-anti-dark-patterns",
+      "tileType": "note",
+      "title": "Anti-dark-patterns \u2014 explicit commitments",
+      "body": "A list of mechanics we will never ship, stated publicly:\n\n\u2014 No streak-break notifications\n\u2014 No read receipt pressure (read receipts are off by default, never shown to the other person unless both opt in)\n\u2014 No typing indicators by default\n\u2014 No 'X is online' status unless the user has explicitly enabled presence sharing with that specific contact\n\u2014 No algorithmic ranking of conversations\n\u2014 No 'You haven't messaged Y in a while' prompts\n\u2014 No attention metrics of any kind (no message count, no response time statistics)\n\u2014 No social graph exposure (the app does not know who your contacts know)\n\nThis list belongs in the product's public values document, not just internal design notes. The commitment is worth making visible.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-game-unlock-mechanic",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Unlock mechanic idea: some features don't appear until you've used the app a certain way. Not a paywall \u2014 discovery. Example: the 'Quiet Hours' ritual feature (a mutual do-not-disturb pact between two contacts) doesn't appear in any menu until both people have been in a conversation for more than 30 days. It just shows up one day. The feature earning its place in your life before it asks to be a setting.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpj01h00-1tf4a8ku",
+      "tileType": "note",
+      "title": "Connect to the Nexus Ecosystem",
+      "body": "The long arc: Nexus Mobile, Nexus Notes (Noted), and eventually a Browser OS form a coherent ecosystem for people who want to live and work without surrendering their data to platforms.\n\nEach product stands alone \u2014 Noted doesn't require Nexus Mobile, Nexus Mobile doesn't require Noted. But when you have both, things get interesting:\n\n\u2014 Your Noted workspace nodes can be cited in conversations\n\u2014 A conversation thread can become a Noted record (with your explicit action, never automatically)\n\u2014 Your Nexus Mobile identity (public key) is the same identity you use for Noted Packets\n\u2014 Shared projects in Nexus Mobile sync via the same CRDT layer that Noted uses for collaboration\n\nBrowser OS: real, interesting, 2+ years away. Don't architect for it yet. Noted that the concept exists here and defer.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-eco-identity-bridge",
+      "tileType": "note",
+      "title": "Shared identity across Nexus apps",
+      "body": "The Nexus identity is a keypair, not an account.\n\nYour public key is your identity. It's the same key used in:\n\u2014 Nexus Mobile: your messaging identity, your inbox address\n\u2014 Noted Packets: the signature on a packet you export proves it came from you\n\u2014 Future Nexus Browser: your browsing identity for private sites\n\nKey infrastructure decisions:\n\u2014 Identity key generation: on-device, on first run, never transmitted\n\u2014 Cross-app key sharing: opt-in. Noted and Nexus Mobile can share a key if you choose, or use separate keys (privacy partition)\n\u2014 Key discovery: QR code, NFC tap, or a short fingerprint you read over voice\n\u2014 Recovery: none. You own the key, you're responsible for backing it up. This is the right answer for a privacy tool.\n\nThis is the deepest piece of the ecosystem design and needs its own architecture document eventually.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-eco-noted-handoff",
+      "tileType": "scrap",
+      "title": "",
+      "body": "The gesture I want: you're in a conversation. You long-press a message. One option is 'Send to Noted.' It creates a scrap in your Noted inbox with the message text, the contact name, and the timestamp \u2014 with no content ever leaving your device. The message content goes directly from the app's encrypted storage to Noted's IndexedDB. The relay server never sees it. That's the handoff.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-eco-browser-os-defer",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Browser OS integration is real but 2+ years away. Note it here so it doesn't get lost: the vision is a Nexus-native browser where your messaging identity is also your web identity. No cookies, no third-party tracking, identity via public key. Conversation threads can reference web content with citations that don't leak your browsing to the cited site. Massive scope \u2014 park it.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-ux-principles",
+      "tileType": "note",
+      "title": "UX principles",
+      "body": "The product should feel like a private room, not a feed.\n\nFive principles:\n\n1. Privacy is visible. Every time a piece of data crosses a boundary, the UI shows it. Not a settings page \u2014 in the flow.\n\n2. Presence is earned. You see who's 'online' only if they've chosen to share presence with you specifically.\n\n3. No defaults that serve the platform. Default read receipts: off. Default typing indicators: off. Default notifications: encrypted count only. Every default favours the user's privacy over the sender's social anxiety.\n\n4. The interface retreats. When you're reading or writing, the chrome disappears. The conversation is the thing.\n\n5. Silence is a valid response. The app should not make not-responding feel like a social failure. No 'last seen' without explicit consent.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-ux-onboarding",
+      "tileType": "note",
+      "title": "Onboarding \u2014 one screen, no account",
+      "body": "First run:\n\n1. App opens. Generates a keypair in the background (takes ~100ms).\n2. One screen: 'Your identity is ready. This is your address.' \u2014 shows a QR code and a short fingerprint.\n3. That's it. No email, no phone number, no username, no password. You are your key.\n\nTo add a contact: show them your QR, scan theirs, or exchange a short invite link. The link contains your public key and a one-time handshake token. It's short enough to send as a text message. It expires after use.\n\nThe onboarding copies the tone of the product: calm, private, no performance. It does not explain itself more than once.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-ux-anti-whatsapp",
+      "tileType": "note",
+      "title": "The anti-WhatsApp",
+      "body": "WhatsApp is the reference product for what Nexus Mobile is not:\n\n\u2014 WhatsApp requires your phone number (you are your phone number)\n\u2014 WhatsApp shows read receipts by default\n\u2014 WhatsApp shows typing indicators by default\n\u2014 WhatsApp shows 'last seen' by default\n\u2014 WhatsApp is owned by Meta, who uses your metadata\n\u2014 WhatsApp backs up to Google Drive or iCloud unencrypted by default\n\u2014 WhatsApp has group invite links that are publicly findable\n\u2014 WhatsApp has status updates (a social feed inside a messaging app)\n\nNexus Mobile inverts every single one of these defaults. Same quality of encryption (WhatsApp does use Signal Protocol). Different relationship with the user.\n\nThe pitch is simple: Signal-grade encryption, with the Nexus ecosystem integration, without the dark patterns, and with the delight of something that feels like it was made for you rather than for an advertiser.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-ux-private-room",
+      "tileType": "scrap",
+      "title": "",
+      "body": "The app should feel like a private room, not a feed. This sentence is the design brief. Every decision that makes it feel like a feed (ranking, surfacing, notifications that pull you back, metrics that make you aware of your own behaviour) is the wrong decision. Every decision that makes it feel like a room you chose to enter is the right one.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-ux-android-first",
+      "tileType": "note",
+      "title": "Android-first rationale",
+      "body": "Android first, not iOS first, for four reasons:\n\n1. Real sideloading: Android lets you install APKs without a store. Early users \u2014 the ones who care enough to sideload a privacy app \u2014 are on Android.\n\n2. Filesystem access: Android exposes the filesystem in ways iOS doesn't. The local-first, user-controlled backup model (export your key to a file, store it where you choose) is easier to build correctly on Android.\n\n3. Demographics: the high-security, privacy-conscious user base skews Android globally. Particularly true outside the US/UK.\n\n4. UnifiedPush: the privacy-respecting push notification infrastructure is Android-native. iOS is locked to APNs (Apple Push Notification Service), which means Apple learns you received a notification.\n\niOS port: necessary eventually for reach, but the design constraints of iOS (no sideloading, no filesystem, APNs dependency) mean some features will be compromised. Name those compromises explicitly rather than pretending they don't exist.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-tech-architecture",
+      "tileType": "note",
+      "title": "Architecture overview",
+      "body": "Three layers:\n\n1. **Client (Android app)**: Kotlin + Jetpack Compose. Local-first. All message content lives in encrypted SQLite (SQLCipher). The cryptographic operations happen here. Nothing sensitive leaves this layer in plaintext.\n\n2. **Relay (server)**: minimal. Its only job is to store encrypted message blobs for delivery to offline recipients and provide the UnifiedPush endpoint. It knows: a blob exists, a public key hash it's addressed to, and a timestamp. That's it. No content. No social graph.\n\n3. **Protocol layer**: Double Ratchet (or MLS for groups) handles key exchange and message encryption. The relay is protocol-agnostic \u2014 it just moves sealed envelopes.\n\nSelf-hosting: the relay should be self-hostable from a Docker image. Power users run their own. The default relay is Nexus-operated but the client is designed to work with any conformant relay.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-tech-local-first",
+      "tileType": "note",
+      "title": "Local-first message storage",
+      "body": "All messages stored locally in SQLCipher (SQLite with AES-256 encryption at rest, key derived from the user's identity key).\n\nConsequences:\n\u2014 Loss of device = loss of messages (unless backup was made)\n\u2014 New device requires a backup restore, not a server re-sync\n\u2014 The server can be destroyed and your conversations survive\n\u2014 Messages don't disappear if the company goes away\n\nBackup model: encrypted export to a file the user controls. The file is encrypted with a passphrase that the user sets (separate from the device PIN). The backup is useless without that passphrase. The passphrase is never stored anywhere except the user's memory.\n\nThis is uncomfortable for most users. The onboarding needs to make this trade-off visible and earn the user's buy-in \u2014 not bury it in settings.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-tech-relay-design",
+      "tileType": "note",
+      "title": "Relay server design",
+      "body": "Minimal, auditable, self-hostable.\n\nThe relay stores: encrypted blobs, addressed to public key hashes, with a TTL (messages not picked up in 30 days are deleted). It does not store: plaintext, public keys, contact lists, read receipts, typing indicators.\n\nAPI surface:\n\u2014 POST /deliver: submit an encrypted blob addressed to a key hash\n\u2014 GET /inbox/{key-hash}: retrieve blobs addressed to this hash (requires proof of key ownership)\n\u2014 DELETE /message/{id}: acknowledge receipt, delete from relay storage\n\nThe relay's attack surface is minimal by design. An attacker who compromises the relay learns: which key hashes have undelivered messages, and when. Nothing else.\n\nOpen question: Tor hidden service support? Would allow the relay itself to be located privately. Worth evaluating.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-tech-offline-queue",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Offline-first message queue: messages composed while offline are queued locally and sent when connectivity resumes. The queue is encrypted (same SQLCipher storage). The app never silently drops a message \u2014 if a send fails, it's visible and retryable. No silent failure. Message delivery confirmation is a local acknowledgement (the relay accepted the blob), not an end-to-end read receipt unless the recipient opts into that.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-tech-p2p",
+      "tileType": "scrap",
+      "title": "",
+      "body": "P2P when possible (same local network or Bluetooth), relay only when necessary. When two Nexus Mobile users are on the same WiFi network, messages should route directly device-to-device via local discovery (mDNS/Bonjour equivalent). The relay is the fallback, not the default. This means truly airgapped conversations are possible between two people in the same room with no internet \u2014 Briar does this with BLE and WiFi Direct, worth studying their implementation.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-mkt-who-for",
+      "tileType": "note",
+      "title": "Who this is for",
+      "body": "Primary: people who already use Signal but want more. They've already done the hard work of caring about privacy \u2014 they're not the ones you need to convince. They want: a better inbox, Noted integration, some delight, and an Android app that respects them.\n\nSecondary: people trying to leave WhatsApp who've been putting it off because the network effect trap is real. The nested messengers feature is the on-ramp \u2014 they can use Nexus Mobile to manage their WhatsApp conversations as a nested feed while they migrate their close contacts to native Nexus.\n\nTertiary: journalists, activists, people in high-risk environments. The military encryption ambition is real here. They have specific needs (metadata privacy, no phone number, self-hosted relay) that Nexus Mobile can meet. Don't lead with this in consumer marketing but don't water down the security model to accommodate features that would conflict with it.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-mkt-business-model",
+      "tileType": "note",
+      "title": "Business model \u2014 no ads, no data, direct payment",
+      "body": "Revenue model:\n\n\u2014 Nexus Mobile is free to use with the default Nexus-operated relay\n\u2014 Self-hosted relay is free (open source relay software)\n\u2014 Optional: a Nexus subscription that covers both Noted and Nexus Mobile (relay hosting, priority support, larger message storage on the relay for high-volume users)\n\u2014 No ads. Ever. The moment you serve ads, you have a reason to maximise engagement, which conflicts with every UX principle in this document.\n\u2014 No data sales. The business model must be explicitly incompatible with data monetisation, not just policy-committed.\n\nThe honest pitch to investors: this is a subscription software business with a strong ideological moat. The users who care enough to use a no-phone-number encrypted messenger will pay a reasonable monthly fee to not be the product.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-mkt-thesis",
+      "tileType": "note",
+      "title": "The product thesis (missing)",
+      "body": "Noted has: 'Private by default. Relational by design. Portable by right.'\nMeridian has: 'Memory is not only something you keep. It is something that happens somewhere.'\nNexus Mobile has: 'Private messaging app for Android.'\n\nThat's a category description, not a thesis. The product needs a sentence that does what the others do \u2014 names the design philosophy in a way that makes product decisions obvious.\n\nCandidates:\n\u2014 'Your conversations are part of your knowledge graph.'\n\u2014 'Encrypted by default. Private by design. Yours by right.' (parallel to Noted but legible in its own right)\n\u2014 'A private room, not a feed.'\n\u2014 'The messenger that treats your thinking as yours.'\n\nThe emoji-only mechanic, the anti-dark-pattern commitments, and the Noted integration all make more sense under 'private room, not a feed' than under 'encrypted messaging app.' That framing is probably the one.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "nx-mkt-no-ads-scrap",
+      "tileType": "scrap",
+      "title": "",
+      "body": "Monetisation hard line: no advertising, ever, in any form. The reason is architectural, not just ethical \u2014 the moment the business model depends on engagement, every UX decision becomes a negotiation between user welfare and attention capture. That negotiation corrupts everything downstream. Take advertising off the table structurally so the design team never has to fight that battle.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    },
+    {
+      "id": "mpizwezw-no35gg3q",
+      "tileType": "note",
+      "title": "First principles check",
+      "body": "Before adding any feature, ask:\n\n1. Does this require the user to trust Nexus with something they currently keep private?\n2. Does this create an incentive structure that could survive a change in ownership or values?\n3. Does this add to the app's attack surface?\n4. Does this work offline?\n5. If a hostile actor (government, advertiser, ex-partner) had full access to our servers, what could they learn from this feature's data?\n\nIf any answer is bad, the feature needs to be redesigned before it ships, not after. The questions belong in the design process, not the post-mortem.",
+      "bodyHtml": null,
+      "extra": {},
+      "createdAt": "2026-05-27T21:30:00.000Z",
+      "updatedAt": "2026-05-27T21:30:00.000Z"
+    }
+  ],
+  "links": [
+    {
+      "id": "lnk-orig-01",
+      "sourceId": "mpizuisd-9efdou3z",
+      "targetId": "mpizwezw-no35gg3q",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-02",
+      "sourceId": "mpizuisd-9efdou3z",
+      "targetId": "mpizytym-mvq04mmr",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-03",
+      "sourceId": "mpizxt6e-0w8d4k8y",
+      "targetId": "mpiebq4w-sjrs5nly",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-04",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "mpj009x3-5du5vl9b",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-05",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "mpj01h00-1tf4a8ku",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-06",
+      "sourceId": "mpj009x3-5du5vl9b",
+      "targetId": "mpj01h00-1tf4a8ku",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-07",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "mpj04krn-vl3wk9v2",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-08",
+      "sourceId": "mpj04krn-vl3wk9v2",
+      "targetId": "mpj04a84-4nefgboy",
+      "label": null
+    },
+    {
+      "id": "lnk-orig-09",
+      "sourceId": "mpj04krn-vl3wk9v2",
+      "targetId": "mpj01h00-1tf4a8ku",
+      "label": null
+    },
+    {
+      "id": "lnk-hub-enc",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "mpizxt6e-0w8d4k8y",
+      "label": null
+    },
+    {
+      "id": "lnk-hub-nest",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "mpizytym-mvq04mmr",
+      "label": null
+    },
+    {
+      "id": "lnk-hub-ux",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "nx-ux-principles",
+      "label": null
+    },
+    {
+      "id": "lnk-hub-tech",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "nx-tech-architecture",
+      "label": null
+    },
+    {
+      "id": "lnk-hub-mkt",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "nx-mkt-who-for",
+      "label": null
+    },
+    {
+      "id": "lnk-hub-thesis",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "nx-mkt-thesis",
+      "label": null
+    },
+    {
+      "id": "lnk-hub-check",
+      "sourceId": "mpiebq4w-sjrs5nly",
+      "targetId": "mpizwezw-no35gg3q",
+      "label": null
+    },
+    {
+      "id": "lnk-enc-01",
+      "sourceId": "mpizxt6e-0w8d4k8y",
+      "targetId": "nx-enc-signal-protocol",
+      "label": null
+    },
+    {
+      "id": "lnk-enc-02",
+      "sourceId": "mpizxt6e-0w8d4k8y",
+      "targetId": "nx-enc-metadata-privacy",
+      "label": null
+    },
+    {
+      "id": "lnk-enc-03",
+      "sourceId": "mpizxt6e-0w8d4k8y",
+      "targetId": "nx-enc-key-management",
+      "label": null
+    },
+    {
+      "id": "lnk-enc-04",
+      "sourceId": "mpizuisd-9efdou3z",
+      "targetId": "nx-enc-signal-protocol",
+      "label": null
+    },
+    {
+      "id": "lnk-enc-05",
+      "sourceId": "nx-enc-forward-secrecy",
+      "targetId": "nx-enc-signal-protocol",
+      "label": null
+    },
+    {
+      "id": "lnk-enc-06",
+      "sourceId": "nx-enc-no-phone-number",
+      "targetId": "nx-enc-key-management",
+      "label": null
+    },
+    {
+      "id": "lnk-enc-07",
+      "sourceId": "nx-enc-key-management",
+      "targetId": "nx-eco-identity-bridge",
+      "label": null
+    },
+    {
+      "id": "lnk-nest-01",
+      "sourceId": "mpizytym-mvq04mmr",
+      "targetId": "nx-nest-protonmail",
+      "label": null
+    },
+    {
+      "id": "lnk-nest-02",
+      "sourceId": "mpizytym-mvq04mmr",
+      "targetId": "nx-nest-unified-inbox",
+      "label": null
+    },
+    {
+      "id": "lnk-nest-03",
+      "sourceId": "mpizytym-mvq04mmr",
+      "targetId": "nx-nest-notification-strategy",
+      "label": null
+    },
+    {
+      "id": "lnk-nest-04",
+      "sourceId": "nx-nest-unified-inbox",
+      "targetId": "nx-nest-contact-graph",
+      "label": null
+    },
+    {
+      "id": "lnk-collab-01",
+      "sourceId": "mpj009x3-5du5vl9b",
+      "targetId": "nx-collab-sync-architecture",
+      "label": null
+    },
+    {
+      "id": "lnk-collab-02",
+      "sourceId": "mpj009x3-5du5vl9b",
+      "targetId": "nx-collab-permission-model",
+      "label": null
+    },
+    {
+      "id": "lnk-collab-03",
+      "sourceId": "nx-collab-permission-model",
+      "targetId": "nx-collab-noted-packet",
+      "label": null
+    },
+    {
+      "id": "lnk-collab-04",
+      "sourceId": "nx-collab-sync-architecture",
+      "targetId": "nx-tech-architecture",
+      "label": null
+    },
+    {
+      "id": "lnk-game-01",
+      "sourceId": "mpj04krn-vl3wk9v2",
+      "targetId": "nx-game-streaks",
+      "label": null
+    },
+    {
+      "id": "lnk-game-02",
+      "sourceId": "mpj04krn-vl3wk9v2",
+      "targetId": "nx-game-easter-eggs",
+      "label": null
+    },
+    {
+      "id": "lnk-game-03",
+      "sourceId": "mpj04krn-vl3wk9v2",
+      "targetId": "nx-game-anti-dark-patterns",
+      "label": null
+    },
+    {
+      "id": "lnk-game-04",
+      "sourceId": "nx-game-unlock-mechanic",
+      "targetId": "mpj04krn-vl3wk9v2",
+      "label": null
+    },
+    {
+      "id": "lnk-game-05",
+      "sourceId": "mpj04a84-4nefgboy",
+      "targetId": "nx-game-easter-eggs",
+      "label": null
+    },
+    {
+      "id": "lnk-eco-01",
+      "sourceId": "mpj01h00-1tf4a8ku",
+      "targetId": "nx-eco-identity-bridge",
+      "label": null
+    },
+    {
+      "id": "lnk-eco-02",
+      "sourceId": "mpj01h00-1tf4a8ku",
+      "targetId": "nx-eco-noted-handoff",
+      "label": null
+    },
+    {
+      "id": "lnk-eco-03",
+      "sourceId": "mpj01h00-1tf4a8ku",
+      "targetId": "nx-eco-browser-os-defer",
+      "label": null
+    },
+    {
+      "id": "lnk-tech-01",
+      "sourceId": "nx-tech-architecture",
+      "targetId": "nx-tech-local-first",
+      "label": null
+    },
+    {
+      "id": "lnk-tech-02",
+      "sourceId": "nx-tech-architecture",
+      "targetId": "nx-tech-relay-design",
+      "label": null
+    },
+    {
+      "id": "lnk-tech-03",
+      "sourceId": "nx-tech-local-first",
+      "targetId": "nx-tech-offline-queue",
+      "label": null
+    },
+    {
+      "id": "lnk-tech-04",
+      "sourceId": "nx-tech-relay-design",
+      "targetId": "nx-tech-p2p",
+      "label": null
+    },
+    {
+      "id": "lnk-ux-01",
+      "sourceId": "nx-ux-principles",
+      "targetId": "nx-ux-onboarding",
+      "label": null
+    },
+    {
+      "id": "lnk-ux-02",
+      "sourceId": "nx-ux-principles",
+      "targetId": "nx-ux-anti-whatsapp",
+      "label": null
+    },
+    {
+      "id": "lnk-ux-03",
+      "sourceId": "nx-ux-principles",
+      "targetId": "nx-ux-android-first",
+      "label": null
+    },
+    {
+      "id": "lnk-ux-04",
+      "sourceId": "nx-ux-private-room",
+      "targetId": "nx-ux-principles",
+      "label": null
+    },
+    {
+      "id": "lnk-ux-05",
+      "sourceId": "nx-ux-onboarding",
+      "targetId": "nx-enc-no-phone-number",
+      "label": null
+    },
+    {
+      "id": "lnk-mkt-01",
+      "sourceId": "nx-mkt-who-for",
+      "targetId": "nx-mkt-business-model",
+      "label": null
+    },
+    {
+      "id": "lnk-mkt-02",
+      "sourceId": "nx-mkt-business-model",
+      "targetId": "nx-mkt-no-ads-scrap",
+      "label": null
+    },
+    {
+      "id": "lnk-mkt-03",
+      "sourceId": "nx-mkt-thesis",
+      "targetId": "nx-ux-private-room",
+      "label": null
+    },
+    {
+      "id": "lnk-mkt-04",
+      "sourceId": "nx-mkt-thesis",
+      "targetId": "nx-mkt-who-for",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-01",
+      "sourceId": "nx-enc-metadata-privacy",
+      "targetId": "nx-ux-principles",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-02",
+      "sourceId": "nx-game-anti-dark-patterns",
+      "targetId": "nx-ux-principles",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-03",
+      "sourceId": "nx-nest-notification-strategy",
+      "targetId": "nx-ux-principles",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-04",
+      "sourceId": "nx-tech-relay-design",
+      "targetId": "nx-enc-metadata-privacy",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-05",
+      "sourceId": "nx-collab-noted-packet",
+      "targetId": "nx-eco-noted-handoff",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-06",
+      "sourceId": "nx-tech-local-first",
+      "targetId": "nx-ux-onboarding",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-07",
+      "sourceId": "nx-enc-key-management",
+      "targetId": "nx-ux-onboarding",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-08",
+      "sourceId": "nx-mkt-who-for",
+      "targetId": "mpizytym-mvq04mmr",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-09",
+      "sourceId": "nx-ux-android-first",
+      "targetId": "nx-tech-architecture",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-10",
+      "sourceId": "mpizwezw-no35gg3q",
+      "targetId": "nx-tech-relay-design",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-11",
+      "sourceId": "mpizwezw-no35gg3q",
+      "targetId": "nx-enc-metadata-privacy",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-12",
+      "sourceId": "nx-game-streaks",
+      "targetId": "nx-game-anti-dark-patterns",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-13",
+      "sourceId": "nx-collab-permission-model",
+      "targetId": "nx-enc-key-management",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-14",
+      "sourceId": "nx-tech-p2p",
+      "targetId": "mpizxt6e-0w8d4k8y",
+      "label": null
+    },
+    {
+      "id": "lnk-cross-15",
+      "sourceId": "nx-mkt-business-model",
+      "targetId": "mpj01h00-1tf4a8ku",
+      "label": null
+    }
+  ],
+  "positions": [
+    {
+      "id": "mpiebq4w-sjrs5nly",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "mpizwezw-no35gg3q",
+      "x": 250,
+      "y": 150
+    },
+    {
+      "id": "mpizxt6e-0w8d4k8y",
+      "x": 350,
+      "y": -250
+    },
+    {
+      "id": "mpizuisd-9efdou3z",
+      "x": 600,
+      "y": -450
+    },
+    {
+      "id": "nx-enc-signal-protocol",
+      "x": 850,
+      "y": -350
+    },
+    {
+      "id": "nx-enc-metadata-privacy",
+      "x": 850,
+      "y": -550
+    },
+    {
+      "id": "nx-enc-key-management",
+      "x": 600,
+      "y": -250
+    },
+    {
+      "id": "nx-enc-no-phone-number",
+      "x": 350,
+      "y": -450
+    },
+    {
+      "id": "nx-enc-forward-secrecy",
+      "x": 1100,
+      "y": -450
+    },
+    {
+      "id": "mpizytym-mvq04mmr",
+      "x": 1050,
+      "y": -100
+    },
+    {
+      "id": "nx-nest-protonmail",
+      "x": 1300,
+      "y": -200
+    },
+    {
+      "id": "nx-nest-unified-inbox",
+      "x": 1300,
+      "y": 0
+    },
+    {
+      "id": "nx-nest-notification-strategy",
+      "x": 1300,
+      "y": 200
+    },
+    {
+      "id": "nx-nest-contact-graph",
+      "x": 1550,
+      "y": 50
+    },
+    {
+      "id": "mpj009x3-5du5vl9b",
+      "x": 1100,
+      "y": 350
+    },
+    {
+      "id": "nx-collab-sync-architecture",
+      "x": 1350,
+      "y": 450
+    },
+    {
+      "id": "nx-collab-permission-model",
+      "x": 1350,
+      "y": 650
+    },
+    {
+      "id": "nx-collab-noted-packet",
+      "x": 1600,
+      "y": 550
+    },
+    {
+      "id": "mpj04krn-vl3wk9v2",
+      "x": 250,
+      "y": 450
+    },
+    {
+      "id": "mpj04a84-4nefgboy",
+      "x": 500,
+      "y": 600
+    },
+    {
+      "id": "nx-game-streaks",
+      "x": 500,
+      "y": 400
+    },
+    {
+      "id": "nx-game-easter-eggs",
+      "x": 750,
+      "y": 500
+    },
+    {
+      "id": "nx-game-anti-dark-patterns",
+      "x": 250,
+      "y": 650
+    },
+    {
+      "id": "nx-game-unlock-mechanic",
+      "x": 0,
+      "y": 600
+    },
+    {
+      "id": "mpj01h00-1tf4a8ku",
+      "x": 900,
+      "y": 350
+    },
+    {
+      "id": "nx-eco-identity-bridge",
+      "x": 900,
+      "y": 550
+    },
+    {
+      "id": "nx-eco-noted-handoff",
+      "x": 1100,
+      "y": 650
+    },
+    {
+      "id": "nx-eco-browser-os-defer",
+      "x": 1100,
+      "y": 800
+    },
+    {
+      "id": "nx-ux-principles",
+      "x": -450,
+      "y": 50
+    },
+    {
+      "id": "nx-ux-onboarding",
+      "x": -700,
+      "y": -100
+    },
+    {
+      "id": "nx-ux-anti-whatsapp",
+      "x": -700,
+      "y": 150
+    },
+    {
+      "id": "nx-ux-private-room",
+      "x": -450,
+      "y": 250
+    },
+    {
+      "id": "nx-ux-android-first",
+      "x": -950,
+      "y": 50
+    },
+    {
+      "id": "nx-tech-architecture",
+      "x": -450,
+      "y": -200
+    },
+    {
+      "id": "nx-tech-local-first",
+      "x": -700,
+      "y": -350
+    },
+    {
+      "id": "nx-tech-relay-design",
+      "x": -700,
+      "y": -500
+    },
+    {
+      "id": "nx-tech-offline-queue",
+      "x": -950,
+      "y": -400
+    },
+    {
+      "id": "nx-tech-p2p",
+      "x": -950,
+      "y": -250
+    },
+    {
+      "id": "nx-mkt-who-for",
+      "x": -450,
+      "y": 450
+    },
+    {
+      "id": "nx-mkt-business-model",
+      "x": -450,
+      "y": 650
+    },
+    {
+      "id": "nx-mkt-thesis",
+      "x": -200,
+      "y": 450
+    },
+    {
+      "id": "nx-mkt-no-ads-scrap",
+      "x": -700,
+      "y": 600
+    }
+  ]
+}

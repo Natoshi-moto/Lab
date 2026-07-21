@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · ENVIRONMENT FORGE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0e;
+  --bg2:#13131a;
+  --bg3:#1a1a23;
+  --line:#2a2a36;
+  --line2:#3a3a4a;
+  --text:#e8e8ee;
+  --dim:#7a7a88;
+  --dim2:#4a4a58;
+  --accent:#aaffcc;
+  --accent2:#aaeeff;
+  --sweep:#ff88aa;
+  --warn:#ffcc66;
+  --red:#ff5566;
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono','SF Mono',Menlo,Consolas,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:var(--mono);font-size:12px;overflow:hidden;
+  -webkit-font-smoothing:antialiased}
+
+#app{display:grid;grid-template-columns:1fr 380px;height:100vh}
+
+#stage{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden}
+#topbar{display:flex;align-items:center;gap:14px;padding:0 16px;height:36px;
+  border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg2)}
+#brand{font-size:11px;letter-spacing:3px;font-weight:600;color:var(--text)}
+#brand b{color:var(--accent)}
+#name-field{flex:1;background:transparent;border:none;color:var(--text);
+  font-family:inherit;font-size:13px;letter-spacing:1px;outline:none;
+  padding:4px 8px;border-radius:2px}
+#name-field:hover{background:var(--bg3)}
+#name-field:focus{background:var(--bg3);outline:1px solid var(--line2)}
+#axis-count{font-size:10px;color:var(--dim);letter-spacing:1px}
+#sweep-indicator{font-size:10px;color:var(--sweep);letter-spacing:1px;
+  padding:2px 8px;border:1px solid var(--sweep);display:none}
+#sweep-indicator.show{display:inline-block}
+
+/* Wide-aspect stage. Environments are 16:9 to match the eventual arena. */
+#canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);min-height:0;position:relative;padding:16px;overflow:hidden}
+#canvas{display:block;max-width:100%;max-height:100%;background:#050508;
+  border:1px solid var(--line);aspect-ratio:16/9}
+
+/* Optional creature silhouettes overlayed for compatibility-checking. */
+#silhouette-overlay{position:absolute;inset:16px;pointer-events:none;display:flex;
+  align-items:flex-end;justify-content:space-between;padding:0 8% 6%}
+#silhouette-overlay canvas{width:14%;aspect-ratio:1;opacity:.55;
+  mix-blend-mode:normal;display:none}
+#silhouette-overlay canvas.show{display:block}
+
+#stage-foot{height:36px;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--bg2);
+  flex-shrink:0}
+.btn{font-family:inherit;font-size:11px;letter-spacing:1px;color:var(--dim);
+  background:transparent;border:1px solid var(--line);padding:6px 12px;
+  cursor:pointer;transition:all .12s;border-radius:2px;text-transform:lowercase}
+.btn:hover{color:var(--text);border-color:var(--line2);background:var(--bg3)}
+.btn.primary{color:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{background:rgba(170,255,204,.08)}
+.btn.toggle{color:var(--accent2);border-color:var(--dim2)}
+.btn.toggle.on{color:var(--bg);background:var(--accent2);border-color:var(--accent2)}
+#status{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:1px}
+
+#controls{display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--line);
+  font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+  background:var(--bg2)}
+.panel-head .ph-hint{color:var(--dim2);font-size:9px;text-transform:none;letter-spacing:.5px}
+
+#axes{flex:1;overflow-y:auto;padding:6px 0}
+#axes::-webkit-scrollbar{width:6px}
+#axes::-webkit-scrollbar-track{background:var(--bg2)}
+#axes::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+
+.axis{display:grid;grid-template-columns:1fr 36px 18px;
+  gap:8px;align-items:center;padding:5px 14px;cursor:default;
+  border-left:2px solid transparent;transition:background .1s,border-color .1s}
+.axis:hover{background:var(--bg3)}
+.axis.sweeping{border-left-color:var(--sweep);background:rgba(255,136,170,.05)}
+
+.axis-row{display:flex;flex-direction:column;gap:3px;min-width:0}
+.axis-label{font-size:10px;color:var(--text);letter-spacing:.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  cursor:text;padding:1px 3px;border-radius:2px;
+  background:transparent;border:1px solid transparent;
+  font-family:inherit}
+.axis-label:hover{background:var(--bg);border-color:var(--line)}
+.axis-label:focus{outline:none;background:var(--bg);
+  border-color:var(--accent);color:var(--accent)}
+.axis-label.renamed{color:var(--accent2);font-weight:500}
+.axis-label.renamed:hover{color:var(--accent2)}
+
+.axis-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;outline:none;
+  background:var(--bg);border:1px solid var(--line);cursor:pointer;border-radius:0}
+.axis-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:14px;
+  background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.axis-slider::-moz-range-thumb{width:10px;height:14px;
+  background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.axis.sweeping .axis-slider::-webkit-slider-thumb{background:var(--sweep)}
+.axis.sweeping .axis-slider::-moz-range-thumb{background:var(--sweep)}
+
+.axis-val{font-size:10px;color:var(--dim);text-align:right;
+  font-variant-numeric:tabular-nums}
+.axis.sweeping .axis-val{color:var(--sweep)}
+
+.axis-sweep{font-size:11px;line-height:1;color:var(--dim2);
+  background:transparent;border:1px solid transparent;cursor:pointer;
+  width:18px;height:18px;display:flex;align-items:center;
+  justify-content:center;border-radius:2px;transition:color .1s,border-color .1s}
+.axis-sweep:hover{color:var(--sweep);border-color:var(--sweep)}
+.axis.sweeping .axis-sweep{color:var(--sweep);border-color:var(--sweep)}
+
+.group-head{padding:10px 14px 4px;font-size:9px;letter-spacing:2px;
+  color:var(--dim2);text-transform:uppercase;border-top:1px solid var(--line);
+  margin-top:4px;background:var(--bg2);position:sticky;top:0;z-index:1}
+.group-head:first-child{border-top:none;margin-top:0}
+
+#file-input,#creature-input{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="stage">
+  <div id="topbar">
+    <span id="brand"><b>◇</b>&nbsp;ENVIRONMENT FORGE</span>
+    <input id="name-field" type="text" value="Untitled" maxlength="32" spellcheck="false">
+    <span id="sweep-indicator">SWEEPING</span>
+    <span id="axis-count">— axes</span>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="canvas" width="1280" height="720"></canvas>
+    <div id="silhouette-overlay">
+      <canvas id="sil-l" width="160" height="160"></canvas>
+      <canvas id="sil-r" width="160" height="160"></canvas>
+    </div>
+  </div>
+  <div id="stage-foot">
+    <button class="btn" onclick="randomize()">randomize</button>
+    <button class="btn" onclick="resetAll()">reset</button>
+    <button class="btn" onclick="document.getElementById('file-input').click()">load env…</button>
+    <input id="file-input" type="file" accept=".json,application/json" onchange="onLoadEnv(this)">
+    <button class="btn toggle" id="creature-toggle" onclick="toggleCreatures()">+ test creatures</button>
+    <input id="creature-input" type="file" accept=".json,application/json" multiple onchange="onLoadCreatures(this)">
+    <button class="btn primary" onclick="saveEnv()">save</button>
+    <span id="status">ready</span>
+  </div>
+</div>
+
+<div id="controls">
+  <div class="panel-head">
+    <span>AXES</span>
+    <span class="ph-hint">click label to rename · ⇌ to sweep</span>
+  </div>
+  <div id="axes"></div>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════
+   ENVIRONMENT AXES
+   Layered structure: deep_bg / far / mid / ground / fg / ambient
+   Each axis does ONE visible thing. No biome presets.
+   No "weather" sliders that secretly drive five things at once.
+   ═══════════════════════════════════════════════════════════════ */
+const AXES = [
+  // ── Deep background (sky) ───────────────────────────────
+  { id:'sky_top_hue',       group:'deep_bg', default:148, label:'sky top hue' },
+  { id:'sky_top_lightness', group:'deep_bg', default: 45, label:'sky top lightness' },
+  { id:'sky_bot_hue',       group:'deep_bg', default:200, label:'sky bottom hue' },
+  { id:'sky_bot_lightness', group:'deep_bg', default:120, label:'sky bottom lightness' },
+  { id:'sky_saturation',    group:'deep_bg', default:120, label:'sky saturation' },
+  { id:'sky_band_position', group:'deep_bg', default:140, label:'sky horizon band' },
+  { id:'sky_pulse_rate',    group:'deep_bg', default:  0, label:'sky pulse rate' },
+  { id:'star_count',        group:'deep_bg', default:  0, label:'star count' },
+  { id:'star_brightness',   group:'deep_bg', default:128, label:'star brightness' },
+
+  // ── Far parallax (distant silhouette layer) ────────────
+  { id:'far_count',         group:'far',     default: 80, label:'far shape count' },
+  { id:'far_height',        group:'far',     default:100, label:'far shape height' },
+  { id:'far_jitter',        group:'far',     default:140, label:'far shape variance' },
+  { id:'far_darkness',      group:'far',     default:140, label:'far shape darkness' },
+  { id:'far_haze',          group:'far',     default:120, label:'atmospheric haze' },
+
+  // ── Mid parallax (closer silhouette layer) ─────────────
+  { id:'mid_count',         group:'mid',     default: 60, label:'mid shape count' },
+  { id:'mid_height',        group:'mid',     default:140, label:'mid shape height' },
+  { id:'mid_jitter',        group:'mid',     default:150, label:'mid shape variance' },
+  { id:'mid_darkness',      group:'mid',     default:180, label:'mid shape darkness' },
+
+  // ── Ground (battle plane) ──────────────────────────────
+  { id:'ground_y',          group:'ground',  default:170, label:'ground horizon y' },
+  { id:'ground_hue',        group:'ground',  default:128, label:'ground hue' },
+  { id:'ground_lightness',  group:'ground',  default: 80, label:'ground lightness' },
+  { id:'ground_texture',    group:'ground',  default: 80, label:'ground texture density' },
+  { id:'ground_glow',       group:'ground',  default: 40, label:'ground rim glow' },
+
+  // ── Foreground (particles between camera and creatures) ─
+  { id:'fg_count',          group:'foreground', default: 30, label:'foreground particle count' },
+  { id:'fg_size',           group:'foreground', default:120, label:'foreground particle size' },
+  { id:'fg_speed',          group:'foreground', default:128, label:'foreground drift speed' },
+  { id:'fg_direction',      group:'foreground', default:128, label:'foreground drift direction' },
+  { id:'fg_opacity',        group:'foreground', default:140, label:'foreground opacity' },
+
+  // ── Ambient (lighting & atmosphere across whole scene) ──
+  { id:'fog_density',       group:'ambient', default: 30, label:'fog density' },
+  { id:'fog_hue',           group:'ambient', default:150, label:'fog hue' },
+  { id:'vignette',          group:'ambient', default: 80, label:'vignette amount' },
+  { id:'scene_tint',        group:'ambient', default: 60, label:'scene tint strength' },
+];
+
+const N = AXES.length;
+const ID_INDEX = Object.fromEntries(AXES.map((a,i)=>[a.id,i]));
+
+let values  = AXES.map(a => a.default);
+let labels  = AXES.map(a => a.label);
+let renamed = AXES.map(() => false);
+let envName = 'Untitled';
+
+let sweepIdx = -1, sweepStart = 0, sweepBase = 0;
+const SWEEP_PERIOD = 4.0;
+const t0 = performance.now();
+let prevT = 0;
+
+// Test creatures (loaded creature.json files for compatibility-checking)
+let testCreatures = [null, null]; // left, right
+let testCreaturesShown = false;
+
+function v(id){ return values[ID_INDEX[id]]; }
+function v01(id){ return values[ID_INDEX[id]]/255; }
+function vN11(id){ return (values[ID_INDEX[id]]-128)/128; }
+function vRange(id, min, max){ return min + (values[ID_INDEX[id]]/255)*(max-min); }
+
+/* ═══ DETERMINISTIC RNG ═══ */
+function mulberry32(seed){
+  let t = seed >>> 0;
+  return () => {
+    t = (t + 0x6D2B79F5) >>> 0; let r = t;
+    r = Math.imul(r ^ (r >>> 15), r | 1);
+    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ═══ ENVIRONMENT RENDERER ═══════════════════════════════════════
+   Layered: sky → stars → far parallax → mid parallax → ground →
+   ground texture → foreground particles → fog → vignette.
+   Each layer reads ONLY the axes for its layer.
+   ═══════════════════════════════════════════════════════════════ */
+function render(canvas, t){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Read axes
+  const skyTopH   = Math.round(v01('sky_top_hue')*359);
+  const skyTopL   = Math.round(vRange('sky_top_lightness', 0, 60));
+  const skyBotH   = Math.round(v01('sky_bot_hue')*359);
+  const skyBotL   = Math.round(vRange('sky_bot_lightness', 0, 80));
+  const skySat    = Math.round(vRange('sky_saturation', 0, 100));
+  const skyBand   = vRange('sky_band_position', 0.15, 0.85);
+  const skyPulse  = vRange('sky_pulse_rate', 0, 2.5);
+
+  const starN     = Math.floor(v01('star_count') * 280);
+  const starBri   = v01('star_brightness');
+
+  const farN      = Math.floor(v01('far_count') * 32);
+  const farH      = vRange('far_height', 0.05, 0.45);
+  const farJit    = vRange('far_jitter', 0.0, 1.0);
+  const farDark   = vRange('far_darkness', 0.05, 0.65);
+  const farHaze   = v01('far_haze');
+
+  const midN      = Math.floor(v01('mid_count') * 22);
+  const midH      = vRange('mid_height', 0.08, 0.55);
+  const midJit    = vRange('mid_jitter', 0.0, 1.0);
+  const midDark   = vRange('mid_darkness', 0.10, 0.85);
+
+  const groundY   = vRange('ground_y', 0.45, 0.95);
+  const groundH   = Math.round(v01('ground_hue')*359);
+  const groundL   = Math.round(vRange('ground_lightness', 4, 50));
+  const groundTex = Math.floor(v01('ground_texture') * 320);
+  const groundGlow= v01('ground_glow');
+
+  const fgN       = Math.floor(v01('fg_count') * 80);
+  const fgSize    = vRange('fg_size', 0.5, 6.0);
+  const fgSpeed   = vRange('fg_speed', -2.5, 2.5);
+  const fgDir     = vN11('fg_direction') * 1.2; // -1.2..1.2 vertical bias
+  const fgOpacity = v01('fg_opacity');
+
+  const fogDens   = v01('fog_density');
+  const fogH      = Math.round(v01('fog_hue')*359);
+  const vigAmt    = v01('vignette');
+  const tintStr   = v01('scene_tint');
+
+  const pulseT = Math.sin(t*skyPulse)*0.5 + 0.5;
+  const skyTopLi = skyTopL + (skyPulse > 0.05 ? pulseT*8 : 0);
+
+  // ── Sky gradient ────────────────────────────────────────
+  const skyG = ctx.createLinearGradient(0, 0, 0, H * groundY);
+  skyG.addColorStop(0,        `hsl(${skyTopH},${skySat}%,${Math.max(0,skyTopLi)}%)`);
+  skyG.addColorStop(skyBand,  `hsl(${Math.round((skyTopH+skyBotH)/2)%360},${skySat}%,${Math.round((skyTopLi+skyBotL)/2)}%)`);
+  skyG.addColorStop(1,        `hsl(${skyBotH},${skySat}%,${skyBotL}%)`);
+  ctx.fillStyle = skyG;
+  ctx.fillRect(0, 0, W, H * groundY);
+
+  // ── Stars (sky layer, only above horizon) ──────────────
+  if(starN > 0){
+    const sr = mulberry32(starN*131 + 7);
+    for(let i=0; i<starN; i++){
+      const x = sr() * W;
+      const y = sr() * H * groundY * 0.85;
+      const sz = 0.5 + sr()*1.5;
+      const tw = 0.6 + Math.sin(t*1.4 + i*0.6)*0.4; // twinkle
+      ctx.fillStyle = `hsla(${skyTopH},20%,95%,${starBri*tw*0.9})`;
+      ctx.beginPath(); ctx.arc(x,y,sz,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ── Far parallax silhouettes ────────────────────────────
+  if(farN > 0){
+    const fr = mulberry32(farN*97 + 13);
+    const baseY = H * groundY;
+    ctx.save();
+    ctx.fillStyle = `hsla(${skyTopH},${Math.round(skySat*0.4)}%,${Math.round(skyTopL*0.7)}%,${1 - farHaze*0.5})`;
+    ctx.beginPath();
+    ctx.moveTo(0, baseY);
+    const step = W / farN;
+    let prevH = baseY - H*farH*(0.5 + fr()*0.5);
+    ctx.lineTo(0, prevH);
+    for(let i=0; i<farN; i++){
+      const x = i*step + step;
+      const peakH = H * farH * (0.5 + fr()*0.8) * (1 + (fr()-0.5)*farJit*1.2);
+      const y = baseY - Math.max(0, peakH);
+      // Smooth between peaks
+      ctx.lineTo(x - step*0.5, (prevH + y) / 2);
+      ctx.lineTo(x, y);
+      prevH = y;
+    }
+    ctx.lineTo(W, baseY);
+    ctx.closePath();
+    ctx.fill();
+    // Darkness overlay
+    ctx.fillStyle = `rgba(0,0,0,${farDark})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Mid parallax silhouettes ────────────────────────────
+  if(midN > 0){
+    const mr = mulberry32(midN*71 + 19);
+    const baseY = H * groundY;
+    ctx.save();
+    ctx.fillStyle = `hsla(${skyBotH},${Math.round(skySat*0.5)}%,${Math.round(skyBotL*0.4)}%,1)`;
+    ctx.beginPath();
+    ctx.moveTo(0, baseY);
+    const step = W / midN;
+    let prevH = baseY - H*midH*(0.4 + mr()*0.6);
+    ctx.lineTo(0, prevH);
+    for(let i=0; i<midN; i++){
+      const x = i*step + step;
+      const peakH = H * midH * (0.4 + mr()*0.9) * (1 + (mr()-0.5)*midJit*1.4);
+      const y = baseY - Math.max(0, peakH);
+      // Sharper peaks for mid layer (it's closer)
+      ctx.lineTo(x - step*0.3, prevH);
+      ctx.lineTo(x, y);
+      prevH = y;
+    }
+    ctx.lineTo(W, baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = `rgba(0,0,0,${midDark})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Ground plane ────────────────────────────────────────
+  const baseY = H * groundY;
+  const groundG = ctx.createLinearGradient(0, baseY, 0, H);
+  groundG.addColorStop(0, `hsl(${groundH},${skySat}%,${groundL}%)`);
+  groundG.addColorStop(1, `hsl(${groundH},${Math.round(skySat*0.6)}%,${Math.max(2, Math.round(groundL*0.3))}%)`);
+  ctx.fillStyle = groundG;
+  ctx.fillRect(0, baseY, W, H - baseY);
+
+  // Ground rim glow (where ground meets horizon)
+  if(groundGlow > 0.05){
+    const gg = ctx.createLinearGradient(0, baseY - 8, 0, baseY + 16);
+    gg.addColorStop(0, 'transparent');
+    gg.addColorStop(0.5, `hsla(${skyBotH},${skySat}%,75%,${groundGlow*0.6})`);
+    gg.addColorStop(1, 'transparent');
+    ctx.fillStyle = gg;
+    ctx.fillRect(0, baseY - 8, W, 24);
+  }
+
+  // Ground texture (dots, scattered, deterministic)
+  if(groundTex > 0){
+    const gr = mulberry32(groundTex*53 + 41);
+    ctx.fillStyle = `hsla(${groundH},${skySat}%,${Math.max(2, groundL*0.5)}%,0.7)`;
+    for(let i=0; i<groundTex; i++){
+      const tx = gr() * W;
+      const tyRel = gr();
+      const ty = baseY + tyRel * (H - baseY);
+      // Perspective: dots get bigger nearer the camera (lower in frame)
+      const persp = 0.3 + tyRel*1.2;
+      const sz = (0.4 + gr()*1.0) * persp;
+      ctx.fillRect(tx, ty, sz, sz);
+    }
+  }
+
+  // ── Foreground particles ────────────────────────────────
+  if(fgN > 0 && fgOpacity > 0.05){
+    for(let i=0; i<fgN; i++){
+      // Particles loop horizontally + drift vertically
+      const speed = fgSpeed * (0.6 + ((i%7)/7)*0.8);
+      const rawX = (i * 137.5 + t*speed*60) % W;
+      const x = rawX < 0 ? rawX + W : rawX;
+      const baseYP = (i * 71.7 % H);
+      const y = (baseYP + t*fgDir*40) % H;
+      const yWrapped = y < 0 ? y + H : y;
+      const sz = fgSize * (0.5 + ((i%5)/5)*0.8);
+      const al = fgOpacity * (0.5 + Math.sin(t*1.1 + i*0.7)*0.4);
+      ctx.fillStyle = `hsla(${skyTopH},20%,90%,${Math.max(0, al)})`;
+      ctx.beginPath(); ctx.arc(x, yWrapped, sz, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ── Fog (overall atmosphere) ────────────────────────────
+  if(fogDens > 0.03){
+    const fogG = ctx.createLinearGradient(0, 0, 0, H);
+    fogG.addColorStop(0, `hsla(${fogH},35%,60%,0)`);
+    fogG.addColorStop(0.5, `hsla(${fogH},35%,60%,${fogDens*0.35})`);
+    fogG.addColorStop(1, `hsla(${fogH},25%,40%,${fogDens*0.45})`);
+    ctx.fillStyle = fogG;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // ── Vignette ────────────────────────────────────────────
+  if(vigAmt > 0.03){
+    const vg = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.3, W/2, H/2, Math.max(W,H)*0.7);
+    vg.addColorStop(0, 'transparent');
+    vg.addColorStop(1, `rgba(0,0,0,${vigAmt*0.7})`);
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // ── Scene tint (color wash for cohesion with creatures) ─
+  if(tintStr > 0.03){
+    ctx.fillStyle = `hsla(${skyTopH},${skySat}%,${skyTopL+30}%,${tintStr*0.18})`;
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+}
+
+/* ═══ TEST CREATURE RENDERER ════════════════════════════════════
+   Stripped-down version of Forge's renderer, only enough to
+   render a creature.json from Eidolon Forge for scale/comp checks.
+   This is NOT a forge — it's a viewer.
+   ═══════════════════════════════════════════════════════════════ */
+function renderTestCreature(canvas, spec, t){
+  if(!spec || !spec.axes){ return; }
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Build axis lookup
+  const ax = {};
+  spec.axes.forEach(a => { ax[a.id] = a.value; });
+  const get = (id, def) => ax[id] !== undefined ? ax[id] : def;
+  const g01 = (id, def) => get(id, def) / 255;
+  const gRange = (id, def, min, max) => min + (get(id, def)/255)*(max-min);
+
+  const baseR     = gRange('body_radius',    160, W*0.06, W*0.30);
+  const stretchX  = gRange('body_stretch_x', 128, 0.50, 1.50);
+  const stretchY  = gRange('body_stretch_y', 128, 0.50, 1.50);
+  const lumpAmp   = gRange('body_lumpiness',  50, 0, 30);
+  const lumpN     = 5 + Math.floor(g01('body_lump_count', 140) * 13);
+  const outline   = gRange('body_outline',   140, 0.5, 9.0);
+
+  const armN      = Math.floor(g01('arm_count', 80) * 14);
+  const armLen    = gRange('arm_length', 128, 0.20, 2.40);
+  const armW      = gRange('arm_width',  128, 1.0, 10.0);
+  const armWobAmp = gRange('arm_wobble',      120, 0.0, 0.7);
+  const armWobRt  = gRange('arm_wobble_rate', 128, 0.0, 3.0);
+
+  const huePri    = Math.round(g01('hue_primary', 200) * 359);
+  const sat       = Math.round(gRange('saturation', 170, 0, 100));
+  const light     = Math.round(gRange('lightness',  130, 20, 80));
+
+  const cx = W/2, cy = H*0.55;
+  const sx = stretchX, sy = stretchY;
+
+  // Appendages first (behind body)
+  if(armN > 0){
+    for(let i=0; i<armN; i++){
+      const baseA = (i/armN)*Math.PI*2;
+      const wob = Math.sin(t*armWobRt + i*0.7) * armWobAmp;
+      const a = baseA + wob;
+      const len = baseR * armLen;
+      const tipX = cx + Math.cos(a)*len*sx;
+      const tipY = cy + Math.sin(a)*len*sy;
+      const cpx = cx + Math.cos(baseA)*len*0.5*sx;
+      const cpy = cy + Math.sin(baseA)*len*0.5*sy;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+      ctx.lineWidth = armW + 2;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.quadraticCurveTo(cpx, cpy, tipX, tipY); ctx.stroke();
+      ctx.strokeStyle = `hsl(${huePri},${sat}%,${light+10}%)`;
+      ctx.lineWidth = armW;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.quadraticCurveTo(cpx, cpy, tipX, tipY); ctx.stroke();
+    }
+  }
+
+  // Body blob
+  const pts = [];
+  for(let i=0; i<lumpN; i++){
+    const a = (i/lumpN)*Math.PI*2 - Math.PI/2;
+    const n = Math.sin(t*0.7 + i*0.9)*lumpAmp + Math.sin(t*0.3 + i*1.5)*lumpAmp*0.4;
+    pts.push({
+      x: cx + Math.cos(a)*(baseR+n)*sx,
+      y: cy + Math.sin(a)*(baseR+n)*sy
+    });
+  }
+  function bp(c){
+    const M = pts.length;
+    c.beginPath();
+    for(let i=0; i<M; i++){
+      const p0=pts[(i-1+M)%M],p1=pts[i],p2=pts[(i+1)%M],p3=pts[(i+2)%M];
+      const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+      const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+      if(i===0) c.moveTo(p1.x,p1.y);
+      c.bezierCurveTo(c1x,c1y,c2x,c2y,p2.x,p2.y);
+    }
+    c.closePath();
+  }
+  bp(ctx);
+  ctx.strokeStyle='rgba(0,0,0,0.92)';ctx.lineWidth=outline;ctx.lineJoin='round';ctx.stroke();
+  bp(ctx);
+  ctx.fillStyle=`hsl(${huePri},${sat}%,${light}%)`;
+  ctx.fill();
+}
+
+/* ═══ ANIMATION ═══ */
+let animId = null;
+function loop(){
+  const now = (performance.now() - t0) / 1000;
+  const dt = Math.min(now - prevT, 0.05);
+  prevT = now;
+
+  if(sweepIdx !== -1){
+    const elapsed = now - sweepStart;
+    const phase = (elapsed % SWEEP_PERIOD) / SWEEP_PERIOD;
+    const tri = phase < 0.5 ? phase*2 : (1-phase)*2;
+    const newVal = Math.round(tri * 255);
+    if(values[sweepIdx] !== newVal){
+      values[sweepIdx] = newVal;
+      const slider = document.getElementById('axs-' + AXES[sweepIdx].id);
+      if(slider) slider.value = newVal;
+      const vEl = document.getElementById('axv-' + AXES[sweepIdx].id);
+      if(vEl) vEl.textContent = newVal;
+    }
+  }
+
+  const canvas = document.getElementById('canvas');
+  if(canvas.width > 0) render(canvas, now);
+
+  if(testCreaturesShown){
+    if(testCreatures[0]) renderTestCreature(document.getElementById('sil-l'), testCreatures[0], now);
+    if(testCreatures[1]) renderTestCreature(document.getElementById('sil-r'), testCreatures[1], now);
+  }
+
+  animId = requestAnimationFrame(loop);
+}
+
+/* ═══ UI ═══ */
+function buildAxes(){
+  const el = document.getElementById('axes');
+  el.innerHTML = '';
+  let lastGroup = null;
+  AXES.forEach((a, i) => {
+    if(a.group !== lastGroup){
+      const h = document.createElement('div');
+      h.className = 'group-head';
+      h.textContent = a.group.replace('_',' ');
+      el.appendChild(h);
+      lastGroup = a.group;
+    }
+    const row = document.createElement('div');
+    row.className = 'axis';
+    row.id = 'ax-' + a.id;
+    row.dataset.idx = i;
+    row.innerHTML = `
+      <div class="axis-row">
+        <input class="axis-label" id="axl-${a.id}" type="text" value="${a.label}" maxlength="40" spellcheck="false">
+        <input class="axis-slider" id="axs-${a.id}" type="range" min="0" max="255" value="${values[i]}">
+      </div>
+      <span class="axis-val" id="axv-${a.id}">${values[i]}</span>
+      <button class="axis-sweep" id="axw-${a.id}" title="sweep this axis 0→255 (4s loop)">⇌</button>
+    `;
+    el.appendChild(row);
+
+    const slider = row.querySelector('.axis-slider');
+    slider.addEventListener('input', e => onSlide(i, e.target.value));
+
+    const labelInput = row.querySelector('.axis-label');
+    labelInput.addEventListener('focus', () => labelInput.select());
+    labelInput.addEventListener('change', () => onLabelChange(i, labelInput.value));
+    labelInput.addEventListener('keydown', e => {
+      if(e.key === 'Enter') labelInput.blur();
+      if(e.key === 'Escape'){ labelInput.value = labels[i]; labelInput.blur(); }
+    });
+
+    row.querySelector('.axis-sweep').addEventListener('click', e => {
+      e.stopPropagation();
+      toggleSweep(i);
+    });
+  });
+}
+
+function onSlide(i, val){
+  values[i] = parseInt(val);
+  document.getElementById('axv-' + AXES[i].id).textContent = values[i];
+  if(sweepIdx === i) stopSweep();
+}
+
+function onLabelChange(i, newLabel){
+  newLabel = (newLabel || '').trim();
+  if(!newLabel) newLabel = AXES[i].label;
+  labels[i] = newLabel;
+  renamed[i] = (newLabel !== AXES[i].label);
+  const el = document.getElementById('axl-'+AXES[i].id);
+  if(el){
+    el.value = newLabel;
+    el.classList.toggle('renamed', renamed[i]);
+  }
+  setStatus(renamed[i] ? `renamed → "${newLabel}"` : `reset → "${newLabel}"`);
+}
+
+function toggleSweep(i){
+  if(sweepIdx === i){ stopSweep(); return; }
+  if(sweepIdx !== -1){
+    values[sweepIdx] = sweepBase;
+    document.getElementById('ax-'+AXES[sweepIdx].id)?.classList.remove('sweeping');
+    document.getElementById('axs-'+AXES[sweepIdx].id).value = sweepBase;
+    document.getElementById('axv-'+AXES[sweepIdx].id).textContent = sweepBase;
+  }
+  sweepIdx = i;
+  sweepBase = values[i];
+  sweepStart = (performance.now() - t0) / 1000;
+  document.getElementById('ax-'+AXES[i].id).classList.add('sweeping');
+  document.getElementById('sweep-indicator').classList.add('show');
+  setStatus(`sweeping "${labels[i]}"`);
+}
+function stopSweep(){
+  if(sweepIdx === -1) return;
+  values[sweepIdx] = sweepBase;
+  const slider = document.getElementById('axs-'+AXES[sweepIdx].id);
+  if(slider) slider.value = sweepBase;
+  const vEl = document.getElementById('axv-'+AXES[sweepIdx].id);
+  if(vEl) vEl.textContent = sweepBase;
+  document.getElementById('ax-'+AXES[sweepIdx].id)?.classList.remove('sweeping');
+  document.getElementById('sweep-indicator').classList.remove('show');
+  sweepIdx = -1;
+  setStatus('sweep ended');
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && sweepIdx !== -1) stopSweep();
+});
+
+function syncAllSliders(){
+  AXES.forEach((a,i) => {
+    document.getElementById('axs-'+a.id).value = values[i];
+    document.getElementById('axv-'+a.id).textContent = values[i];
+    const lbl = document.getElementById('axl-'+a.id);
+    lbl.value = labels[i];
+    lbl.classList.toggle('renamed', renamed[i]);
+  });
+}
+
+function randomize(){
+  if(sweepIdx !== -1) stopSweep();
+  values = AXES.map(() => Math.floor(Math.random()*256));
+  syncAllSliders();
+  setStatus('randomized');
+}
+
+function resetAll(){
+  if(sweepIdx !== -1) stopSweep();
+  values = AXES.map(a => a.default);
+  labels = AXES.map(a => a.label);
+  renamed = AXES.map(() => false);
+  envName = 'Untitled';
+  document.getElementById('name-field').value = envName;
+  syncAllSliders();
+  setStatus('reset');
+}
+
+function setStatus(msg){
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  clearTimeout(setStatus._tm);
+  setStatus._tm = setTimeout(() => { el.textContent = 'ready'; }, 2400);
+}
+
+document.getElementById('name-field').addEventListener('change', e => {
+  envName = (e.target.value || 'Untitled').trim() || 'Untitled';
+  e.target.value = envName;
+});
+
+/* ═══ TEST CREATURES ═══ */
+function toggleCreatures(){
+  if(testCreatures[0] || testCreatures[1]){
+    // Already loaded — toggle visibility
+    testCreaturesShown = !testCreaturesShown;
+    const showCls = testCreaturesShown ? 'show' : '';
+    const sl = document.getElementById('sil-l');
+    const sr = document.getElementById('sil-r');
+    sl.className = (testCreatures[0] && testCreaturesShown) ? 'show' : '';
+    sr.className = (testCreatures[1] && testCreaturesShown) ? 'show' : '';
+    document.getElementById('creature-toggle').classList.toggle('on', testCreaturesShown);
+    setStatus(testCreaturesShown ? 'creatures shown' : 'creatures hidden');
+  } else {
+    document.getElementById('creature-input').click();
+  }
+}
+
+async function onLoadCreatures(input){
+  const files = Array.from(input.files || []).slice(0,2);
+  input.value = '';
+  if(!files.length) return;
+  for(let i=0; i<files.length; i++){
+    try {
+      const text = await files[i].text();
+      const spec = JSON.parse(text);
+      if(spec && Array.isArray(spec.axes)){
+        testCreatures[i] = spec;
+      }
+    } catch(err){
+      console.error(err);
+    }
+  }
+  testCreaturesShown = true;
+  if(testCreatures[0]) document.getElementById('sil-l').className = 'show';
+  if(testCreatures[1]) document.getElementById('sil-r').className = 'show';
+  document.getElementById('creature-toggle').classList.add('on');
+  const loaded = testCreatures.filter(Boolean).length;
+  setStatus(`loaded ${loaded} test creature${loaded>1?'s':''}`);
+}
+
+/* ═══ SAVE / LOAD ═══════════════════════════════════════════════
+   Format: eidolon-environment/1
+   Same shape as creature spec for forward consistency.
+   ═══════════════════════════════════════════════════════════════ */
+function buildSpec(){
+  return {
+    format: 'eidolon-environment/1',
+    name: envName,
+    savedAt: new Date().toISOString(),
+    axes: AXES.map((a,i) => ({
+      id: a.id,
+      label: labels[i],
+      renamed: renamed[i],
+      value: values[i]
+    }))
+  };
+}
+
+function saveEnv(){
+  if(sweepIdx !== -1) stopSweep();
+  const spec = buildSpec();
+  const json = JSON.stringify(spec, null, 2);
+  const safe = (envName || 'untitled')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'untitled';
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${safe}.environment.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1200);
+  setStatus(`saved: ${safe}.environment.json`);
+}
+
+async function onLoadEnv(input){
+  const f = input.files && input.files[0];
+  input.value = '';
+  if(!f) return;
+  try {
+    const text = await f.text();
+    const spec = JSON.parse(text);
+    if(!spec || !Array.isArray(spec.axes)) throw new Error('not an environment spec');
+    if(sweepIdx !== -1) stopSweep();
+    values = AXES.map(a => a.default);
+    labels = AXES.map(a => a.label);
+    renamed = AXES.map(() => false);
+    let applied = 0, unknown = 0;
+    for(const ax of spec.axes){
+      const idx = ID_INDEX[ax.id];
+      if(idx === undefined){ unknown++; continue; }
+      if(typeof ax.value === 'number'){
+        values[idx] = Math.max(0, Math.min(255, ax.value|0));
+      }
+      if(typeof ax.label === 'string' && ax.label.trim()){
+        labels[idx] = ax.label.trim();
+        renamed[idx] = !!ax.renamed || (labels[idx] !== AXES[idx].label);
+      }
+      applied++;
+    }
+    envName = (spec.name || f.name.replace(/\.environment\.json$/i,'')).trim() || 'Untitled';
+    document.getElementById('name-field').value = envName;
+    syncAllSliders();
+    let msg = `loaded ${envName} · ${applied} axes`;
+    if(unknown) msg += ` · ${unknown} unknown skipped`;
+    setStatus(msg);
+  } catch(err){
+    console.error(err);
+    setStatus('load failed: ' + err.message);
+  }
+}
+
+/* ═══ BOOT ═══ */
+buildAxes();
+document.getElementById('axis-count').textContent = N + ' axes';
+loop();
+setStatus(`forge ready · ${N} axes`);
+</script>
+</body>
+</html>

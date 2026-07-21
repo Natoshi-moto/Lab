@@ -1,0 +1,95 @@
+{
+  "schema": "nexus.receipt/v1",
+  "receipt_id": "RCT-NOTED-PROJECT-OS-PHASE-0-001",
+  "operation": "noted-project-os-phase-0-scaffold-containment",
+  "status_authority": "NONE",
+  "started_at": "2026-07-21T18:20:00Z",
+  "finished_at": "2026-07-21T18:31:22Z",
+  "exit_code": 0,
+  "inputs": [
+    {
+      "baseline_commit": "ba4beb0dd1e8ebbba28fe3eea0174ad825502f64"
+    },
+    {
+      "path": "/home/anon/New Base/noted_nexus_router_bb02_host_adapter_v0.06 (Copy)/noted-v0.01-nexus-router-merge",
+      "description": "owner-specified Noted router-merge source seed; imported without nested Git metadata, node_modules, or dist"
+    },
+    {
+      "path": "experiments/NOTED_PROJECT_OS_001/operations_task_PHASE_0.md"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "products/REGISTRY.json",
+      "sha256": "4eb10fef1fa7a6756e4c2f2e5b54668c1bb8181af5a1860f3341ed007b0f5bc4"
+    },
+    {
+      "path": "products/REGISTRY.schema.json",
+      "sha256": "f6d0328ca3bc64e002bac211b60f6677e760dd6be4a4ead3d536833fc08e2320"
+    },
+    {
+      "path": "products/noted-host/",
+      "package_lock_sha256": "2ef3937a8a4f7add3e917f3b1a4b0000cf99e8525d3a070d6f40c804ac0817fe"
+    },
+    {
+      "path": "products/nexus-blocks/",
+      "status": "scaffold"
+    },
+    {
+      "path": "products/creature-engine/",
+      "status": "scaffold"
+    },
+    {
+      "path": "drops/.gitkeep"
+    }
+  ],
+  "claims": [
+    "Registry verification passed for three registered packages.",
+    "The imported noted-host passed npm ci, TypeScript typecheck, and production build in this environment.",
+    "Lab doctor passed after generated dependency and build directories were removed."
+  ],
+  "non_claims": [
+    "This receipt has no status authority and does not promote accepted or canonical state.",
+    "Phase 1 and later bridge, block, creature, Nostr, and cold-drop behavior was not implemented or verified.",
+    "Inherited Noted seed assets retain legacy Pokemon identifiers and strings; their Phase 4 creature migration was not pulled into Phase 0.",
+    "Passing checks do not establish production readiness, exhaustive security, privacy, or semantic correctness.",
+    "npm ci reported five dependency audit findings: one low, three moderate, and one high; dependency remediation is outside Phase 0."
+  ],
+  "checks": [
+    {
+      "command": "python3 experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py",
+      "exit_code": 0,
+      "result": "PASS registry: 3 package(s) ok"
+    },
+    {
+      "command": "cd products/noted-host && npm ci",
+      "exit_code": 0,
+      "result": "added 166 packages; npm audit reported 5 vulnerabilities"
+    },
+    {
+      "command": "cd products/noted-host && npm run typecheck",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "cd products/noted-host && npm run build",
+      "exit_code": 0,
+      "result": "PASS; Vite transformed 295 modules and pack.js emitted single-file artifacts"
+    },
+    {
+      "command": "./nexus doctor",
+      "exit_code": 0,
+      "result": "PASS; expected WORKTREE_DIRTY warning"
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "result": "PASS; 185 tests"
+    },
+    {
+      "command": "./nexus verify",
+      "exit_code": 0,
+      "result": "PASS"
+    }
+  ]
+}

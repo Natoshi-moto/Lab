@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block Hash</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #08090c; --surface: #111318; --surface-2: #181b22; --surface-3: #1f222b;
+  --border: #262a35; --border-hi: #363b4a;
+  --text: #d2d5de; --text-dim: #6b7089; --text-muted: #3e4255;
+  --ok: #4dbb7a; --ok-dim: rgba(77,187,122,.10);
+  --warn: #f59e0b; --warn-dim: rgba(245,158,11,.10);
+  --bad: #ef4444; --bad-dim: rgba(239,68,68,.10);
+  --info: #3b82f6;
+  --amber: #c9920a;
+  --r: 6px;
+  --mono: 'JetBrains Mono','SF Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--mono);font-size:12px}
+body{background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+
+#nx-boot-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#nx-boot-icon{font-size:38px;color:var(--amber)}
+#nx-boot-title{font-size:14px;font-weight:600}
+#nx-boot-state{font-size:10px;color:var(--text-dim);letter-spacing:1px}
+#nx-app{display:none;width:100%;height:100%;flex-direction:column;overflow:hidden}
+body.nx-mounted #nx-app, body.nx-standalone #nx-app{display:flex}
+body.nx-mounted #nx-boot-screen, body.nx-standalone #nx-boot-screen{display:none}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+#topbar{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+#topbar h1{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--text)}
+#topbar h1 .sub{color:var(--text-dim);font-weight:400;margin-left:6px}
+.btn{
+  padding:6px 12px;background:var(--surface-2);color:var(--text-dim);
+  border:1px solid var(--border);border-radius:var(--r);cursor:pointer;
+  font-family:inherit;font-size:11px;transition:all .12s;
+}
+.btn:hover{color:var(--text);border-color:var(--border-hi)}
+.btn.primary{color:var(--amber);border-color:var(--amber);background:rgba(201,146,10,0.06)}
+.btn.primary:hover{background:rgba(201,146,10,0.12)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+
+#main{flex:1;overflow-y:auto;padding:18px}
+.section{margin-bottom:22px}
+.section h2{
+  font-size:10px;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--amber);margin-bottom:10px;
+}
+.helper{font-size:11px;color:var(--text-dim);line-height:1.55;margin-bottom:10px}
+
+.input-row{display:flex;gap:8px;align-items:stretch}
+.input-row input[type="file"]{display:none}
+.input-row .file-button{
+  flex:1;padding:24px 14px;background:var(--surface);
+  border:1px dashed var(--border-hi);border-radius:var(--r);
+  text-align:center;font-size:11px;color:var(--text-dim);
+  cursor:pointer;transition:all .15s;
+}
+.input-row .file-button:hover{border-color:var(--amber);color:var(--text);background:var(--surface-2)}
+.input-row .file-button.has-file{border-style:solid;border-color:var(--ok);color:var(--text)}
+
+textarea#paste-area{
+  width:100%;min-height:200px;padding:10px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--text);font-family:var(--mono);font-size:11px;line-height:1.5;
+  resize:vertical;
+}
+textarea#paste-area:focus{outline:none;border-color:var(--amber)}
+
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{
+  padding:6px 14px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-muted);background:transparent;border:1px solid var(--border);
+  border-radius:var(--r);cursor:pointer;transition:all .12s;
+}
+.tab.active{color:var(--amber);border-color:var(--amber);background:rgba(201,146,10,0.06)}
+.tab:hover:not(.active){color:var(--text-dim)}
+
+.result-card{
+  padding:14px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);margin-bottom:10px;
+}
+.result-card.empty{
+  border-style:dashed;color:var(--text-muted);
+  text-align:center;padding:30px 14px;font-style:italic;
+}
+
+.field{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:11px}
+.field .k{color:var(--text-dim);min-width:120px;letter-spacing:.04em;text-transform:uppercase;font-size:10px}
+.field .v{color:var(--text);word-break:break-all;flex:1}
+.field.hash .v{color:var(--amber);font-weight:500}
+.field .copy-btn{
+  padding:2px 8px;background:var(--surface-2);color:var(--text-dim);
+  border:1px solid var(--border);border-radius:3px;cursor:pointer;
+  font-family:inherit;font-size:9px;letter-spacing:.06em;
+}
+.field .copy-btn:hover{color:var(--amber);border-color:var(--amber)}
+
+.manifest-row{
+  display:flex;flex-wrap:wrap;gap:5px;padding:5px 0;
+}
+.manifest-row .chip{
+  padding:2px 8px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:3px;
+  font-size:10px;color:var(--text-dim);
+}
+.manifest-row .chip.emit{color:var(--ok);border-color:var(--ok-dim)}
+.manifest-row .chip.consume{color:var(--info);border-color:rgba(59,130,246,0.2)}
+
+.compare-input{
+  width:100%;padding:8px 10px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--text);font-family:var(--mono);font-size:11px;
+  margin-top:6px;
+}
+.compare-input:focus{outline:none;border-color:var(--amber)}
+.compare-input.match{border-color:var(--ok)}
+.compare-input.mismatch{border-color:var(--bad)}
+
+.verdict{
+  padding:10px 14px;border-radius:var(--r);font-size:12px;
+  font-weight:500;letter-spacing:.04em;display:flex;align-items:center;gap:10px;
+  margin-top:10px;
+}
+.verdict.match{background:var(--ok-dim);color:var(--ok);border:1px solid rgba(77,187,122,0.2)}
+.verdict.mismatch{background:var(--bad-dim);color:var(--bad);border:1px solid rgba(239,68,68,0.2)}
+.verdict.idle{background:var(--surface);color:var(--text-muted);border:1px dashed var(--border-hi)}
+.verdict .icon{font-size:16px}
+
+.warn-banner{
+  padding:10px 14px;background:var(--warn-dim);
+  border:1px solid rgba(245,158,11,0.25);border-left:3px solid var(--warn);
+  border-radius:var(--r);font-size:11px;color:var(--warn);line-height:1.55;
+}
+.warn-banner strong{color:var(--text)}
+</style>
+</head>
+<body>
+<div id="nx-boot-screen">
+  <div id="nx-boot-icon">⌬</div>
+  <div id="nx-boot-title">Block Hash</div>
+  <div id="nx-boot-state">BOOTING</div>
+</div>
+
+<div id="nx-app">
+  <div id="topbar">
+    <h1>BLOCK HASH <span class="sub">verify what you're about to install</span></h1>
+  </div>
+
+  <div id="main">
+
+    <div class="warn-banner">
+      <strong>What this is for.</strong> Before you install or run a block someone sent you,
+      hash it here and compare against the hash they advertised. Different bytes → different hash →
+      different block, regardless of filename. Same hash on two copies means the bytes are
+      byte-identical. See <code>docs/COMMUNITY_BLOCKS_DESIGN.md</code> for the full trust story.
+    </div>
+
+    <div class="section" style="margin-top:22px">
+      <h2>Source</h2>
+      <div class="tabs">
+        <button class="tab active" data-tab="file">From file</button>
+        <button class="tab" data-tab="paste">Paste contents</button>
+      </div>
+
+      <div class="tab-pane" data-pane="file">
+        <div class="helper">
+          Pick any local file. It's hashed in your browser; the bytes don't leave this page.
+        </div>
+        <div class="input-row">
+          <label class="file-button" id="file-button">
+            <input type="file" id="file-input" accept=".html,.htm,.js,.json,.md,.txt,*">
+            <span id="file-button-label">Click to pick a file…</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="tab-pane" data-pane="paste" style="display:none">
+        <div class="helper">
+          Paste any block's full HTML source. Same hash function, same answer as the file path.
+        </div>
+        <textarea id="paste-area" spellcheck="false" placeholder="<!DOCTYPE html>&#10;<html>..."></textarea>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button class="btn primary" id="hash-paste-btn">Hash this</button>
+          <button class="btn" id="clear-paste-btn">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Result</h2>
+      <div id="result-pane" class="result-card empty">
+        Pick or paste a block to see its hash.
+      </div>
+    </div>
+
+    <div class="section" id="compare-section" style="display:none">
+      <h2>Compare against a published hash</h2>
+      <div class="helper">
+        If the block was advertised with a hash, paste that hash below. The kernel computes
+        SHA-256 of the bytes; community-block trust is rooted in this match.
+      </div>
+      <input
+        class="compare-input"
+        id="compare-input"
+        type="text"
+        spellcheck="false"
+        placeholder="sha256:abcd1234… (with or without the sha256: prefix, with or without 0x)"
+      >
+      <div id="verdict" class="verdict idle">
+        <span class="icon">○</span>
+        <span class="text">Paste a hash to compare.</span>
+      </div>
+    </div>
+
+    <div class="section" id="manifest-section" style="display:none">
+      <h2>Declared manifest (extracted from the block)</h2>
+      <div class="helper">
+        What the block <em>claims</em> it will do. The kernel will only let it do this much.
+        These channels come from the block's <code>DECLARE</code> message — we extract them by
+        scanning the source. <strong>Trust this only after the hash matches a hash you trust.</strong>
+        A block can lie about its manifest; the protocol catches the lie at runtime, but by then
+        you've already opened it.
+      </div>
+      <div class="result-card" id="manifest-pane"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+"use strict";
+// ════════════════════════════════════════════════════════════════
+//  BLOCK HASH VERIFIER
+//  Content-addresses any block file. Companion to docs/COMMUNITY_BLOCKS_DESIGN.md.
+//  Boots both inside Nexus and standalone (no kernel channels needed).
+// ════════════════════════════════════════════════════════════════
+
+const fileInput      = document.getElementById('file-input');
+const fileButton     = document.getElementById('file-button');
+const fileButtonLbl  = document.getElementById('file-button-label');
+const pasteArea      = document.getElementById('paste-area');
+const hashPasteBtn   = document.getElementById('hash-paste-btn');
+const clearPasteBtn  = document.getElementById('clear-paste-btn');
+const resultPane     = document.getElementById('result-pane');
+const compareSection = document.getElementById('compare-section');
+const compareInput   = document.getElementById('compare-input');
+const verdictEl      = document.getElementById('verdict');
+const manifestSection = document.getElementById('manifest-section');
+const manifestPane   = document.getElementById('manifest-pane');
+
+let lastHash    = null;   // sha256 hex of the current bytes
+let lastSource  = null;   // {kind: 'file'|'paste', name, size}
+let lastText    = null;   // the raw text (for manifest extraction)
+
+// ── Tabs ──────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const which = btn.dataset.tab;
+    document.querySelectorAll('.tab-pane').forEach(p => {
+      p.style.display = p.dataset.pane === which ? '' : 'none';
+    });
+  });
+});
+
+// ── Hash function ─────────────────────────────────────────────
+async function sha256Hex(bytes) {
+  // Accept either an ArrayBuffer or a string; normalize to ArrayBuffer.
+  const buf = (typeof bytes === 'string') ? new TextEncoder().encode(bytes).buffer : bytes;
+  const digest = await window.crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(digest))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ── Manifest extraction (best effort, for display only) ───────
+// Scans the block's HTML for the kind of manifest declarations the
+// codebase uses: bootBlock({manifest: {emits, consumes, app}}), or
+// hand-rolled DECLARE messages with the same shape. Returns null if
+// no manifest is found (which is normal for non-block files).
+function extractManifest(html) {
+  // Try multiple patterns; the codebase has a few stylings.
+  const patterns = [
+    // bootBlock({ manifest: { emits: [...], consumes: [...], app: {...} } })
+    /manifest\s*:\s*\{\s*emits\s*:\s*\[([^\]]*)\]\s*,\s*consumes\s*:\s*\[([^\]]*)\]/m,
+    // Alt order
+    /manifest\s*:\s*\{\s*consumes\s*:\s*\[([^\]]*)\]\s*,\s*emits\s*:\s*\[([^\]]*)\]/m,
+    // Hand-rolled type:'DECLARE' postMessage
+    /type\s*:\s*['"]DECLARE['"][\s\S]{0,200}emits\s*:\s*\[([^\]]*)\][\s\S]{0,200}consumes\s*:\s*\[([^\]]*)\]/m,
+  ];
+  let emits = null, consumes = null, swap = false;
+  for (let i = 0; i < patterns.length; i++) {
+    const m = html.match(patterns[i]);
+    if (m) {
+      emits    = m[1];
+      consumes = m[2];
+      swap     = (i === 1);  // alt-order pattern
+      break;
+    }
+  }
+  if (emits === null) return null;
+  const parseList = s => Array.from(s.matchAll(/['"]([a-z0-9._-]+)['"]/gi)).map(x => x[1]);
+  return swap
+    ? { emits: parseList(consumes), consumes: parseList(emits) }
+    : { emits: parseList(emits),    consumes: parseList(consumes) };
+}
+
+// Also try to extract the app metadata for display (title/icon/desc).
+function extractApp(html) {
+  const m = html.match(/app\s*:\s*\{([^{}]*)\}/);
+  if (!m) return null;
+  const inside = m[1];
+  const grab = (key) => {
+    const r = new RegExp(key + '\\s*:\\s*[\'"]([^\'"]*)[\'"]');
+    const mm = inside.match(r);
+    return mm ? mm[1] : null;
+  };
+  return {
+    title:       grab('title'),
+    icon:        grab('icon'),
+    description: grab('description'),
+  };
+}
+
+// ── Result rendering ──────────────────────────────────────────
+function renderResult() {
+  resultPane.classList.remove('empty');
+  resultPane.replaceChildren();
+
+  const fields = [
+    { k: 'source',  v: lastSource.kind === 'file'
+        ? `${lastSource.name} (${formatBytes(lastSource.size)})`
+        : `pasted (${formatBytes(lastSource.size)})` },
+    { k: 'sha-256', v: 'sha256:' + lastHash, hash: true, copy: 'sha256:' + lastHash },
+    { k: 'short',   v: lastHash.slice(0, 16) + '…' + lastHash.slice(-8), copy: lastHash },
+  ];
+  for (const f of fields) {
+    const row = document.createElement('div');
+    row.className = 'field' + (f.hash ? ' hash' : '');
+    const k = document.createElement('span'); k.className = 'k'; k.textContent = f.k;
+    const v = document.createElement('span'); v.className = 'v'; v.textContent = f.v;
+    row.appendChild(k); row.appendChild(v);
+    if (f.copy) {
+      const cb = document.createElement('button');
+      cb.className = 'copy-btn'; cb.textContent = 'Copy';
+      cb.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(f.copy); cb.textContent = '✓'; setTimeout(() => cb.textContent = 'Copy', 1000); }
+        catch (e) { cb.textContent = '!'; setTimeout(() => cb.textContent = 'Copy', 1000); }
+      });
+      row.appendChild(cb);
+    }
+    resultPane.appendChild(row);
+  }
+
+  compareSection.style.display = '';
+  // Re-evaluate any compare value already typed.
+  evaluateCompare();
+
+  // Try to extract and show a manifest if the bytes look like an HTML block.
+  const manifest = extractManifest(lastText);
+  const app = extractApp(lastText);
+  if (manifest || app) {
+    manifestSection.style.display = '';
+    manifestPane.replaceChildren();
+    if (app) {
+      const appFields = [
+        ['title',       app.title],
+        ['icon',        app.icon],
+        ['description', app.description],
+      ].filter(p => p[1]);
+      for (const [k, v] of appFields) {
+        const row = document.createElement('div'); row.className = 'field';
+        const kk = document.createElement('span'); kk.className = 'k'; kk.textContent = k;
+        const vv = document.createElement('span'); vv.className = 'v'; vv.textContent = v;
+        row.appendChild(kk); row.appendChild(vv);
+        manifestPane.appendChild(row);
+      }
+    }
+    if (manifest) {
+      for (const [label, list, cls] of [
+        ['emits',    manifest.emits,    'emit'],
+        ['consumes', manifest.consumes, 'consume'],
+      ]) {
+        const row = document.createElement('div'); row.className = 'field';
+        const k = document.createElement('span'); k.className = 'k'; k.textContent = label;
+        const v = document.createElement('span'); v.className = 'v';
+        if (list.length === 0) { v.textContent = '(none)'; v.style.color = 'var(--text-muted)'; }
+        else {
+          const wrap = document.createElement('span'); wrap.className = 'manifest-row';
+          for (const ch of list) {
+            const chip = document.createElement('span');
+            chip.className = 'chip ' + cls;
+            chip.textContent = (cls === 'emit' ? '→ ' : '← ') + ch;
+            wrap.appendChild(chip);
+          }
+          v.appendChild(wrap);
+        }
+        row.appendChild(k); row.appendChild(v);
+        manifestPane.appendChild(row);
+      }
+    }
+  } else {
+    manifestSection.style.display = 'none';
+  }
+}
+
+function formatBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+// ── Compare against advertised hash ───────────────────────────
+function normalizeHash(s) {
+  return String(s || '').trim().toLowerCase()
+    .replace(/^sha-?256:/i, '')
+    .replace(/^0x/, '')
+    .replace(/[^0-9a-f]/g, '');
+}
+function evaluateCompare() {
+  const value = compareInput.value;
+  if (!value.trim()) {
+    compareInput.classList.remove('match', 'mismatch');
+    verdictEl.className = 'verdict idle';
+    verdictEl.querySelector('.icon').textContent = '○';
+    verdictEl.querySelector('.text').textContent = 'Paste a hash to compare.';
+    return;
+  }
+  const normalized = normalizeHash(value);
+  if (normalized.length !== 64) {
+    compareInput.classList.remove('match', 'mismatch');
+    verdictEl.className = 'verdict idle';
+    verdictEl.querySelector('.icon').textContent = '?';
+    verdictEl.querySelector('.text').textContent = 'Not a valid SHA-256 (need 64 hex chars).';
+    return;
+  }
+  if (!lastHash) return;
+  if (normalized === lastHash) {
+    compareInput.classList.add('match'); compareInput.classList.remove('mismatch');
+    verdictEl.className = 'verdict match';
+    verdictEl.querySelector('.icon').textContent = '✓';
+    verdictEl.querySelector('.text').textContent = 'MATCH — these bytes are the block that was advertised.';
+  } else {
+    compareInput.classList.add('mismatch'); compareInput.classList.remove('match');
+    verdictEl.className = 'verdict mismatch';
+    verdictEl.querySelector('.icon').textContent = '✗';
+    verdictEl.querySelector('.text').textContent = 'MISMATCH — different bytes, different block. Do not install.';
+  }
+}
+compareInput.addEventListener('input', evaluateCompare);
+
+// ── File picker ───────────────────────────────────────────────
+fileInput.addEventListener('change', async () => {
+  const f = fileInput.files && fileInput.files[0];
+  if (!f) return;
+  fileButton.classList.add('has-file');
+  fileButtonLbl.textContent = `Hashing ${f.name}…`;
+  try {
+    const buf = await f.arrayBuffer();
+    lastHash   = await sha256Hex(buf);
+    lastSource = { kind: 'file', name: f.name, size: f.size };
+    // For manifest extraction we want text; only do the decode for plausibly-text files.
+    lastText = await tryDecodeAsText(buf);
+    fileButtonLbl.textContent = `${f.name} — hashed`;
+    renderResult();
+  } catch (e) {
+    fileButtonLbl.textContent = `Error: ${e.message}`;
+    console.error(e);
+  }
+});
+
+async function tryDecodeAsText(buf) {
+  try {
+    const td = new TextDecoder('utf-8', { fatal: false });
+    return td.decode(buf);
+  } catch (_) {
+    return '';
+  }
+}
+
+// ── Paste handler ─────────────────────────────────────────────
+hashPasteBtn.addEventListener('click', async () => {
+  const text = pasteArea.value;
+  if (!text.trim()) return;
+  hashPasteBtn.disabled = true;
+  hashPasteBtn.textContent = 'Hashing…';
+  try {
+    lastHash   = await sha256Hex(text);
+    lastSource = { kind: 'paste', name: 'pasted-content', size: new TextEncoder().encode(text).length };
+    lastText   = text;
+    renderResult();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    hashPasteBtn.disabled = false;
+    hashPasteBtn.textContent = 'Hash this';
+  }
+});
+clearPasteBtn.addEventListener('click', () => { pasteArea.value = ''; pasteArea.focus(); });
+
+// ── Boot ──────────────────────────────────────────────────────
+const APP = {
+  title: 'Block Hash',
+  icon: '⌬',
+  description: 'Content-address any block file',
+  emits: [],
+  consumes: []
+};
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: { emits: APP.emits, consumes: APP.consumes,
+              app: { title: APP.title, icon: APP.icon, description: APP.description, visible: true } }
+});
+if (nx) {
+  nx.ready.then(() => document.body.classList.add('nx-mounted'));
+}
+// Standalone fallback: if no kernel BOOT in 800ms, run free.
+setTimeout(() => {
+  if (!document.body.classList.contains('nx-mounted')) {
+    document.body.classList.add('nx-standalone');
+  }
+}, 800);
+</script>
+</body>
+</html>

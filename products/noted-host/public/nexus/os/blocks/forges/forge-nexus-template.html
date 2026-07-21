@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eidolon Forge</title>
+<style>
+:root { color-scheme: dark; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+  background: #050a05; color: #d2d5de;
+}
+body { display: flex; flex-direction: column; }
+
+/* ── Boot screen during handshake ── */
+#nx-boot-screen {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; background: #050a05;
+}
+#nx-boot-icon  { font-size: 40px; color: #33ff66; text-shadow: 0 0 14px rgba(51,255,102,.4); }
+#nx-boot-title { font-size: 15px; font-weight: 600; color: #99ffaa; letter-spacing: 3px; }
+#nx-boot-state { font-size: 10px; color: #1a9940; letter-spacing: 2px; margin-top: 4px; }
+#nx-app { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; }
+body.nx-mounted #nx-boot-screen { display: none; }
+body.nx-mounted #nx-app         { display: flex; }
+
+/* ── App vocabulary — phosphor CRT, same dialect as eidolon family ── */
+:root {
+  --phosphor: #33ff66;
+  --phosphor-dim: #1a9940;
+  --phosphor-bright: #99ffaa;
+  --phosphor-glow: rgba(51, 255, 102, 0.18);
+  --bg: #050a05;
+  --bg-panel: #0a120a;
+  --bg-deeper: #050803;
+  --border: #1a331a;
+  --bad: #ff4466;
+  --warn: #ffdd55;
+  --scanline: rgba(0,0,0,0.13);
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, var(--scanline) 0px, var(--scanline) 1px, transparent 1px, transparent 3px);
+  pointer-events: none; z-index: 9999;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none; z-index: 9998;
+}
+@keyframes flicker {
+  0%, 96%, 100% { opacity: 1; }
+  97% { opacity: 0.92; }
+  98% { opacity: 0.97; }
+}
+#nx-app { animation: flicker 5s infinite; }
+
+#topbar {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--phosphor-dim);
+  background: var(--bg-panel);
+}
+#topbar h1 {
+  font-size: 14px; letter-spacing: 4px; font-weight: normal;
+  color: var(--phosphor);
+  text-shadow: 0 0 8px var(--phosphor-glow);
+}
+#topbar .status {
+  margin-left: auto;
+  font-size: 10px; letter-spacing: 1px;
+  color: var(--phosphor-dim);
+}
+#topbar .dot {
+  display: inline-block; width: 8px; height: 8px;
+  background: var(--phosphor); border-radius: 50%;
+  margin-right: 5px; box-shadow: 0 0 6px var(--phosphor-glow);
+  vertical-align: 1px;
+}
+
+.layout {
+  flex: 1; display: grid;
+  grid-template-columns: 240px 1fr 240px 240px;
+  gap: 8px; padding: 10px; overflow: hidden;
+}
+@media (max-width: 1100px) { .layout { grid-template-columns: 220px 1fr 220px; } .archive-col { display: none; } }
+@media (max-width: 840px)  { .layout { grid-template-columns: 1fr; grid-template-rows: auto auto auto; } }
+
+.col { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; }
+.panel {
+  border: 1px solid var(--phosphor-dim);
+  background: var(--bg-panel);
+  padding: 10px;
+}
+.panel h2 {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--phosphor-dim);
+  font-weight: normal;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 4px;
+}
+.archetype-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.arch-btn {
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 7px 8px;
+  background: transparent;
+  color: var(--phosphor-dim);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  text-transform: uppercase;
+  text-align: center;
+}
+.arch-btn:hover { color: var(--phosphor); border-color: var(--phosphor-dim); }
+.arch-btn.selected {
+  color: var(--phosphor-bright);
+  border-color: var(--phosphor);
+  background: rgba(51, 255, 102, 0.08);
+  text-shadow: 0 0 6px var(--phosphor-glow);
+}
+.arch-desc {
+  font-size: 9px; color: var(--phosphor-dim);
+  margin-top: 8px; font-style: italic;
+  line-height: 1.4; min-height: 28px;
+}
+.slider-wrap { display: flex; gap: 8px; align-items: center; }
+.slider-wrap input[type="range"] {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  background: var(--bg-deeper);
+  height: 4px;
+  border: 1px solid var(--border);
+  outline: none;
+}
+.slider-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  background: var(--phosphor);
+  border: 1px solid var(--phosphor-bright);
+  cursor: pointer;
+}
+.slider-wrap input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px;
+  background: var(--phosphor);
+  border: 1px solid var(--phosphor-bright);
+  cursor: pointer; border-radius: 0;
+}
+.slider-val {
+  font-size: 11px;
+  color: var(--phosphor-bright);
+  width: 36px; text-align: right;
+}
+.seed-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 12px;
+  background: var(--bg-deeper);
+  color: var(--phosphor-bright);
+  border: 1px solid var(--border);
+  padding: 5px 7px;
+  outline: none;
+}
+.seed-input:focus { border-color: var(--phosphor-dim); }
+.seed-input::placeholder { color: var(--phosphor-dim); font-style: italic; }
+.seed-meta {
+  font-size: 9px; color: var(--phosphor-dim);
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+}
+.btn {
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--phosphor);
+  border: 1px solid var(--phosphor-dim);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.btn:hover {
+  color: var(--phosphor-bright);
+  border-color: var(--phosphor-bright);
+  box-shadow: inset 0 0 14px var(--phosphor-glow);
+}
+.btn.primary {
+  border-color: var(--phosphor);
+  color: var(--phosphor-bright);
+  font-size: 13px;
+  padding: 11px 18px;
+  letter-spacing: 2px;
+  display: block;
+  width: 100%;
+}
+.stage {
+  background: var(--bg-deeper);
+  border: 1px solid var(--border);
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+}
+pre.creature {
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.0;
+  color: var(--phosphor);
+  text-shadow: 0 0 6px var(--phosphor-glow);
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0;
+  white-space: pre;
+  user-select: none;
+}
+.traits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+.trait-cell {
+  font-family: inherit;
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 4px 4px;
+  background: transparent;
+  color: var(--phosphor-dim);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.trait-cell .lbl { flex: 1; text-align: left; padding-left: 3px; }
+.trait-cell .state { width: 14px; text-align: center; font-size: 10px; font-weight: bold; }
+.trait-cell.force-on  { border-color: var(--phosphor); color: var(--phosphor-bright); background: rgba(51, 255, 102, 0.1); }
+.trait-cell.force-on .state  { color: var(--phosphor); }
+.trait-cell.force-off { border-color: #553030; color: #885050; background: rgba(255, 80, 80, 0.06); }
+.trait-cell.force-off .state { color: var(--bad); }
+.trait-cell.neutral .state { color: var(--phosphor-dim); }
+.dna-bars {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+}
+.dna-bar {
+  display: grid;
+  grid-template-columns: 16px 1fr 24px;
+  gap: 4px;
+  align-items: center;
+  font-size: 9px;
+}
+.dna-bar .idx { color: var(--phosphor-dim); text-align: right; }
+.dna-bar .track { background: var(--bg-deeper); border: 1px solid var(--border); height: 7px; }
+.dna-bar .fill {
+  background: var(--phosphor-dim);
+  height: 100%;
+  transition: width 0.15s, background 0.15s;
+}
+.dna-bar.over-thresh .fill { background: var(--phosphor); box-shadow: 0 0 4px var(--phosphor-glow); }
+.dna-bar .v { color: var(--phosphor); text-align: right; font-size: 10px; }
+
+.identity-readout { font-size: 10px; line-height: 1.5; color: var(--phosphor-dim); }
+.identity-readout .row {
+  display: flex; justify-content: space-between;
+  border-bottom: 1px dotted var(--border);
+  padding: 2px 0;
+}
+.identity-readout .v { color: var(--phosphor); }
+
+.helper {
+  font-size: 9px;
+  color: var(--phosphor-dim);
+  font-style: italic;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+.row-with-btn { display: flex; gap: 6px; align-items: center; }
+.row-with-btn input { flex: 1; }
+
+/* History list — minted specimens panel */
+.archive-list {
+  display: flex; flex-direction: column;
+  gap: 4px; max-height: 100%; overflow-y: auto;
+}
+.archive-row {
+  border: 1px solid var(--border);
+  padding: 6px 7px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.archive-row:hover { border-color: var(--phosphor-dim); background: rgba(51, 255, 102, 0.04); }
+.archive-row.selected { border-color: var(--phosphor); background: rgba(51, 255, 102, 0.07); }
+.archive-row .name { color: var(--phosphor); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.archive-row .meta { color: var(--phosphor-dim); font-size: 9px; display: flex; justify-content: space-between; }
+.archive-empty {
+  padding: 14px 8px; font-size: 10px;
+  color: var(--phosphor-dim); font-style: italic; text-align: center;
+}
+
+/* Flash toast */
+.flash {
+  position: fixed;
+  bottom: 14px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--phosphor);
+  padding: 8px 16px;
+  color: var(--phosphor-bright);
+  font-size: 11px; letter-spacing: 1px;
+  z-index: 10000;
+  box-shadow: 0 0 14px var(--phosphor-glow);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.flash.show { opacity: 1; }
+.flash.bad  { border-color: var(--bad); color: var(--bad); }
+
+/* Scrollbars to match the rest */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--phosphor-dim); }
+</style>
+</head>
+<body>
+
+<!-- Shown during the kernel handshake -->
+<div id="nx-boot-screen">
+  <div id="nx-boot-icon">⌬</div>
+  <div id="nx-boot-title">EIDOLON FORGE</div>
+  <div id="nx-boot-state">WAITING FOR KERNEL</div>
+</div>
+
+<!-- App UI — revealed on MOUNTED -->
+<div id="nx-app">
+  <div id="topbar">
+    <h1>⌬ EIDOLON FORGE</h1>
+    <span class="status" id="ipc-status"><span class="dot"></span>MOUNTED · LIVE</span>
+  </div>
+
+  <div class="layout">
+
+    <!-- LEFT: archetype, chaos, seed, traits -->
+    <div class="col">
+      <div class="panel">
+        <h2>ARCHETYPE</h2>
+        <div class="archetype-list" id="arch-list"></div>
+        <div class="arch-desc" id="arch-desc"></div>
+      </div>
+
+      <div class="panel">
+        <h2>CHAOS</h2>
+        <div class="slider-wrap">
+          <input type="range" id="chaos" min="0" max="100" value="40">
+          <span class="slider-val" id="chaos-val">0.40</span>
+        </div>
+        <div class="helper">
+          0 = pure archetype · 1 = wide variance.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>SEED PHRASE</h2>
+        <div class="row-with-btn">
+          <input type="text" class="seed-input" id="seed" placeholder="empty = random">
+          <button class="btn" id="reroll">Roll</button>
+        </div>
+        <div class="seed-meta" id="seed-meta">stream: cryptographic random</div>
+        <div class="helper">
+          Same seed → same creature. Reproducible.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>TRAIT TARGETS</h2>
+        <div class="traits-grid" id="traits-grid"></div>
+        <div class="helper">click: ○ → ＋ → － → ○</div>
+      </div>
+    </div>
+
+    <!-- CENTER: live creature + DNA + identity + MINT -->
+    <div class="col">
+      <div class="panel">
+        <h2>LIVE PREVIEW</h2>
+        <div class="stage"><pre class="creature" id="stage"></pre></div>
+        <div class="identity-readout" id="identity" style="margin-top:8px"></div>
+      </div>
+      <div class="panel">
+        <h2>DNA · 16 GENES</h2>
+        <div class="dna-bars" id="dna-bars"></div>
+      </div>
+      <button class="btn primary" id="btn-mint">★ MINT &amp; LAUNCH ★</button>
+    </div>
+
+    <!-- RIGHT: forge state -->
+    <div class="col">
+      <div class="panel">
+        <h2>FORGE STATE</h2>
+        <div class="identity-readout" id="forge-state"></div>
+      </div>
+      <div class="panel">
+        <h2>NEXUS BRIDGE</h2>
+        <div class="identity-readout" id="bridge-state"></div>
+        <div class="helper">
+          Mint INSERTS into NexusDB ·
+          EMITs <code>eidolon.minted</code> ·
+          launches creature as a managed block via <code>nexus.launch</code>.
+        </div>
+      </div>
+    </div>
+
+    <!-- ARCHIVE: lifetime mint history from NexusDB -->
+    <div class="col archive-col">
+      <div class="panel" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <h2>LIFETIME MINTS · <span id="archive-count">0</span></h2>
+        <div class="archive-list" id="archive-list">
+          <div class="archive-empty" id="archive-empty">
+            no mints yet — be the genesis
+          </div>
+        </div>
+        <div class="helper" style="margin-top:6px">
+          Persisted in <code>NexusDB</code>. Click any mint to relaunch.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+"use strict";
+// ════════════════════════════════════════════════════════════════════════
+//  EIDOLON FORGE  ·  Nexus OS managed block
+//
+//  Uses engines/nexus-block-client.js for the kernel handshake. See
+//  docs/HANDY_LESSONS.md #14 for the migration recipe.
+//
+//  Citizens of: Nexus OS v3
+//  Talks to:    NexusDB (persistence) · kernel (nexus.launch syscall)
+//  Emits:       eidolon.minted · db.query · nexus.launch
+//  Consumes:    db.result · db.notify
+//
+//  Storage shape (in NexusDB social_events):
+//    { id: birthHash, pubkey: 'eidolon-forge', kind: 'eidolon-specimen',
+//      content: JSON.stringify({ name, archetype, seed, dna, hues, nonce }),
+//      created_at: unix_seconds, tags: [['archetype', name], ['seed', s]] }
+//
+//  Archive panel shows every specimen ever minted by anyone, persistent
+//  across kernel restarts, live-updated when other forges mint via the
+//  db.notify channel.
+// ════════════════════════════════════════════════════════════════════════
+
+const APP = {
+  title:       "Eidolon Forge",
+  icon:        "⌬",
+  description: "Procedural genesis-creature minter with cryptographic lineage",
+  emits:       ["eidolon.minted", "db.query", "nexus.launch"],
+  consumes:    ["db.result", "db.notify", "eidolon.minted"],
+};
+
+const TRAITS = ['venomous','spectral','swarming','titanic','murky','resonant','vital','volatile','ethereal','crystalline','feral','ancient','luminous','toxic','phantom','armored'];
+
+// ════════════════════════════════════════════════════════════════════════
+//  ARCHETYPES — 16-gene mean vectors. Same definitions as the standalone
+//  forge so creatures minted in either environment are family.
+// ════════════════════════════════════════════════════════════════════════
+const ARCHETYPES = [
+  { name: 'WISP',    sigma: 20, center: [55, 70, 70, 90, 200, 60, 195, 75, 128, 180, 90, 60, 175, 60, 70, 200],
+    desc: 'Small, fast, fewest tendrils. Light footprint, high pulse, low halo.' },
+  { name: 'TITAN',   sigma: 18, center: [220, 195, 200, 60, 50, 70, 170, 180, 60, 70, 200, 180, 50, 200, 200, 50],
+    desc: 'Huge, slow, dense. Big body, slow heartbeat, thick palette.' },
+  { name: 'PHANTOM', sigma: 22, center: [120, 180, 200, 200, 130, 150, 130, 60, 200, 110, 70, 80, 200, 70, 175, 130],
+    desc: 'Medium body, flowing tendrils, drifting particles. Hard to fix in place.' },
+  { name: 'SWARM',   sigma: 20, center: [80, 60, 100, 110, 140, 230, 100, 200, 90, 200, 180, 220, 110, 180, 160, 220],
+    desc: 'Small body, many particles, high turbulence, fast drift.' },
+  { name: 'CRYSTAL', sigma: 16, center: [140, 130, 180, 30, 90, 90, 200, 220, 200, 230, 80, 30, 50, 220, 130, 60],
+    desc: 'Rigid. Low wobble, sharp asymmetric tendrils, hard palette. Holds its pose.' },
+  { name: 'WILD',    sigma: 60, center: [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
+    desc: 'No archetype. Pure procedural noise. Most surprising children come from here.' },
+];
+
+// ════════════════════════════════════════════════════════════════════════
+//  CRYPTO + UTILITIES — match the ring/canonicalize protocol exactly.
+// ════════════════════════════════════════════════════════════════════════
+async function sha256(data) {
+  const buf = new TextEncoder().encode(typeof data === 'string' ? data : JSON.stringify(data));
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function sha256Bytes(data) {
+  const buf = new TextEncoder().encode(typeof data === 'string' ? data : JSON.stringify(data));
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return new Uint8Array(hash);
+}
+function canonicalize(obj) {
+  if (obj === null || obj === undefined) return JSON.stringify(obj);
+  if (typeof obj !== 'object') return JSON.stringify(obj);
+  if (Array.isArray(obj)) return '[' + obj.map(canonicalize).join(',') + ']';
+  return '{' + Object.keys(obj).sort().map(k => JSON.stringify(k) + ':' + canonicalize(obj[k])).join(',') + '}';
+}
+function randomNonce() {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function mulberry32(seed) {
+  let t = seed >>> 0;
+  return function() {
+    t = (t + 0x6D2B79F5) >>> 0;
+    let r = t;
+    r = Math.imul(r ^ (r >>> 15), r | 1);
+    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function gaussian(rng, mean, sigma) {
+  const u1 = Math.max(rng(), 1e-9);
+  const u2 = rng();
+  const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+  return mean + z * sigma;
+}
+function clampGene(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+// ════════════════════════════════════════════════════════════════════════
+//  FORGE STATE
+// ════════════════════════════════════════════════════════════════════════
+const state = {
+  archetype: 0,
+  chaos: 0.40,
+  seed: '',
+  seedHash: null,
+  traitForce: new Array(16).fill(0),
+  dna: null,
+  hues: null,
+  rngSeedInt: 0,
+  archive: [],   // populated from NexusDB
+  selectedArchiveId: null,
+};
+
+// DNA synthesis (identical to standalone forge)
+function synthesizeDNA() {
+  const arch = ARCHETYPES[state.archetype];
+  const baseSigma = arch.sigma;
+  const sigma = baseSigma * (0.3 + state.chaos * 1.7);
+
+  let rng;
+  if (state.seed && state.rngSeedInt) {
+    rng = mulberry32(state.rngSeedInt);
+  } else {
+    rng = function() {
+      const buf = new Uint32Array(1);
+      crypto.getRandomValues(buf);
+      return buf[0] / 4294967296;
+    };
+  }
+
+  const dna = new Array(16);
+  for (let i = 0; i < 16; i++) {
+    let v = clampGene(gaussian(rng, arch.center[i], sigma));
+    const force = state.traitForce[i];
+    if (force === 1 && v <= 128) {
+      v = clampGene(129 + Math.abs(gaussian(rng, 50, 35)));
+    } else if (force === -1 && v > 128) {
+      v = clampGene(128 - Math.abs(gaussian(rng, 50, 35)));
+    }
+    dna[i] = clampGene(v);
+  }
+  const hues = [
+    (dna[8]  / 255) * 360,
+    ((dna[9]  / 255) * 360 + 120) % 360,
+    ((dna[10] / 255) * 360 + 240) % 360,
+  ].map(h => Math.round(h * 100) / 100);
+
+  state.dna = dna;
+  state.hues = hues;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  ASCII RENDERER — same as eidolon-glyph
+// ════════════════════════════════════════════════════════════════════════
+const GRID_W = 60, GRID_H = 26, ASPECT = 0.5;
+const PALETTE_SOFT = ' .·:-+*x#%@';
+const PALETTE_HARD = ' .,;=+*o#$@';
+const PARTICLE_GLYPHS = '·•*+';
+
+function pickPalette(g) { return g > 128 ? PALETTE_HARD : PALETTE_SOFT; }
+function intensityToChar(i, p) { if (i <= 0) return ' '; const k = Math.min(p.length - 1, Math.floor(i * p.length)); return p[k]; }
+
+function renderFrameToText(dna, t, gridW = GRID_W, gridH = GRID_H) {
+  const baseR = 4 + (dna[0] / 255) * 8;
+  const tendrils = 1 + Math.floor((dna[1] / 255) * 11);
+  const tendrilLen = baseR * (0.8 + (dna[2] / 255) * 1.6);
+  const wobble = (dna[3] / 255) * 0.6;
+  const pulseRate = 0.5 + (dna[4] / 255) * 2.5;
+  const particles = 8 + Math.floor((dna[5] / 255) * 24);
+  const coreBright = 0.4 + (dna[6] / 255) * 0.6;
+  const asym = (dna[7] / 255) * 0.45;
+  const turbulence = (dna[11] / 255) * 1.2;
+  const curl = (dna[12] / 255) * 1.1;
+  const palette = pickPalette(dna[13]);
+  const haloR = baseR * (1.6 + (dna[14] / 255) * 1.6);
+  const drift = 0.2 + (dna[15] / 255) * 0.7;
+  const pulse = 1 + Math.sin(t * pulseRate) * 0.12;
+  const cx = gridW / 2, cy = gridH / 2;
+  const grid = new Float32Array(gridW * gridH);
+
+  for (let y = 0; y < gridH; y++) {
+    for (let x = 0; x < gridW; x++) {
+      const dx = x - cx, dy = (y - cy) / ASPECT;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const bodyR = baseR * pulse, halo = haloR * pulse;
+      let v = 0;
+      if (dist < bodyR) v = coreBright * (1 - (dist / bodyR) * 0.5);
+      else if (dist < halo) v = coreBright * 0.35 * (1 - (dist - bodyR) / (halo - bodyR));
+      grid[y * gridW + x] = Math.max(grid[y * gridW + x], v);
+    }
+  }
+  for (let i = 0; i < tendrils; i++) {
+    const baseAngle = (i / tendrils) * Math.PI * 2;
+    const phase = Math.sin(t * pulseRate * 0.7 + i * 1.3) * wobble;
+    const lenMod = 1 + asym * Math.cos(baseAngle);
+    for (let s = 1; s <= 18; s++) {
+      const sf = s / 18;
+      const r = baseR * pulse + sf * tendrilLen * lenMod;
+      const a = baseAngle + phase + Math.sin(t * pulseRate + sf * 4 + i) * (curl * 0.35);
+      const px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r * ASPECT;
+      const ix = Math.floor(px), iy = Math.floor(py);
+      for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+        const tx = ix + ox, ty = iy + oy;
+        if (tx < 0 || tx >= gridW || ty < 0 || ty >= gridH) continue;
+        const fx = (tx + 0.5) - px, fy = (ty + 0.5) - py;
+        const fd = Math.sqrt(fx * fx + fy * fy);
+        if (fd < 1.4) {
+          const stamp = (1 - fd / 1.4) * 0.9 * (1 - sf * 0.4);
+          grid[ty * gridW + tx] = Math.max(grid[ty * gridW + tx], stamp);
+        }
+      }
+    }
+  }
+  const stamps = [];
+  for (let p = 0; p < particles; p++) {
+    const seed = p * 17 + dna[p % 16];
+    const orbitR = baseR * 1.4 + ((seed % 13) * 0.7);
+    const orbitA = (p / particles) * Math.PI * 2 + t * drift * 0.6 + Math.sin(t + seed) * 0.4;
+    const turb = Math.sin(t * 1.7 + seed) * turbulence;
+    const px = cx + Math.cos(orbitA) * (orbitR + turb);
+    const py = cy + Math.sin(orbitA) * (orbitR + turb) * ASPECT;
+    const ix = Math.floor(px), iy = Math.floor(py);
+    if (ix >= 0 && ix < gridW && iy >= 0 && iy < gridH) {
+      stamps.push({ x: ix, y: iy, glyph: PARTICLE_GLYPHS[p % PARTICLE_GLYPHS.length] });
+    }
+  }
+  const lines = [];
+  for (let y = 0; y < gridH; y++) {
+    let line = '';
+    for (let x = 0; x < gridW; x++) line += intensityToChar(grid[y * gridW + x], palette);
+    lines.push(line);
+  }
+  for (const p of stamps) {
+    const arr = lines[p.y].split('');
+    if (arr[p.x] === ' ' || arr[p.x] === '.' || arr[p.x] === '·') {
+      arr[p.x] = p.glyph; lines[p.y] = arr.join('');
+    }
+  }
+  return lines.join('\n');
+}
+
+const stageEl = document.getElementById('stage');
+let t0 = performance.now();
+function loop() {
+  if (state.dna) {
+    const t = (performance.now() - t0) / 1000;
+    stageEl.textContent = renderFrameToText(state.dna, t);
+  }
+  requestAnimationFrame(loop);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  UI RENDERING
+// ════════════════════════════════════════════════════════════════════════
+function renderArchetypes() {
+  const el = document.getElementById('arch-list');
+  el.innerHTML = ARCHETYPES.map((a, i) =>
+    `<button class="arch-btn ${i === state.archetype ? 'selected' : ''}" data-arch="${i}">${a.name}</button>`
+  ).join('');
+  el.querySelectorAll('.arch-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.archetype = parseInt(btn.dataset.arch);
+      renderArchetypes();
+      document.getElementById('arch-desc').textContent = ARCHETYPES[state.archetype].desc;
+      reroll();
+    });
+  });
+  document.getElementById('arch-desc').textContent = ARCHETYPES[state.archetype].desc;
+}
+function renderTraitsGrid() {
+  const el = document.getElementById('traits-grid');
+  const sg = (s) => s === 1 ? '＋' : s === -1 ? '－' : '○';
+  const sc = (s) => s === 1 ? 'force-on' : s === -1 ? 'force-off' : 'neutral';
+  el.innerHTML = TRAITS.map((t, i) => {
+    const f = state.traitForce[i];
+    return `<button class="trait-cell ${sc(f)}" data-trait="${i}"><span class="lbl">${t}</span><span class="state">${sg(f)}</span></button>`;
+  }).join('');
+  el.querySelectorAll('.trait-cell').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.trait);
+      const cur = state.traitForce[i];
+      state.traitForce[i] = cur === 0 ? 1 : cur === 1 ? -1 : 0;
+      renderTraitsGrid();
+      reroll();
+    });
+  });
+}
+function renderDnaBars() {
+  const el = document.getElementById('dna-bars');
+  if (!state.dna) { el.innerHTML = ''; return; }
+  el.innerHTML = state.dna.map((v, i) => {
+    const pct = (v / 255) * 100, over = v > 128;
+    return `<div class="dna-bar ${over ? 'over-thresh' : ''}"><span class="idx">${String(i).padStart(2,'0')}</span><span class="track"><span class="fill" style="width:${pct}%"></span></span><span class="v">${v}</span></div>`;
+  }).join('');
+}
+function renderIdentity(birthHash) {
+  const expressed = state.dna ? state.dna.map((v, i) => v > 128 ? TRAITS[i] : null).filter(Boolean) : [];
+  document.getElementById('identity').innerHTML = `
+    <div class="row"><span>archetype</span><span class="v">${ARCHETYPES[state.archetype].name}</span></div>
+    <div class="row"><span>chaos</span><span class="v">${state.chaos.toFixed(2)}</span></div>
+    <div class="row"><span>active traits</span><span class="v">${expressed.length}/16</span></div>
+    <div class="row"><span>traits</span><span class="v" style="font-size:9px">${expressed.join(', ') || '—'}</span></div>
+  `;
+  document.getElementById('forge-state').innerHTML = `
+    <div class="row"><span>seed</span><span class="v">${state.seed ? '"' + state.seed.slice(0, 14) + (state.seed.length > 14 ? '…' : '') + '"' : 'random'}</span></div>
+    <div class="row"><span>RNG</span><span class="v">${state.seed ? 'mulberry32' : 'crypto'}</span></div>
+    <div class="row"><span>hues</span><span class="v">${state.hues ? state.hues.map(h => h.toFixed(0)).join(', ') : '—'}</span></div>
+    <div class="row"><span>preview hash</span><span class="v">${birthHash ? birthHash.slice(0, 12) + '…' : '—'}</span></div>
+  `;
+}
+function renderArchive() {
+  const list = document.getElementById('archive-list');
+  const empty = document.getElementById('archive-empty');
+  document.getElementById('archive-count').textContent = state.archive.length;
+  if (state.archive.length === 0) {
+    list.innerHTML = '<div class="archive-empty">no mints yet — be the genesis</div>';
+    return;
+  }
+  // Sort newest first
+  const rows = [...state.archive].sort((a, b) => b.created_at - a.created_at);
+  list.innerHTML = rows.map(row => {
+    const sel = row.id === state.selectedArchiveId ? 'selected' : '';
+    let payload = {};
+    try { payload = JSON.parse(row.content || '{}'); } catch (_) {}
+    const arch = (payload.archetype || '?').toUpperCase();
+    const seed = payload.seed ? '"' + (payload.seed.length > 12 ? payload.seed.slice(0, 11) + '…' : payload.seed) + '"' : 'rnd';
+    const ts = new Date(row.created_at * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return `<div class="archive-row ${sel}" data-id="${row.id}">
+      <div class="name">${arch}</div>
+      <div class="meta"><span>${seed}</span><span>${ts}</span></div>
+      <div class="meta" style="font-size:8px">${row.id.slice(0, 16)}…</div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.archive-row').forEach(el => {
+    el.addEventListener('click', () => relaunchSpecimen(el.dataset.id));
+  });
+}
+function renderBridgeState() {
+  const dbStat = state.dbReady ? 'ONLINE' : 'WAITING';
+  const dbColor = state.dbReady ? 'var(--phosphor)' : 'var(--warn)';
+  document.getElementById('bridge-state').innerHTML = `
+    <div class="row"><span>kernel IPC</span><span class="v" style="color:var(--phosphor)">MOUNTED</span></div>
+    <div class="row"><span>NexusDB</span><span class="v" style="color:${dbColor}">${dbStat}</span></div>
+    <div class="row"><span>archive rows</span><span class="v">${state.archive.length}</span></div>
+    <div class="row"><span>last mint</span><span class="v">${state.lastMintAt ? new Date(state.lastMintAt).toLocaleTimeString() : '—'}</span></div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  REROLL — re-synthesize on any input change
+// ════════════════════════════════════════════════════════════════════════
+async function reroll() {
+  if (state.seed) {
+    const bytes = await sha256Bytes(state.seed);
+    state.seedHash = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    state.rngSeedInt = (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0;
+    document.getElementById('seed-meta').textContent = `stream: ${state.seedHash.slice(0, 16)}…  ·  deterministic`;
+  } else {
+    state.seedHash = null;
+    state.rngSeedInt = 0;
+    document.getElementById('seed-meta').textContent = 'stream: cryptographic random';
+  }
+  synthesizeDNA();
+  renderDnaBars();
+  const previewHash = await sha256(canonicalize({ nonce: '__preview__', dna: state.dna }));
+  renderIdentity(previewHash);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  KERNEL PROTOCOL  ·  uses engines/nexus-block-client.js
+// ════════════════════════════════════════════════════════════════════════
+let _reqId = 0;
+const nextReqId = () => 'forge-' + (++_reqId);
+state.dbReady = false;
+state.lastMintAt = null;
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ["eidolon.minted", "db.query", "nexus.launch"],
+    consumes: ["db.result", "db.notify", "eidolon.minted"],
+    app: {
+      title:       APP.title,
+      icon:        APP.icon,
+      description: APP.description,
+      visible:     true
+    }
+  },
+  onMessage({ channel, payload, src }) {
+    if (channel === 'db.result') {
+      if (!payload || !payload.ok) {
+        console.warn('[forge] db error:', payload?.error, 'reqId:', payload?._reqId);
+        if (payload?._reqId === 'forge-archive-load') {
+          state.dbReady = true;
+          renderBridgeState();
+        }
+        return;
+      }
+      state.dbReady = true;
+      if (payload._reqId === 'forge-archive-load') {
+        const rows = (payload.data || []).filter(r => r.kind === 'eidolon-specimen');
+        state.archive = rows;
+        renderArchive();
+        renderBridgeState();
+      }
+      return;
+    }
+    if (channel === 'db.notify' && payload?.table === 'social_events') {
+      const row = payload.data;
+      if (row && row.kind === 'eidolon-specimen') {
+        if (!state.archive.find(r => r.id === row.id)) {
+          state.archive.push(row);
+          renderArchive();
+          renderBridgeState();
+        }
+      }
+      return;
+    }
+    if (channel === 'eidolon.minted') {
+      // Other forges minted — already handled via db.notify; keep this as a hook
+      return;
+    }
+  }
+});
+
+if (nx) {
+  nx.ready.then(() => {
+    document.body.classList.add("nx-mounted");
+    nx.subscribe('db.result');
+    nx.subscribe('db.notify');
+    nx.subscribe('eidolon.minted');
+    bootApp();
+    loadArchive();
+  });
+}
+
+function emit(channel, payload) {
+  if (nx) nx.emit(channel, payload);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  NEXUSDB INTEGRATION
+// ════════════════════════════════════════════════════════════════════════
+function loadArchive() {
+  emit('db.query', {
+    query:  'SELECT * FROM social_events',
+    sort:   { column: 'created_at', direction: 'DESC' },
+    _reqId: 'forge-archive-load',
+    appId:  'forge',
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  MINT — the moment the forge produces a specimen
+//
+//  Steps:
+//    1. Roll final DNA (already in state.dna)
+//    2. Mint nonce + birthHash
+//    3. Build the specimen HTML by splicing GENE_DATA into the embedded
+//       template (same template every other specimen uses, so identical
+//       in shape — terminal can't tell them apart from hand-built ones)
+//    4. Create blob: URL for the HTML
+//    5. INSERT into NexusDB social_events as kind='eidolon-specimen'
+//    6. EMIT 'eidolon.minted' for any listening blocks
+//    7. EMIT 'nexus.launch' so the kernel spawns the creature as a window
+// ════════════════════════════════════════════════════════════════════════
+
+const SPECIMEN_TEMPLATE = __SPECIMEN_TEMPLATE_STRING__;
+
+async function mint() {
+  if (!state.dna) return;
+  const nonce = randomNonce();
+  const birthHash = await sha256(canonicalize({ nonce, dna: state.dna }));
+  const timestamp = new Date().toISOString();
+  const archName = ARCHETYPES[state.archetype].name;
+
+  // Build the standalone specimen HTML
+  const html = SPECIMEN_TEMPLATE
+    .replace('__GENESIS_NONCE__', nonce)
+    .replace('__GENESIS_BIRTH_HASH__', birthHash)
+    .replace('__GENESIS_DNA__', state.dna.join(','))
+    .replace('__GENESIS_HUES__', state.hues.join(','))
+    .replace('__GENESIS_TIMESTAMP__', timestamp);
+
+  // Create blob URL — kernel allowlist accepts blob: URLs
+  const blob = new Blob([html], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  // Persist to NexusDB
+  const dbRow = {
+    id:         birthHash,
+    pubkey:     'eidolon-forge',
+    kind:       'eidolon-specimen',
+    content:    JSON.stringify({
+      name:      `Eidolon-${archName}-${nonce.slice(0, 8)}`,
+      archetype: archName,
+      seed:      state.seed || null,
+      seedHash:  state.seedHash,
+      nonce,
+      dna:       state.dna,
+      hues:      state.hues,
+    }),
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [
+      ['archetype', archName],
+      ['seed',      state.seed || ''],
+    ],
+  };
+  emit('db.query', {
+    query:  'INSERT INTO social_events',
+    params: dbRow,
+    _reqId: nextReqId(),
+    appId:  'forge',
+  });
+
+  // Optimistic local update so the archive panel reflects immediately
+  if (!state.archive.find(r => r.id === birthHash)) {
+    state.archive.push(dbRow);
+    state.lastMintAt = Date.now();
+    renderArchive();
+    renderBridgeState();
+  }
+
+  // Broadcast the mint event for any other listeners (Archive blocks, etc.)
+  emit('eidolon.minted', {
+    id:        birthHash,
+    archetype: archName,
+    name:      `Eidolon-${archName}-${nonce.slice(0, 8)}`,
+    nonce,
+    seedHash:  state.seedHash,
+  });
+
+  // Launch the creature as a managed block in the OS itself
+  emit('nexus.launch', {
+    path:  blobUrl,
+    title: `${archName} · ${nonce.slice(0, 6)}`,
+    icon:  '◉',
+  });
+
+  flash(`★ MINTED · ${archName} · ${nonce.slice(0, 8)} · launched`);
+}
+
+async function relaunchSpecimen(id) {
+  state.selectedArchiveId = id;
+  renderArchive();
+  const row = state.archive.find(r => r.id === id);
+  if (!row) return;
+  let payload = null;
+  try { payload = JSON.parse(row.content || '{}'); } catch (_) { return; }
+  if (!payload.dna || !payload.nonce || !payload.hues) {
+    flash('archive entry corrupt — cannot relaunch', true); return;
+  }
+
+  // Recompute birthHash to verify integrity. If it doesn't match the
+  // stored id, the row was tampered with.
+  const expected = await sha256(canonicalize({ nonce: payload.nonce, dna: payload.dna }));
+  if (expected !== id) {
+    flash('integrity check failed — birthHash mismatch', true);
+    return;
+  }
+
+  const html = SPECIMEN_TEMPLATE
+    .replace('__GENESIS_NONCE__', payload.nonce)
+    .replace('__GENESIS_BIRTH_HASH__', expected)
+    .replace('__GENESIS_DNA__', payload.dna.join(','))
+    .replace('__GENESIS_HUES__', payload.hues.join(','))
+    .replace('__GENESIS_TIMESTAMP__', new Date(row.created_at * 1000).toISOString());
+  const blob = new Blob([html], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+  emit('nexus.launch', {
+    path:  blobUrl,
+    title: `${(payload.archetype || '?').toUpperCase()} · ${payload.nonce.slice(0, 6)}`,
+    icon:  '◉',
+  });
+  flash(`relaunched ${payload.archetype || '?'} · ${payload.nonce.slice(0, 8)}`);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  FLASH
+// ════════════════════════════════════════════════════════════════════════
+let _flashTimer = null;
+function flash(msg, bad = false) {
+  const el = document.getElementById('flash');
+  el.textContent = msg;
+  el.classList.toggle('bad', bad);
+  el.classList.add('show');
+  if (_flashTimer) clearTimeout(_flashTimer);
+  _flashTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  APP BOOT (after MOUNTED)
+// ════════════════════════════════════════════════════════════════════════
+function bindControls() {
+  const chaosEl = document.getElementById('chaos');
+  const chaosVal = document.getElementById('chaos-val');
+  chaosEl.addEventListener('input', () => {
+    state.chaos = parseInt(chaosEl.value) / 100;
+    chaosVal.textContent = state.chaos.toFixed(2);
+    reroll();
+  });
+  const seedEl = document.getElementById('seed');
+  seedEl.addEventListener('input', () => {
+    state.seed = seedEl.value;
+    reroll();
+  });
+  document.getElementById('reroll').addEventListener('click', () => {
+    seedEl.value = '';
+    state.seed = '';
+    reroll();
+  });
+  document.getElementById('btn-mint').addEventListener('click', mint);
+}
+
+async function bootApp() {
+  renderArchetypes();
+  renderTraitsGrid();
+  bindControls();
+  await reroll();
+  renderBridgeState();
+  loop();
+}
+</script>
+</body>
+</html>

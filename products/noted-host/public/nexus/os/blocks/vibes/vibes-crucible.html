@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crucible</title>
+<style>
+:root {
+  --void:#09090c; --s1:#111116; --s2:#18181f; --s3:#222230;
+  --border:#2a2a3a; --border-hi:#3d3d58;
+  --ink:#ddd8cc; --ink-2:#999084; --ink-3:#524e48;
+  --rose:#9b2335; --rose-glow:rgba(155,35,53,.16);
+  --amber:#c9920a; --green:#4dbb7a; --purple:#7c3aed; --teal:#0d7377;
+  --t-creature:#7c3aed; --t-environment:#0d7377; --t-attack:#c9920a;
+  --t-battle:#4dbb7a;
+  --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+  --display:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--void);color:var(--ink);font-family:var(--mono);font-size:12px;overflow:hidden}
+body{display:flex;flex-direction:column}
+
+#top{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0}
+#title{font-family:var(--display);font-weight:700;letter-spacing:3px;font-size:13px;color:var(--rose)}
+#title-sub{color:var(--ink-3);letter-spacing:1px;font-size:10px}
+#status{margin-left:auto;color:var(--ink-3);font-size:10px;letter-spacing:1px}
+
+#main{flex:1;overflow:auto;padding:24px;display:flex;flex-direction:column;align-items:center;gap:24px}
+
+.battle-name-row{width:100%;max-width:760px;display:flex;gap:10px;align-items:center}
+#battle-name{flex:1;background:var(--s1);border:1px solid var(--border);color:var(--ink);padding:10px 14px;font-family:var(--display);font-size:18px;letter-spacing:2px;border-radius:4px;outline:none}
+#battle-name:focus{border-color:var(--rose)}
+
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:760px}
+.lane-full{grid-column:1/-1}
+
+.slot{background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:140px}
+.slot-head{display:flex;align-items:center;gap:8px}
+.slot-label{font-family:var(--display);font-size:10px;letter-spacing:2.5px;color:var(--ink-3);font-weight:600}
+.slot-pick-btn{margin-left:auto;background:var(--s2);border:1px solid var(--border);color:var(--ink-2);padding:4px 10px;font-family:var(--mono);font-size:10px;cursor:pointer;border-radius:3px}
+.slot-pick-btn:hover{border-color:var(--border-hi);color:var(--ink)}
+.slot-empty{color:var(--ink-3);font-size:11px;text-align:center;padding:20px;font-style:italic}
+.slot-filled{display:flex;flex-direction:column;gap:6px}
+.slot-name{font-family:var(--display);font-size:16px;color:var(--ink);font-weight:600;letter-spacing:1px}
+.slot-meta{font-size:10px;color:var(--ink-3);letter-spacing:1px}
+.slot-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tag{background:var(--s3);border:1px solid var(--border);padding:1px 5px;border-radius:2px;font-size:8px;color:var(--ink-2)}
+.slot-clear{background:transparent;border:none;color:var(--ink-3);font-size:11px;cursor:pointer;align-self:flex-start;margin-top:6px}
+.slot-clear:hover{color:var(--rose)}
+
+.attacks-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.attack-slot{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px;font-size:10px;color:var(--ink-2);min-height:50px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center}
+.attack-slot.filled{color:var(--ink);background:var(--s3);border-color:var(--border-hi);font-weight:600;flex-direction:column;align-items:flex-start;text-align:left}
+.attack-slot:hover{border-color:var(--amber)}
+.attack-name{font-family:var(--display);font-size:11px;color:var(--ink)}
+.attack-meta{font-size:9px;color:var(--ink-3);margin-top:2px}
+
+#forge-btn{background:linear-gradient(135deg, var(--rose), #c44a5a);border:1px solid #c44a5a;color:#fff;padding:14px 38px;font-family:var(--display);font-size:14px;letter-spacing:4px;font-weight:700;cursor:pointer;border-radius:4px;margin-top:8px;transition:transform .12s,box-shadow .12s}
+#forge-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px var(--rose-glow)}
+#forge-btn:disabled{background:var(--s2);border-color:var(--border);color:var(--ink-3);cursor:not-allowed;transform:none;box-shadow:none}
+
+#picker{position:fixed;inset:0;background:rgba(9,9,12,.92);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+#picker.show{display:flex}
+.picker-panel{background:var(--s1);border:1px solid var(--border-hi);border-radius:6px;width:90vw;max-width:680px;max-height:80vh;display:flex;flex-direction:column}
+.picker-head{padding:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.picker-title{font-family:var(--display);font-size:14px;letter-spacing:2px}
+.picker-close{margin-left:auto;background:transparent;border:none;color:var(--ink-3);font-size:20px;cursor:pointer}
+.picker-search{flex:1;background:var(--void);border:1px solid var(--border);color:var(--ink);padding:6px 10px;font-family:var(--mono);font-size:11px;border-radius:3px;outline:none}
+.picker-list{flex:1;overflow-y:auto;padding:10px}
+.picker-row{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:3px;margin-bottom:6px;cursor:pointer;background:var(--s2)}
+.picker-row:hover{border-color:var(--border-hi);background:var(--s3)}
+.picker-row .pname{font-family:var(--display);font-size:13px;color:var(--ink);font-weight:600}
+.picker-row .pmeta{font-size:9px;color:var(--ink-3);margin-top:2px;letter-spacing:1px}
+.picker-row .ptags{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end;max-width:240px}
+.picker-empty{padding:40px;text-align:center;color:var(--ink-3);font-size:11px}
+
+.type-chip{font-size:8px;letter-spacing:1.2px;text-transform:uppercase;padding:2px 5px;border-radius:2px;font-weight:700}
+.type-chip.t-creature{background:rgba(124,58,237,.18);color:var(--t-creature);border:1px solid rgba(124,58,237,.35)}
+.type-chip.t-environment{background:rgba(13,115,119,.20);color:#3aa5a8;border:1px solid rgba(13,115,119,.40)}
+.type-chip.t-attack{background:rgba(201,146,10,.18);color:var(--amber);border:1px solid rgba(201,146,10,.35)}
+
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border-hi);color:var(--ink);padding:8px 16px;border-radius:3px;font-size:11px;z-index:500;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.show{opacity:1}
+
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+</style>
+</head>
+<body>
+
+<div id="top">
+  <div id="title">CRUCIBLE</div>
+  <div id="title-sub">forge a battle from vibes</div>
+  <div id="status">—</div>
+</div>
+
+<div id="main">
+  <div class="battle-name-row">
+    <input id="battle-name" placeholder="Untitled Battle" autocomplete="off">
+  </div>
+
+  <div class="lanes">
+    <div class="slot" data-slot="creatureA">
+      <div class="slot-head">
+        <span class="type-chip t-creature">creature</span>
+        <span class="slot-label">PROTAGONIST</span>
+        <button class="slot-pick-btn" data-pick="creatureA">browse</button>
+      </div>
+      <div class="slot-body" id="body-creatureA">
+        <div class="slot-empty">no creature picked</div>
+      </div>
+    </div>
+
+    <div class="slot" data-slot="creatureB">
+      <div class="slot-head">
+        <span class="type-chip t-creature">creature</span>
+        <span class="slot-label">OPPONENT</span>
+        <button class="slot-pick-btn" data-pick="creatureB">browse</button>
+      </div>
+      <div class="slot-body" id="body-creatureB">
+        <div class="slot-empty">no creature picked</div>
+      </div>
+    </div>
+
+    <div class="slot lane-full" data-slot="environment">
+      <div class="slot-head">
+        <span class="type-chip t-environment">environment</span>
+        <span class="slot-label">STAGE</span>
+        <button class="slot-pick-btn" data-pick="environment">browse</button>
+      </div>
+      <div class="slot-body" id="body-environment">
+        <div class="slot-empty">no environment picked · battle will use a default void backdrop</div>
+      </div>
+    </div>
+
+    <div class="slot lane-full" data-slot="attacks">
+      <div class="slot-head">
+        <span class="type-chip t-attack">attack</span>
+        <span class="slot-label">MOVESET · 4 SLOTS</span>
+        <button class="slot-pick-btn" data-pick="attacks">browse</button>
+      </div>
+      <div class="attacks-grid" id="attacks-grid"></div>
+    </div>
+  </div>
+
+  <button id="forge-btn" disabled>FORGE BATTLE</button>
+</div>
+
+<div id="picker">
+  <div class="picker-panel">
+    <div class="picker-head">
+      <div class="picker-title" id="picker-title">PICK</div>
+      <input class="picker-search" id="picker-search" placeholder="filter…" autocomplete="off">
+      <button class="picker-close" id="picker-close">×</button>
+    </div>
+    <div class="picker-list" id="picker-list"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════════
+   CRUCIBLE — battle vibe composer
+   ════════════════════════════════════════════════════════════════════ */
+
+let mounted = false;
+const state = {
+  creatureA: null, creatureB: null, environment: null,
+  attacks: [null, null, null, null]
+};
+let pickerSlot = null;     // 'creatureA' | 'creatureB' | 'environment' | 'attacks:N'
+let pickerCache = [];
+
+function $(id){return document.getElementById(id);}
+function escHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function showToast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400); // METADATA: display only, not content-addressed
+}
+
+// ── Kernel I/O ─────────────────────────────────────────────────────
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits: ['vibe.save', 'vibe.list', 'vibe.load', 'vibe.search', 'nexus.launch', 'arena.play'],
+    consumes: ['vibe.result', 'vibe.notify'],
+    app: { title: 'Crucible', icon: '⚒', description: 'Compose battles from vibes', visible: true }
+  }
+});
+
+function emit(channel, payload){ if (nx) nx.emit(channel, payload); }
+function call(channel, payload){
+  if (!nx) return Promise.reject(new Error('not connected to Nexus'));
+
+  return nx.request(channel, payload, { timeout: 8000 });
+}
+
+// ── Canonical hash for battle envelope ─────────────────────────────
+function canonical(v){
+  if (v===null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '['+v.map(canonical).join(',')+']';
+  return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';
+}
+async function sha256Hex(s){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Render slot bodies ─────────────────────────────────────────────
+function renderSlot(slot) {
+  const env = state[slot];
+  const body = $(`body-${slot}`);
+  if (!env) {
+    body.innerHTML = `<div class="slot-empty">no ${slot.replace('creature','creature ')} picked</div>`;
+    return;
+  }
+  body.innerHTML = `
+    <div class="slot-filled">
+      <div class="slot-name">${escHtml(env.name)}</div>
+      <div class="slot-meta">${escHtml(env.subFormat||env.type)} · <code>${env.id.slice(2,15)}</code></div>
+      <div class="slot-tags">${(env.tags||[]).map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>
+      <button class="slot-clear" data-clear="${slot}">clear</button>
+    </div>`;
+  body.querySelector('[data-clear]').onclick = () => { state[slot] = null; renderSlot(slot); updateForgeBtn(); };
+}
+function renderAttacks() {
+  const grid = $('attacks-grid');
+  grid.innerHTML = '';
+  state.attacks.forEach((env, i) => {
+    const el = document.createElement('div');
+    el.className = 'attack-slot' + (env ? ' filled' : '');
+    if (env) {
+      el.innerHTML = `<div class="attack-name">${escHtml(env.name)}</div><div class="attack-meta">${escHtml(env.subFormat||'attack')}</div>`;
+    } else {
+      el.textContent = `+ slot ${i+1}`;
+    }
+    el.onclick = () => openPicker(`attacks:${i}`);
+    grid.appendChild(el);
+  });
+}
+function updateForgeBtn() {
+  const ok = state.creatureA && state.creatureB;
+  $('forge-btn').disabled = !ok;
+  $('status').textContent = ok ? 'ready to forge' : 'need both creatures';
+}
+
+// ── Picker ─────────────────────────────────────────────────────────
+async function openPicker(slot) {
+  pickerSlot = slot;
+  let type = 'creature';
+  if (slot === 'environment') type = 'environment';
+  else if (slot.startsWith('attacks')) type = 'attack';
+  $('picker-title').textContent = `PICK · ${type.toUpperCase()}`;
+  $('picker').classList.add('show');
+  $('picker-search').value = ''; $('picker-search').focus();
+  $('picker-list').innerHTML = '<div class="picker-empty">loading…</div>';
+  try {
+    const res = await call('vibe.list', { type, sort: 'recent' });
+    pickerCache = res.data || [];
+    renderPickerList('');
+  } catch (e) {
+    $('picker-list').innerHTML = `<div class="picker-empty">library unreachable: ${escHtml(e.message)}</div>`;
+  }
+}
+function renderPickerList(q) {
+  q = (q || '').toLowerCase();
+  let arr = pickerCache;
+  if (q) arr = arr.filter(e => (e.name||'').toLowerCase().includes(q) || (e.tags||[]).some(t => t.toLowerCase().includes(q)));
+  if (!arr.length) {
+    $('picker-list').innerHTML = `<div class="picker-empty">no matching vibes${q?' for "'+escHtml(q)+'"':''}.<br>open a forge and save one to the library first.</div>`;
+    return;
+  }
+  $('picker-list').innerHTML = arr.map(e => `
+    <div class="picker-row" data-id="${e.id}">
+      <div>
+        <div class="pname">${escHtml(e.name)}</div>
+        <div class="pmeta">${e.parents && e.parents.length ? `gen ${e.parents.length+1}` : 'origin'} · ${e.id.slice(2,15)}</div>
+      </div>
+      <div class="ptags">${(e.tags||[]).slice(0,5).map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>
+    </div>`).join('');
+  $('picker-list').querySelectorAll('.picker-row').forEach(r => {
+    r.onclick = async () => {
+      const id = r.dataset.id;
+      try {
+        const res = await call('vibe.load', { id });
+        if (!res.ok) throw new Error(res.error || 'load failed');
+        const env = res.envelope;
+        if (pickerSlot.startsWith('attacks:')) {
+          const i = Number(pickerSlot.split(':')[1]);
+          state.attacks[i] = env;
+          renderAttacks();
+        } else {
+          state[pickerSlot] = env;
+          renderSlot(pickerSlot);
+        }
+        updateForgeBtn();
+        $('picker').classList.remove('show');
+      } catch (e) { showToast(`load failed: ${e.message}`); }
+    };
+  });
+}
+$('picker-close').onclick = () => $('picker').classList.remove('show');
+$('picker-search').oninput = e => renderPickerList(e.target.value);
+document.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => openPicker(b.dataset.pick));
+
+// ── Forge battle ───────────────────────────────────────────────────
+$('forge-btn').onclick = async () => {
+  if (!state.creatureA || !state.creatureB) return;
+  const name = ($('battle-name').value || '').trim() ||
+    `${state.creatureA.name} vs ${state.creatureB.name}`;
+
+  const payload = {
+    format: 'eidolon-battle/1',
+    name,
+    participants: [state.creatureA.id, state.creatureB.id],
+    stage:        state.environment ? state.environment.id : null,
+    moveset:      state.attacks.filter(Boolean).map(a => a.id),
+    composedAt:   new Date().toISOString()
+  };
+
+  // Inherit tags from union of components
+  const tagSet = new Set();
+  for (const e of [state.creatureA, state.creatureB, state.environment, ...state.attacks].filter(Boolean)) {
+    for (const t of e.tags || []) tagSet.add(t);
+  }
+
+  // Build envelope
+  const payloadStr = canonical(payload);
+  const birthHash = 'sha256:' + await sha256Hex(payloadStr);
+  const id = `v_battle_${birthHash.slice(7,23)}`;
+  const env = {
+    format: 'vibe/1', id, type: 'battle', subFormat: 'eidolon-battle/1',
+    name,
+    tags: Array.from(tagSet).slice(0, 32),
+    parents: [state.creatureA.id, state.creatureB.id, state.environment, ...state.attacks].filter(Boolean).map(e => e.id || e),
+    birthHash,
+    createdAt: new Date().toISOString(),
+    source: 'crucible',
+    payload
+  };
+
+  try {
+    const res = await call('vibe.save', { envelope: env });
+    if (!res.ok) throw new Error(res.error || 'save failed');
+    showToast(`Forged: ${name}`);
+    // Reset for next composition (keep the names selected creatures for fast iteration)
+    state.attacks = [null, null, null, null];
+    $('battle-name').value = '';
+    renderAttacks();
+    updateForgeBtn();
+    // Offer to open in Arena
+    if (confirm('Battle forged. Open in Arena?')) {
+      emit('nexus.launch', { path: './vibes-arena.html', title: 'Arena', icon: '⚔', legacy: false });
+      // Send the battle id via a one-shot subscribe-style channel? Simpler: Arena reads the latest battle.
+      setTimeout(() => emit('arena.play', { battleId: env.id }), 800);
+    }
+  } catch (e) {
+    showToast(`forge failed: ${e.message}`);
+  }
+};
+
+// ── Kernel handshake ───────────────────────────────────────────────
+if (nx) {
+  nx.ready.then(() => {
+    mounted = true;
+    $('status').textContent = 'connected to library';
+    updateForgeBtn();
+  });
+}
+
+// Init UI
+renderSlot('creatureA'); renderSlot('creatureB'); renderSlot('environment');
+renderAttacks(); updateForgeBtn();
+
+setTimeout(() => {
+  if (!mounted) $('status').textContent = 'standalone — no library connection';
+}, 1200);
+</script>
+</body>
+</html>

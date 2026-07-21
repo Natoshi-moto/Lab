@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON OS</title>
+<meta name="nexus-block" content="managed">
+<meta name="nexus-emits" content="vibe.save vibe.load vibe.list">
+<meta name="nexus-consumes" content="vibe.result vibe.notify">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P:wght@400&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   EIDOLON OS — SOVEREIGN GAME CARTRIDGE
+   Shell: Battle arena. Infrastructure: invisible.
+   No desktop. No windows. No taskbar.
+   Boot → Battle → Forever.
+   ═══════════════════════════════════════════════════════════ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#020305;
+  --deep:#050709;
+  --surface:#0a0d14;
+  --border:rgba(80,200,140,.12);
+  --border-hi:rgba(80,200,140,.28);
+
+  --ink:#dde5f0;
+  --ink-2:#8a9094;
+  --ink-3:#4a5258;
+
+  --green:#33ff77;
+  --green-d:rgba(51,255,119,.10);
+  --green-hi:#88ffbb;
+  --rose:#ff3355;
+  --rose-d:rgba(255,51,85,.08);
+  --gold:#f5c842;
+  --gold-d:rgba(245,200,66,.08);
+  --amber:#c9920a;
+  --cyan:#33eeff;
+  --purple:#9955ff;
+
+  --hp-high:var(--green);
+  --hp-mid:var(--gold);
+  --hp-low:var(--rose);
+
+  --font-game:'Press Start 2P', monospace;
+  --font-ui:'IBM Plex Mono', monospace;
+  --font-name:'Syne', sans-serif;
+}
+
+html,body{
+  height:100%;
+  background:var(--void);
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-size:12px;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── CRT atmosphere ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;
+  background:repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,.12) 0px,rgba(0,0,0,.12) 1px,
+    transparent 1px,transparent 3px
+  );
+  mix-blend-mode:multiply;
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:8999;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.6) 100%);
+}
+@keyframes flicker{
+  0%,95%,100%{opacity:1}
+  96%{opacity:.92}97.5%{opacity:.97}98%{opacity:.93}
+}
+
+/* ── ROOT SHELL ── */
+#shell{
+  position:fixed;inset:0;
+  display:grid;
+  grid-template-rows:1fr auto;
+  animation:flicker 8s infinite;
+  z-index:1;
+}
+
+/* ── ARENA STAGE ── */
+#stage{
+  position:relative;
+  overflow:hidden;
+  background:var(--void);
+}
+#bg-canvas{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+}
+#opp-canvas,#player-canvas{
+  position:absolute;z-index:2;display:block;
+}
+#opp-canvas{top:8px;right:12%;width:200px;height:200px;}
+#player-canvas{bottom:90px;left:12%;width:240px;height:240px;}
+
+/* ── HUD PANELS ── */
+.hud{
+  position:absolute;z-index:5;
+  padding:8px 12px;min-width:200px;
+  background:rgba(5,7,9,.88);
+  border:1px solid var(--border);
+  backdrop-filter:blur(8px);
+}
+#hud-opp{top:12px;left:12px;}
+#hud-player{bottom:100px;right:12px;text-align:right;}
+
+.hud-name{
+  font-family:var(--font-name);
+  font-weight:800;font-size:15px;
+  letter-spacing:0.04em;color:var(--ink);
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:3px;
+}
+#hud-player .hud-name{justify-content:flex-end;}
+.hud-level{
+  font-family:var(--font-ui);font-size:9px;
+  color:var(--ink-3);letter-spacing:1px;
+  margin-bottom:6px;
+}
+.type-chips{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;}
+#hud-player .type-chips{justify-content:flex-end;}
+.type-chip{
+  font-size:7px;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;padding:1px 5px;border-radius:2px;border:1px solid;
+}
+
+.hp-label{font-size:8px;color:var(--ink-3);letter-spacing:1px;margin-bottom:3px;}
+.hp-track{
+  height:8px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);position:relative;overflow:hidden;
+  border-radius:1px;
+}
+.hp-fill{
+  height:100%;transition:width .45s ease;background:var(--hp-high);
+  border-radius:1px;
+}
+.hp-fill.mid{background:var(--hp-mid);}
+.hp-fill.low{background:var(--hp-low);}
+.hp-nums{font-size:9px;color:var(--ink-3);margin-top:3px;font-variant-numeric:tabular-nums;}
+.status-tag{
+  font-size:7px;font-weight:700;letter-spacing:1px;
+  padding:1px 6px;border-radius:1px;margin-top:4px;display:inline-block;
+}
+.st-poison{background:rgba(180,60,255,.18);color:#bb66ff;border:1px solid rgba(180,60,255,.3);}
+.st-burn{background:rgba(255,100,30,.18);color:#ff7744;border:1px solid rgba(255,100,30,.3);}
+
+/* ── ATTACK EFFECT CANVAS ── */
+#fx-canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:3;pointer-events:none;display:block;
+}
+
+/* ── BOTTOM UI ── */
+#battle-ui{
+  position:relative;z-index:10;
+  background:rgba(5,7,9,.95);
+  border-top:1px solid var(--border);
+  display:grid;
+  grid-template-rows:32px 1fr;
+}
+
+/* Log strip */
+#log-strip{
+  display:flex;align-items:center;gap:10px;
+  padding:0 14px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  overflow:hidden;
+}
+#log-text{
+  flex:1;font-size:10px;letter-spacing:.3px;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  line-height:1;
+}
+#log-cursor{
+  font-size:9px;color:var(--ink-3);flex-shrink:0;
+  animation:logblink 1s step-end infinite;
+}
+@keyframes logblink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Move buttons */
+#move-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:rgba(255,255,255,.03);
+  padding:1px;
+}
+.move-btn{
+  font-family:var(--font-ui);
+  font-size:9px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;
+  padding:7px 10px;
+  background:var(--deep);
+  color:var(--ink);
+  border:none;
+  cursor:pointer;
+  transition:background .1s,color .1s;
+  text-align:left;
+  display:flex;flex-direction:column;gap:3px;
+  position:relative;overflow:hidden;
+}
+.move-btn::before{
+  content:'';position:absolute;inset:0;
+  background:var(--border);opacity:0;transition:opacity .1s;
+}
+.move-btn:hover:not(:disabled)::before{opacity:1;}
+.move-btn:hover:not(:disabled){color:var(--green);}
+.move-btn:active:not(:disabled){transform:scale(.98);}
+.move-btn:disabled{opacity:.22;cursor:not-allowed;}
+.move-btn-name{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;
+}
+.move-btn-meta{font-size:8px;color:var(--ink-3);letter-spacing:.5px;}
+.move-type-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cat-physical .move-type-dot{background:#ff8844;}
+.cat-special  .move-type-dot{background:#44aaff;}
+.cat-status   .move-type-dot{background:#aabb33;}
+
+/* ── OVERLAYS ── */
+#boot-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:var(--void);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:20px;
+  transition:opacity .8s ease;
+}
+#boot-overlay.hidden{opacity:0;pointer-events:none;}
+#boot-logo{
+  font-family:var(--font-game);
+  font-size:clamp(14px,3vw,22px);
+  letter-spacing:6px;
+  color:var(--green);
+  text-shadow:0 0 20px var(--green),0 0 40px rgba(51,255,119,.3);
+  text-align:center;
+  animation:logobreathe 2s ease-in-out infinite;
+}
+@keyframes logobreathe{
+  0%,100%{text-shadow:0 0 20px var(--green),0 0 40px rgba(51,255,119,.3);}
+  50%{text-shadow:0 0 30px var(--green),0 0 60px rgba(51,255,119,.5),0 0 80px rgba(51,255,119,.2);}
+}
+#boot-sub{
+  font-family:var(--font-ui);font-size:9px;
+  color:var(--ink-3);letter-spacing:3px;
+  text-transform:uppercase;
+}
+#boot-bar-wrap{width:200px;height:3px;background:rgba(255,255,255,.06);border:1px solid var(--border);}
+#boot-bar{height:100%;width:0%;background:var(--green);transition:width .1s linear;}
+#boot-msg{font-size:8px;color:var(--ink-3);letter-spacing:1px;}
+
+#end-overlay{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(2,3,5,.92);
+  display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  backdrop-filter:blur(3px);
+}
+#end-overlay.show{display:flex;}
+#end-title{
+  font-family:var(--font-game);
+  font-size:clamp(16px,4vw,28px);
+  letter-spacing:4px;text-align:center;
+  text-shadow:0 0 24px currentColor;
+}
+#end-title.win{color:var(--gold);}
+#end-title.lose{color:var(--rose);}
+#end-sub{font-size:10px;color:var(--ink-2);letter-spacing:2px;text-align:center;line-height:2;}
+.end-btn{
+  font-family:var(--font-ui);font-size:10px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:9px 28px;background:transparent;
+  color:var(--ink);border:1px solid var(--border-hi);
+  cursor:pointer;transition:all .15s;margin-top:6px;
+}
+.end-btn:hover{background:var(--green-d);border-color:var(--green);color:var(--green);}
+.end-btn.primary{color:var(--gold);border-color:var(--gold);}
+.end-btn.primary:hover{background:var(--gold-d);}
+
+/* ── DEV HUD (hidden by default) ── */
+#dev-hud{
+  position:fixed;top:8px;right:8px;z-index:9500;
+  background:rgba(0,0,0,.85);border:1px solid var(--amber);
+  padding:8px 12px;font-size:9px;color:var(--amber);
+  letter-spacing:1px;display:none;min-width:200px;
+  font-family:var(--font-ui);
+}
+#dev-hud.show{display:block;}
+#dev-hud h4{font-size:8px;letter-spacing:2px;margin-bottom:6px;color:var(--ink-3);}
+.dev-row{display:flex;justify-content:space-between;gap:16px;margin-bottom:3px;}
+.dev-k{color:var(--ink-3);}
+.dev-v{color:var(--amber);}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--surface);border:1px solid var(--border-hi);
+  color:var(--ink);padding:8px 16px;font-size:10px;letter-spacing:.5px;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  z-index:600;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── HIT ANIMATIONS ── */
+@keyframes hitShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-7px)}40%{transform:translateX(6px)}
+  60%{transform:translateX(-5px)}80%{transform:translateX(4px)}
+}
+.hit-shake{animation:hitShake .32s ease-out;}
+@keyframes hitFlash{0%,100%{opacity:1}25%{opacity:.1}75%{opacity:.8}}
+.hit-flash{animation:hitFlash .38s ease-out;}
+</style>
+<script src="../../engines/substrate.js"></script>
+<script src="../../engines/battle-engine.js"></script>
+</head>
+<body>
+
+<!-- ═══ GAME SHELL ═══════════════════════════════════════════ -->
+<div id="shell">
+  <div id="stage">
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="opp-canvas"></canvas>
+    <canvas id="player-canvas"></canvas>
+    <canvas id="fx-canvas"></canvas>
+
+    <!-- Opponent HUD -->
+    <div class="hud" id="hud-opp">
+      <div class="hud-name" id="opp-name">—</div>
+      <div class="hud-level" id="opp-level">GEN·—</div>
+      <div class="type-chips" id="opp-types"></div>
+      <div class="hp-label">HP</div>
+      <div class="hp-track"><div class="hp-fill" id="opp-hpfill" style="width:100%"></div></div>
+      <div class="hp-nums" id="opp-hpnums">—/—</div>
+      <div id="opp-status"></div>
+    </div>
+
+    <!-- Player HUD -->
+    <div class="hud" id="hud-player">
+      <div class="hud-name" id="player-name">—</div>
+      <div class="hud-level" id="player-level">GEN·—</div>
+      <div class="type-chips" id="player-types"></div>
+      <div class="hp-label">HP</div>
+      <div class="hp-track"><div class="hp-fill" id="player-hpfill" style="width:100%"></div></div>
+      <div class="hp-nums" id="player-hpnums">—/—</div>
+      <div id="player-status"></div>
+    </div>
+  </div>
+
+  <!-- Battle UI bar -->
+  <div id="battle-ui">
+    <div id="log-strip">
+      <span id="log-text">Initializing…</span>
+      <span id="log-cursor" style="display:none">▼</span>
+    </div>
+    <div id="move-grid">
+      <button class="move-btn" id="m0" disabled></button>
+      <button class="move-btn" id="m1" disabled></button>
+      <button class="move-btn" id="m2" disabled></button>
+      <button class="move-btn" id="m3" disabled></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BOOT OVERLAY ═══════════════════════════════════════════ -->
+<div id="boot-overlay">
+  <div id="boot-logo">EIDOLON</div>
+  <div id="boot-sub">OS</div>
+  <div id="boot-bar-wrap"><div id="boot-bar"></div></div>
+  <div id="boot-msg">initializing…</div>
+</div>
+
+<!-- ═══ END OVERLAY ══════════════════════════════════════════== -->
+<div id="end-overlay">
+  <div id="end-title">—</div>
+  <div id="end-sub">—</div>
+  <button class="end-btn primary" id="end-rematch">⚔ REMATCH</button>
+  <button class="end-btn" id="end-new">↻ NEW CREATURES</button>
+</div>
+
+<!-- ═══ DEV HUD ═══════════════════════════════════════════════ -->
+<div id="dev-hud">
+  <h4>EIDOLON OS · DEV</h4>
+  <div class="dev-row"><span class="dev-k">blocks</span><span class="dev-v" id="dv-blocks">0</span></div>
+  <div class="dev-row"><span class="dev-k">nexus</span><span class="dev-v" id="dv-nexus">standalone</span></div>
+  <div class="dev-row"><span class="dev-k">state</span><span class="dev-v" id="dv-state">boot</span></div>
+  <div class="dev-row"><span class="dev-k">turn</span><span class="dev-v" id="dv-turn">—</span></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ── mulberry32 fallback guard ── substrate.js defines this globally;
+   inline copy ensures boot never fails if the external script is blocked. */
+if (typeof mulberry32 === 'undefined') {
+  function mulberry32(seed) {
+    let s = seed >>> 0;
+    return function() {
+      s = (s + 0x6D2B79F5) >>> 0;
+      let t = s;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+}
+/* ════════════════════════════════════════════════════════════════════
+   EIDOLON OS · Sovereign Cartridge
+   ════════════════════════════════════════════════════════════════════
+
+   Architecture:
+   · SECTION 0 — KERNEL (trimmed from Nexus OS v3)
+     Block lifecycle, MessageChannel protocol, channel routing.
+     Stripped: window management, taskbar, launcher, file browser.
+   · SECTION 1 — CREATURE ENGINE
+     DNA → stats → moves → types. Mulberry32 determinism throughout.
+   · SECTION 2 — RENDERERS
+     renderCreature(): PHANTIVEX-quality blob renderer.
+     renderEnvironment(): Layered parallax from env-forge.
+     renderFX(): Attack phase effects.
+   · SECTION 3 — BATTLE ENGINE
+     Turn-based combat. Log queue. Status effects. Stage system.
+   · SECTION 4 — ANIMATION LOOP
+     60fps main loop. Blink, bob, attack phases, damage flash.
+   · SECTION 5 — UI
+     HP bars, move buttons, log strip, overlays.
+   · SECTION 6 — BOOT
+     Boot sequence. Creature generation. World seed.
+   · SECTION 7 — NEXUS ADAPTER
+     Standalone-safe Nexus handshake.
+     When mounted: vibe.save/load for creature persistence.
+*/
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 0 — KERNEL (trimmed Nexus OS v3 kernel)
+// ════════════════════════════════════════════════════════════════════
+
+const SETTINGS = Object.freeze({
+  watchdogMs: 12000,
+  maxRetries: 1,
+  pongDeadlineMs: 20000,
+  firstPongGraceMs: 60000,
+  pingIntervalFloorMs: 4000,
+  payloadLimitBytes: 131072,
+  payloadMaxDepth: 10,
+  payloadMaxNodes: 1024,
+  payloadMaxKeysPerObject: 256,
+  payloadMaxArrayLength: 512,
+  dataLimiterCapacity: 100,
+  dataLimiterRefillPerSec: 50,
+  controlLimiterCapacity: 10,
+  controlLimiterRefillPerSec: 5,
+  maxRateStrikes: 8,
+  maxManifestChannels: 48,
+  maxSubscriptionsPerBlock: 48,
+  maxChannelNameLen: 96,
+  maxBlocks: 16,
+  feedMax: 500,
+  maxLifetimeReloads: 3
+});
+
+const CHANNEL_RE = /^[a-z0-9._-]{1,96}$/;
+const BLOCKS = new Map();
+const PORT_ID = new WeakMap();
+const CHANNEL_SUBS = new Map();
+const FEED = [];
+const PERSISTED = new Map();
+const COUNTERS = {
+  totalAccepted: 0, totalDelivered: 0,
+  totalViolations: 0, totalReloads: 0,
+  totalEvictions: 0, bootTime: Date.now()
+};
+const CONTROL_TYPES = new Set(['DECLARE','SUB','PONG','MOUNT_ACK']);
+
+function pushFeed(level, message) {
+  const entry = { at: Date.now(), level, message: String(message) };
+  if (FEED.length >= SETTINGS.feedMax) FEED.shift();
+  FEED.push(entry);
+  kernelBroadcast('nexus.kernel.log', entry);
+  updateDevHud();
+}
+
+function makeBucket(cap) {
+  return { tokens: cap, lastRefillAt: Date.now() };
+}
+function consumeBucket(bucket, cap, refillPerSec) {
+  const now = Date.now();
+  const elapsed = Math.max(0, (now - bucket.lastRefillAt) / 1000);
+  let potential = Math.min(cap, bucket.tokens + elapsed * refillPerSec);
+  if (potential < 1) return false;
+  bucket.tokens = potential - 1;
+  bucket.lastRefillAt = now;
+  return true;
+}
+
+function sanitizePayload(payload) {
+  const seen = new WeakSet();
+  let bytes = 0, nodes = 0;
+  function walk(value, depth) {
+    if (depth > SETTINGS.payloadMaxDepth) throw new Error('payload too deep');
+    if (value === null) return null;
+    const t = typeof value;
+    if (t === 'string') { bytes += value.length; if (bytes > SETTINGS.payloadLimitBytes) throw new Error('payload too large'); return value; }
+    if (t === 'number' || t === 'boolean') return value;
+    if (t === 'undefined') return null;
+    if (t === 'bigint' || t === 'function' || t === 'symbol') throw new Error('unsupported type');
+    if (seen.has(value)) throw new Error('cycle detected');
+    seen.add(value); nodes++;
+    if (nodes > SETTINGS.payloadMaxNodes) throw new Error('too complex');
+    if (Array.isArray(value)) {
+      if (value.length > SETTINGS.payloadMaxArrayLength) throw new Error('array too long');
+      return value.map(item => walk(item, depth + 1));
+    }
+    const proto = Object.getPrototypeOf(value);
+    if (proto !== Object.prototype && proto !== null) throw new Error('prototype not allowed');
+    const keys = Object.keys(value);
+    if (keys.length > SETTINGS.payloadMaxKeysPerObject) throw new Error('object too wide');
+    const out = {};
+    for (const key of keys) {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') throw new Error('forbidden key');
+      bytes += key.length; out[key] = walk(value[key], depth + 1);
+    }
+    return out;
+  }
+  return walk(payload, 0);
+}
+
+function removeFromChannels(blockId) {
+  for (const [ch, subs] of Array.from(CHANNEL_SUBS.entries())) {
+    subs.delete(blockId);
+    if (subs.size === 0) CHANNEL_SUBS.delete(ch);
+  }
+}
+
+function violation(block, reason) {
+  block.metrics.violations++;
+  COUNTERS.totalViolations++;
+  pushFeed('WARN', `${block.id} violation: ${reason}`);
+  if (block.metrics.violations >= 6) evictBlock(block.id, 'violation threshold');
+}
+
+function cleanupBlock(block) {
+  clearTimeout(block.watchdogTimer);
+  clearTimeout(block.retryResetTimer);
+  clearTimeout(block.declareWarningTimer);
+  removeFromChannels(block.id);
+  try { if (block.port) block.port.close(); } catch (_) {}
+  if (block.url && block.url.startsWith('blob:')) {
+    try { URL.revokeObjectURL(block.url); } catch (_) {}
+  }
+  if (block.iframe && block.iframe.parentNode) block.iframe.parentNode.removeChild(block.iframe);
+  BLOCKS.delete(block.id);
+  updateDevHud();
+}
+
+function evictBlock(id, reason) {
+  const block = BLOCKS.get(id);
+  if (!block) return;
+  block.state = 'EVICTED';
+  COUNTERS.totalEvictions++;
+  pushFeed('BAD', `${id} evicted: ${reason}`);
+  PERSISTED.delete(id);
+  cleanupBlock(block);
+}
+
+function activateSubscriptions(block) {
+  removeFromChannels(block.id);
+  block.activeSubscriptions = new Set();
+  for (const ch of block.desiredSubscriptions) {
+    if (!block.manifest.consumes.includes(ch)) continue;
+    if (!CHANNEL_SUBS.has(ch)) CHANNEL_SUBS.set(ch, new Set());
+    CHANNEL_SUBS.get(ch).add(block.id);
+    block.activeSubscriptions.add(ch);
+  }
+}
+
+function deliverMessage(srcId, channel, payload) {
+  const subs = CHANNEL_SUBS.get(channel);
+  if (!subs || subs.size === 0) return;
+  for (const targetId of subs) {
+    const target = BLOCKS.get(targetId);
+    if (!target || target.state !== 'MOUNTED') continue;
+    try {
+      target.port.postMessage({ type: 'MSG', src: srcId, channel, payload });
+      target.metrics.delivered++;
+      COUNTERS.totalDelivered++;
+    } catch (_) { violation(target, `delivery failure on ${channel}`); }
+  }
+}
+
+function armWatchdog(block) {
+  block.declareWarningTimer = setTimeout(() => {
+    const live = BLOCKS.get(block.id);
+    if (live && live.state === 'LOADING') {
+      pushFeed('BAD', `${block.id} never sent DECLARE — is it served over HTTP?`);
+    }
+  }, SETTINGS.firstPongGraceMs);
+  clearTimeout(block.watchdogTimer);
+  block.watchdogTimer = setTimeout(() => {
+    const live = BLOCKS.get(block.id);
+    if (!live) return;
+    if (live.state !== 'MOUNTED') {
+      pushFeed('WARN', `${live.id} watchdog triggered`);
+      reloadBlock(live.id, 'watchdog timeout');
+    }
+  }, SETTINGS.watchdogMs);
+}
+
+function reloadBlock(id, reason) {
+  const block = BLOCKS.get(id);
+  if (!block) return;
+  if (block.totalReloads >= SETTINGS.maxLifetimeReloads) {
+    evictBlock(id, `lifetime reload cap: ${reason}`); return;
+  }
+  block.retryCount++;
+  block.totalReloads++;
+  COUNTERS.totalReloads++;
+  pushFeed('INFO', `${id} reloading (${reason})`);
+  PERSISTED.set(id, {
+    desiredSubscriptions: new Set(block.desiredSubscriptions),
+    retryCount: block.retryCount,
+    url: block.url
+  });
+  cleanupBlock(block);
+  const prior = PERSISTED.get(id);
+  if (prior) spawnBlock(id, prior.url, { carriedSubscriptions: [...prior.desiredSubscriptions], retryCount: prior.retryCount, totalReloads: block.totalReloads });
+}
+
+function handleDeclare(block, msg) {
+  if (block.state !== 'LOADING') { violation(block, 'DECLARE after LOADING'); return; }
+  clearTimeout(block.declareWarningTimer);
+  const m = msg.manifest || {};
+  const emits = Array.isArray(m.emits) ? m.emits : [];
+  const consumes = Array.isArray(m.consumes) ? m.consumes : [];
+  if (emits.length + consumes.length > SETTINGS.maxManifestChannels) { violation(block, 'manifest too large'); return; }
+  for (const ch of [...emits, ...consumes]) {
+    if (!CHANNEL_RE.test(ch)) { violation(block, `bad channel name: ${ch}`); return; }
+  }
+  block.manifest = { emits, consumes };
+  if (msg.app && typeof msg.app === 'object') {
+    block.appMeta = { title: msg.app.title || block.id, icon: msg.app.icon || '▪', description: msg.app.description || '', visible: !!msg.app.visible };
+  }
+  block.mountNonce = Math.random().toString(36).slice(2, 14);
+  block.port.postMessage({ type: 'MOUNT_CHALLENGE', nonce: block.mountNonce });
+  pushFeed('INFO', `${block.id} declared · emits:[${emits.join(',')}]`);
+}
+
+function handleSub(block, msg) {
+  if (block.state !== 'MOUNTED') { violation(block, 'SUB before MOUNTED'); return; }
+  const ch = msg.channel;
+  if (!ch || !CHANNEL_RE.test(ch) || ch.length > SETTINGS.maxChannelNameLen) { violation(block, `bad SUB channel: ${ch}`); return; }
+  if (!block.manifest.consumes.includes(ch)) { violation(block, `SUB to undeclared channel: ${ch}`); return; }
+  if (block.activeSubscriptions.size >= SETTINGS.maxSubscriptionsPerBlock) { violation(block, 'subscription cap'); return; }
+  if (!CHANNEL_SUBS.has(ch)) CHANNEL_SUBS.set(ch, new Set());
+  CHANNEL_SUBS.get(ch).add(block.id);
+  block.desiredSubscriptions.add(ch);
+  block.activeSubscriptions.add(ch);
+}
+
+function handleMountAck(block, msg) {
+  if (block.state !== 'LOADING' || !block.mountNonce) { violation(block, 'unexpected MOUNT_ACK'); return; }
+  if (msg.nonce !== block.mountNonce) { violation(block, 'nonce mismatch'); return; }
+  block.state = 'MOUNTED';
+  clearTimeout(block.watchdogTimer);
+  block.retryResetTimer = setTimeout(() => { if (BLOCKS.get(block.id)) block.retryCount = 0; }, 5000);
+  activateSubscriptions(block);
+  block.port.postMessage({ type: 'MOUNTED' });
+  pushFeed('OK', `${block.id} mounted`);
+  updateDevHud();
+
+  // Start periodic PING
+  const doPing = () => {
+    const live = BLOCKS.get(block.id);
+    if (!live || live.state !== 'MOUNTED') return;
+    const nonce = Math.random().toString(36).slice(2);
+    live.outstandingPings.set(nonce, Date.now());
+    live.port.postMessage({ type: 'PING', nonce });
+    const deadline = SETTINGS.pongDeadlineMs;
+    setTimeout(() => {
+      const still = BLOCKS.get(block.id);
+      if (!still) return;
+      if (still.outstandingPings.has(nonce)) {
+        still.outstandingPings.delete(nonce);
+        const since = Date.now() - (still.lastPongAt || 0);
+        if (since > deadline) evictBlock(block.id, 'pong timeout');
+      }
+    }, deadline);
+    setTimeout(doPing, Math.max(SETTINGS.pingIntervalFloorMs, 8000));
+  };
+  setTimeout(doPing, 10000);
+}
+
+function handlePong(block, msg) {
+  block.lastPongAt = Date.now();
+  block.metrics.pongs++;
+  if (msg.nonce) block.outstandingPings.delete(msg.nonce);
+}
+
+function handleEmit(block, msg) {
+  if (block.state !== 'MOUNTED') { violation(block, 'EMIT before MOUNTED'); return; }
+  if (!consumeBucket(block.dataBucket, SETTINGS.dataLimiterCapacity, SETTINGS.dataLimiterRefillPerSec)) { violation(block, 'data rate exceeded'); return; }
+  const ch = msg.channel;
+  if (!ch || !CHANNEL_RE.test(ch)) { violation(block, `bad EMIT channel: ${ch}`); return; }
+  if (!block.manifest.emits.includes(ch)) { violation(block, `EMIT to undeclared channel: ${ch}`); return; }
+  let safe;
+  try { safe = sanitizePayload(msg.payload); } catch(e) { violation(block, `payload: ${e.message}`); return; }
+  block.metrics.emitted++;
+  COUNTERS.totalAccepted++;
+
+  // Intercept vibe channels — route to vibes-library block
+  if (ch.startsWith('vibe.')) {
+    handleVibeChannel(block, ch, safe);
+    return;
+  }
+
+  deliverMessage(block.id, ch, safe);
+}
+
+function router(port, msg) {
+  const id = PORT_ID.get(port);
+  const block = id ? BLOCKS.get(id) : null;
+  if (!block) return;
+  if (!msg || typeof msg.type !== 'string') { violation(block, 'malformed message'); return; }
+  if (CONTROL_TYPES.has(msg.type)) {
+    if (!consumeBucket(block.controlBucket, SETTINGS.controlLimiterCapacity, SETTINGS.controlLimiterRefillPerSec)) {
+      violation(block, `control rate exceeded: ${msg.type}`); return;
+    }
+  }
+  switch (msg.type) {
+    case 'DECLARE':   handleDeclare(block, msg);   break;
+    case 'SUB':       handleSub(block, msg);       break;
+    case 'MOUNT_ACK': handleMountAck(block, msg);  break;
+    case 'PONG':      handlePong(block, msg);       break;
+    case 'EMIT':      handleEmit(block, msg);       break;
+    default: violation(block, `unknown type: ${msg.type}`);
+  }
+}
+
+function makeBlockState(id, url, iframe, port, opts = {}) {
+  const prior = PERSISTED.get(id);
+  const desired = new Set(opts.carriedSubscriptions || (prior ? prior.desiredSubscriptions : []));
+  return {
+    id, url, iframe, port,
+    state: 'LOADING',
+    manifest: { emits: [], consumes: [] },
+    appMeta: opts.appMeta || { title: id, icon: '▪', description: '', visible: false },
+    desiredSubscriptions: desired,
+    activeSubscriptions: new Set(),
+    retryCount: typeof opts.retryCount === 'number' ? opts.retryCount : 0,
+    totalReloads: typeof opts.totalReloads === 'number' ? opts.totalReloads : 0,
+    watchdogTimer: null,
+    retryResetTimer: null,
+    declareWarningTimer: null,
+    mountNonce: null,
+    lastPongAt: Date.now(),
+    outstandingPings: new Map(),
+    dataBucket: makeBucket(SETTINGS.dataLimiterCapacity),
+    controlBucket: makeBucket(SETTINGS.controlLimiterCapacity),
+    metrics: { accepted: 0, emitted: 0, delivered: 0, pongs: 0, violations: 0, rateStrikes: 0, lastAcceptedKind: '' }
+  };
+}
+
+function kernelBroadcast(channel, payload) {
+  const subs = CHANNEL_SUBS.get(channel);
+  if (!subs || subs.size === 0) return;
+  for (const targetId of subs) {
+    const target = BLOCKS.get(targetId);
+    if (!target || target.state !== 'MOUNTED') continue;
+    try { target.port.postMessage({ type: 'MSG', src: '_kernel', channel, payload }); } catch (_) {}
+  }
+}
+
+function isAllowedBlockUrl(url) {
+  if (typeof url === 'string' && url.startsWith('blob:')) return true;
+  try {
+    const resolved = new URL(url, location.href);
+    const path = resolved.pathname.toLowerCase();
+    if (location.protocol === 'file:') return path.endsWith('.html');
+    return resolved.origin === location.origin && path.endsWith('.html');
+  } catch (_) { return false; }
+}
+
+function spawnBlock(id, url, opts = {}) {
+  if (BLOCKS.size >= SETTINGS.maxBlocks) { pushFeed('BAD', 'block cap reached'); return null; }
+  if (BLOCKS.has(id)) return BLOCKS.get(id);
+  if (!isAllowedBlockUrl(url)) { pushFeed('BAD', `blocked URL: ${url}`); return null; }
+
+  const iframe = document.createElement('iframe');
+  iframe.sandbox = 'allow-scripts allow-same-origin';
+  iframe.referrerPolicy = 'no-referrer';
+  iframe.style.cssText = 'position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(iframe);
+
+  const channel = new MessageChannel();
+  const port = channel.port1;
+  const block = makeBlockState(id, url, iframe, port, opts);
+  BLOCKS.set(id, block);
+  PORT_ID.set(port, id);
+
+  port.onmessage = (ev) => {
+    try { router(port, ev.data); } catch (e) { pushFeed('BAD', `${id} handler error: ${e.message}`); }
+  };
+  port.start();
+  armWatchdog(block);
+
+  iframe.onload = () => {
+    try {
+      iframe.contentWindow.postMessage({ type: 'BOOT' }, '*', [channel.port2]);
+      pushFeed('INFO', `${id} BOOT sent`);
+    } catch (e) { pushFeed('BAD', `${id} BOOT failed: ${e.message}`); }
+  };
+  iframe.src = url;
+  updateDevHud();
+  return block;
+}
+
+// ── Vibe channel routing ──────────────────────────────────────
+// When a block emits vibe.*, route to the vibes-library block if mounted.
+// Otherwise, queue and handle directly via localStorage fallback.
+const vibesPending = new Map(); // _reqId → {resolve, timeout}
+
+function handleVibeChannel(srcBlock, channel, payload) {
+  const libBlock = BLOCKS.get('vibes-library');
+  if (libBlock && libBlock.state === 'MOUNTED') {
+    // Forward to library
+    libBlock.port.postMessage({ type: 'MSG', src: srcBlock.id, channel, payload });
+    return;
+  }
+  // Fallback: handle locally with localStorage
+  const _reqId = payload && payload._reqId;
+  const reply = (data) => {
+    if (_reqId) {
+      try { srcBlock.port.postMessage({ type: 'MSG', src: '_kernel', channel: 'vibe.result', payload: { ...data, _reqId } }); }
+      catch (_) {}
+    }
+  };
+  localVibeHandler(channel, payload, reply);
+}
+
+function localVibeHandler(channel, payload, reply) {
+  try {
+    const LS_KEY = 'eidolon_vibes';
+    let db = {};
+    try { db = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch (_) {}
+    const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(db)); } catch (_) {} };
+
+    if (channel === 'vibe.save') {
+      const env = payload.envelope;
+      if (!env || !env.id) { reply({ ok: false, error: 'no envelope' }); return; }
+      db[env.id] = env;
+      save();
+      reply({ ok: true, id: env.id });
+      return;
+    }
+    if (channel === 'vibe.load') {
+      const id = payload.id;
+      if (!id || !db[id]) { reply({ ok: false, error: 'not found' }); return; }
+      reply({ ok: true, envelope: db[id] });
+      return;
+    }
+    if (channel === 'vibe.list') {
+      const type = payload.type;
+      const items = Object.values(db).filter(v => !type || v.type === type);
+      reply({ ok: true, data: items });
+      return;
+    }
+    if (channel === 'vibe.delete') {
+      const id = payload.id;
+      if (id && db[id]) { delete db[id]; save(); }
+      reply({ ok: true });
+      return;
+    }
+    reply({ ok: false, error: `unknown channel: ${channel}` });
+  } catch (e) {
+    reply({ ok: false, error: e.message });
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 1 — CREATURE ENGINE
+// ════════════════════════════════════════════════════════════════════
+
+<!-- substrate functions loaded via substrate.js -->
+
+function randomDna() {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr);
+}
+
+// Derives a deterministic 16-byte DNA from a companion seed.
+// Uses the same mulberry32 PRNG as the rest of the engine.
+function dnaFromSeed(seed) {
+  const rng = mulberry32(Number(seed) >>> 0);
+  return Array.from({ length: 16 }, () => Math.floor(rng() * 256));
+}
+
+// Reads the selected companion from OS localStorage state.
+// Returns { dna, hues, name, gen } or null if not found/invalid.
+function loadCompanionFromOS() {
+  try {
+    const raw = localStorage.getItem('nexus:selected-companion:v1');
+    if (!raw) return null;
+    const spec = JSON.parse(raw);
+    if (!spec || !Number.isFinite(Number(spec.seed))) return null;
+    const dna  = dnaFromSeed(spec.seed);
+    const hues = makeHues(dna);
+    const name = spec.name || makeName(dna);
+    return { dna, hues, name, gen: 1 };
+  } catch (e) {
+    return null;
+  }
+}
+
+function makeName(dna) {
+  const P = ['PHAN','VEX','AETH','KRON','LUMI','ETH','ARC','SPEC','ZYN','NETH','GLYPH','OMNI'];
+  const M = ['TI','LA','VO','RU','NI','KA','MO','EL','SI','RA','PHI','SU'];
+  const S = ['EX','ON','IX','AR','UM','AN','OX','IS','OR','EN','AX','UR'];
+  return P[dna[0]%P.length]+M[dna[1]%M.length]+S[dna[2]%S.length];
+}
+
+function makeHues(dna) {
+  // Three hues derived from DNA — spread around the color wheel, harmonious
+  const base = (dna[0] / 255) * 360;
+  return [
+    Math.round(base),
+    Math.round((base + 120 + (dna[1]/255)*60) % 360),
+    Math.round((base + 240 + (dna[2]/255)*60) % 360)
+  ];
+}
+
+const TYPE_COLOR = {
+  TOXIC:'#cc44ff',SPECTRAL:'#33eeff',WILD:'#44ff88',IRON:'#8899cc',
+  VOID:'#5566ff',ANCIENT:'#ffaa44',LIGHT:'#ffdd33',SHADOW:'#aa55cc',
+};
+const TYPE_BG = {
+  TOXIC:'rgba(180,40,255,.15)',SPECTRAL:'rgba(30,220,255,.12)',WILD:'rgba(50,220,100,.12)',
+  IRON:'rgba(120,140,200,.12)',VOID:'rgba(60,80,255,.15)',ANCIENT:'rgba(255,150,40,.12)',
+  LIGHT:'rgba(255,220,40,.12)',SHADOW:'rgba(150,60,180,.12)',
+};
+
+function requireBattleEngine() {
+  const engine = window.NexusBattleEngine;
+  if (!engine) throw new Error('NexusBattleEngine unavailable; load ../../engines/battle-engine.js before eidolon-os inline script');
+  return engine;
+}
+
+function canonical(v){
+  if(v===null||v===undefined)return JSON.stringify(v);
+  if(typeof v!=='object')return JSON.stringify(v);
+  if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';
+  return'{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';
+}
+
+async function sha256Hex(str){
+  const cryptoApi = window.crypto || globalThis.crypto;
+  if(!cryptoApi || !cryptoApi.subtle) throw new Error('WebCrypto subtle digest unavailable for OS battle turnSeed');
+  const bytes = new TextEncoder().encode(String(str));
+  const buf = await cryptoApi.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function toBattleEidolon(dna, hues, name, gen, id) {
+  return {
+    id: id || name || 'eidolon',
+    name: name || makeName(dna),
+    payload: { dna, hues, name: name || makeName(dna), gen: gen || 1 }
+  };
+}
+
+function decorateBoard(state, dna, hues, name, gen) {
+  state.dna = Array.from(state.dna || dna || []);
+  state.hues = Array.from(hues || state.hues || makeHues(state.dna));
+  state.name = name || state.name || makeName(state.dna);
+  state.gen = gen || 1;
+  return state;
+}
+
+function makeBoard(dna, hues, name, gen, side) {
+  const engine = requireBattleEngine();
+  const eidolon = toBattleEidolon(dna, hues, name, gen, side || 'single');
+  const mirror = toBattleEidolon(dna, hues, name, gen, 'mirror');
+  const init = side === 'B'
+    ? engine.initBattle({eidolonA:mirror, eidolonB:eidolon})
+    : engine.initBattle({eidolonA:eidolon, eidolonB:mirror});
+  const state = side === 'B' ? init.stateB : init.stateA;
+  return decorateBoard(state, dna, hues, name, gen);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 2 — RENDERERS
+// ════════════════════════════════════════════════════════════════════
+
+// ── Creature renderer (PHANTIVEX quality) ─────────────────────────
+function renderCreature(canvas, dna, hues, t, flip, flash) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H*0.50;
+  ctx.clearRect(0,0,W,H);
+  if (flip) { ctx.save(); ctx.scale(-1,1); ctx.translate(-W,0); }
+
+  const rng = mulberry32(dna.reduce((a,b) => a*31+b, 1));
+
+  // Body geometry
+  const baseR   = W*0.16 + (dna[0]/255)*W*0.10;
+  const sqX     = 0.7 + rng()*0.8;
+  const sqY     = 0.7 + rng()*0.8;
+  const blobN   = rng()*22;
+  const lumpN   = 6 + Math.floor(rng()*8);
+  const outline = 2.5 + rng()*5.5;
+  const shadowP = 0.45 + rng()*0.3;
+  const eCY     = cy + (rng()-0.5)*baseR*0.25;
+
+  // Animation
+  const pulseRt = rng()*1.5;
+  const pulse   = Math.sin(t*pulseRt)*0.5+0.5;
+  const coreBri = 0.5 + rng()*0.5;
+  const nPart   = 4 + Math.floor(rng()*18);
+  const drift   = rng()*1.2;
+  const turb    = rng()*0.8;
+  const bobSq   = 0.8 + rng()*0.4;
+
+  // Appendages
+  const armN      = Math.floor(dna[14]/255*11);
+  const armLen    = 0.55 + rng()*1.4;
+  const armW      = 1.5 + rng()*7;
+  const armTaper  = rng();
+  const armWobAmp = rng()*0.45;
+  const armWobRt  = rng()*2.5;
+  const armCurl   = rng()*1.2;
+
+  // Surface marks
+  const spotN  = Math.floor(dna[12]/255*8);
+  const runeN  = Math.floor(dna[13]/255*7);
+
+  // Eye
+  const eyeN    = 1 + Math.floor(dna[8]/255*4);
+  const eyeR    = baseR*(0.12 + rng()*0.12);
+  const eyeSpace= baseR*(0.18 + rng()*0.5);
+  const eyeY    = eCY - baseR*(0.1 + rng()*0.3);
+  const eyePupil= 0.4 + rng()*0.4;
+
+  const bob = Math.sin(t*0.85)*baseR*0.04;
+  const bcy = eCY + bob;
+
+  const [huePri,hueAcc,hueGlow] = hues;
+  const sat   = 50 + (dna[9]/255)*50;
+  const light = 35 + (dna[10]/255)*30;
+
+  // Outer glow
+  const glowR   = baseR*(1.6 + rng()*1.2);
+  const glowStr = 0.3 + rng()*0.5;
+  const og = ctx.createRadialGradient(cx,bcy,0,cx,bcy,glowR);
+  og.addColorStop(0, `hsla(${huePri},${sat}%,${light}%,${0.14*glowStr+pulse*0.04*glowStr})`);
+  og.addColorStop(0.5,`hsla(${hueAcc},${sat*0.8}%,${light*0.7}%,${0.07*glowStr})`);
+  og.addColorStop(1,'transparent');
+  ctx.fillStyle = og;
+  ctx.beginPath(); ctx.ellipse(cx,bcy,glowR,glowR*0.85,0,0,Math.PI*2); ctx.fill();
+
+  // Blob helpers
+  function blobPts(r) {
+    return Array.from({length:lumpN},(_,i)=>{
+      const a = (i/lumpN)*Math.PI*2-Math.PI/2;
+      const n = Math.sin(t*0.7+i*0.9)*blobN+Math.sin(t*0.3+i*1.5)*blobN*0.38;
+      return{x:cx+Math.cos(a)*(r+n)*sqX,y:bcy+Math.sin(a)*(r+n)*sqY*bobSq};
+    });
+  }
+  function blobPath(c,pts){
+    const N=pts.length; c.beginPath();
+    for(let i=0;i<N;i++){
+      const p0=pts[(i-1+N)%N],p1=pts[i],p2=pts[(i+1)%N],p3=pts[(i+2)%N];
+      const cp1x=p1.x+(p2.x-p0.x)/6,cp1y=p1.y+(p2.y-p0.y)/6;
+      const cp2x=p2.x-(p3.x-p1.x)/6,cp2y=p2.y-(p3.y-p1.y)/6;
+      if(i===0)c.moveTo(p1.x,p1.y);
+      c.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,p2.x,p2.y);
+    }
+    c.closePath();
+  }
+
+  // Appendages (drawn behind body)
+  if (armN > 0) {
+    for (let i=0;i<armN;i++){
+      const baseA=(i/armN)*Math.PI*2;
+      const wob=Math.sin(t*armWobRt+i*0.7)*armWobAmp;
+      const curl=Math.sin(t*0.5+i*0.9)*armCurl*0.5;
+      const a=baseA+wob;
+      const len=baseR*armLen;
+      const tipX=cx+Math.cos(a+curl)*len*sqX;
+      const tipY=bcy+Math.sin(a+curl)*len*sqY;
+      const cpx=cx+Math.cos(baseA+wob*0.4)*len*0.5*sqX;
+      const cpy=bcy+Math.sin(baseA+wob*0.4)*len*0.5*sqY+curl*len*0.3;
+      ctx.lineCap='round';
+      ctx.strokeStyle='rgba(0,0,0,0.85)'; ctx.lineWidth=armW+3;
+      ctx.beginPath(); ctx.moveTo(cx,bcy); ctx.quadraticCurveTo(cpx,cpy,tipX,tipY); ctx.stroke();
+      const segs=5;
+      for(let s=0;s<segs;s++){
+        const t0_=s/segs,t1_=(s+1)/segs;
+        const w0=armW*(1-armTaper*t0_*0.8);
+        const x0=(1-t0_)*(1-t0_)*cx+2*(1-t0_)*t0_*cpx+t0_*t0_*tipX;
+        const y0=(1-t0_)*(1-t0_)*bcy+2*(1-t0_)*t0_*cpy+t0_*t0_*tipY;
+        const x1=(1-t1_)*(1-t1_)*cx+2*(1-t1_)*t1_*cpx+t1_*t1_*tipX;
+        const y1=(1-t1_)*(1-t1_)*bcy+2*(1-t1_)*t1_*cpy+t1_*t1_*tipY;
+        ctx.strokeStyle=`hsla(${huePri},${sat}%,${light+10}%,0.85)`;
+        ctx.lineWidth=w0;
+        ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+      }
+    }
+  }
+
+  const pts = blobPts(baseR);
+
+  // Body shadow
+  ctx.save();
+  ctx.shadowColor=`hsla(${huePri},${sat}%,15%,0.55)`;ctx.shadowBlur=18;ctx.shadowOffsetY=4;
+  blobPath(ctx,pts); ctx.fillStyle=`hsla(${huePri},${sat*0.6}%,8%,0.4)`; ctx.fill();
+  ctx.restore();
+
+  // Body outline
+  blobPath(ctx,pts); ctx.strokeStyle='rgba(0,0,0,0.92)'; ctx.lineWidth=outline; ctx.lineJoin='round'; ctx.stroke();
+
+  // Body fill
+  blobPath(ctx,pts); ctx.fillStyle=`hsl(${huePri},${sat}%,${light}%)`; ctx.fill();
+
+  // Cel shading
+  ctx.save(); blobPath(ctx,pts); ctx.clip();
+  const sg=ctx.createLinearGradient(cx,bcy-baseR,cx,bcy+baseR);
+  sg.addColorStop(shadowP-0.04,'transparent');
+  sg.addColorStop(shadowP,`hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.55)`);
+  sg.addColorStop(1,`hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.65)`);
+  ctx.fillStyle=sg; ctx.fillRect(cx-baseR*3,bcy-baseR*3,baseR*6,baseR*6);
+  const hg=ctx.createRadialGradient(cx-baseR*0.3,bcy-baseR*0.35,0,cx-baseR*0.15,bcy-baseR*0.15,baseR*0.7);
+  hg.addColorStop(0,`hsla(${huePri},${sat*0.4}%,92%,0.42)`);
+  hg.addColorStop(0.5,'transparent');
+  ctx.fillStyle=hg; ctx.fillRect(cx-baseR*3,bcy-baseR*3,baseR*6,baseR*6);
+
+  // Glow spots
+  if (spotN > 0){
+    const sr=mulberry32(dna[11]*53+1);
+    for(let i=0;i<spotN;i++){
+      const sa=sr()*Math.PI*2,srr=baseR*(0.15+sr()*0.55);
+      const sxp=cx+Math.cos(sa)*srr*sqX,syp=bcy+Math.sin(sa)*srr*sqY;
+      const ssz=baseR*(0.05+sr()*0.09);
+      const lg=ctx.createRadialGradient(sxp,syp,0,sxp,syp,ssz*2.5);
+      lg.addColorStop(0,`hsla(${hueGlow},95%,90%,${0.65+pulse*0.2})`);
+      lg.addColorStop(0.4,`hsla(${hueGlow},85%,75%,0.25)`);
+      lg.addColorStop(1,'transparent');
+      ctx.fillStyle=lg; ctx.beginPath(); ctx.arc(sxp,syp,ssz*2.5,0,Math.PI*2); ctx.fill();
+    }
+  }
+  // Runes
+  if (runeN > 0){
+    const r2=mulberry32(runeN*71+13);
+    ctx.strokeStyle=`hsla(${hueAcc},80%,70%,0.28)`; ctx.lineWidth=1.5;
+    for(let i=0;i<runeN;i++){
+      const ra=r2()*Math.PI*2,rr=baseR*(0.1+r2()*0.45);
+      const rx=cx+Math.cos(ra)*rr*sqX,ry=bcy+Math.sin(ra)*rr*sqY;
+      const rs=baseR*(0.06+r2()*0.12);
+      ctx.beginPath();
+      ctx.moveTo(rx,ry-rs);ctx.lineTo(rx+rs*0.6,ry+rs*0.5);
+      ctx.moveTo(rx,ry-rs);ctx.lineTo(rx-rs*0.6,ry+rs*0.5);
+      ctx.moveTo(rx-rs*0.4,ry+rs*0.1);ctx.lineTo(rx+rs*0.4,ry+rs*0.1);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // Damage flash
+  if (flash && flash > 0){
+    ctx.save(); blobPath(ctx,pts);
+    ctx.fillStyle=`rgba(255,80,80,${flash*0.65})`; ctx.fill();
+    ctx.restore();
+  }
+
+  // Eyes
+  const blinkSY = canvas._blinkSY !== undefined ? canvas._blinkSY : 1;
+  const wander = Math.sin(t*0.55)*2.5;
+  const eyePos = [];
+  if(eyeN===1){eyePos.push([cx,eyeY]);}
+  else if(eyeN===2){eyePos.push([cx-eyeSpace,eyeY],[cx+eyeSpace,eyeY]);}
+  else{
+    const sp=Math.PI*0.85;
+    for(let i=0;i<eyeN;i++){
+      const tt=eyeN===1?0.5:i/(eyeN-1);
+      const a=-sp/2+tt*sp;
+      eyePos.push([cx+Math.cos(a+Math.PI*1.5)*eyeSpace,eyeY+Math.sin(a+Math.PI*1.5)*eyeSpace]);
+    }
+  }
+  for(const [ex,ey] of eyePos){
+    const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,eyeR*2.2);
+    eg.addColorStop(0,`hsla(${hueGlow},90%,80%,0.32)`);eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.beginPath(); ctx.arc(ex,ey,eyeR*2.2,0,Math.PI*2); ctx.fill();
+    ctx.shadowColor=`hsla(${hueGlow},72%,78%,0.4)`;ctx.shadowBlur=6;
+    ctx.fillStyle=`hsl(${hueGlow},18%,93%)`;
+    ctx.strokeStyle='rgba(0,0,0,0.82)';ctx.lineWidth=Math.max(1.2,outline*0.4);
+    ctx.beginPath();ctx.ellipse(ex,ey,eyeR,eyeR*blinkSY,0,0,Math.PI*2);
+    ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+    if(blinkSY>0.12&&eyePupil>0.1){
+      ctx.fillStyle=`hsl(${hueGlow},84%,38%)`;
+      ctx.beginPath();ctx.ellipse(ex+wander*0.3,ey,eyeR*0.6,eyeR*0.6*blinkSY,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#020306';
+      ctx.beginPath();ctx.ellipse(ex+wander*0.3,ey,eyeR*0.35,eyeR*0.35*blinkSY,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.88)';
+      ctx.beginPath();ctx.ellipse(ex-eyeR*0.22,ey-eyeR*0.22*blinkSY,eyeR*0.12,eyeR*0.1*blinkSY,0,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Core glow
+  const coreSz=baseR*(0.09+rng()*0.14);
+  if(coreSz>0&&coreBri>0.1){
+    const cg=ctx.createRadialGradient(cx,bcy,0,cx,bcy,coreSz*4);
+    cg.addColorStop(0,`hsla(${hueGlow},96%,94%,${0.8*coreBri})`);
+    cg.addColorStop(0.25,`hsla(${huePri},88%,70%,${0.4*coreBri})`);
+    cg.addColorStop(0.7,`hsla(${huePri},78%,52%,${0.1*coreBri})`);
+    cg.addColorStop(1,'transparent');
+    ctx.shadowColor=`hsla(${huePri},88%,68%,0.6)`;ctx.shadowBlur=18;
+    ctx.fillStyle=cg;ctx.beginPath();ctx.arc(cx,bcy,coreSz*4,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+  }
+
+  // Orbiting particles
+  for(let p=0;p<nPart;p++){
+    const seed=p*17+dna[p%16];
+    const orR=baseR*1.55+(seed%13)*(baseR*0.06);
+    const orA=(p/nPart)*Math.PI*2+t*drift*0.5+Math.sin(t+seed*0.1)*0.4;
+    const tu=Math.sin(t*1.3+seed*0.22)*turb*7;
+    const px=cx+Math.cos(orA)*(orR+tu);
+    const py=bcy+Math.sin(orA)*(orR+tu)*0.82;
+    const pSz=0.7+(dna[p%16]/255)*2.4;
+    const pHue=hues[p%3];
+    const pAl=0.3+Math.sin(t*1.7+p*0.55)*0.28;
+    ctx.shadowColor=`hsla(${pHue},92%,70%,0.7)`;ctx.shadowBlur=pSz*3;
+    ctx.fillStyle=`hsla(${pHue},86%,78%,${pAl})`;
+    ctx.beginPath();ctx.arc(px,py,pSz,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+  }
+
+  if(flip) ctx.restore();
+}
+
+// ── Environment renderer ───────────────────────────────────────────
+function renderEnvironment(canvas, seed, t) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const rng = mulberry32(seed >>> 0);
+
+  // Derive env params from seed
+  const skyTopH   = Math.floor(rng()*360);
+  const skySat    = 20 + Math.floor(rng()*50);
+  const skyTopL   = 3 + Math.floor(rng()*18);
+  const skyBotH   = (skyTopH + 30 + Math.floor(rng()*80)) % 360;
+  const skyBotL   = 12 + Math.floor(rng()*28);
+  const groundFrac= 0.52 + rng()*0.2;
+  const groundH   = Math.floor(rng()*360);
+  const groundL   = 4 + Math.floor(rng()*18);
+  const fogDense  = rng()*0.35;
+  const farN      = 10 + Math.floor(rng()*18);
+  const midN      = 6 + Math.floor(rng()*10);
+  const farDark   = 0.18 + rng()*0.45;
+  const midDark   = 0.4 + rng()*0.45;
+  const starN     = Math.floor(rng()*140);
+  const hasStars  = rng() > 0.35;
+
+  // Sky
+  const grd = ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0, `hsl(${skyTopH},${skySat}%,${skyTopL}%)`);
+  grd.addColorStop(1, `hsl(${skyBotH},${skySat}%,${skyBotL}%)`);
+  ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
+
+  const groundY = H * groundFrac;
+
+  // Stars
+  if (hasStars) {
+    const srng = mulberry32(seed ^ 0xDEADBEEF);
+    for(let i=0;i<starN;i++){
+      const sx=srng()*W, sy=srng()*groundY*0.92;
+      const ss=0.2+srng()*0.9;
+      const sa=0.06+srng()*0.45+Math.sin(t*0.4+i*0.31)*0.08;
+      ctx.fillStyle=`rgba(255,255,255,${sa})`;
+      ctx.beginPath();ctx.arc(sx,sy,ss,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Far silhouettes (mountains)
+  const frng = mulberry32(seed ^ 0xCAFEBABE);
+  for(let i=0;i<farN;i++){
+    const x=frng()*W*1.2-W*0.1;
+    const w=30+frng()*90;
+    const h=groundY*(0.12+frng()*0.25);
+    const jag=frng()*w*0.25;
+    ctx.fillStyle=`rgba(0,0,0,${farDark})`;
+    ctx.beginPath();
+    ctx.moveTo(x,groundY);
+    ctx.lineTo(x+w*0.3+jag,groundY-h*0.7);
+    ctx.lineTo(x+w*0.5,groundY-h);
+    ctx.lineTo(x+w*0.75,groundY-h*0.6);
+    ctx.lineTo(x+w,groundY);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // Mid silhouettes (closer, darker, taller)
+  const mrng = mulberry32(seed ^ 0xFEEDBEEF);
+  for(let i=0;i<midN;i++){
+    const x=mrng()*W*1.15-W*0.08;
+    const w=40+mrng()*100;
+    const h=groundY*(0.22+mrng()*0.38);
+    ctx.fillStyle=`rgba(0,0,0,${midDark})`;
+    ctx.beginPath();
+    ctx.moveTo(x,groundY);
+    ctx.lineTo(x+w*0.2,groundY-h*0.75);
+    ctx.lineTo(x+w*0.45+mrng()*w*0.15,groundY-h);
+    ctx.lineTo(x+w*0.8,groundY-h*0.65);
+    ctx.lineTo(x+w,groundY);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // Ground plane
+  ctx.fillStyle = `hsl(${groundH},22%,${groundL}%)`;
+  ctx.fillRect(0, groundY, W, H-groundY);
+
+  // Ground texture lines
+  const gTex = 3 + Math.floor(rng()*5);
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 1;
+  for(let i=1;i<gTex;i++){
+    const ly = groundY + (i/gTex)*(H-groundY)*0.75;
+    ctx.beginPath(); ctx.moveTo(0,ly); ctx.lineTo(W,ly); ctx.stroke();
+  }
+
+  // Ground rim glow
+  const rimG = ctx.createLinearGradient(0,groundY-8,0,groundY+20);
+  rimG.addColorStop(0,`hsla(${groundH},60%,45%,0.15)`);
+  rimG.addColorStop(1,'transparent');
+  ctx.fillStyle=rimG; ctx.fillRect(0,groundY-8,W,28);
+
+  // Fog
+  if(fogDense > 0.05){
+    const fg = ctx.createLinearGradient(0,groundY-15,0,groundY+35);
+    fg.addColorStop(0,'transparent');
+    fg.addColorStop(0.5,`rgba(160,175,210,${fogDense*0.6})`);
+    fg.addColorStop(1,'transparent');
+    ctx.fillStyle=fg; ctx.fillRect(0,groundY-15,W,50);
+  }
+
+  // Vignette
+  const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.2,W/2,H/2,Math.max(W,H)*0.9);
+  vg.addColorStop(0,'transparent');
+  vg.addColorStop(1,'rgba(0,0,0,0.65)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+}
+
+// ── FX renderer (attack animations) ───────────────────────────────
+function renderFX(canvas, attackAnim, fighters, groundFrac, t) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!attackAnim) return;
+
+  const W=canvas.width,H=canvas.height;
+  const groundY = H * (groundFrac || 0.62);
+
+  // Fighter positions in stage space
+  const att = fighters[attackAnim.attacker];
+  const def = fighters[attackAnim.defender];
+  const ax = att.stageX, ay = groundY - att.size*0.7;
+  const dx = def.stageX, dy = groundY - def.size*0.7;
+
+  const f = attackAnim.phaseF;
+  const phase = attackAnim.phase;
+  const hue = attackAnim.hue;
+  const isSpecial = attackAnim.isSpecial;
+
+  if(phase === 'anticipation'){
+    // Charging glow at attacker
+    const u = f;
+    const r = 15 + u*25;
+    const glow = ctx.createRadialGradient(ax,ay,0,ax,ay,r);
+    glow.addColorStop(0,`hsla(${hue},95%,80%,${u*0.5})`);
+    glow.addColorStop(1,'transparent');
+    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(ax,ay,r,0,Math.PI*2); ctx.fill();
+  }
+
+  if(phase === 'strike'){
+    const u = f;
+    if(isSpecial){
+      // Energy bolt — arc from attacker to defender
+      const midX=(ax+dx)/2, midY=Math.min(ay,dy)-60-u*20;
+      ctx.strokeStyle=`hsla(${hue},95%,75%,${0.9-u*0.3})`;
+      ctx.lineWidth=4-u*2;ctx.lineCap='round';
+      ctx.shadowColor=`hsla(${hue},95%,75%,0.7)`;ctx.shadowBlur=12;
+      ctx.beginPath(); ctx.moveTo(ax,ay);
+      ctx.quadraticCurveTo(midX,midY,ax+(dx-ax)*u,ay+(dy-ay)*u);
+      ctx.stroke(); ctx.shadowBlur=0;
+      // Tip spark
+      const tipX=ax+(dx-ax)*u, tipY=ay+(dy-ay)*u;
+      const sg=ctx.createRadialGradient(tipX,tipY,0,tipX,tipY,14);
+      sg.addColorStop(0,`hsla(${hue},95%,90%,0.85)`);sg.addColorStop(1,'transparent');
+      ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(tipX,tipY,14,0,Math.PI*2); ctx.fill();
+    } else {
+      // Physical rush — attacker slides toward defender
+      const px=ax+(dx-ax)*u*0.65, py=ay+(dy-ay)*u*0.5;
+      // Trail
+      ctx.strokeStyle=`hsla(${hue},70%,65%,${0.4-u*0.2})`;
+      ctx.lineWidth=6; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(px,py); ctx.stroke();
+      // Motion blur dots
+      for(let i=0;i<4;i++){
+        const bx=ax+(px-ax)*(i/4), by=ay+(py-ay)*(i/4);
+        ctx.fillStyle=`rgba(255,255,255,${0.08+i*0.04})`;
+        ctx.beginPath(); ctx.arc(bx,by,3-i*0.5,0,Math.PI*2); ctx.fill();
+      }
+    }
+  }
+
+  if(phase === 'impact'){
+    const u = f;
+    const radius=(1-u)*55;
+    // Main flash
+    const flash=ctx.createRadialGradient(dx,dy,0,dx,dy,radius);
+    flash.addColorStop(0,`hsla(${hue},95%,90%,${(1-u)*0.85})`);
+    flash.addColorStop(0.4,`hsla(${hue},85%,65%,${(1-u)*0.5})`);
+    flash.addColorStop(1,'transparent');
+    ctx.fillStyle=flash; ctx.beginPath(); ctx.arc(dx,dy,radius,0,Math.PI*2); ctx.fill();
+    // Sparks
+    const sparks=8;
+    const srng=mulberry32(Math.floor(attackAnim.t0*1000)%(0xFFFFFFFF));
+    for(let i=0;i<sparks;i++){
+      const ang=srng()*Math.PI*2;
+      const sd=u*(50+srng()*30);
+      const sx=dx+Math.cos(ang)*sd, sy=dy+Math.sin(ang)*sd;
+      ctx.fillStyle=`hsla(${hue+srng()*40-20},92%,78%,${(1-u)*0.9})`;
+      ctx.beginPath(); ctx.arc(sx,sy,2+srng()*2,0,Math.PI*2); ctx.fill();
+    }
+    // Ring
+    ctx.strokeStyle=`hsla(${hue},80%,70%,${(1-u)*0.6})`;
+    ctx.lineWidth=2; ctx.beginPath();
+    ctx.arc(dx,dy,radius*0.6,0,Math.PI*2); ctx.stroke();
+  }
+
+  if(phase === 'recovery'){
+    // Attacker returning — fading trail
+    const u = f;
+    const px=dx+(ax-dx)*(0.65+u*0.35), py=dy+(ay-dy)*(0.5+u*0.5);
+    if(u < 0.5){
+      ctx.strokeStyle=`hsla(${hue},50%,60%,${(0.5-u)*0.3})`;
+      ctx.lineWidth=3; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(dx,dy); ctx.lineTo(px,py); ctx.stroke();
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 3 — BATTLE ENGINE
+// ════════════════════════════════════════════════════════════════════
+
+// Combat state
+let player = null;  // board
+let enemy  = null;  // board
+let turn   = 0;     // 0=player, 1=enemy
+let battlePhase = 'idle'; // idle|player-picking|animating|log-wait|end
+
+// Log queue — messages that advance one at a time
+const logQueue = [];
+let logWaiting = false;
+
+function pushLog(msg, cls) {
+  logQueue.push({msg, cls: cls||''});
+}
+function flushNextLog() {
+  if(logQueue.length === 0){ setLogWait(false); return; }
+  const {msg, cls} = logQueue.shift();
+  const el = document.getElementById('log-text');
+  el.textContent = msg;
+  el.style.color = cls === 'good' ? 'var(--green-hi)' : cls === 'bad' ? 'var(--rose)' : cls === 'gold' ? 'var(--gold)' : 'var(--ink)';
+  if(logQueue.length > 0){
+    setLogWait(true);
+  } else {
+    setLogWait(false);
+    onLogDrained();
+  }
+}
+function setLogWait(waiting) {
+  logWaiting = waiting;
+  const cursor = document.getElementById('log-cursor');
+  cursor.style.display = waiting ? 'inline' : 'none';
+  if(waiting) setButtonsEnabled(false);
+}
+
+let turnResolutionCallback = null;
+let battleTurnCount = 0;
+let battleId = null;
+let battleSeq = 0;
+
+async function osTurnSeed(battle_id, turnNo) {
+  if(!battle_id) throw new Error('battle_id_required');
+  const hex = await sha256Hex(canonical({battle_id, turn:turnNo}));
+  return 'sha256:' + hex;
+}
+
+function chooseEnemyMoveIndex() {
+  // PRESENTATION-LAYER: local enemy AI randomness is intentionally unwitnessed.
+  return Math.floor(Math.random() * enemy.moves.length);
+}
+
+function eventClass(ev) {
+  if(!ev) return '';
+  if(ev.kind === 'damage' || ev.kind === 'miss' || ev.kind === 'status_tick') return 'bad';
+  if(ev.kind === 'heal' || ev.kind === 'dodge') return 'good';
+  if(ev.kind === 'stage' || ev.kind === 'multi' || (ev.kind === 'damage' && ev.effectiveness >= 2)) return 'gold';
+  return '';
+}
+
+function splitStatusEvents(events) {
+  const body = [], tail = [];
+  for(const ev of events || []) {
+    if(ev && ev.kind === 'status_tick') tail.push(ev);
+    else body.push(ev);
+  }
+  return {body, tail};
+}
+
+function canonicalActingOrder(stateA, stateB) {
+  const engine = requireBattleEngine();
+  const spA = stateA.base.spd * engine._stageM(stateA.spdSt);
+  const spB = stateB.base.spd * engine._stageM(stateB.spdSt);
+  return spA === spB ? 'A' : (spA > spB ? 'A' : 'B');
+}
+
+function mergeEvents(eventsA, eventsB, firstSide) {
+  const a = splitStatusEvents(eventsA);
+  const b = splitStatusEvents(eventsB);
+  const first = firstSide === 'A' ? a : b;
+  const second = firstSide === 'A' ? b : a;
+  return first.body.concat(second.body, a.tail, b.tail);
+}
+
+function applyPresentationForEvent(ev) {
+  if(!ev || !ev.kind) return;
+  if(ev.kind === 'move') {
+    const side = ev.actor === 'A' ? 'player' : 'enemy';
+    const board = side === 'player' ? player : enemy;
+    const move = (board.moves || []).find(m => m.name === ev.move) || board.moves[0];
+    startAttackAnim(side, side === 'player' ? 'enemy' : 'player', move);
+  }
+  if(ev.kind === 'damage') {
+    triggerHitAnim(ev.target === 'A' ? 'player' : 'enemy');
+  }
+}
+
+function animateEventQueue(events, onComplete) {
+  turnResolutionCallback = onComplete;
+  for(const ev of events || []) {
+    if(ev && ev.msg) pushLog(ev.msg, eventClass(ev));
+    applyPresentationForEvent(ev);
+  }
+  updateHpBars();
+  if(logQueue.length > 0) flushNextLog();
+  else if(turnResolutionCallback) { const cb = turnResolutionCallback; turnResolutionCallback = null; cb(); }
+}
+
+async function executeTurn(playerMoveIdx) {
+  if(battlePhase!=='player-picking') return;
+  battlePhase='animating';
+  setButtonsEnabled(false);
+
+  const engine = requireBattleEngine();
+  const moveA = playerMoveIdx;
+  const moveB = chooseEnemyMoveIndex();
+  const nextTurn = battleTurnCount + 1;
+  const firstSide = canonicalActingOrder(player, enemy);
+  pushLog(`— Turn ${nextTurn} —`);
+
+  const r = engine.resolveTurn({
+    stateA: player,
+    stateB: enemy,
+    moveA,
+    moveB,
+    turnSeed: await osTurnSeed(battleId, nextTurn)
+  });
+
+  battleTurnCount = nextTurn;
+  player = decorateBoard(r.newStateA, r.newStateA.dna, r.newStateA.hues, r.newStateA.name, player.gen);
+  enemy  = decorateBoard(r.newStateB, r.newStateB.dna, r.newStateB.hues, r.newStateB.name, enemy.gen);
+
+  animateEventQueue(mergeEvents(r.eventsA, r.eventsB, firstSide), () => {
+    const over = engine.isOver({stateA:player, stateB:enemy});
+    if(over) {
+      const winner = over === 'A' ? 'player' : 'enemy';
+      if(winner === 'player') pushLog(`${enemy.name} fainted!`, 'bad');
+      else pushLog(`${player.name} fainted!`, 'bad');
+      onBattleEnd(winner);
+      return;
+    }
+    battlePhase='player-picking';
+    setButtonsEnabled(true);
+    updateDevState('player-picking');
+  });
+}
+
+function onBattleEnd(winner) {
+  battlePhase='end';
+  if(winner==='player'){ showEndOverlay(true, player.name, enemy.name); }
+  else if(winner==='enemy'){ showEndOverlay(false, player.name, enemy.name); }
+  else { showEndOverlay(null, player.name, enemy.name); }
+
+  // Notify router so it records world history
+  if(nexusPort && nexusMounted) {
+    nexusPort.postMessage({type:'EMIT', channel:'eidolon.battle.result', payload:{
+      winner,
+      playerName: player.name,
+      playerHp:   Math.max(0, player.hp),
+      enemyName:  enemy.name,
+      enemyId:    enemy._routerId || null,
+      enemyHp:    Math.max(0, enemy.hp),
+    }});
+  }
+}
+
+// After log queue empties mid-battle
+function onLogDrained() {
+  if(battlePhase==='end') return;
+
+  // Intro sequence complete — open the floor
+  if(battlePhase==='intro'){
+    battlePhase='player-picking';
+    setButtonsEnabled(true);
+    updateDevState('player-picking');
+    return;
+  }
+
+  if(battlePhase==='animating' && turnResolutionCallback){
+    const cb = turnResolutionCallback;
+    turnResolutionCallback = null;
+    cb();
+    return;
+  }
+
+  // Turn complete — hand back to player
+  battlePhase='player-picking';
+  setButtonsEnabled(true);
+  updateDevState('player-picking');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 4 — ANIMATION LOOP
+// ════════════════════════════════════════════════════════════════════
+
+let t0 = performance.now();
+let prevT = 0;
+const bgCanvas     = document.getElementById('bg-canvas');
+const oppCanvas    = document.getElementById('opp-canvas');
+const playerCanvas = document.getElementById('player-canvas');
+const fxCanvas     = document.getElementById('fx-canvas');
+
+// Blink state
+const blink = {
+  player: {cd:3,p:0,active:false},
+  enemy:  {cd:2,p:0,active:false}
+};
+
+// Flash state (damage)
+const flash = { player:0, enemy:0 };
+
+// Attack animation state
+let attackAnim = null;
+
+// Stage fighter positions (for FX)
+const fighters = {
+  player: {stageX:0, stageY:0, size:120},
+  enemy:  {stageX:0, stageY:0, size:80},
+};
+
+// Ground fraction from last env render
+let envGroundFrac = 0.62;
+let envSeed = 12345;
+
+function startAttackAnim(attacker, defender, move) {
+  const isSpecial = move.cat === 'special';
+  const hue = attacker==='player' ? player.hues[0] : enemy.hues[0];
+  attackAnim = {
+    attacker, defender,
+    phase: 'anticipation',
+    phaseF: 0,
+    t0: (performance.now()-t0)/1000,
+    hue,
+    isSpecial,
+    damageDone: false,
+    phaseDurs: {anticipation:0.38, strike:0.42, impact:0.28, recovery:0.32}
+  };
+}
+
+function triggerHitAnim(side) {
+  flash[side] = 1;
+  const canvasEl = side==='player' ? playerCanvas : oppCanvas;
+  canvasEl.classList.add('hit-shake');
+  setTimeout(()=> canvasEl.classList.remove('hit-shake'), 320);
+}
+
+let animLoopId = null;
+function mainLoop() {
+  const now = (performance.now()-t0)/1000;
+  const dt  = Math.min(now-prevT, 0.05);
+  prevT = now;
+
+  // Blink ticks
+  for(const [side,bl] of Object.entries(blink)){
+    bl.cd -= dt;
+    if(bl.cd<=0 && !bl.active){ bl.active=true; bl.p=0; bl.cd=2+Math.random()*4; } // PRESENTATION-LAYER: blink cadence only
+    if(bl.active){ bl.p+=dt*8; if(bl.p>=1){ bl.active=false; bl.p=0; } }
+    const cv = side==='player' ? playerCanvas : oppCanvas;
+    cv._blinkSY = bl.active ? Math.max(0.05, 1-Math.sin(bl.p*Math.PI)*0.92) : 1;
+  }
+
+  // Flash decay
+  for(const side of ['player','enemy']){ if(flash[side]>0) flash[side]=Math.max(0,flash[side]-dt*4); }
+
+  // Attack animation tick
+  if(attackAnim){
+    const dur = attackAnim.phaseDurs[attackAnim.phase];
+    attackAnim.phaseF += dt/dur;
+    if(attackAnim.phaseF >= 1){
+      attackAnim.phaseF = 0;
+      const phases=['anticipation','strike','impact','recovery'];
+      const i=phases.indexOf(attackAnim.phase);
+      if(i < phases.length-1){
+        attackAnim.phase=phases[i+1];
+        if(attackAnim.phase==='recovery'){
+          // Log advances when impact done
+          setTimeout(()=>{ flushNextLog(); }, 100);
+        }
+      } else {
+        attackAnim = null;
+        // All FX done — keep processing log
+        if(logQueue.length > 0) setTimeout(()=> flushNextLog(), 300);
+      }
+    }
+  }
+
+  // Resize canvases to stage
+  const stage = document.getElementById('stage');
+  const stW = stage.clientWidth, stH = stage.clientHeight;
+  if(bgCanvas.width!==stW || bgCanvas.height!==stH){
+    bgCanvas.width=fxCanvas.width=stW;
+    bgCanvas.height=fxCanvas.height=stH;
+    // Update FX canvas css
+    fxCanvas.style.width=stW+'px'; fxCanvas.style.height=stH+'px';
+  }
+
+  // Update fighter stage positions (for FX)
+  fighters.player.stageX = stW*0.25;
+  fighters.enemy.stageX  = stW*0.75;
+  fighters.player.size   = 240;
+  fighters.enemy.size    = 200;
+
+  // Render environment (static bg can be cached, but redraw for star twinkle)
+  if(envSeed) renderEnvironment(bgCanvas, envSeed, now);
+
+  // Render creatures
+  if(player) renderCreature(playerCanvas, player.dna, player.hues, now, false, flash.player);
+  if(enemy)  renderCreature(oppCanvas,    enemy.dna,  enemy.hues,  now, true,  flash.enemy);
+
+  // Render FX
+  renderFX(fxCanvas, attackAnim, fighters, envGroundFrac, now);
+
+  animLoopId = requestAnimationFrame(mainLoop);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 5 — UI
+// ════════════════════════════════════════════════════════════════════
+
+function updateHpBars() {
+  for(const [side, board] of [['player',player],['enemy',enemy]]){
+    if(!board) continue;
+    const pct = board.hp/board.maxHp*100;
+    const fill = document.getElementById(side+'-hpfill');
+    fill.style.width = Math.max(0,pct)+'%';
+    fill.className = 'hp-fill' + (pct>50?'':pct>20?' mid':' low');
+    document.getElementById(side+'-hpnums').textContent = `${Math.max(0,board.hp)}/${board.maxHp}`;
+    const statusEl = document.getElementById(side+'-status');
+    statusEl.innerHTML = board.status ? `<span class="status-tag st-${board.status}">${board.status.toUpperCase()}</span>` : '';
+  }
+}
+
+function buildTypeChips(types) {
+  return types.map(t => {
+    const col = TYPE_COLOR[t]||'#888';
+    const bg = TYPE_BG[t]||'rgba(100,100,100,.12)';
+    return `<span class="type-chip" style="color:${col};background:${bg};border-color:${col}">${t}</span>`;
+  }).join('');
+}
+
+function populateHuds() {
+  document.getElementById('opp-name').textContent    = enemy.name;
+  document.getElementById('player-name').textContent = player.name;
+  document.getElementById('opp-level').textContent    = `GEN·${enemy.gen} · SPD ${enemy.base.spd}`;
+  document.getElementById('player-level').textContent = `GEN·${player.gen} · SPD ${player.base.spd}`;
+  document.getElementById('opp-types').innerHTML    = buildTypeChips(enemy.types);
+  document.getElementById('player-types').innerHTML = buildTypeChips(player.types);
+  updateHpBars();
+}
+
+function buildMoveBtns() {
+  for(let i=0;i<4;i++){
+    const move = player.moves[i];
+    const btn  = document.getElementById('m'+i);
+    const dot  = move.cat==='physical' ? 'cat-physical' : move.cat==='special' ? 'cat-special' : 'cat-status';
+    const typeKey = player.types[0];
+    const col = TYPE_COLOR[typeKey]||'var(--green)';
+    btn.className = `move-btn ${dot}`;
+    btn.innerHTML = `
+      <span class="move-btn-name">
+        <span class="move-type-dot"></span>
+        <span>${move.name}</span>
+      </span>
+      <span class="move-btn-meta">${move.desc}</span>
+    `;
+    btn.disabled = false;
+    btn.onclick = () => { if(battlePhase==='player-picking') executeTurn(i); };
+  }
+}
+
+function setButtonsEnabled(en) {
+  for(let i=0;i<4;i++) document.getElementById('m'+i).disabled = !en;
+}
+
+function showLog(msg, cls) {
+  const el = document.getElementById('log-text');
+  el.textContent = msg;
+  el.style.color = cls==='good'?'var(--green-hi)':cls==='bad'?'var(--rose)':cls==='gold'?'var(--gold)':'var(--ink)';
+}
+
+function showEndOverlay(win, pName, eName) {
+  const ov = document.getElementById('end-overlay');
+  const title = document.getElementById('end-title');
+  const sub   = document.getElementById('end-sub');
+  if(win===true){
+    title.textContent='VICTORY!'; title.className='end-title win';
+    sub.textContent=`${pName} defeated ${eName}.`;
+  } else if(win===false){
+    title.textContent='DEFEAT'; title.className='end-title lose';
+    sub.textContent=`${eName} defeated ${pName}.`;
+  } else {
+    title.textContent='DRAW'; title.className='end-title';
+    sub.textContent='The battle ends in a draw.';
+  }
+  ov.classList.add('show');
+}
+
+function hideEndOverlay() {
+  document.getElementById('end-overlay').classList.remove('show');
+}
+
+// Log advance on click / spacebar
+document.addEventListener('keydown', (e)=>{
+  if(e.key===' '&&logWaiting){ e.preventDefault(); flushNextLog(); }
+  if(e.key==='`'){ document.getElementById('dev-hud').classList.toggle('show'); }
+});
+document.getElementById('log-strip').addEventListener('click',()=>{
+  if(logWaiting) flushNextLog();
+});
+
+// End screen buttons
+document.getElementById('end-rematch').onclick = () => {
+  hideEndOverlay();
+  startBattle(player.dna, player.hues, player.name, player.gen, enemy.dna, enemy.hues, enemy.name, enemy.gen);
+};
+document.getElementById('end-new').onclick = () => {
+  hideEndOverlay();
+  const [pDna,pHues] = [randomDna(), null];
+  const [eDna,eHues] = [randomDna(), null];
+  const pH = makeHues(pDna), eH = makeHues(eDna);
+  startBattle(pDna,pH,makeName(pDna),1, eDna,eH,makeName(eDna),1);
+};
+
+function updateDevHud() {
+  document.getElementById('dv-blocks').textContent = BLOCKS.size;
+  document.getElementById('dv-nexus').textContent  = nexusPort ? 'mounted' : 'standalone';
+}
+function updateDevState(s) {
+  document.getElementById('dv-state').textContent = s;
+  document.getElementById('dv-turn').textContent  = turn===0?'player':'enemy';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 6 — BOOT
+// ════════════════════════════════════════════════════════════════════
+
+function startBattle(pDna, pHues, pName, pGen, eDna, eHues, eName, eGen, opts = {}) {
+  battleId = opts.battleId || `os-battle-${(++battleSeq).toString(36)}`;
+  const engine = requireBattleEngine();
+  const init = engine.initBattle({
+    eidolonA: toBattleEidolon(pDna, pHues, pName, pGen, 'player'),
+    eidolonB: toBattleEidolon(eDna, eHues, eName, eGen, 'enemy'),
+    battleSeed: battleId
+  });
+  player = decorateBoard(init.stateA, pDna, pHues, pName, pGen);
+  enemy  = decorateBoard(init.stateB, eDna, eHues, eName, eGen);
+  logQueue.length = 0;
+  logWaiting = false;
+  turnResolutionCallback = null;
+  battlePhase = 'intro';
+  battleTurnCount = 0;
+  setButtonsEnabled(false);
+  populateHuds();
+  buildMoveBtns();
+
+  // Queue intro — drains into player-picking via onLogDrained
+  logQueue.push({msg:`${enemy.name} appeared!`, cls:''});
+  logQueue.push({msg:`Go, ${player.name}!`, cls:'good'});
+  setTimeout(flushNextLog, 120);
+
+  updateDevState('intro');
+}
+
+async function boot() {
+  const bar = document.getElementById('boot-bar');
+  const msg = document.getElementById('boot-msg');
+
+  const steps = [
+    [10, 'substrate initializing…'],
+    [25, 'loading creature engine…'],
+    [45, 'compiling move tables…'],
+    [60, 'seeding world…'],
+    [75, 'rendering environment…'],
+    [88, 'spawning creatures…'],
+    [100,'ready.'],
+  ];
+
+  for(const [pct, text] of steps) {
+    msg.textContent = text;
+    bar.style.width = pct+'%';
+    await new Promise(r=>setTimeout(r, 180+Math.random()*120)); // PRESENTATION-LAYER: boot pacing only
+  }
+
+  // Generate world seed from time
+  envSeed = (Date.now() * 0x9E3779B9) >>> 0;
+
+  // Load player from OS companion state, or fall back to random
+  const _companion = loadCompanionFromOS();
+  const pDna  = _companion ? _companion.dna  : randomDna();
+  const pHues = _companion ? _companion.hues : makeHues(pDna);
+  const pName = _companion ? _companion.name : makeName(pDna);
+  const _companionFound = !!_companion;
+
+  const eDna  = randomDna();
+  const eHues = makeHues(eDna);
+  const eName = makeName(eDna);
+
+  // Start main render loop
+  mainLoop();
+
+  // Hide boot overlay
+  const bootOv = document.getElementById('boot-overlay');
+  bootOv.classList.add('hidden');
+  setTimeout(()=>{ bootOv.style.display='none'; }, 900);
+
+  await new Promise(r=>setTimeout(r, 500));
+
+  // Start battle
+  startBattle(pDna, pHues, pName, 1, eDna, eHues, eName, 1);
+
+  if (_companionFound) {
+    pushFeed('OK', `Companion loaded: ${pName}`);
+  } else {
+    pushFeed('INFO', 'No companion selected — using random challenger. Choose one in First Contact.');
+  }
+
+  // Spawn background infrastructure
+  setTimeout(()=>{
+    spawnBlock('vibes-library', './vibes-library.html', {
+      appMeta: {title:'Vibes Library', icon:'◈', description:'Asset library', visible:false}
+    });
+  }, 1000);
+
+  // Spawn world engine — challengers will arrive automatically
+  setTimeout(()=>{
+    spawnBlock('eidolon-router', './eidolon-router.html', {
+      appMeta: {title:'World Engine', icon:'◉', description:'Infinite world simulation', visible:false}
+    });
+    pushFeed('INFO', 'World engine spawning — challengers incoming');
+  }, 2500);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SECTION 7 — NEXUS ADAPTER
+// Eidolon OS can ITSELF run inside a parent Nexus OS as a managed block.
+// When that happens, the parent OS can coordinate creature loading via vibes.
+// ════════════════════════════════════════════════════════════════════
+
+let nexusPort = null;
+let nexusMounted = false;
+const nexusPending = new Map();
+
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'BOOT') return;
+  nexusPort = e.ports[0];
+  if (!nexusPort) return;
+
+  nexusPort.postMessage({
+    type: 'DECLARE',
+    manifest: {
+      emits:    ['vibe.save','vibe.load','vibe.list','eidolon.battle.result'],
+      consumes: ['vibe.result','vibe.notify','eidolon.challenger.appears','eidolon.world.tick']
+    },
+    app: {
+      title: 'Eidolon OS',
+      icon: '⚔',
+      description: 'Sovereign creature battle cartridge',
+      visible: true
+    }
+  });
+
+  nexusPort.onmessage = ev => {
+    const msg = ev.data;
+    if (!msg || typeof msg.type !== 'string') return;
+    if (msg.type === 'MOUNT_CHALLENGE') {
+      nexusPort.postMessage({ type: 'MOUNT_ACK', nonce: msg.nonce });
+    } else if (msg.type === 'MOUNTED') {
+      nexusPort.postMessage({ type: 'SUB', channel: 'vibe.result' });
+      nexusPort.postMessage({ type: 'SUB', channel: 'vibe.notify' });
+      nexusPort.postMessage({ type: 'SUB', channel: 'eidolon.challenger.appears' });
+      nexusPort.postMessage({ type: 'SUB', channel: 'eidolon.world.tick' });
+      nexusMounted = true;
+      updateDevHud();
+      pushFeed('OK', 'Eidolon OS mounted — router channel open');
+    } else if (msg.type === 'PING') {
+      nexusPort.postMessage({ type: 'PONG', nonce: msg.nonce });
+    } else if (msg.type === 'MSG') {
+      if (msg.channel === 'vibe.result') {
+        const p = msg.payload || {};
+        const slot = nexusPending.get(p._reqId);
+        if (slot) {
+          clearTimeout(slot.timer);
+          nexusPending.delete(p._reqId);
+          slot.resolve(p);
+        }
+      } else if (msg.channel === 'eidolon.challenger.appears') {
+        onChallengerArrival(msg.payload);
+      } else if (msg.channel === 'eidolon.world.tick') {
+        onWorldTick(msg.payload);
+      }
+    }
+  };
+});
+
+// Called when the router sends a challenger from the living world
+function onChallengerArrival(payload) {
+  if (!payload || !payload.dna || battlePhase === 'animating') return;
+
+  const eDna   = payload.dna;
+  const eHues  = payload.hues || makeHues(eDna);
+  const eName  = payload.name || makeName(eDna);
+  const eGen   = payload.gen  || 1;
+
+  // If we don't have a player creature yet, generate one
+  if (!player) {
+    const _osCompanion = loadCompanionFromOS();
+    const pDna  = _osCompanion ? _osCompanion.dna  : randomDna();
+    const pHues = _osCompanion ? _osCompanion.hues : makeHues(pDna);
+    const pName = _osCompanion ? _osCompanion.name : makeName(pDna);
+    startBattle(pDna, pHues, pName, 1, eDna, eHues, eName, eGen);
+    if (payload.wins > 0) pushLog(`A challenger from the world appears! (${payload.wins}W)`, 'gold');
+    return;
+  }
+
+  // Inject challenger as new enemy and restart battle
+  hideEndOverlay();
+  // Restore player HP for the new fight
+  battleId = `os-battle-${(++battleSeq).toString(36)}`;
+  battleTurnCount = 0;
+  const freshP = makeBoard(player.dna, player.hues, player.name, player.gen, 'A');
+  const freshE = makeBoard(eDna, eHues, eName, eGen, 'B');
+  freshE._routerId = payload.id;
+
+  player = freshP;
+  enemy  = freshE;
+  battlePhase = 'player-picking';
+  logQueue.length = 0;
+  logWaiting = false;
+
+  populateHuds();
+  buildMoveBtns();
+  setButtonsEnabled(true);
+
+  const record = payload.wins ? `${payload.wins}W · ` : '';
+  showLog(`${eName} appeared from the world!`);
+  logQueue.push({msg:`${eName} appeared! [${record}Gen ${eGen}]`, cls:'gold'});
+  logQueue.push({msg:`Go! ${player.name}!`, cls:'good'});
+  setTimeout(()=>flushNextLog(), 300);
+
+  updateDevState('challenger-arrived');
+}
+
+function onWorldTick(payload) {
+  // Future: show world info in dev hud
+  if (payload) document.getElementById('dv-nexus').textContent = `world 0x${(payload.seed||0).toString(16)}`;
+}
+
+window.__eidolonOsTestHooks = {
+  startBattle,
+  executeTurn,
+  makeBoard,
+  osTurnSeed,
+  mergeEvents,
+  _getState(){ return {player, enemy, battlePhase, battleTurnCount, battleId}; },
+  _setBattleForTest(pDna, pHues, pName, pGen, eDna, eHues, eName, eGen, opts = {}) {
+    startBattle(pDna, pHues, pName, pGen, eDna, eHues, eName, eGen, opts);
+    battlePhase = 'player-picking';
+    logQueue.length = 0;
+    logWaiting = false;
+    turnResolutionCallback = null;
+    setButtonsEnabled(true);
+    return this._getState();
+  },
+  _drainLogsForTest(){ while(logQueue.length) flushNextLog(); },
+  _setBattlePhaseForTest(phase){ battlePhase = phase; },
+};
+
+// ── Boot ────────────────────────────────────────────────────────────
+boot().catch(err => {
+  console.error('[eidolon-os] boot failed:', err);
+  document.getElementById('boot-msg').textContent = 'boot failed: ' + err.message;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "version": "0.04",
+  "kinds": [
+    {
+      "kind": 30078,
+      "name": "application-specific data",
+      "defaultUse": "prompt snapshots, receipts, game objects"
+    },
+    {
+      "kind": 78,
+      "name": "application data stream",
+      "defaultUse": "multiple app records of same type"
+    },
+    {
+      "kind": 10002,
+      "name": "relay list metadata",
+      "defaultUse": "relay read/write policy reference"
+    },
+    {
+      "kind": 24133,
+      "name": "remote signer communication candidate",
+      "defaultUse": "future remote signing path"
+    }
+  ]
+}

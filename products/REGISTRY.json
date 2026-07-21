@@ -1,0 +1,55 @@
+{
+  "$schema": "./REGISTRY.schema.json",
+  "schema": "nexus.products-registry/v1",
+  "status_authority": "NONE",
+  "packages": [
+    {
+      "id": "noted-host",
+      "path": "products/noted-host",
+      "kind": "host",
+      "ring": 0,
+      "status": "build",
+      "status_authority": "NONE",
+      "parent_programme": "NOTED_PROJECT_OS_001",
+      "checkpoint_bind": "BGEN-CANONICAL-CHECKPOINT-001",
+      "nested_git": {"enabled": false, "remote": null, "pinned_commit": null},
+      "ai_default_seat": "codex",
+      "fat_drop_include": true,
+      "synthetic_economy_surface": false,
+      "real_world_value_forbidden": true,
+      "readme": "products/noted-host/README.md"
+    },
+    {
+      "id": "nexus-blocks",
+      "path": "products/nexus-blocks",
+      "kind": "blocks",
+      "ring": 0,
+      "status": "scaffold",
+      "status_authority": "NONE",
+      "parent_programme": "NOTED_PROJECT_OS_001",
+      "checkpoint_bind": "BGEN-CANONICAL-CHECKPOINT-001",
+      "nested_git": {"enabled": false, "remote": null, "pinned_commit": null},
+      "ai_default_seat": "codex",
+      "fat_drop_include": true,
+      "synthetic_economy_surface": false,
+      "real_world_value_forbidden": true,
+      "readme": "products/nexus-blocks/README.md"
+    },
+    {
+      "id": "creature-engine",
+      "path": "products/creature-engine",
+      "kind": "engine",
+      "ring": 0,
+      "status": "scaffold",
+      "status_authority": "NONE",
+      "parent_programme": "NOTED_PROJECT_OS_001",
+      "checkpoint_bind": "BGEN-CANONICAL-CHECKPOINT-001",
+      "nested_git": {"enabled": false, "remote": null, "pinned_commit": null},
+      "ai_default_seat": "codex",
+      "fat_drop_include": true,
+      "synthetic_economy_surface": false,
+      "real_world_value_forbidden": true,
+      "readme": "products/creature-engine/README.md"
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · BATTLE SYSTEM</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070b;--bg2:#111119;--bg3:#181824;--bg4:#202030;
+  --line:#2a2a3a;--line2:#42425f;--text:#ece8f4;--dim:#8b8497;--dim2:#575167;
+  --accent:#ffcc44;--cyan:#66e8ff;--pink:#ff66aa;--green:#66ff99;--red:#ff5566;--purple:#aa77ff;
+  --mono:'IBM Plex Mono','Cascadia Mono','SF Mono',Menlo,Consolas,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,select{font-family:inherit}
+#app{height:100vh;display:grid;grid-template-rows:38px 1fr 126px;grid-template-columns:1fr 380px;grid-template-areas:"top top" "stage side" "bottom side";overflow:hidden}
+#top{grid-area:top;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 12px}
+#brand{letter-spacing:3px;font-weight:700;font-size:12px;color:var(--text)}#brand b{color:var(--accent)}
+#sub{font-size:10px;color:var(--dim2);letter-spacing:1px}.pill{font-size:9px;letter-spacing:1px;border:1px solid var(--line2);color:var(--dim);padding:2px 7px;border-radius:2px;text-transform:uppercase}.pill.live{color:var(--green);border-color:var(--green)}.pill.warn{color:var(--accent);border-color:var(--accent)}
+#top-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+.btn{font-size:10px;letter-spacing:.7px;text-transform:lowercase;color:var(--dim);background:transparent;border:1px solid var(--line);padding:5px 9px;border-radius:2px;cursor:pointer;transition:.12s;white-space:nowrap}.btn:hover{color:var(--text);border-color:var(--line2);background:var(--bg3)}.btn.primary{color:var(--accent);border-color:var(--accent)}.btn.primary:hover{background:rgba(255,204,68,.08)}.btn.danger{color:var(--red);border-color:rgba(255,85,102,.45)}.btn.on{color:#071009;background:var(--green);border-color:var(--green)}.btn:disabled{opacity:.35;cursor:default;pointer-events:none}
+#stage{grid-area:stage;background:#030306;display:flex;align-items:center;justify-content:center;padding:12px;position:relative;overflow:hidden}
+#battle{display:block;width:100%;height:100%;max-height:100%;object-fit:contain;background:#050509;border:1px solid var(--line)}
+#drop{position:absolute;inset:12px;border:2px dashed var(--accent);background:rgba(7,7,11,.86);display:none;align-items:center;justify-content:center;z-index:8;font-size:18px;letter-spacing:3px;color:var(--accent);text-transform:uppercase}#drop.show{display:flex}
+#side{grid-area:side;background:var(--bg2);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.panel-head{height:34px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:var(--dim);font-size:10px;letter-spacing:2px;text-transform:uppercase;flex-shrink:0}
+#tabs{display:flex;border-bottom:1px solid var(--line);background:var(--bg2);flex-shrink:0}.tab{flex:1;text-align:center;padding:8px 4px;color:var(--dim2);border-right:1px solid var(--line);cursor:pointer;font-size:10px;letter-spacing:1px}.tab:last-child{border-right:0}.tab.active{color:var(--accent);background:var(--bg3)}
+.side-page{display:none;flex:1;overflow-y:auto;padding:12px;gap:10px;flex-direction:column}.side-page.active{display:flex}.side-page::-webkit-scrollbar{width:6px}.side-page::-webkit-scrollbar-thumb{background:var(--line2)}
+.section{border:1px solid var(--line);background:rgba(255,255,255,.015);padding:10px;border-radius:4px}.section h4{font-size:9px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
+.row{display:flex;align-items:center;gap:6px;margin:5px 0}.row label{font-size:10px;color:var(--dim);min-width:70px}.row select,.row input{background:var(--bg);border:1px solid var(--line);color:var(--text);font-size:10px;padding:5px;border-radius:2px;outline:none;min-width:0}.row select{flex:1}.row input[type=checkbox]{width:auto}.row input[type=range]{flex:1;height:4px;appearance:none;background:var(--bg);border:1px solid var(--line);padding:0}.row input[type=range]::-webkit-slider-thumb{appearance:none;width:10px;height:14px;background:var(--text);border-radius:1px;cursor:pointer}
+.team-card{border:1px solid var(--line);background:var(--bg);padding:7px;border-radius:3px;margin-bottom:6px;cursor:pointer;transition:.1s}.team-card:hover{border-color:var(--line2)}.team-card.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(255,204,68,.1)}.team-card.fainted{opacity:.45}.team-top{display:flex;gap:6px;align-items:center}.team-name{font-weight:700;letter-spacing:.8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.team-hp{font-size:9px;color:var(--dim);margin-left:auto}.bar{height:6px;background:rgba(255,255,255,.05);border:1px solid var(--line);margin-top:5px}.fill{height:100%;background:var(--green);transition:width .3s}.fill.mid{background:var(--accent)}.fill.low{background:var(--red)}.chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}.chip{font-size:8px;text-transform:uppercase;letter-spacing:.9px;padding:2px 5px;border-radius:2px;border:1px solid rgba(255,255,255,.18);color:var(--dim)}
+.asset-item{border:1px solid var(--line);background:var(--bg);padding:7px;border-radius:3px;margin-bottom:6px;display:grid;grid-template-columns:44px 1fr auto;gap:7px;align-items:center}.asset-thumb{width:44px;height:34px;background:#050509;border:1px solid var(--line);border-radius:2px}.asset-title{font-size:10px;letter-spacing:.5px}.asset-meta{font-size:8px;color:var(--dim2);margin-top:3px;text-transform:uppercase;letter-spacing:.8px}.asset-actions{display:flex;flex-direction:column;gap:3px}.mini{font-size:9px;padding:3px 5px}
+#bottom{grid-area:bottom;background:var(--bg2);border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 330px;min-height:0}
+#moves{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;border-right:1px solid var(--line)}.move{background:var(--bg);border:1px solid var(--line);color:var(--text);cursor:pointer;text-align:left;padding:7px 9px;border-radius:3px;position:relative;overflow:hidden}.move:hover:not(:disabled){border-color:var(--accent);background:var(--bg3)}.move:disabled{opacity:.35;cursor:default}.move-name{font-size:11px;font-weight:700;letter-spacing:1px;display:flex;justify-content:space-between}.move-meta{font-size:9px;color:var(--dim);margin-top:3px}.move-type{font-size:8px;text-transform:uppercase;color:var(--dim2)}
+#tactics{padding:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;align-content:start}.tact{background:transparent;border:1px solid var(--line);color:var(--dim);font-size:10px;padding:7px;cursor:pointer;text-transform:lowercase;border-radius:3px}.tact:hover{border-color:var(--line2);color:var(--text);background:var(--bg3)}
+#log{height:100%;overflow-y:auto;background:#060609;padding:9px 12px;border-top:1px solid var(--line);font-size:10px;line-height:1.55;color:var(--dim)}#log .hot{color:var(--accent)}#log .bad{color:var(--red)}#log .good{color:var(--green)}#log::-webkit-scrollbar{width:5px}#log::-webkit-scrollbar-thumb{background:var(--line2)}
+.stat-table{display:grid;grid-template-columns:58px 1fr 30px;gap:4px 7px;align-items:center;font-size:9px;color:var(--dim)}.statbar{height:5px;background:var(--bg);border:1px solid var(--line)}.statbar div{height:100%;background:var(--purple)}
+.compare{font-size:10px;color:var(--dim);line-height:1.6}.kbd{border:1px solid var(--line2);background:var(--bg);padding:1px 4px;border-radius:2px;color:var(--text);font-size:9px}
+#fileInput{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <div id="brand"><b>⚔</b>&nbsp;EIDOLON BATTLE SYSTEM</div>
+    <div id="sub">real battle layer · asset-driven · npc simulation</div>
+    <span class="pill live" id="modePill">manual</span>
+    <span class="pill warn" id="turnPill">turn 1</span>
+    <div id="top-actions">
+      <button class="btn" onclick="document.getElementById('fileInput').click()">load assets</button>
+      <input id="fileInput" type="file" multiple accept=".json,.html,application/json,text/html" onchange="handleFiles(this.files)">
+      <button class="btn" onclick="randomEncounter()">new battle</button>
+      <button class="btn" id="autoBtn" onclick="toggleAuto()">auto npc</button>
+      <button class="btn primary" onclick="exportBattleScene()">export scene</button>
+      <button class="btn" onclick="exportFrame()">png</button>
+    </div>
+  </div>
+
+  <div id="stage">
+    <canvas id="battle" width="1280" height="720"></canvas>
+    <div id="drop">drop creatures · environments · attacks</div>
+  </div>
+
+  <aside id="side">
+    <div class="panel-head"><span>command nexus</span><span id="assetCount">0 assets</span></div>
+    <div id="tabs">
+      <div class="tab active" data-tab="battlePage" onclick="tab(this)">battle</div>
+      <div class="tab" data-tab="teamPage" onclick="tab(this)">teams</div>
+      <div class="tab" data-tab="assetPage" onclick="tab(this)">assets</div>
+      <div class="tab" data-tab="systemPage" onclick="tab(this)">system</div>
+    </div>
+
+    <div class="side-page active" id="battlePage">
+      <div class="section">
+        <h4>field state <span id="fieldShort">—</span></h4>
+        <div class="row"><label>weather</label><select id="weatherSel" onchange="setWeather(this.value)"></select></div>
+        <div class="row"><label>terrain</label><select id="terrainSel" onchange="setTerrain(this.value)"></select></div>
+        <div class="row"><label>npc brain</label><select id="aiMode" onchange="battle.aiMode=this.value"><option>smart</option><option>aggressive</option><option>defensive</option><option>status</option><option>chaotic</option></select></div>
+        <div class="row"><label>player ai</label><input type="checkbox" id="autoPlayer" onchange="battle.autoPlayer=this.checked"> <span style="color:var(--dim);font-size:10px">simulate both sides</span></div>
+      </div>
+      <div class="section">
+        <h4>active readout</h4>
+        <div id="activeReadout" class="compare">—</div>
+      </div>
+      <div class="section">
+        <h4>turn log</h4>
+        <div id="log"></div>
+      </div>
+    </div>
+
+    <div class="side-page" id="teamPage">
+      <div class="section"><h4>player team</h4><div id="playerTeam"></div><button class="btn mini" onclick="addRandomTo('player')">+ generate player creature</button></div>
+      <div class="section"><h4>enemy team</h4><div id="enemyTeam"></div><button class="btn mini" onclick="addRandomTo('enemy')">+ generate enemy creature</button></div>
+    </div>
+
+    <div class="side-page" id="assetPage">
+      <div class="section">
+        <h4>loaded assets</h4>
+        <div id="assetList"></div>
+      </div>
+    </div>
+
+    <div class="side-page" id="systemPage">
+      <div class="section">
+        <h4>battle mechanics</h4>
+        <div class="compare">
+          Included: teams, switching, types, STAB, crits, accuracy/evasion, priority, PP, physical/special/status moves, stat stages, abilities, held sigils, weather, terrain, hazards, burn, poison, shock, sleep, frost, confusion, bleed, flinch, protect, recoil, drain, multi-hit, charging, trapping, NPC move scoring and NPC switching.<br><br>
+          Added beyond the usual monster-battle template: resonance, corruption, overdrive, field rupture, glyph hazards, asset-driven VFX, animated environment carryover, and scene export.
+        </div>
+      </div>
+      <div class="section">
+        <h4>hotkeys</h4>
+        <div class="compare"><span class="kbd">1-4</span> moves · <span class="kbd">s</span> switch · <span class="kbd">a</span> auto · <span class="kbd">n</span> new battle · <span class="kbd">p</span> png</div>
+      </div>
+    </div>
+  </aside>
+
+  <div id="bottom">
+    <div id="moves"></div>
+    <div id="tactics">
+      <button class="tact" onclick="showSwitches()">switch creature</button>
+      <button class="tact" onclick="playerGuard()">guard / protect</button>
+      <button class="tact" onclick="playerFocus()">focus / scan</button>
+      <button class="tact" onclick="simulateTurns(5)">simulate 5 turns</button>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+
+const canvas=document.getElementById('battle');
+const ctx=canvas.getContext('2d');
+const ASSET_VERSION='eidolon-battle-system/1';
+
+const TYPE_COLORS={
+  SHADOW:'#aa55cc',VOID:'#5566ff',LIGHT:'#ffdd44',TOXIC:'#cc44ff',SPECTRAL:'#33eeff',WILD:'#44ff88',IRON:'#8899cc',ANCIENT:'#ffaa44',FLAME:'#ff7744',FROST:'#77ddff',STORM:'#ffee55',ARCANE:'#ff66cc'
+};
+const TYPES=Object.keys(TYPE_COLORS);
+const TYPE_BEATS={
+  SHADOW:['VOID','TOXIC','SPECTRAL'], VOID:['LIGHT','SHADOW','ANCIENT'], LIGHT:['TOXIC','VOID','SHADOW'], TOXIC:['ANCIENT','WILD','LIGHT'],
+  SPECTRAL:['ANCIENT','VOID','FLAME'], WILD:['IRON','VOID','STORM'], IRON:['SPECTRAL','LIGHT','FROST'], ANCIENT:['SHADOW','SPECTRAL','ARCANE'],
+  FLAME:['WILD','FROST','IRON'], FROST:['WILD','STORM','VOID'], STORM:['WILD','SPECTRAL','LIGHT'], ARCANE:['IRON','VOID','ANCIENT']
+};
+const WEATHER={
+  none:{name:'none',desc:'neutral air'},
+  voidstorm:{name:'voidstorm',desc:'void/shadow +20%, light -20%'},
+  radiance:{name:'radiance',desc:'light +20%, shadow/void -15%'},
+  ashfall:{name:'ashfall',desc:'flame/toxic +15%, passive chip'},
+  downpour:{name:'downpour',desc:'frost/storm +15%, flame -20%'},
+  starlit:{name:'starlit',desc:'arcane/spectral +15%, crit +5%'}
+};
+const TERRAIN={
+  none:{name:'none',desc:'plain ground'},
+  mire:{name:'mire',desc:'speed down, toxic stronger'},
+  crystal:{name:'crystal',desc:'iron/frost stronger, crit sparks'},
+  sigil:{name:'sigil',desc:'arcane/status stronger'},
+  overgrowth:{name:'overgrowth',desc:'wild heals, flame stronger'}
+};
+const TRAITS=['venomous','spectral','swarming','titanic','murky','resonant','vital','volatile','ethereal','crystalline','feral','ancient','luminous','toxic','phantom','armored'];
+const TRAIT_TYPE={venomous:'TOXIC',spectral:'SPECTRAL',swarming:'WILD',titanic:'IRON',murky:'VOID',resonant:'SPECTRAL',vital:'WILD',volatile:'FLAME',ethereal:'VOID',crystalline:'FROST',feral:'WILD',ancient:'ANCIENT',luminous:'LIGHT',toxic:'TOXIC',phantom:'SHADOW',armored:'IRON'};
+const ABILITY_POOL={
+  venomous:{id:'venom_aura',name:'Venom Aura',desc:'contact attackers may be poisoned'},
+  spectral:{id:'phase_skin',name:'Phase Skin',desc:'+10 evasion under starlit or voidstorm'},
+  swarming:{id:'swarm_logic',name:'Swarm Logic',desc:'multi-hit moves gain one extra hit'},
+  titanic:{id:'colossus',name:'Colossus',desc:'cannot be flinched; slower but tougher'},
+  murky:{id:'mire_body',name:'Mire Body',desc:'entering foe loses accuracy'},
+  resonant:{id:'resonator',name:'Resonator',desc:'special moves may echo for small damage'},
+  vital:{id:'regenerator',name:'Regenerator',desc:'heals when switching out'},
+  volatile:{id:'overdrive',name:'Overdrive',desc:'below 35% HP, power rises'},
+  ethereal:{id:'slipstream',name:'Slipstream',desc:'first incoming hit has reduced accuracy'},
+  crystalline:{id:'crystal_guard',name:'Crystal Guard',desc:'resists crits and bleed'},
+  feral:{id:'bloodrush',name:'Bloodrush',desc:'crit chance rises after KO'},
+  ancient:{id:'ancient_memory',name:'Ancient Memory',desc:'stat boosts last longer'},
+  luminous:{id:'lumen_core',name:'Lumen Core',desc:'status moves also grant focus'},
+  toxic:{id:'acid_blood',name:'Acid Blood',desc:'takes less poison/burn damage'},
+  phantom:{id:'phantom_limb',name:'Phantom Limb',desc:'ignores protect once per battle'},
+  armored:{id:'iron_hide',name:'Iron Hide',desc:'physical damage reduced by 10%'}
+};
+const BASE_MOVES=[
+  {name:'Pulse',type:'SPECTRAL',cat:'special',power:40,acc:100,pp:24,priority:0,effect:null,desc:'reliable special pulse'},
+  {name:'Strike',type:'IRON',cat:'physical',power:45,acc:95,pp:24,priority:0,effect:null,desc:'reliable physical strike'},
+  {name:'Guard',type:'IRON',cat:'status',power:0,acc:100,pp:12,priority:3,effect:'protect',desc:'protect this turn'},
+  {name:'Mend',type:'WILD',cat:'status',power:0,acc:100,pp:10,priority:0,effect:'heal25',desc:'restore 25% HP'}
+];
+const TRAIT_MOVES={
+  venomous:{name:'Venom Stitch',type:'TOXIC',cat:'physical',power:45,acc:100,pp:16,effect:'poison',desc:'may poison'},
+  spectral:{name:'Spectral Ray',type:'SPECTRAL',cat:'special',power:65,acc:92,pp:12,effect:null,desc:'clean spectral beam'},
+  swarming:{name:'Swarm Rush',type:'WILD',cat:'physical',power:22,acc:100,pp:18,effect:'multi',desc:'hits 2-5 times'},
+  titanic:{name:'Seismic Slam',type:'IRON',cat:'physical',power:90,acc:82,pp:8,effect:'flinch',desc:'heavy blow'},
+  murky:{name:'Murk Cloud',type:'VOID',cat:'status',power:0,acc:100,pp:14,effect:'accDown',desc:'lower accuracy + veil'},
+  resonant:{name:'Resonance',type:'SPECTRAL',cat:'special',power:55,acc:100,pp:14,effect:'echo',desc:'echoes if focused'},
+  vital:{name:'Vital Surge',type:'WILD',cat:'status',power:0,acc:100,pp:6,effect:'heal40',desc:'restore 40% HP'},
+  volatile:{name:'Detonation',type:'FLAME',cat:'physical',power:115,acc:88,pp:6,effect:'recoil',desc:'huge recoil'},
+  ethereal:{name:'Phase Slip',type:'VOID',cat:'status',power:0,acc:100,pp:10,effect:'dodge',desc:'evade next attack'},
+  crystalline:{name:'Crystal Lance',type:'FROST',cat:'special',power:70,acc:96,pp:12,effect:'bleed',desc:'piercing shards'},
+  feral:{name:'Feral Claws',type:'WILD',cat:'physical',power:32,acc:100,pp:18,effect:'multi',desc:'claw combo'},
+  ancient:{name:'Ancient Power',type:'ANCIENT',cat:'special',power:60,acc:100,pp:10,effect:'boostAll',desc:'may boost all stats'},
+  luminous:{name:'Flash Burst',type:'LIGHT',cat:'special',power:45,acc:100,pp:14,effect:'accDown',desc:'damage + blind'},
+  toxic:{name:'Acid Stream',type:'TOXIC',cat:'special',power:55,acc:98,pp:14,effect:'burn',desc:'corrosive burn'},
+  phantom:{name:'Phantom Claw',type:'SHADOW',cat:'physical',power:72,acc:95,pp:12,effect:'pierceProtect',desc:'can pierce protect'},
+  armored:{name:'Iron Wall',type:'IRON',cat:'status',power:0,acc:100,pp:12,effect:'defUp2',desc:'raise defense sharply'}
+};
+const EXTRA_MOVES=[
+  {name:'Priority Blink',type:'VOID',cat:'physical',power:35,acc:100,pp:16,priority:1,effect:null,desc:'+1 priority'},
+  {name:'Drain Bloom',type:'WILD',cat:'special',power:55,acc:100,pp:12,priority:0,effect:'drain',desc:'heal half damage'},
+  {name:'Glyph Trap',type:'ARCANE',cat:'status',power:0,acc:100,pp:8,priority:0,effect:'hazardGlyph',desc:'sets glyph hazard'},
+  {name:'Spine Field',type:'IRON',cat:'status',power:0,acc:100,pp:8,priority:0,effect:'hazardSpikes',desc:'sets spikes'},
+  {name:'Static Hex',type:'STORM',cat:'special',power:50,acc:95,pp:12,priority:0,effect:'shock',desc:'may shock'},
+  {name:'Sleep Sigil',type:'ARCANE',cat:'status',power:0,acc:80,pp:8,priority:0,effect:'sleep',desc:'sleep if it hits'},
+  {name:'Frost Lock',type:'FROST',cat:'special',power:58,acc:95,pp:12,priority:0,effect:'frost',desc:'may frost-lock'},
+  {name:'Rupture',type:'ANCIENT',cat:'special',power:80,acc:90,pp:8,priority:0,effect:'terrainBreak',desc:'breaks terrain'}
+];
+
+let assets=[];
+let battle={turn:1,phase:'choose',weather:'none',terrain:'none',aiMode:'smart',autoPlayer:false,auto:false,hazards:{player:{spikes:0,glyph:0,venom:0},enemy:{spikes:0,glyph:0,venom:0}},fieldSeed:1,environment:null,attacks:[],playerTeam:[],enemyTeam:[],pActive:0,eActive:0,history:[]};
+let visual={events:[],particles:[],shake:0,flash:null,lastMove:null};
+let renderStart=performance.now();
+let resolving=false;
+
+function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let r=s;r=Math.imul(r^(r>>>15),r|1);r^=r+Math.imul(r^(r>>>7),r|61);return((r^(r>>>14))>>>0)/4294967296;}}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))} function lerp(a,b,t){return a+(b-a)*t} function ease(t){return t*t*(3-2*t)} function out(t){return 1-(1-t)*(1-t)}
+function safe(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function log(msg,cls=''){const el=document.getElementById('log');const d=document.createElement('div');d.className=cls;d.innerHTML=msg;el.appendChild(d);el.scrollTop=el.scrollHeight;battle.history.push(msg);}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+function active(side){return side==='player'?battle.playerTeam[battle.pActive]:battle.enemyTeam[battle.eActive]}
+function other(side){return side==='player'?'enemy':'player'}
+function alive(team){return team.filter(c=>c.hp>0)}
+function pct(c){return c.maxHp?c.hp/c.maxHp:0}
+function hpClass(c){const p=pct(c);return p<.25?'low':p<.55?'mid':''}
+function typeEff(moveType,defTypes){let m=1;for(const dt of defTypes){if((TYPE_BEATS[moveType]||[]).includes(dt))m*=2;if((TYPE_BEATS[dt]||[]).includes(moveType))m*=0.5;}return m}
+function stageMult(s){const arr=[.25,.28,.33,.4,.5,.67,1,1.5,2,2.5,3,3.5,4];return arr[clamp(s+6,0,12)]}
+function getWeatherMod(type){const w=battle.weather;if(w==='voidstorm'&&(type==='VOID'||type==='SHADOW'))return 1.2;if(w==='voidstorm'&&type==='LIGHT')return .8;if(w==='radiance'&&type==='LIGHT')return 1.2;if(w==='radiance'&&(type==='VOID'||type==='SHADOW'))return .85;if(w==='ashfall'&&(type==='FLAME'||type==='TOXIC'))return 1.15;if(w==='downpour'&&(type==='FROST'||type==='STORM'))return 1.15;if(w==='downpour'&&type==='FLAME')return .8;if(w==='starlit'&&(type==='ARCANE'||type==='SPECTRAL'))return 1.15;return 1}
+function getTerrainMod(type,cat){const t=battle.terrain;if(t==='mire'&&type==='TOXIC')return 1.15;if(t==='crystal'&&(type==='IRON'||type==='FROST'))return 1.15;if(t==='sigil'&&(type==='ARCANE'||cat==='status'))return 1.12;if(t==='overgrowth'&&(type==='WILD'||type==='FLAME'))return 1.12;return 1}
+
+function makeName(dna){const P=['PHAN','VEX','AETH','KRON','LUMI','ETH','ARC','SPEC','ZYN','NETH','GLYPH','OMNI','MORD','VEL','RIFT','QOR'];const M=['TI','LA','VO','RU','NI','KA','MO','EL','SI','RA','PHI','SU','ZA','XU','DRA','LY'];const S=['EX','ON','IX','AR','UM','AN','OX','IS','OR','EN','AX','UR','AEL','OTH','EON','YX'];return P[dna[0]%P.length]+M[dna[1]%M.length]+S[dna[2]%S.length]}
+function expressedTraits(dna){return TRAITS.map((name,i)=>({name,val:dna[i]??0})).sort((a,b)=>b.val-a.val)}
+function deriveTypes(dna){const e=expressedTraits(dna).filter(t=>t.val>110);const a=TRAIT_TYPE[e[0]?.name]||TYPES[dna[0]%TYPES.length];const b=TRAIT_TYPE[e[1]?.name]||TYPES[dna[1]%TYPES.length];return a===b?[a]:[a,b]}
+function computeStats(dna){return{maxHp:70+Math.floor((dna[7]??128)/255*90),atk:35+Math.floor((dna[3]??128)/255*75),def:35+Math.floor((dna[5]??128)/255*75),spAtk:35+Math.floor((dna[4]??128)/255*75),spDef:35+Math.floor((dna[6]??128)/255*75),spd:30+Math.floor((dna[2]??128)/255*80)}}
+function deriveAbility(dna){const t=expressedTraits(dna)[0]?.name||'spectral';return ABILITY_POOL[t]||ABILITY_POOL.spectral}
+function deriveMoves(dna){const traits=expressedTraits(dna).filter(t=>t.val>118);let moves=traits.slice(0,4).map(t=>cloneMove(TRAIT_MOVES[t.name])).filter(Boolean);let k=0;while(moves.length<4&&k<EXTRA_MOVES.length){if((dna[(k+8)%16]||0)>150)moves.push(cloneMove(EXTRA_MOVES[k]));k++;}k=0;while(moves.length<4)moves.push(cloneMove(BASE_MOVES[k++]));return moves.slice(0,4).map(m=>({...m,ppLeft:m.pp}))}
+function cloneMove(m){return m?JSON.parse(JSON.stringify(m)):null}
+function randomDNA(seed){const r=rng(seed);return Array.from({length:16},()=>Math.floor(r()*256))}
+function randomHues(dna){return[(dna[0]*1.41)%360,(dna[4]*2.11+80)%360,(dna[14]*3.17+20)%360]}
+function makeCreature(source){const dna=(source.dna||randomDNA(Date.now())).map(x=>Math.max(0,Math.min(255,Math.round(x))));const stats=computeStats(dna);const c={id:source.id||'c_'+Math.random().toString(36).slice(2),name:source.name||makeName(dna),dna,hues:source.hues||randomHues(dna),types:source.types||deriveTypes(dna),ability:source.ability||deriveAbility(dna),moves:source.moves?source.moves.map(m=>({...m,ppLeft:m.ppLeft??m.pp??10})):deriveMoves(dna),stats,maxHp:stats.maxHp,hp:source.hp??stats.maxHp,stages:{atk:0,def:0,spAtk:0,spDef:0,spd:0,acc:0,eva:0},status:null,statusTurns:0,vol:{protect:false,dodge:false,focus:false,confusion:0,flinch:false,taunt:0,charge:null,phantomPierce:true,trapped:false,overdrive:false},side:null,notes:source.notes||'',source:source.source||'generated'};return c}
+function createRandomCreature(seed,label){const dna=randomDNA(seed);return makeCreature({name:label||makeName(dna),dna,hues:randomHues(dna),source:'generated'})}
+
+function setupDefaults(){battle.playerTeam=[createRandomCreature(12001,'PHANTIVEX'),createRandomCreature(12002,'LUMIKAON'),createRandomCreature(12003,'NETHRUM')];battle.enemyTeam=[createRandomCreature(90001,'KRONPHIAX'),createRandomCreature(90002,'OMNIVOX'),createRandomCreature(90003,'RIFTRAEL')];battle.playerTeam.forEach(c=>c.side='player');battle.enemyTeam.forEach(c=>c.side='enemy');battle.environment=defaultEnvironment();battle.attacks=[];battle.weather='none';battle.terrain='none';battle.turn=1;battle.phase='choose';battle.hazards={player:{spikes:0,glyph:0,venom:0},enemy:{spikes:0,glyph:0,venom:0}};log('<span class="hot">Battle system online.</span> Load assets or start fighting.');refreshAll();}
+function defaultEnvironment(){return{name:'Default Arena',type:'environment',axes:null,palette:[250,180,300],source:'generated'}}
+
+function moveTypeColor(t){return TYPE_COLORS[t]||'#ddd'}
+function refreshAll(){refreshMoves();refreshTeams();refreshAssets();refreshField();refreshReadout();document.getElementById('turnPill').textContent='turn '+battle.turn;document.getElementById('modePill').textContent=battle.auto||battle.autoPlayer?'simulation':'manual';document.getElementById('modePill').className='pill '+(battle.auto||battle.autoPlayer?'warn':'live');}
+function refreshMoves(){const c=active('player');const box=document.getElementById('moves');if(!c){box.innerHTML='';return;}box.innerHTML=c.moves.map((m,i)=>`<button class="move" ${battle.phase!=='choose'||resolving?'disabled':''} onclick="chooseMove(${i})"><div class="move-name"><span>${safe(m.name)}</span><span class="move-type" style="color:${moveTypeColor(m.type)}">${m.type}</span></div><div class="move-meta">${m.cat} · ${m.power?m.power+' power':'status'} · acc ${m.acc}% · pp ${m.ppLeft}/${m.pp}</div></button>`).join('');}
+function refreshTeams(){renderTeam('player',battle.playerTeam,battle.pActive);renderTeam('enemy',battle.enemyTeam,battle.eActive)}
+function renderTeam(side,team,activeIdx){const el=document.getElementById(side+'Team');el.innerHTML=team.map((c,i)=>`<div class="team-card ${i===activeIdx?'active':''} ${c.hp<=0?'fainted':''}" onclick="${side==='player'?'switchPlayerTo':'inspectCreature'}(${i})"><div class="team-top"><div class="team-name">${safe(c.name)}</div><div class="team-hp">${c.hp}/${c.maxHp}</div></div><div class="bar"><div class="fill ${hpClass(c)}" style="width:${pct(c)*100}%"></div></div><div class="chips">${c.types.map(t=>`<span class="chip" style="color:${TYPE_COLORS[t]};border-color:${TYPE_COLORS[t]}66">${t}</span>`).join('')}<span class="chip">${safe(c.ability.name)}</span>${c.status?`<span class="chip" style="color:var(--red)">${c.status}</span>`:''}</div></div>`).join('')}
+function refreshField(){document.getElementById('fieldShort').textContent=battle.weather+' · '+battle.terrain;const w=document.getElementById('weatherSel'),t=document.getElementById('terrainSel');if(!w.options.length){w.innerHTML=Object.keys(WEATHER).map(k=>`<option value="${k}">${WEATHER[k].name}</option>`).join('');t.innerHTML=Object.keys(TERRAIN).map(k=>`<option value="${k}">${TERRAIN[k].name}</option>`).join('')}w.value=battle.weather;t.value=battle.terrain;}
+function refreshReadout(){const p=active('player'),e=active('enemy');const el=document.getElementById('activeReadout');if(!p||!e){el.textContent='—';return;}el.innerHTML=`<b style="color:${TYPE_COLORS[p.types[0]]}">${safe(p.name)}</b> vs <b style="color:${TYPE_COLORS[e.types[0]]}">${safe(e.name)}</b><br>Player ability: <span class="hot">${safe(p.ability.name)}</span> — ${safe(p.ability.desc)}<br>Enemy ability: <span class="hot">${safe(e.ability.name)}</span> — ${safe(e.ability.desc)}<br>Weather: ${WEATHER[battle.weather].desc}<br>Terrain: ${TERRAIN[battle.terrain].desc}`}
+function refreshAssets(){document.getElementById('assetCount').textContent=assets.length+' assets';const el=document.getElementById('assetList');if(!assets.length){el.innerHTML='<div class="compare">Drop .html/.json assets here. Creature battle HTML, Forge creature JSON, Environment Forge JSON, Battleforge templates, and Asset Bay packs are accepted.</div>';return;}el.innerHTML=assets.map((a,i)=>`<div class="asset-item"><canvas class="asset-thumb" id="ath_${i}" width="88" height="68"></canvas><div><div class="asset-title">${safe(a.name)}</div><div class="asset-meta">${a.type}${a.form?' · '+a.form:''}${a.element?' · '+a.element:''}</div></div><div class="asset-actions">${assetButtons(a,i)}</div></div>`).join('');setTimeout(()=>assets.forEach((a,i)=>drawAssetThumb(document.getElementById('ath_'+i),a)),0)}
+function assetButtons(a,i){if(a.type==='creature')return `<button class="btn mini" onclick="sendAsset(${i},'player')">player</button><button class="btn mini" onclick="sendAsset(${i},'enemy')">enemy</button>`;if(a.type==='environment')return `<button class="btn mini" onclick="useEnvironment(${i})">use</button>`;if(a.type==='attack')return `<button class="btn mini" onclick="useAttack(${i})">vfx</button>`;return `<button class="btn mini" onclick="inspectAsset(${i})">view</button>`}
+function tab(el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.side-page').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById(el.dataset.tab).classList.add('active')}
+
+async function chooseMove(i){if(resolving||battle.phase!=='choose')return;const p=active('player');if(!p||p.moves[i].ppLeft<=0){log('No PP left.','bad');return;}await resolveTurn({side:'player',kind:'move',moveIndex:i});}
+function chooseNpcAction(side){const self=active(side),opp=active(other(side));const team=side==='player'?battle.playerTeam:battle.enemyTeam;const mode=side==='player'?'smart':battle.aiMode;if(!self||self.hp<=0)return{side,kind:'none'};
+  if(mode!=='chaotic'){const low=pct(self)<.25;const badMatch=Math.max(...opp.types.map(t=>typeEff(t,self.types)))>=2;const candidates=team.map((c,i)=>({c,i})).filter(x=>x.c.hp>0&&x.i!==(side==='player'?battle.pActive:battle.eActive));if(candidates.length&&(low||badMatch)&&Math.random()<.45){let best=candidates[0];let bestScore=-999;for(const x of candidates){let sc=pct(x.c)*20+Math.max(...x.c.types.map(t=>typeEff(t,opp.types)))*12-Math.max(...opp.types.map(t=>typeEff(t,x.c.types)))*8;if(sc>bestScore){bestScore=sc;best=x}}return{side,kind:'switch',to:best.i};}}
+  const scored=self.moves.map((m,idx)=>({idx,m,score:scoreMove(self,opp,m,mode)})).filter(x=>x.m.ppLeft>0);if(!scored.length)return{side,kind:'guard'};scored.sort((a,b)=>b.score-a.score);const pick=mode==='chaotic'?scored[Math.floor(Math.random()*scored.length)]:scored[Math.random()<.78?0:Math.min(1,scored.length-1)];return{side,kind:'move',moveIndex:pick.idx};}
+function scoreMove(self,opp,m,mode){let s=0;if(m.cat!=='status'){s+=estimateDamage(self,opp,m)*2;s+=typeEff(m.type,opp.types)*12;if(m.type&&self.types.includes(m.type))s+=8;if(m.effect==='drain'&&pct(self)<.7)s+=18;if(m.effect==='multi')s+=8;if(m.effect==='recoil'&&pct(self)<.35)s-=25;}else{s+=20;if(m.effect&&['heal25','heal40'].includes(m.effect))s+=pct(self)<.5?35:-10;if(m.effect==='protect')s+=pct(self)<.3?22:5;if(['accDown','dodge','defUp2','hazardGlyph','hazardSpikes'].includes(m.effect))s+=16;}if(mode==='aggressive'&&m.power)s+=20;if(mode==='defensive'&&m.cat==='status')s+=15;if(mode==='status'&&m.effect)s+=20;return s+Math.random()*10}
+function estimateDamage(a,d,m){if(!m.power)return 0;let atk=a.stats[m.cat==='physical'?'atk':'spAtk']*stageMult(a.stages[m.cat==='physical'?'atk':'spAtk']);let def=d.stats[m.cat==='physical'?'def':'spDef']*stageMult(d.stages[m.cat==='physical'?'def':'spDef']);let raw=(atk/Math.max(1,def))*m.power/2.5;raw*=typeEff(m.type,d.types);raw*=a.types.includes(m.type)?1.18:1;raw*=getWeatherMod(m.type)*getTerrainMod(m.type,m.cat);return raw}
+async function resolveTurn(playerAction){resolving=true;battle.phase='resolving';refreshAll();let actions=[playerAction,chooseNpcAction('enemy')];if(battle.autoPlayer)actions=[chooseNpcAction('player'),chooseNpcAction('enemy')];actions=actions.filter(a=>a.kind!=='none');actions.sort((a,b)=>actionPriority(b)-actionPriority(a));for(const a of actions){if(battle.phase==='over')break;await executeAction(a);if(checkEnd())break;}if(battle.phase!=='over'){await endOfTurn();if(!checkEnd()){battle.turn++;battle.phase='choose';refreshAll();if(battle.auto||battle.autoPlayer)setTimeout(()=>resolveTurn({side:'player',kind:'none'}),650);}}resolving=false;refreshAll();}
+function actionPriority(a){if(a.kind==='switch')return 10000;if(a.kind==='guard')return 5000;const c=active(a.side);const m=c?.moves[a.moveIndex];return (m?.priority||0)*1000+(c?.stats.spd||0)*stageMult(c?.stages.spd||0)+(Math.random()*5)}
+async function executeAction(a){if(a.kind==='switch')return switchSideTo(a.side,a.to,true);if(a.kind==='guard'){const c=active(a.side);c.vol.protect=true;log(`${c.name} braced behind a guard.`,'good');return wait(450)}const attacker=active(a.side),defender=active(other(a.side));if(!attacker||!defender||attacker.hp<=0)return;const m=attacker.moves[a.moveIndex];if(!m||m.ppLeft<=0){log(`${attacker.name} has no PP left.`,'bad');return;}m.ppLeft--;await useMove(attacker,defender,m,a.side,other(a.side));}
+async function useMove(attacker,defender,m,side,defSide){if(await blockedByStatus(attacker))return;log(`<span class="hot">${safe(attacker.name)}</span> used <span style="color:${moveTypeColor(m.type)}">${safe(m.name)}</span>.`);visual.lastMove={side,move:m,t:performance.now()};spawnMoveEvent(side,m);await wait(360);
+  if(m.cat!=='status'){let hitChance=(m.acc/100)*stageMult(attacker.stages.acc)/stageMult(defender.stages.eva);if(defender.vol.dodge)hitChance*=.45;if(defender.ability.id==='slipstream'&&!defender.vol.slipUsed){hitChance*=.75;defender.vol.slipUsed=true;}if(attacker.status==='shock'&&Math.random()<.2){log(`${attacker.name} locked up in shock!`,'bad');return;}if(Math.random()>hitChance){log(`${defender.name} avoided it.`,'bad');defender.vol.dodge=false;return;}if(defender.vol.protect&&m.effect!=='pierceProtect'&&!(attacker.ability.id==='phantom_limb'&&attacker.vol.phantomPierce)){log(`${defender.name} protected itself.`,'good');return;}if(defender.vol.protect&&attacker.ability.id==='phantom_limb'&&attacker.vol.phantomPierce){attacker.vol.phantomPierce=false;log(`${attacker.name}'s phantom limb pierced the guard!`,'hot');}
+    let hits=1;if(m.effect==='multi'){hits=2+Math.floor(Math.random()*3);if(attacker.ability.id==='swarm_logic')hits++;}let total=0;for(let h=0;h<hits;h++){let dmg=calcDamage(attacker,defender,m);defender.hp=Math.max(0,defender.hp-dmg);total+=dmg;hitVisual(defSide,dmg,m);refreshTeams();await wait(hits>1?220:360);if(defender.hp<=0)break;}const eff=typeEff(m.type,defender.types);if(eff>=2)log('Super effective.','hot');else if(eff<1)log('Not very effective.');log(`${m.name} dealt ${total} damage${hits>1?' across '+hits+' hits':''}.`);await applyMoveEffect(m.effect,attacker,defender,total,side,defSide);if(attacker.ability.id==='resonator'&&m.cat==='special'&&Math.random()<.25&&defender.hp>0){let echo=Math.max(1,Math.floor(total*.18));defender.hp=Math.max(0,defender.hp-echo);log(`${attacker.name}'s resonance echoed for ${echo}.`,'hot');hitVisual(defSide,echo,m);}if(defender.ability.id==='venom_aura'&&m.cat==='physical'&&Math.random()<.22&&!attacker.status){attacker.status='poison';attacker.statusTurns=4;log(`${attacker.name} was poisoned by Venom Aura.`,'bad');}
+  } else {await applyMoveEffect(m.effect,attacker,defender,0,side,defSide);}defender.vol.dodge=false;refreshAll();}
+function calcDamage(a,d,m){let atk=a.stats[m.cat==='physical'?'atk':'spAtk']*stageMult(a.stages[m.cat==='physical'?'atk':'spAtk']);let def=d.stats[m.cat==='physical'?'def':'spDef']*stageMult(d.stages[m.cat==='physical'?'def':'spDef']);if(a.status==='burn'&&m.cat==='physical')atk*=.65;if(d.ability.id==='iron_hide'&&m.cat==='physical')def*=1.12;if(a.ability.id==='overdrive'&&pct(a)<.35)atk*=1.25;let power=m.power;if(battle.terrain==='sigil'&&m.cat==='status')power*=1.1;let dmg=Math.floor((atk/Math.max(1,def))*power/2.8+2);dmg*=typeEff(m.type,d.types);if(a.types.includes(m.type))dmg*=1.2;dmg*=getWeatherMod(m.type)*getTerrainMod(m.type,m.cat);let critChance=.065+(battle.weather==='starlit'?.05:0)+(a.vol.focus?.12:0);if(d.ability.id==='crystal_guard')critChance*=.35;if(Math.random()<critChance){dmg*=1.65;log('Critical rupture.','hot');}dmg*=.88+Math.random()*.24;return Math.max(1,Math.floor(dmg));}
+async function blockedByStatus(c){if(c.status==='sleep'){c.statusTurns--;if(c.statusTurns<=0){c.status=null;log(`${c.name} woke up.`,'good');return false}log(`${c.name} is asleep.`,'bad');return true}if(c.status==='frost'&&Math.random()<.45){log(`${c.name} is frost-locked.`,'bad');return true}if(c.vol.confusion>0){c.vol.confusion--;if(Math.random()<.33){let d=Math.max(1,Math.floor(c.maxHp*.08));c.hp=Math.max(0,c.hp-d);log(`${c.name} hurt itself in confusion.`,'bad');return true}}if(c.vol.flinch){c.vol.flinch=false;log(`${c.name} flinched.`,'bad');return true}return false}
+async function applyMoveEffect(effect,a,d,dmg,side,defSide){const msgs=[];switch(effect){case'poison':if(!d.status&&Math.random()<.45){d.status='poison';d.statusTurns=5;msgs.push(`${d.name} was poisoned.`)}break;case'burn':if(!d.status&&Math.random()<.32){d.status='burn';d.statusTurns=4;msgs.push(`${d.name} is corroding.`)}break;case'shock':if(!d.status&&Math.random()<.35){d.status='shock';d.statusTurns=3;msgs.push(`${d.name} was shocked.`)}break;case'sleep':if(!d.status){d.status='sleep';d.statusTurns=2+Math.floor(Math.random()*2);msgs.push(`${d.name} fell asleep.`)}break;case'frost':if(!d.status&&Math.random()<.3){d.status='frost';d.statusTurns=3;msgs.push(`${d.name} is frost-locked.`)}break;case'bleed':if(!d.status&&Math.random()<.35){d.status='bleed';d.statusTurns=4;msgs.push(`${d.name} is bleeding light.`)}break;case'flinch':if(Math.random()<.32){d.vol.flinch=true;msgs.push(`${d.name} staggered.`)}break;case'drain':{let h=Math.floor(dmg*.5);a.hp=Math.min(a.maxHp,a.hp+h);msgs.push(`${a.name} drained ${h} HP.`)}break;case'recoil':{let r=Math.floor(dmg*.33);a.hp=Math.max(0,a.hp-r);msgs.push(`${a.name} took ${r} recoil.`)}break;case'heal25':{let h=Math.floor(a.maxHp*.25);a.hp=Math.min(a.maxHp,a.hp+h);msgs.push(`${a.name} restored ${h} HP.`)}break;case'heal40':{let h=Math.floor(a.maxHp*.4);a.hp=Math.min(a.maxHp,a.hp+h);msgs.push(`${a.name} surged back ${h} HP.`)}break;case'protect':a.vol.protect=true;msgs.push(`${a.name} is protected.`);break;case'dodge':a.vol.dodge=true;msgs.push(`${a.name} slipped out of phase.`);break;case'accDown':d.stages.acc=clamp(d.stages.acc-1,-6,6);msgs.push(`${d.name}'s accuracy fell.`);break;case'defUp2':a.stages.def=clamp(a.stages.def+2,-6,6);msgs.push(`${a.name}'s defense sharply rose.`);break;case'boostAll':if(Math.random()<.35||battle.terrain==='sigil'){for(const k of ['atk','def','spAtk','spDef','spd'])a.stages[k]=clamp(a.stages[k]+1,-6,6);msgs.push(`${a.name}'s ancient stats rose.`)}break;case'hazardGlyph':battle.hazards[defSide].glyph=1;msgs.push(`Glyph trap set on ${defSide}'s field.`);break;case'hazardSpikes':battle.hazards[defSide].spikes=clamp(battle.hazards[defSide].spikes+1,0,3);msgs.push(`Spines litter ${defSide}'s field.`);break;case'terrainBreak':battle.terrain='none';msgs.push('The terrain ruptured into neutral ground.');break;case'echo':if(a.vol.focus){let ed=Math.max(1,Math.floor(dmg*.25));d.hp=Math.max(0,d.hp-ed);msgs.push(`Focused echo dealt ${ed}.`)}break;}for(const m of msgs){log(m,m.includes('restored')||m.includes('rose')?'good':'bad');await wait(330)}refreshAll();}
+async function endOfTurn(){for(const side of ['player','enemy']){const c=active(side);if(!c||c.hp<=0)continue;c.vol.protect=false;c.vol.focus=false;let dmg=0;if(c.status==='poison')dmg=Math.floor(c.maxHp*(c.ability.id==='acid_blood'?.05:.1));if(c.status==='burn')dmg=Math.floor(c.maxHp*(c.ability.id==='acid_blood'?.035:.06));if(c.status==='bleed')dmg=Math.floor(c.maxHp*.075);if(dmg){c.hp=Math.max(0,c.hp-dmg);log(`${c.name} suffered ${dmg} from ${c.status}.`,'bad');hitVisual(side,dmg,{type:'TOXIC'});await wait(280);}if(battle.weather==='ashfall'&&!['FLAME','IRON'].some(t=>c.types.includes(t))){let ad=Math.floor(c.maxHp*.035);c.hp=Math.max(0,c.hp-ad);log(`${c.name} took ${ad} ashfall damage.`,'bad');}if(battle.terrain==='overgrowth'&&c.types.includes('WILD')){let h=Math.floor(c.maxHp*.04);c.hp=Math.min(c.maxHp,c.hp+h);log(`${c.name} recovered ${h} from overgrowth.`,'good');}if(c.statusTurns>0&&['poison','burn','bleed','shock','frost'].includes(c.status)){c.statusTurns--;if(c.statusTurns<=0){log(`${c.name}'s ${c.status} faded.`,'good');c.status=null;}}}refreshAll();}
+function checkEnd(){if(!alive(battle.enemyTeam).length){battle.phase='over';log('<span class="good">Victory. Enemy team defeated.</span>');return true}if(!alive(battle.playerTeam).length){battle.phase='over';log('<span class="bad">Defeat. Player team defeated.</span>');return true}if(active('enemy')?.hp<=0){autoSwitch('enemy');return false}if(active('player')?.hp<=0){autoSwitch('player');return false}return false}
+function autoSwitch(side){const team=side==='player'?battle.playerTeam:battle.enemyTeam;const idx=team.findIndex(c=>c.hp>0);if(idx>=0){if(side==='player')battle.pActive=idx;else battle.eActive=idx;log(`${team[idx].name} entered the battle.`,'hot');applyEntryHazards(side,team[idx]);refreshAll();}}
+async function switchSideTo(side,idx,forced=false){const team=side==='player'?battle.playerTeam:battle.enemyTeam;if(idx<0||idx>=team.length||team[idx].hp<=0)return;if(side==='player'&&battle.pActive===idx)return;if(side==='enemy'&&battle.eActive===idx)return;const old=active(side);if(old?.ability.id==='regenerator'&&old.hp>0){old.hp=Math.min(old.maxHp,old.hp+Math.floor(old.maxHp*.18));log(`${old.name} regenerated while withdrawing.`,'good')}if(side==='player')battle.pActive=idx;else battle.eActive=idx;const c=active(side);log(`${c.name} switched in${forced?' after a faint':''}.`,'hot');applyEntryHazards(side,c);refreshAll();await wait(400)}
+function applyEntryHazards(side,c){const h=battle.hazards[side];if(h.spikes){let d=Math.floor(c.maxHp*(.06*h.spikes));c.hp=Math.max(0,c.hp-d);log(`${c.name} was cut by spines for ${d}.`,'bad')}if(h.glyph){c.vol.confusion=Math.max(c.vol.confusion,2);log(`${c.name} triggered a glyph trap.`,'bad')}if(h.venom&&!c.status){c.status='poison';c.statusTurns=4;log(`${c.name} entered venom mist.`,'bad')}}
+function showSwitches(){const p=active('player');document.getElementById('moves').innerHTML=battle.playerTeam.map((c,i)=>`<button class="move" ${c.hp<=0||i===battle.pActive||battle.phase!=='choose'?'disabled':''} onclick="playerSwitch(${i})"><div class="move-name"><span>${safe(c.name)}</span><span>${c.hp}/${c.maxHp}</span></div><div class="move-meta">${c.types.join('/')} · ${safe(c.ability.name)}</div></button>`).join('')+`<button class="move" onclick="refreshMoves()"><div class="move-name">cancel</div><div class="move-meta">return to moves</div></button>`}
+async function playerSwitch(i){if(resolving||battle.phase!=='choose')return;resolving=true;battle.phase='resolving';await switchSideTo('player',i);const enemyAction=chooseNpcAction('enemy');await executeAction(enemyAction);await endOfTurn();battle.turn++;battle.phase='choose';resolving=false;refreshAll()}
+function switchPlayerTo(i){if(battle.phase==='choose')showSwitches();else inspectCreature(i)}function inspectCreature(i){/* reserved */}
+function playerGuard(){if(battle.phase==='choose')resolveTurn({side:'player',kind:'guard'})}function playerFocus(){const p=active('player');if(!p||battle.phase!=='choose')return;p.vol.focus=true;log(`${p.name} focused and scanned the enemy.`,'good');resolveTurn({side:'player',kind:'none'})}
+
+function hitVisual(side,dmg,m){visual.shake=Math.min(18,4+dmg*.08);visual.flash={color:TYPE_COLORS[m.type]||'#fff',until:performance.now()+200};const target=side==='enemy'?{x:.73,y:.56}:{x:.28,y:.66};for(let i=0;i<18;i++)visual.particles.push({x:target.x*canvas.width,y:target.y*canvas.height,vx:(Math.random()-.5)*160,vy:(Math.random()-.7)*140,life:.45,age:0,color:TYPE_COLORS[m.type]||'#fff',r:1+Math.random()*3});}
+function spawnMoveEvent(side,m){const from=side==='player'?{x:.28,y:.62}:{x:.73,y:.50};const to=side==='player'?{x:.73,y:.50}:{x:.28,y:.62};visual.events.push({kind:'move',form:moveForm(m),element:m.type,from,to,start:performance.now(),dur:650,color:TYPE_COLORS[m.type]||'#fff'});}
+function moveForm(m){if(m.effect==='multi')return'chain';if(m.effect==='drain')return'beam';if(m.type==='ARCANE')return'burst';if(m.cat==='special')return'projectile';return'slash'}
+
+function setWeather(v){battle.weather=v;log(`Weather changed to ${v}.`);refreshAll()}function setTerrain(v){battle.terrain=v;log(`Terrain changed to ${v}.`);refreshAll()}
+function toggleAuto(){battle.auto=!battle.auto;document.getElementById('autoBtn').classList.toggle('on',battle.auto);refreshAll();if(battle.auto&&battle.phase==='choose'&&!resolving)resolveTurn({side:'player',kind:'none'});}async function simulateTurns(n){for(let i=0;i<n;i++){if(battle.phase==='over')break;await resolveTurn({side:'player',kind:'none'});await wait(250)}}
+function randomEncounter(){battle.enemyTeam=[createRandomCreature(Date.now()&0xffff,'') ,createRandomCreature((Date.now()+33)&0xffff,''),createRandomCreature((Date.now()+77)&0xffff,'')];battle.enemyTeam.forEach(c=>c.side='enemy');battle.playerTeam.forEach(c=>{c.hp=c.maxHp;c.status=null;c.statusTurns=0;c.stages={atk:0,def:0,spAtk:0,spDef:0,spd:0,acc:0,eva:0};c.moves.forEach(m=>m.ppLeft=m.pp)});battle.pActive=0;battle.eActive=0;battle.turn=1;battle.phase='choose';battle.hazards={player:{spikes:0,glyph:0,venom:0},enemy:{spikes:0,glyph:0,venom:0}};log('<span class="hot">New battle generated.</span>');refreshAll()}
+function addRandomTo(side){const c=createRandomCreature(Math.floor(Math.random()*999999),'');c.side=side;if(side==='player')battle.playerTeam.push(c);else battle.enemyTeam.push(c);refreshAll()}
+
+function parseFiles(files){return Array.from(files||[]).map(f=>f.text().then(t=>ingestText(t,f.name)).catch(e=>log('Failed '+f.name+': '+e.message,'bad')))}
+async function handleFiles(files){await Promise.all(parseFiles(files));refreshAll()}
+function ingestText(text,name){if(!text)return;let parsed=null;if(/<script[^>]+id=["']creature-dna["'][^>]*>/i.test(text)){const m=text.match(/<script[^>]+id=["']creature-dna["'][^>]*>([\s\S]*?)<\/script>/i);if(m){const dna=JSON.parse(m[1]);const c=makeCreature({id:'asset_'+Date.now()+Math.random(),name:dna.name||name,dna:dna.dna,hues:dna.hues,source:'battle-html'});addAsset({type:'creature',name:c.name,creature:c,source:name});return;}}
+  try{parsed=JSON.parse(text)}catch{addAsset({type:'tool-html',name,source:name,raw:text.slice(0,2000)});return;}
+  if(parsed.format&&String(parsed.format).startsWith('vibe/')&&parsed.payload){const env=parsed;parsed=env.payload;name=env.name||name;}
+  if(parsed.assets&&Array.isArray(parsed.assets)){parsed.assets.forEach(a=>{if(a.raw)ingestObject(a.raw,a.name||name);else ingestObject(a,a.name||name)});return;}
+  ingestObject(parsed,name);
+}
+function ingestObject(obj,name){if(!obj)return;if(Array.isArray(obj)){obj.forEach((x,i)=>ingestObject(x,name+' '+i));return;}if(obj.templates&&Array.isArray(obj.templates)){obj.templates.forEach(t=>ingestAttack(t,t.name||name));return;}if(obj.values&&Array.isArray(obj.values)&&obj.name){ingestAttack(obj,obj.name);return;}if(obj.dna&&Array.isArray(obj.dna)){const c=makeCreature({id:'asset_'+Date.now()+Math.random(),name:obj.name||name,dna:obj.dna,hues:obj.hues,source:'json-dna'});addAsset({type:'creature',name:c.name,creature:c,source:name});return;}if(Array.isArray(obj.axes)&&obj.axes.some(a=>String(a.id).startsWith('sky_'))){addAsset({type:'environment',name:obj.name||name,env:obj,source:name});return;}if(Array.isArray(obj.axes)&&obj.axes.some(a=>['body_radius','hue_primary'].includes(a.id))){const vals=obj.axes.map(a=>a.value||0);const dna=Array.from({length:16},(_,i)=>vals[(i*3)%vals.length]||128);const c=makeCreature({name:obj.name||name,dna,hues:[axisVal(obj,'hue_primary')/255*360,axisVal(obj,'hue_accent')/255*360,axisVal(obj,'hue_glow')/255*360],source:'forge-creature'});addAsset({type:'creature',name:c.name,creature:c,source:name});return;}if(obj.format&&String(obj.format).includes('environment')){addAsset({type:'environment',name:obj.name||name,env:obj,source:name});return;}if(obj.format&&String(obj.format).includes('attack')){ingestAttack(obj,obj.name||name);return;}addAsset({type:'unknown',name:obj.name||name,raw:obj,source:name});}
+function axisVal(obj,id){const ax=obj.axes?.find(a=>a.id===id);return ax?ax.value:128}
+function ingestAttack(t,name){let vals=t.values||t.payload?.values||t.axes?.map(a=>a.value)||[];let form='slash',element='ARCANE';if(vals.length){const formByte=vals[13]??vals[0]??0;form=formByte<43?'slash':formByte<86?'thrust':formByte<129?'projectile':formByte<171?'beam':formByte<214?'burst':'chain';const hue=(vals[43]??vals[37]??40)/255*359;element=hue<31?'FLAME':hue<61?'STORM':hue<151?'WILD':hue<211?'FROST':hue<271?'VOID':'ARCANE';}const attack={type:'attack',name:name||'attack',form,element,values:vals,source:'battleforge'};addAsset(attack);battle.attacks.push(attack);}
+function addAsset(a){assets.push(a);if(a.type==='environment'&&!battle.environment)battle.environment=a.env;if(a.type==='attack')battle.attacks.push(a);log(`Imported ${a.type}: <span class="hot">${safe(a.name)}</span>`,'good')}
+function sendAsset(i,side){const a=assets[i];if(a?.type!=='creature')return;const c=makeCreature(JSON.parse(JSON.stringify(a.creature)));c.side=side;if(side==='player')battle.playerTeam.push(c);else battle.enemyTeam.push(c);refreshAll()}
+function useEnvironment(i){const a=assets[i];if(a?.type==='environment'){battle.environment=a.env;log(`Environment set: ${a.name}`,'good')}}
+function useAttack(i){const a=assets[i];if(a?.type==='attack'){battle.attacks.push(a);log(`Attack VFX queued: ${a.name}`,'good')}}function inspectAsset(i){log('Asset: '+assets[i].name)}
+
+function drawAssetThumb(c,a){if(!c)return;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);g.fillStyle='#050509';g.fillRect(0,0,c.width,c.height);if(a.type==='creature')drawCreature(g,a.creature,c.width,c.height,performance.now()/1000,false,.6);else if(a.type==='environment')drawEnvironment(g,c.width,c.height,performance.now()/1000,a.env);else if(a.type==='attack'){g.strokeStyle=TYPE_COLORS[a.element]||'#fff';g.lineWidth=4;g.beginPath();g.moveTo(10,45);g.quadraticCurveTo(40,8,78,30);g.stroke();g.fillStyle=TYPE_COLORS[a.element]||'#fff';g.beginPath();g.arc(68,30,6,0,Math.PI*2);g.fill();}else{g.fillStyle='#333';g.fillRect(12,12,60,40)}}
+
+function drawEnvironment(g,W,H,t,env){const axes=env?.axes;function av(id,d){if(!axes)return d;const a=axes.find(x=>x.id===id);return a?a.value:d}const skyTop=(av('sky_top_hue',160)/255)*359,skyBot=(av('sky_bot_hue',220)/255)*359,sat=20+(av('sky_saturation',130)/255)*70,topL=5+(av('sky_top_lightness',50)/255)*35,botL=8+(av('sky_bot_lightness',110)/255)*45,gy=.45+(av('ground_y',170)/255)*.45;let gr=g.createLinearGradient(0,0,0,H*gy);gr.addColorStop(0,`hsl(${skyTop},${sat}%,${topL}%)`);gr.addColorStop(1,`hsl(${skyBot},${sat}%,${botL}%)`);g.fillStyle=gr;g.fillRect(0,0,W,H);const starN=Math.floor((av('star_count',30)/255)*80);const r=rng(starN*7+3);for(let i=0;i<starN;i++){g.fillStyle=`rgba(255,255,255,${.15+r()*.7})`;g.fillRect(r()*W,r()*H*gy*.8,1+r()*1.5,1+r()*1.5)}drawMountains(g,W,H,gy,av('far_count',80),av('far_height',100),skyTop,.35);drawMountains(g,W,H,gy,av('mid_count',60),av('mid_height',140),skyBot,.65);let gg=g.createLinearGradient(0,H*gy,0,H);const gh=(av('ground_hue',128)/255)*359;gg.addColorStop(0,`hsl(${gh},${sat}%,${10+(av('ground_lightness',80)/255)*25}%)`);gg.addColorStop(1,'#030306');g.fillStyle=gg;g.fillRect(0,H*gy,W,H-H*gy);if(av('fog_density',30)>10){g.fillStyle=`hsla(${(av('fog_hue',150)/255)*359},40%,70%,${av('fog_density',30)/255*.28})`;g.fillRect(0,0,W,H)}}
+function drawMountains(g,W,H,gy,countByte,heightByte,hue,alpha){const n=Math.max(3,Math.floor(countByte/255*18));const hh=.07+heightByte/255*.35;const r=rng(n*99+heightByte);g.fillStyle=`hsla(${hue},45%,5%,${alpha})`;g.beginPath();g.moveTo(0,H*gy);for(let i=0;i<=n;i++){const x=i/n*W;const y=H*gy-H*hh*(.3+r()*.9);g.lineTo(x,y)}g.lineTo(W,H*gy);g.closePath();g.fill()}
+function drawCreature(g,c,W,H,t,flip=false,scale=1){if(!c)return;const dna=c.dna,h=c.hues||randomHues(dna);const cx=W*.5,cy=H*.55;g.save();if(flip){g.translate(W,0);g.scale(-1,1)}const base=Math.min(W,H)*(.16+(dna[0]/255)*.08)*scale;const n=8+(dna[1]%6);const tend=2+Math.floor(dna[2]/50);for(let i=0;i<tend;i++){const a=i/tend*Math.PI*2+Math.sin(t+i)*.3;const len=base*(1.2+dna[(i+3)%16]/255);const tx=cx+Math.cos(a)*len,ty=cy+Math.sin(a)*len*.8;g.strokeStyle='rgba(0,0,0,.85)';g.lineWidth=base*.13;g.lineCap='round';g.beginPath();g.moveTo(cx,cy);g.quadraticCurveTo((cx+tx)/2,cy+Math.sin(a+t)*base*.7,tx,ty);g.stroke();g.strokeStyle=`hsla(${h[i%3]},80%,60%,.8)`;g.lineWidth=base*.08;g.stroke();}const pts=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2-Math.PI/2;const rr=base+Math.sin(t*.8+i)*base*.08;pts.push([cx+Math.cos(a)*rr,cy+Math.sin(a)*rr*1.05])}g.beginPath();pts.forEach((p,i)=>{const q=pts[(i+1)%pts.length];if(i===0)g.moveTo(p[0],p[1]);g.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2)});g.closePath();g.fillStyle=`hsl(${h[0]},65%,46%)`;g.fill();g.lineWidth=base*.08;g.strokeStyle='rgba(0,0,0,.9)';g.stroke();const shade=g.createLinearGradient(0,cy-base,0,cy+base);shade.addColorStop(0,'rgba(255,255,255,.25)');shade.addColorStop(.55,'rgba(255,255,255,0)');shade.addColorStop(1,'rgba(0,0,0,.45)');g.fillStyle=shade;g.fill();for(let e=-1;e<=1;e+=2){g.fillStyle='#eee';g.beginPath();g.ellipse(cx+e*base*.32,cy-base*.18,base*.18,base*.22,0,0,Math.PI*2);g.fill();g.fillStyle=`hsl(${h[2]},90%,35%)`;g.beginPath();g.arc(cx+e*base*.32+Math.sin(t*.7)*2,cy-base*.18,base*.09,0,Math.PI*2);g.fill()}g.restore()}
+function drawMoveVFX(g,W,H,t){const now=performance.now();visual.events=visual.events.filter(ev=>now<ev.start+ev.dur);for(const ev of visual.events){const k=clamp((now-ev.start)/ev.dur,0,1);const x1=ev.from.x*W,y1=ev.from.y*H,x2=ev.to.x*W,y2=ev.to.y*H;g.save();g.globalAlpha=1-k*.6;g.strokeStyle=ev.color;g.fillStyle=ev.color;g.lineCap='round';if(ev.form==='slash'){g.lineWidth=16*(1-k)+4;g.beginPath();g.moveTo(x1,y1);g.quadraticCurveTo(W*.5,H*(.25+.25*Math.sin(k*Math.PI)),lerp(x1,x2,out(k)),lerp(y1,y2,out(k)));g.stroke();}else if(ev.form==='projectile'||ev.form==='beam'){const x=lerp(x1,x2,out(k)),y=lerp(y1,y2,out(k));g.lineWidth=6;g.beginPath();g.moveTo(x1,y1);g.lineTo(x,y);g.stroke();g.beginPath();g.arc(x,y,16+Math.sin(k*Math.PI)*10,0,Math.PI*2);g.fill();}else{const x=lerp(x1,x2,out(k)),y=lerp(y1,y2,out(k));g.lineWidth=4;for(let r=0;r<3;r++){g.beginPath();g.arc(x,y,(r+1)*22*k,0,Math.PI*2);g.stroke()}}g.restore();}}
+function drawBattle(){const W=canvas.width,H=canvas.height,t=(performance.now()-renderStart)/1000;ctx.clearRect(0,0,W,H);drawEnvironment(ctx,W,H,t,battle.environment);const shake=visual.shake;visual.shake*=.86;ctx.save();ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);drawShadows(ctx,W,H);drawCreature(ctx,active('enemy'),W,H,t*1.05,true,1.05);drawCreature(ctx,active('player'),W,H,t,false,1.25);drawMoveVFX(ctx,W,H,t);drawParticles(ctx,W,H,1/60);ctx.restore();drawHud(ctx,W,H);if(visual.flash&&performance.now()<visual.flash.until){ctx.fillStyle=visual.flash.color+'22';ctx.fillRect(0,0,W,H)}requestAnimationFrame(drawBattle)}
+function drawShadows(g,W,H){g.fillStyle='rgba(0,0,0,.36)';g.beginPath();g.ellipse(W*.28,H*.78,W*.12,H*.025,0,0,Math.PI*2);g.fill();g.beginPath();g.ellipse(W*.73,H*.70,W*.10,H*.022,0,0,Math.PI*2);g.fill()}
+function drawHud(g,W,H){const p=active('player'),e=active('enemy');drawUnitHud(g,32,H-126,360,95,p,true);drawUnitHud(g,W-392,28,360,95,e,false);g.fillStyle='rgba(5,5,9,.72)';g.strokeStyle='rgba(255,255,255,.12)';g.lineWidth=1;g.fillRect(W/2-150,16,300,32);g.strokeRect(W/2-150,16,300,32);g.fillStyle='#d9d3e6';g.font='12px '+getComputedStyle(document.body).fontFamily;g.textAlign='center';g.fillText(`${battle.weather.toUpperCase()} · ${battle.terrain.toUpperCase()} · TURN ${battle.turn}`,W/2,36);g.textAlign='left'}
+function drawUnitHud(g,x,y,w,h,c,left){if(!c)return;g.fillStyle='rgba(10,10,16,.82)';g.strokeStyle='rgba(255,255,255,.14)';g.lineWidth=1;g.fillRect(x,y,w,h);g.strokeRect(x,y,w,h);g.fillStyle=TYPE_COLORS[c.types[0]];g.font='bold 18px '+getComputedStyle(document.body).fontFamily;g.fillText(c.name,x+12,y+24);g.font='10px '+getComputedStyle(document.body).fontFamily;g.fillStyle='#8b8497';g.fillText(c.types.join(' / ')+' · '+c.ability.name,x+12,y+42);g.fillStyle='rgba(255,255,255,.05)';g.fillRect(x+12,y+55,w-24,10);const hpw=(w-24)*pct(c);g.fillStyle=pct(c)<.25?'#ff5566':pct(c)<.55?'#ffcc44':'#66ff99';g.fillRect(x+12,y+55,hpw,10);g.strokeStyle='rgba(255,255,255,.15)';g.strokeRect(x+12,y+55,w-24,10);g.fillStyle='#8b8497';g.fillText(`${c.hp}/${c.maxHp}`,x+12,y+80);if(c.status){g.fillStyle='#ff5566';g.fillText(c.status.toUpperCase(),x+w-90,y+80)}}
+function drawParticles(g,W,H,dt){visual.particles=visual.particles.filter(p=>p.age<p.life);for(const p of visual.particles){p.age+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=120*dt;const a=1-p.age/p.life;g.globalAlpha=a;g.fillStyle=p.color;g.beginPath();g.arc(p.x,p.y,p.r*a,0,Math.PI*2);g.fill();g.globalAlpha=1}}
+
+function exportFrame(){const a=document.createElement('a');a.download='eidolon-battle-frame.png';a.href=canvas.toDataURL('image/png');a.click()}
+function exportBattleScene(){const pack={format:ASSET_VERSION,createdAt:new Date().toISOString(),weather:battle.weather,terrain:battle.terrain,hazards:battle.hazards,playerTeam:battle.playerTeam.map(stripCreature),enemyTeam:battle.enemyTeam.map(stripCreature),environment:battle.environment,attacks:battle.attacks,history:battle.history};download('eidolon-battle-scene.json',JSON.stringify(pack,null,2),'application/json')}
+function stripCreature(c){return{name:c.name,dna:c.dna,hues:c.hues,types:c.types,ability:c.ability,moves:c.moves.map(m=>({...m})),hp:c.hp,maxHp:c.maxHp,status:c.status,source:c.source}}
+function download(name,text,type){const b=new Blob([text],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+
+const drop=document.getElementById('drop');let drag=0;window.addEventListener('dragenter',e=>{e.preventDefault();drag++;drop.classList.add('show')});window.addEventListener('dragover',e=>e.preventDefault());window.addEventListener('dragleave',e=>{drag=Math.max(0,drag-1);if(!drag)drop.classList.remove('show')});window.addEventListener('drop',e=>{e.preventDefault();drag=0;drop.classList.remove('show');handleFiles(e.dataTransfer.files)});
+window.addEventListener('keydown',e=>{if(e.target&&['INPUT','SELECT'].includes(e.target.tagName))return;if(e.key>='1'&&e.key<='4')chooseMove(Number(e.key)-1);if(e.key==='s')showSwitches();if(e.key==='a')toggleAuto();if(e.key==='n')randomEncounter();if(e.key==='p')exportFrame();});
+
+setupDefaults();refreshAll();drawBattle();
+</script>
+</body>
+</html>

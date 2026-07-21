@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arena</title>
+<style>
+:root {
+  --void:#020305; --s1:#07090f; --s2:#0d1018; --s3:#161a26;
+  --border:rgba(80,160,120,.13); --border-hi:rgba(80,160,120,.30);
+  --ink:#dde5f0; --ink-2:#8a9094; --ink-3:#4a5258;
+  --green:#33ff77; --green-d:rgba(51,255,119,.10);
+  --rose:#ff3355; --rose-d:rgba(255,51,85,.08);
+  --gold:#f5c842; --cyan:#33eeff;
+  --mono:'JetBrains Mono','Courier New',monospace;
+  --display:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--void);color:var(--ink);font-family:var(--mono);font-size:11px;overflow:hidden}
+body{display:grid;grid-template-rows:36px 1fr 100px}
+
+/* CRT */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0,rgba(0,0,0,.10) 1px,transparent 1px,transparent 4px)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
+  background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.55) 100%)}
+@keyframes flicker{0%,96%,100%{opacity:1}97%{opacity:.93}98%{opacity:.97}99%{opacity:1}}
+#root{display:contents;animation:flicker 9s infinite}
+
+/* Top bar */
+#top{display:flex;align-items:center;gap:12px;padding:0 12px;background:var(--s1);border-bottom:1px solid var(--border)}
+#title{font-family:var(--display);font-weight:700;letter-spacing:4px;font-size:12px;color:var(--green);text-shadow:0 0 8px rgba(51,255,119,.3)}
+#sub{color:var(--ink-3);letter-spacing:1px;font-size:9px}
+.tb-btn{background:var(--s2);border:1px solid var(--border);color:var(--ink);padding:4px 10px;font-family:var(--mono);font-size:10px;cursor:pointer;border-radius:2px;letter-spacing:1px}
+.tb-btn:hover{border-color:var(--border-hi)}
+#status{margin-left:auto;color:var(--ink-3);font-size:9px;letter-spacing:1px}
+
+/* Stage */
+#stage{position:relative;background:var(--void);overflow:hidden}
+#arena-canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+#hud-left,#hud-right{position:absolute;top:12px;padding:8px 12px;background:rgba(7,9,15,.85);border:1px solid var(--border);min-width:180px;z-index:5;backdrop-filter:blur(4px)}
+#hud-left{left:12px}
+#hud-right{right:12px;text-align:right}
+.cname{font-family:var(--display);font-weight:700;letter-spacing:2px;font-size:13px;color:var(--ink)}
+.cgen{font-size:8px;color:var(--ink-3);letter-spacing:1px;margin-top:2px}
+.hp-track{height:6px;background:rgba(255,255,255,.05);border:1px solid var(--border);margin-top:6px;position:relative;overflow:hidden}
+.hp-fill{height:100%;background:var(--green);transition:width .4s ease}
+.hp-fill.mid{background:var(--gold)}
+.hp-fill.low{background:var(--rose)}
+.hp-text{font-size:9px;color:var(--ink-3);margin-top:2px}
+
+#empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--ink-2);text-align:center;padding:40px}
+#empty.hidden{display:none}
+#empty-title{font-family:var(--display);font-size:18px;letter-spacing:3px;color:var(--ink)}
+#empty-sub{font-size:11px;color:var(--ink-3);max-width:360px;line-height:1.6}
+
+/* Bottom panel */
+#bottom{background:var(--s1);border-top:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+#log-strip{flex:1;font-size:10px;color:var(--ink-2);overflow-y:auto;line-height:1.5;font-family:var(--mono)}
+.log-line{padding:1px 0}
+.log-line.hit{color:var(--gold)}
+.log-line.crit{color:var(--rose)}
+.log-line.system{color:var(--ink-3);font-style:italic}
+#controls{display:flex;gap:6px;flex-shrink:0}
+#picker{position:fixed;inset:0;background:rgba(2,3,5,.92);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+#picker.show{display:flex}
+.picker-panel{background:var(--s1);border:1px solid var(--border-hi);width:90vw;max-width:560px;max-height:80vh;display:flex;flex-direction:column}
+.picker-head{padding:10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.picker-head .ptitle{font-family:var(--display);font-size:13px;letter-spacing:2px}
+.picker-head input{flex:1;background:var(--void);border:1px solid var(--border);color:var(--ink);padding:5px 8px;font-family:var(--mono);font-size:10px;outline:none}
+.picker-head .pclose{background:transparent;border:none;color:var(--ink-3);font-size:18px;cursor:pointer}
+.picker-list{overflow-y:auto;padding:8px}
+.picker-row{padding:8px 10px;border:1px solid var(--border);margin-bottom:4px;cursor:pointer;background:var(--s2)}
+.picker-row:hover{border-color:var(--border-hi);background:var(--s3)}
+.prname{font-family:var(--display);color:var(--ink);font-size:12px;font-weight:600}
+.prmeta{font-size:9px;color:var(--ink-3);margin-top:2px}
+.picker-empty{padding:30px;text-align:center;color:var(--ink-3);font-size:10px}
+
+#toast{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border-hi);color:var(--ink);padding:6px 14px;font-size:10px;z-index:500;opacity:0;transition:opacity .2s}
+#toast.show{opacity:1}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="root">
+
+<div id="top">
+  <div id="title">ARENA</div>
+  <div id="sub">vibe runner v1</div>
+  <button class="tb-btn" id="mode-solo">Solo</button>
+  <button class="tb-btn" id="mode-multi">Multiplayer</button>
+  <button class="tb-btn" id="btn-pick">⛶ Pick Battle</button>
+  <button class="tb-btn" id="btn-mp-parent" style="display:none">◎ Own Eidolon</button>
+  <button class="tb-btn" id="btn-mp-offer" style="display:none">→ Intent</button>
+  <button class="tb-btn" id="btn-mp-inbox" style="display:none">☷ Inbox</button>
+  <button class="tb-btn" id="btn-imprint" style="display:none">✶ Imprint</button>
+  <button class="tb-btn" id="btn-replay" style="display:none">↻ Replay</button>
+  <button class="tb-btn" id="btn-export" style="display:none">↓ Export HTML</button>
+  <div id="status">no battle loaded</div>
+</div>
+
+<div id="stage">
+  <canvas id="arena-canvas"></canvas>
+  <div id="hud-left" style="display:none">
+    <div class="cname" id="hl-name">—</div>
+    <div class="cgen" id="hl-gen">—</div>
+    <div class="hp-track"><div class="hp-fill" id="hl-hp" style="width:100%"></div></div>
+    <div class="hp-text" id="hl-hp-text">—</div>
+  </div>
+  <div id="hud-right" style="display:none">
+    <div class="cname" id="hr-name">—</div>
+    <div class="cgen" id="hr-gen">—</div>
+    <div class="hp-track"><div class="hp-fill" id="hr-hp" style="width:100%"></div></div>
+    <div class="hp-text" id="hr-hp-text">—</div>
+  </div>
+  <div id="empty">
+    <div id="empty-title">ARENA EMPTY</div>
+    <div id="empty-sub">Forge a battle in the Crucible, or pick an existing battle vibe from the library.</div>
+    <button class="tb-btn" id="empty-pick">⛶ Pick a Battle</button>
+  </div>
+</div>
+
+<div id="bottom">
+  <div id="log-strip"></div>
+</div>
+
+</div>
+
+<div id="picker">
+  <div class="picker-panel">
+    <div class="picker-head">
+      <div class="ptitle">PICK BATTLE</div>
+      <input id="picker-search" placeholder="filter…" autocomplete="off">
+      <button class="pclose" id="picker-close">×</button>
+    </div>
+    <div class="picker-list" id="picker-list"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="../../engines/battle-engine.js"></script>
+<script src="../../engines/nexus-block-client.js"></script>
+<script src="../../engines/battle-protocol.js"></script>
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════════
+   ARENA — battle vibe runner
+   ════════════════════════════════════════════════════════════════════ */
+
+let mounted = false;
+let battleEnv = null;       // current battle envelope
+let creatureA = null, creatureB = null, stageEnv = null;
+let movesetEnvs = [];       // attack envelopes
+let pickerCache = [];
+let arenaMode = 'solo';
+let mpOwn = null;
+let mpInbox = [];
+
+function $(id){return document.getElementById(id);}
+function escHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits: ['vibe.load', 'vibe.list', 'vibe.battle.intent', 'vibe.battle.inbox', 'vibe.battle.accept', 'vibe.battle.results', 'vibe.realm.current', 'vibe.imprint.create'],
+    consumes: ['vibe.result', 'vibe.notify', 'arena.play'],
+    app: { title: 'Arena', icon: '⚔', description: 'Vibe battle runner', visible: true }
+  },
+  onMessage({ channel, payload }) {
+    if (channel === 'arena.play' && payload && payload.battleId) loadBattle(payload.battleId);
+  }
+});
+
+function emit(ch,p){ if(nx) nx.emit(ch,p); }
+function call(ch,p){
+  if (!nx) return Promise.reject(new Error('not connected to Nexus'));
+
+  return nx.request(ch,p,{timeout:8000});
+}
+function showToast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000); /* METADATA: display only, not content-addressed */}
+
+/* ── DETERMINISTIC RNG (lifted from forges) ──────────────────────── */
+function mulberry32(seed){
+  let t = seed >>> 0;
+  return () => { t = (t + 0x6D2B79F5) >>> 0; let r = t; r = Math.imul(r ^ (r >>> 15), r | 1); r ^= r + Math.imul(r ^ (r >>> 7), r | 61); return ((r ^ (r >>> 14)) >>> 0) / 4294967296; };
+}
+function dnaSeed(dna){ let h = 2166136261; for (const b of (dna||[])) { h ^= b; h = Math.imul(h, 16777619); } return h >>> 0; }
+
+/* ── Combat state ────────────────────────────────────────────────── */
+const fighter = {
+  A: { x: 0, y: 0, vx: 0, vy: 0, hp: 100, maxHp: 100, scale: 1, flash: 0, dna: null, hues: null, name:'', gen:1, anim:'idle', animT: 0, currentAttack: null, sideX: -1 },
+  B: { x: 0, y: 0, vx: 0, vy: 0, hp: 100, maxHp: 100, scale: 1, flash: 0, dna: null, hues: null, name:'', gen:1, anim:'idle', animT: 0, currentAttack: null, sideX: +1 }
+};
+let battleStart = 0, battleOver = false;
+let nextAttackAt = { A: 0, B: 0 };
+let activeAttack = null; // {attacker:'A'|'B', defender:'A'|'B', t0, vals, phases}
+let envAxes = null;      // resolved env axes by id
+let stageShake = 0;
+
+/* ── Env axis lookups (defaults if no environment) ───────────────── */
+const ENV_DEFAULTS = {
+  sky_top_hue: 220, sky_top_lightness: 8, sky_bot_hue: 240, sky_bot_lightness: 18,
+  sky_saturation: 60, ground_y: 175, ground_hue: 220, ground_lightness: 6,
+  far_count: 60, far_height: 80, far_darkness: 200, mid_count: 30, mid_height: 110, mid_darkness: 220,
+  fog_density: 30, vignette: 100
+};
+function envV(id, def) {
+  if (!envAxes) return ENV_DEFAULTS[id] !== undefined ? ENV_DEFAULTS[id] : def;
+  return envAxes.get(id) ?? (ENV_DEFAULTS[id] !== undefined ? ENV_DEFAULTS[id] : def);
+}
+
+/* ── Render ──────────────────────────────────────────────────────── */
+const cv = $('arena-canvas');
+const ctx = cv.getContext('2d');
+let W = 800, H = 400;
+function resize() {
+  const stage = $('stage');
+  cv.width = W = stage.clientWidth;
+  cv.height = H = stage.clientHeight;
+}
+window.addEventListener('resize', resize);
+
+function drawBg(t) {
+  // Sky
+  const skyTopH = envV('sky_top_hue')*360/255, skyTopL = envV('sky_top_lightness')*60/255;
+  const skyBotH = envV('sky_bot_hue')*360/255, skyBotL = envV('sky_bot_lightness')*60/255;
+  const skySat = envV('sky_saturation')*100/255;
+  const grd = ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0, `hsl(${skyTopH}, ${skySat}%, ${skyTopL}%)`);
+  grd.addColorStop(1, `hsl(${skyBotH}, ${skySat}%, ${skyBotL}%)`);
+  ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
+
+  // Far parallax
+  const farN = Math.floor(envV('far_count')/255*120);
+  const farMaxH = envV('far_height')/255*100;
+  const farDark = envV('far_darkness')/255;
+  const groundY = H * (envV('ground_y')/255);
+  const farRng = mulberry32(13);
+  ctx.fillStyle = `rgba(0,0,0,${0.3 + farDark*0.5})`;
+  for (let i=0;i<farN;i++){
+    const x = (farRng()*W*1.1) - W*0.05 + Math.sin(t*0.05+i)*2;
+    const w = 20 + farRng()*50;
+    const h = 20 + farRng()*farMaxH;
+    ctx.fillRect(x, groundY-h, w, h);
+  }
+
+  // Mid parallax
+  const midN = Math.floor(envV('mid_count')/255*60);
+  const midMaxH = envV('mid_height')/255*150;
+  const midDark = envV('mid_darkness')/255;
+  const midRng = mulberry32(29);
+  ctx.fillStyle = `rgba(0,0,0,${0.5 + midDark*0.4})`;
+  for (let i=0;i<midN;i++){
+    const x = (midRng()*W*1.1) - W*0.05;
+    const w = 30 + midRng()*70;
+    const h = 30 + midRng()*midMaxH;
+    ctx.fillRect(x, groundY-h, w, h);
+  }
+
+  // Ground
+  const gH = envV('ground_hue')*360/255, gL = envV('ground_lightness')*30/255;
+  ctx.fillStyle = `hsl(${gH}, 30%, ${gL}%)`;
+  ctx.fillRect(0, groundY, W, H-groundY);
+
+  // Fog
+  const fog = envV('fog_density')/255;
+  if (fog > 0.05) {
+    ctx.fillStyle = `rgba(180,180,200,${fog*0.3})`;
+    ctx.fillRect(0, groundY-30, W, H-groundY+30);
+  }
+
+  // Vignette
+  const vig = envV('vignette')/255;
+  if (vig > 0.05) {
+    const vg = ctx.createRadialGradient(W/2,H/2, Math.min(W,H)*0.3, W/2,H/2, Math.max(W,H)*0.7);
+    vg.addColorStop(0, 'transparent');
+    vg.addColorStop(1, `rgba(0,0,0,${vig*0.7})`);
+    ctx.fillStyle = vg; ctx.fillRect(0,0,W,H);
+  }
+
+  return groundY;
+}
+
+function drawCreature(f, t) {
+  if (!f.dna) return;
+  const seed = dnaSeed(f.dna);
+  const rng = mulberry32(seed);
+  const groundY = H * (envV('ground_y')/255);
+  const baseY = groundY - 70;
+  const x = f.x, y = baseY + f.y;
+  const hue = (f.hues && f.hues[0]) || 0;
+  const sat = 70, light = 55;
+
+  // Idle bob
+  const bob = f.anim === 'idle' ? Math.sin(t*2 + (f.sideX>0 ? 1.5 : 0))*2 : 0;
+
+  ctx.save();
+  ctx.translate(x, y + bob);
+  ctx.scale(f.sideX * f.scale, f.scale);
+
+  // Damage flash
+  if (f.flash > 0) {
+    ctx.shadowColor = `hsl(${hue}, 80%, 70%)`;
+    ctx.shadowBlur = 30 * f.flash;
+  }
+
+  // Body — deterministic blob from DNA bytes
+  const w = 40 + (f.dna[0]/255)*40;
+  const h = 50 + (f.dna[1]/255)*50;
+  const bodyShape = f.dna[2] % 4;
+  ctx.fillStyle = `hsl(${hue}, ${sat}%, ${light}%)`;
+  ctx.beginPath();
+  if (bodyShape === 0) {
+    // round
+    ctx.ellipse(0, 0, w/2, h/2, 0, 0, Math.PI*2);
+  } else if (bodyShape === 1) {
+    // angular
+    ctx.moveTo(-w/2, h/2); ctx.lineTo(0, -h/2); ctx.lineTo(w/2, h/2); ctx.closePath();
+  } else if (bodyShape === 2) {
+    // tall oval
+    ctx.ellipse(0, 0, w/3, h*0.6, 0, 0, Math.PI*2);
+  } else {
+    // wide
+    ctx.ellipse(0, 0, w*0.7, h*0.4, 0, 0, Math.PI*2);
+  }
+  ctx.fill();
+
+  // Plates (DNA bytes 3-7 control number/size/position)
+  const plateCount = 1 + (f.dna[3] % 5);
+  ctx.fillStyle = `hsl(${hue + 30}, ${sat-10}%, ${light+15}%)`;
+  for (let i=0;i<plateCount;i++) {
+    const ang = (i/plateCount)*Math.PI*2 + (f.dna[4]/255)*Math.PI;
+    const r = (f.dna[5]/255)*w*0.4;
+    const px = Math.cos(ang)*r, py = Math.sin(ang)*r*0.6;
+    const ps = 6 + (f.dna[6]/255)*10;
+    ctx.beginPath(); ctx.arc(px, py, ps, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Eye
+  const eyeX = (f.dna[8]/255 - 0.5) * w * 0.4;
+  const eyeY = -h*0.15;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(eyeX, eyeY, 4, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(eyeX + 1, eyeY, 2, 0, Math.PI*2); ctx.fill();
+
+  // Damage flash overlay
+  if (f.flash > 0) {
+    ctx.fillStyle = `rgba(255, 80, 80, ${f.flash*0.6})`;
+    ctx.beginPath();
+    if (bodyShape === 0) ctx.ellipse(0,0,w/2,h/2,0,0,Math.PI*2);
+    else ctx.rect(-w/2, -h/2, w, h);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function drawAttackEffect(t) {
+  if (!activeAttack) return;
+  const phaseT = (t - activeAttack.t0);
+  const dur = activeAttack.duration; // seconds
+  if (phaseT > dur) { activeAttack = null; return; }
+  const f = phaseT / dur;
+  const att = fighter[activeAttack.attacker];
+  const def = fighter[activeAttack.defender];
+  const groundY = H * (envV('ground_y')/255);
+  const baseY = groundY - 70;
+  const ax = att.x, ay = baseY + att.y;
+  const dx = def.x, dy = baseY + def.y;
+
+  // Strike phase: draw arc from attacker to defender
+  const v = activeAttack.vals;
+  const strikeStart = v.anticipationFrac;
+  const strikeEnd = strikeStart + 0.2;
+  const impactStart = strikeEnd;
+
+  if (f >= strikeStart && f < strikeEnd) {
+    const u = (f - strikeStart) / (strikeEnd - strikeStart);
+    const px = ax + (dx - ax) * u;
+    const py = ay + (dy - ay) * u - Math.sin(u*Math.PI) * 40 * v.arcHeight;
+    ctx.strokeStyle = `hsla(${v.hue}, 80%, 60%, ${0.8 - u*0.3})`;
+    ctx.lineWidth = 4 * v.thickness;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.quadraticCurveTo(
+      (ax+px)/2, ay - 20 * v.arcHeight,
+      px, py
+    );
+    ctx.stroke();
+  }
+
+  // Impact phase: flash + sparks
+  if (f >= impactStart && f < impactStart + 0.15) {
+    const u = (f - impactStart) / 0.15;
+    const radius = (1-u) * 60 * v.flashSize;
+    ctx.fillStyle = `hsla(${v.impactHue}, 90%, 70%, ${(1-u)*0.7})`;
+    ctx.beginPath(); ctx.arc(dx, dy, radius, 0, Math.PI*2); ctx.fill();
+    // Sparks
+    const sparkRng = mulberry32(Math.floor(activeAttack.t0*1000));
+    for (let i=0;i<v.sparks;i++){
+      const ang = sparkRng()*Math.PI*2;
+      const sd = u * 60;
+      const sx = dx + Math.cos(ang)*sd, sy = dy + Math.sin(ang)*sd;
+      ctx.fillStyle = `hsla(${v.impactHue + sparkRng()*40}, 90%, 75%, ${1-u})`;
+      ctx.beginPath(); ctx.arc(sx, sy, 2, 0, Math.PI*2); ctx.fill();
+    }
+    // Trigger damage on impact frame
+    if (!activeAttack.damageDealt) {
+      const dmg = 8 + Math.floor(Math.random() * 12);
+      def.hp = Math.max(0, def.hp - dmg);
+      def.flash = 1;
+      def.vx = (def.sideX) * 8 * v.knockback;
+      def.vy = -3;
+      stageShake = 8 * v.shake;
+      logLine(`${att.name} hits ${def.name} for ${dmg}`, 'hit');
+      activeAttack.damageDealt = true;
+      if (def.hp <= 0) endBattle(activeAttack.attacker);
+    }
+  }
+}
+
+function drawHud() {
+  function setHud(side, f) {
+    const pct = (f.hp / f.maxHp) * 100;
+    const fill = $(side === 'left' ? 'hl-hp' : 'hr-hp');
+    fill.style.width = pct + '%';
+    fill.classList.toggle('mid', pct < 50 && pct >= 25);
+    fill.classList.toggle('low', pct < 25);
+    $(side === 'left' ? 'hl-hp-text' : 'hr-hp-text').textContent = `${Math.round(f.hp)} / ${f.maxHp}`;
+  }
+  setHud('left', fighter.A);
+  setHud('right', fighter.B);
+}
+
+function loop() {
+  requestAnimationFrame(loop);
+  if (!battleEnv || !fighter.A.dna || !fighter.B.dna) return;
+  const t = (performance.now() - battleStart) / 1000;
+
+  // Apply screen shake
+  ctx.save();
+  if (stageShake > 0.1) {
+    const sh = (Math.random()-0.5) * stageShake;
+    const sv = (Math.random()-0.5) * stageShake;
+    ctx.translate(sh, sv);
+    stageShake *= 0.85;
+  }
+
+  drawBg(t);
+
+  // Update & draw fighters
+  for (const k of ['A','B']) {
+    const f = fighter[k];
+    f.x += f.vx; f.y += f.vy;
+    f.vx *= 0.85; f.vy *= 0.85;
+    if (f.y < 0) f.vy += 0.5;
+    if (f.y >= 0) { f.y = 0; f.vy = 0; }
+    f.flash = Math.max(0, f.flash - 0.04);
+    f.animT += 1;
+  }
+
+  drawCreature(fighter.A, t);
+  drawCreature(fighter.B, t);
+  drawAttackEffect(t);
+  ctx.restore();
+
+  // AI: pick attacks
+  if (!battleOver && !activeAttack) {
+    for (const k of ['A','B']) {
+      if (t >= nextAttackAt[k] && fighter[k].hp > 0 && fighter[k === 'A' ? 'B' : 'A'].hp > 0) {
+        triggerAttack(k);
+        nextAttackAt[k] = t + 1.5 + Math.random() * 1.5;
+        break;
+      }
+    }
+  }
+
+  drawHud();
+}
+
+function triggerAttack(side) {
+  const att = fighter[side];
+  const def = fighter[side === 'A' ? 'B' : 'A'];
+  // Pick an attack from moveset
+  const move = movesetEnvs.length ? movesetEnvs[Math.floor(Math.random() * movesetEnvs.length)] : null;
+  const vals = movesetToVals(move);
+  activeAttack = {
+    attacker: side, defender: side === 'A' ? 'B' : 'A',
+    t0: (performance.now() - battleStart) / 1000,
+    duration: vals.duration,
+    vals,
+    damageDealt: false
+  };
+  // Lunge
+  att.vx = att.sideX * (-1) * 6 * vals.lunge; // attacker moves toward defender (which is opposite sideX)
+  // Actually opposite direction:
+  att.vx = att.sideX * 6 * vals.lunge * (-1) * (att.sideX > 0 ? 1 : -1);
+  // Simpler: just push attacker toward center
+  att.vx = att.sideX * (-1) * 5 * vals.lunge;
+  logLine(`${att.name} attacks!`, 'system');
+}
+
+function movesetToVals(env) {
+  // Default attack values
+  const def = {
+    duration: 0.9,
+    anticipationFrac: 0.35,
+    arcHeight: 1.0,
+    thickness: 1.0,
+    flashSize: 1.0,
+    sparks: 8,
+    hue: 30,
+    impactHue: 50,
+    knockback: 1.0,
+    shake: 1.0,
+    lunge: 1.0
+  };
+  if (!env || !env.payload) return def;
+  // Attack envelopes from Battleforge use BATTLE_AXES (42 axes). We extract a few.
+  const p = env.payload;
+  if (p.values && Array.isArray(p.values)) {
+    // multiforge/battleforge template format
+    const v = p.values;
+    return {
+      duration:        Math.max(0.3, (v[0]||120)/255 * 1.8),
+      anticipationFrac: ((v[1]||80)/255) * 0.6,
+      arcHeight:       ((v[14]||110)/255) * 1.5,
+      thickness:       ((v[16]||120)/255) * 1.5,
+      flashSize:       ((v[18]||140)/255) * 1.5,
+      sparks:          Math.floor(((v[20]||120)/255) * 20),
+      hue:             ((v[37]||10)/255) * 360,
+      impactHue:       ((v[38]||40)/255) * 360,
+      knockback:       ((v[24]||120)/255) * 2,
+      shake:           ((v[23]||80)/255) * 2,
+      lunge:           ((v[6]||140)/255) * 2
+    };
+  }
+  return def;
+}
+
+function logLine(msg, cls='') {
+  const strip = $('log-strip');
+  const el = document.createElement('div');
+  el.className = 'log-line ' + cls;
+  el.textContent = msg;
+  strip.appendChild(el);
+  strip.scrollTop = strip.scrollHeight;
+  while (strip.children.length > 30) strip.removeChild(strip.firstChild);
+}
+
+function endBattle(winnerSide) {
+  if (battleOver) return;
+  battleOver = true;
+  const w = fighter[winnerSide];
+  logLine(`KO! ${w.name} wins.`, 'crit');
+  $('btn-replay').style.display = '';
+  $('status').textContent = `${w.name} wins`;
+}
+
+
+/* ── Multiplayer battle controls ─────────────────────────────────── */
+function setArenaMode(mode) {
+  arenaMode = mode === 'multi' ? 'multi' : 'solo';
+  const multi = arenaMode === 'multi';
+  $('btn-mp-parent').style.display = multi ? '' : 'none';
+  $('btn-mp-offer').style.display = multi ? '' : 'none';
+  $('btn-mp-inbox').style.display = multi ? '' : 'none';
+  $('btn-imprint').style.display = multi ? '' : 'none';
+  $('btn-pick').style.display = multi ? 'none' : '';
+  $('empty-sub').textContent = multi ? 'Pick a local full Eidolon, issue or accept a battle intent, then resolve turns through platform protocol.' : 'Forge a battle in the Crucible, or pick an existing battle vibe from the library.';
+  $('status').textContent = multi ? 'multiplayer ready' : 'solo mode';
+}
+async function listFullCreatures() {
+  const res = await call('vibe.list', { type:'creature/*', sort:'recent' });
+  return (res.data || []).filter(x => !x.foreign_stub && x.full_artifact !== false);
+}
+async function pickOwnEidolon() {
+  $('picker').classList.add('show');
+  $('picker-search').value = ''; $('picker-search').focus();
+  $('picker-list').innerHTML = '<div class="picker-empty">loading creatures…</div>';
+  try {
+    pickerCache = await listFullCreatures();
+    renderCreaturePicker('');
+  } catch (e) { $('picker-list').innerHTML = `<div class="picker-empty">library unreachable: ${escHtml(e.message)}</div>`; }
+}
+function renderCreaturePicker(q) {
+  q = (q||'').toLowerCase();
+  let arr = pickerCache;
+  if (q) arr = arr.filter(e => (e.name||'').toLowerCase().includes(q) || (e.content_hash||'').toLowerCase().includes(q));
+  if (!arr.length) { $('picker-list').innerHTML = '<div class="picker-empty">no full local creatures available</div>'; return; }
+  $('picker-list').innerHTML = arr.map(e => `<div class="picker-row" data-id="${e.id}"><div class="prname">${escHtml(e.name)}</div><div class="prmeta">${escHtml(e.content_hash || e.birthHash || e.id)} · ${escHtml(e.realm || 'no realm')}</div></div>`).join('');
+  $('picker-list').querySelectorAll('.picker-row').forEach(r => { r.onclick = async () => { $('picker').classList.remove('show'); const got = await call('vibe.load', {id:r.dataset.id}); if (got.ok) { mpOwn = got.envelope; logLine(`own Eidolon: ${mpOwn.name}`, 'system'); $('status').textContent = `own: ${mpOwn.name}`; } }; });
+}
+async function issueBattleIntent() {
+  if (!mpOwn) { showToast('pick own Eidolon first'); return; }
+  const partner = prompt('Partner Nostr pubkey');
+  const partnerHash = prompt('Partner Eidolon hash');
+  if (!partner || !partnerHash) return;
+  const myHash = mpOwn.content_hash || mpOwn.content_addr || mpOwn.birthHash || mpOwn.id;
+  const ts = Date.now(); const res = await call('vibe.battle.intent', { partner_pubkey:partner, eidolon_a_hash:myHash, eidolon_b_hash:partnerHash, nonce:newProtocolNonce('battle'), ts, expires:Math.floor((ts+15*60*1000)/1000) });
+  if (!res.ok) { showToast(res.error || 'intent failed'); return; }
+  logLine(`battle intent ${res.data.intent.id} → ${partner.slice(0,10)}`, 'system');
+  $('status').textContent = 'intent sent';
+}
+async function loadBattleInbox() {
+  const res = await call('vibe.battle.inbox', { incoming:true });
+  if (!res.ok) { showToast(res.error || 'inbox failed'); return; }
+  mpInbox = res.data || [];
+  if (!mpInbox.length) { logLine('battle inbox empty', 'system'); return; }
+  for (const it of mpInbox.slice(0,5)) logLine(`intent ${it.id}: ${it.eidolon_a} vs ${it.eidolon_b}`, 'system');
+  const id = prompt('Accept battle intent id?', mpInbox[0].id);
+  if (id) acceptBattleIntent(id);
+}
+async function acceptBattleIntent(id) {
+  const res = await call('vibe.battle.accept', { intent_id:id });
+  if (!res.ok) { showToast(res.error || 'accept failed'); return; }
+  logLine(`accepted battle intent ${id}`, 'hit');
+  $('status').textContent = 'battle intent accepted';
+}
+
+async function imprintVictory() {
+  if (!mpOwn) { showToast('pick own Eidolon first'); return; }
+  const battleId = prompt('Ranked winning battle_id to imprint');
+  if (!battleId) return;
+  const res = await call('vibe.imprint.create', { battle_id:battleId, source_eidolon_id:mpOwn.id });
+  if (!res.ok) { showToast(res.error || 'imprint failed'); return; }
+  logLine(`imprint created descendant ${res.envelope.id}`, 'hit');
+  $('status').textContent = 'imprint saved';
+}
+
+function runLocalEnginePreview(aEnv, bEnv) {
+  if (!window.NexusBattleEngine) return;
+  const a = aEnv && aEnv.payload, b = bEnv && bEnv.payload;
+  if (!a || !b || !Array.isArray(a.dna) || !Array.isArray(b.dna)) return;
+  const r = window.NexusBattleEngine.replay({eidolonA:aEnv, eidolonB:bEnv, battleSeed:'preview'});
+  logLine(`engine preview winner: ${r.winner || 'draw'} in ${r.transcript.length} turns`, 'hit');
+}
+
+/* ── Battle setup ────────────────────────────────────────────────── */
+async function loadBattle(battleId) {
+  $('status').textContent = 'loading…';
+  try {
+    const r1 = await call('vibe.load', { id: battleId });
+    if (!r1.ok) throw new Error(r1.error || 'battle not found');
+    battleEnv = r1.envelope;
+    const p = battleEnv.payload;
+    // Resolve participants
+    const [aRes, bRes] = await Promise.all([
+      call('vibe.load', { id: p.participants[0] }),
+      call('vibe.load', { id: p.participants[1] })
+    ]);
+    if (!aRes.ok || !bRes.ok) throw new Error('participants not found');
+    creatureA = aRes.envelope; creatureB = bRes.envelope;
+    // Stage
+    stageEnv = null; envAxes = null;
+    if (p.stage) {
+      try {
+        const s = await call('vibe.load', { id: p.stage });
+        if (s.ok) {
+          stageEnv = s.envelope;
+          envAxes = new Map((stageEnv.payload.axes||[]).map(a => [a.id, a.value]));
+        }
+      } catch (_) {}
+    }
+    // Moveset
+    movesetEnvs = [];
+    if (Array.isArray(p.moveset)) {
+      const moves = await Promise.all(p.moveset.map(id => call('vibe.load', {id}).catch(()=>null)));
+      movesetEnvs = moves.filter(r => r && r.ok).map(r => r.envelope);
+    }
+
+    setupFighters();
+    $('empty').classList.add('hidden');
+    $('hud-left').style.display = ''; $('hud-right').style.display = '';
+    $('btn-export').style.display = ''; $('btn-replay').style.display = '';
+    $('status').textContent = `${creatureA.name} vs ${creatureB.name}`;
+    logLine(`battle loaded: ${battleEnv.name}`, 'system');
+    if (stageEnv) logLine(`stage: ${stageEnv.name}`, 'system');
+    if (movesetEnvs.length) logLine(`moveset: ${movesetEnvs.length} attack${movesetEnvs.length>1?'s':''}`, 'system');
+  } catch (e) {
+    showToast(`load failed: ${e.message}`);
+    $('status').textContent = 'load failed';
+  }
+}
+
+function setupFighters() {
+  resize();
+  battleStart = performance.now();
+  battleOver = false; activeAttack = null;
+  const groundY = H * (envV('ground_y')/255);
+  fighter.A.dna = creatureA.payload.dna;
+  fighter.A.hues = creatureA.payload.hues || [180];
+  fighter.A.name = creatureA.name;
+  fighter.A.gen = creatureA.payload.generation || 1;
+  fighter.A.x = W * 0.25; fighter.A.y = 0; fighter.A.vx = 0; fighter.A.vy = 0;
+  fighter.A.hp = fighter.A.maxHp = 100; fighter.A.scale = 1; fighter.A.flash = 0;
+  fighter.A.sideX = 1;
+
+  fighter.B.dna = creatureB.payload.dna;
+  fighter.B.hues = creatureB.payload.hues || [0];
+  fighter.B.name = creatureB.name;
+  fighter.B.gen = creatureB.payload.generation || 1;
+  fighter.B.x = W * 0.75; fighter.B.y = 0; fighter.B.vx = 0; fighter.B.vy = 0;
+  fighter.B.hp = fighter.B.maxHp = 100; fighter.B.scale = 1; fighter.B.flash = 0;
+  fighter.B.sideX = -1;
+
+  $('hl-name').textContent = creatureA.name;
+  $('hl-gen').textContent = `gen ${String(fighter.A.gen).padStart(2,'0')} · ${creatureA.id.slice(2,12)}`;
+  $('hr-name').textContent = creatureB.name;
+  $('hr-gen').textContent = `gen ${String(fighter.B.gen).padStart(2,'0')} · ${creatureB.id.slice(2,12)}`;
+
+  nextAttackAt.A = 1.0 + Math.random();
+  nextAttackAt.B = 1.5 + Math.random();
+}
+
+/* ── Picker ──────────────────────────────────────────────────────── */
+async function openPicker() {
+  $('picker').classList.add('show');
+  $('picker-search').value = ''; $('picker-search').focus();
+  $('picker-list').innerHTML = '<div class="picker-empty">loading…</div>';
+  try {
+    const res = await call('vibe.list', { type: 'battle', sort: 'recent' });
+    pickerCache = res.data || [];
+    renderPicker('');
+  } catch (e) {
+    $('picker-list').innerHTML = `<div class="picker-empty">library unreachable: ${escHtml(e.message)}</div>`;
+  }
+}
+function renderPicker(q) {
+  q = (q||'').toLowerCase();
+  let arr = pickerCache;
+  if (q) arr = arr.filter(e => (e.name||'').toLowerCase().includes(q));
+  if (!arr.length) {
+    $('picker-list').innerHTML = '<div class="picker-empty">no battles yet · forge one in the Crucible</div>';
+    return;
+  }
+  $('picker-list').innerHTML = arr.map(e => `
+    <div class="picker-row" data-id="${e.id}">
+      <div class="prname">${escHtml(e.name)}</div>
+      <div class="prmeta">${(e.tags||[]).join(' · ') || 'no tags'} · ${e.id.slice(2,15)}</div>
+    </div>`).join('');
+  $('picker-list').querySelectorAll('.picker-row').forEach(r => {
+    r.onclick = () => { $('picker').classList.remove('show'); loadBattle(r.dataset.id); };
+  });
+}
+$('btn-pick').onclick = $('empty-pick').onclick = openPicker;
+$('mode-solo').onclick = () => setArenaMode('solo');
+$('mode-multi').onclick = () => setArenaMode('multi');
+$('btn-mp-parent').onclick = pickOwnEidolon;
+$('btn-mp-offer').onclick = issueBattleIntent;
+$('btn-mp-inbox').onclick = loadBattleInbox;
+$('btn-imprint').onclick = imprintVictory;
+$('picker-close').onclick = () => $('picker').classList.remove('show');
+$('picker-search').oninput = e => arenaMode === 'multi' ? renderCreaturePicker(e.target.value) : renderPicker(e.target.value);
+$('btn-replay').onclick = () => { if (battleEnv) setupFighters(); $('btn-replay').style.display='none'; };
+
+/* ── Export to standalone HTML ───────────────────────────────────── */
+$('btn-export').onclick = async () => {
+  if (!battleEnv) return;
+  // Bundle: battle env + resolved creature/env/attack envelopes inline
+  const bundle = {
+    format: 'eidolon-battle-bundle/1',
+    battle: battleEnv,
+    creatures: [creatureA, creatureB],
+    stage: stageEnv,
+    moveset: movesetEnvs,
+    exportedAt: new Date().toISOString()
+  };
+  const html = buildStandaloneBattleHTML(bundle);
+  const safe = (battleEnv.name||'battle').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${safe}.battle.html`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  showToast('exported');
+};
+
+function buildStandaloneBattleHTML(bundle) {
+  // The simplest possible reproducible standalone: embed the bundle JSON,
+  // plus a stripped-down version of this Arena's renderer. Self-contained.
+  const cssAndScript = document.documentElement.outerHTML
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/g, '') // strip scripts
+    .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(bundle.battle.name)} — Battle</title>`);
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>${escHtml(bundle.battle.name)} — Battle</title>
+<script id="battle-bundle" type="application/json">
+${JSON.stringify(bundle, null, 2)}
+<\/script>
+<style>${document.querySelector('style').textContent}</style>
+</head>
+<body><div id="root">
+${document.getElementById('top').outerHTML.replace(/<button[^>]+id="btn-(pick|export|replay)"[^>]*>[\s\S]*?<\/button>/g,'')}
+${document.getElementById('stage').outerHTML.replace(/id="empty"[^>]*>[\s\S]*?<\/div>\s*<\/div>/, '</div>')}
+${document.getElementById('bottom').outerHTML}
+</div>
+<script>
+'use strict';
+const BUNDLE = JSON.parse(document.getElementById('battle-bundle').textContent);
+${standaloneRunner.toString()}
+standaloneRunner(BUNDLE);
+<\/script>
+</body></html>`;
+}
+
+// Standalone runner — minimal version that just plays the embedded bundle
+function standaloneRunner(bundle) {
+  // For brevity in this Round-4 cut, we direct standalone exports to use
+  // their embedded bundle — actually rendering it standalone would mean
+  // duplicating the Arena's full ~500 lines. Instead the export carries
+  // the data, and a future render-from-bundle pass can be added later.
+  // For now: show the bundle data so the file is at minimum a record.
+  const stage = document.getElementById('stage');
+  if (stage) {
+    stage.innerHTML = `<div style="padding:40px;color:#33ff77;font-family:monospace;line-height:1.6">
+      <div style="font-size:18px;letter-spacing:3px;margin-bottom:14px">⚔ ${bundle.battle.name}</div>
+      <div style="font-size:11px;color:#888;line-height:1.7">
+        <div>${bundle.creatures[0].name} (gen ${bundle.creatures[0].payload.generation||1}) vs ${bundle.creatures[1].name} (gen ${bundle.creatures[1].payload.generation||1})</div>
+        ${bundle.stage ? `<div>stage: ${bundle.stage.name}</div>` : ''}
+        ${bundle.moveset && bundle.moveset.length ? `<div>moveset: ${bundle.moveset.map(m=>m.name).join(', ')}</div>` : ''}
+        <div style="margin-top:14px;color:#555">This is an exported battle bundle. The full Arena renderer is not embedded yet — this file preserves the battle data.</div>
+        <div style="margin-top:10px;color:#555">Drop this file into the Vibes Library to re-import the battle and play it in the Arena.</div>
+      </div>
+      <pre style="margin-top:20px;padding:14px;background:#0d1018;border:1px solid #2a2a3a;font-size:9px;overflow:auto;max-height:400px">${JSON.stringify(bundle, null, 2).replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</pre>
+    </div>`;
+  }
+}
+
+/* ── Kernel handshake ────────────────────────────────────────────── */
+if (nx) {
+  nx.ready.then(() => {
+    mounted = true;
+    $('status').textContent = 'no battle loaded';
+  });
+}
+
+setTimeout(() => { if (!mounted) $('status').textContent = 'standalone — connect via Nexus to play'; }, 1200);
+
+resize();
+loop();
+</script>
+</body>
+</html>

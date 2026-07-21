@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · FORGE PRO</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   EIDOLON FORGE PRO — creator tool (v3: volumetric anatomy +
+   quadruped + seed system + sprite export). DNA schema is frozen:
+   58 axes, alphabetical DNA_ORDER, vibe/1 mint format — all
+   preserved for compatibility with the Library and other tools.
+   ═══════════════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0e;
+  --bg2:#13131a;
+  --bg3:#1a1a23;
+  --line:#2a2a36;
+  --line2:#3a3a4a;
+  --text:#e8e8ee;
+  --dim:#7a7a88;
+  --dim2:#4a4a58;
+  --accent:#c8ffaa;
+  --accent2:#aaeeff;
+  --accent3:#ffaadd;
+  --gold:#ffaa44;
+  --sweep:#ff88aa;
+  --warn:#ffcc66;
+  --red:#ff5566;
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono','SF Mono',Menlo,Consolas,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:var(--mono);font-size:12px;overflow:hidden;
+  -webkit-font-smoothing:antialiased}
+
+#app{display:grid;grid-template-columns:1fr 380px;height:100vh;min-height:0}
+@media (max-width: 720px){
+  #app{grid-template-columns:1fr 280px}
+}
+
+#stage{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden;min-width:0}
+#topbar{display:flex;align-items:center;gap:14px;padding:0 16px;height:36px;
+  border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg2)}
+#brand{font-size:11px;letter-spacing:3px;font-weight:600;color:var(--text);white-space:nowrap}
+#brand b{color:var(--accent)}
+#brand i{font-style:normal;color:var(--gold);letter-spacing:2px;margin-left:6px;font-size:9px;
+  border:1px solid var(--gold);padding:1px 5px;border-radius:2px;opacity:.8}
+#name-field{flex:1;min-width:60px;background:transparent;border:none;color:var(--text);
+  font-family:inherit;font-size:13px;letter-spacing:1px;outline:none;
+  padding:4px 8px;border-radius:2px}
+#name-field:hover{background:var(--bg3)}
+#name-field:focus{background:var(--bg3);outline:1px solid var(--line2)}
+#axis-count{font-size:10px;color:var(--dim);letter-spacing:1px;white-space:nowrap}
+#mode-pill{font-size:10px;letter-spacing:1px;padding:2px 8px;
+  border:1px solid var(--line2);color:var(--dim);border-radius:2px;white-space:nowrap}
+#mode-pill.blob{color:var(--accent2);border-color:var(--accent2)}
+#mode-pill.biped{color:var(--accent3);border-color:var(--accent3)}
+#mode-pill.quad{color:var(--gold);border-color:var(--gold)}
+#mode-pill.morph{color:var(--warn);border-color:var(--warn)}
+#sweep-indicator{font-size:10px;color:var(--sweep);letter-spacing:1px;
+  padding:2px 8px;border:1px solid var(--sweep);display:none;white-space:nowrap}
+#sweep-indicator.show{display:inline-block}
+
+#canvas-wrap{flex:1;display:block;background:var(--bg);min-height:0;
+  min-width:0;position:relative;overflow:hidden}
+#canvas{display:block;width:100%;height:100%;
+  background:radial-gradient(circle at 50% 50%, #050508 0%, #030305 100%)}
+
+#stage-foot{min-height:36px;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--bg2);
+  flex-shrink:0;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:11px;letter-spacing:1px;color:var(--dim);
+  background:transparent;border:1px solid var(--line);padding:6px 12px;
+  cursor:pointer;transition:all .12s;border-radius:2px;text-transform:lowercase;
+  white-space:nowrap}
+.btn:hover{color:var(--text);border-color:var(--line2);background:var(--bg3)}
+.btn.primary{color:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{background:rgba(200,255,170,.08)}
+.btn.mint{color:var(--accent3);border-color:var(--accent3)}
+.btn.mint:hover{background:rgba(255,170,221,.08)}
+.btn.warn{color:var(--warn);border-color:var(--dim2)}
+
+#export-wrap{position:relative;display:inline-block}
+#export-menu{position:absolute;bottom:calc(100% + 4px);left:0;
+  background:var(--bg);border:1px solid var(--line2);border-radius:2px;
+  display:none;flex-direction:column;min-width:180px;z-index:10;
+  box-shadow:0 8px 24px rgba(0,0,0,.6)}
+#export-menu.show{display:flex}
+#export-menu .em-item{font-family:inherit;font-size:11px;letter-spacing:1px;
+  color:var(--dim);background:transparent;border:none;padding:8px 12px;
+  cursor:pointer;text-align:left;text-transform:lowercase;border-bottom:1px solid var(--line);
+  white-space:nowrap}
+#export-menu .em-item:last-child{border-bottom:none}
+#export-menu .em-item:hover{color:var(--accent);background:var(--bg2)}
+#export-menu .em-row{display:flex;align-items:center;gap:8px;padding:6px 12px;
+  border-bottom:1px solid var(--line);font-size:10px;color:var(--dim2)}
+#export-menu select{font-family:inherit;font-size:11px;color:var(--text);
+  background:var(--bg2);border:1px solid var(--line);padding:3px 6px;border-radius:2px;
+  outline:none}
+
+#status{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:1px;
+  text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+#controls{display:flex;flex-direction:column;background:var(--bg2);overflow:hidden;min-width:0}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--line);
+  font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+  background:var(--bg2);gap:8px}
+.panel-head .ph-hint{color:var(--dim2);font-size:9px;text-transform:none;letter-spacing:.5px;
+  text-align:right}
+
+#seed-row{display:flex;align-items:center;gap:6px;padding:10px 14px;
+  border-bottom:1px solid var(--line);background:var(--bg2);flex-shrink:0}
+.seed-label{font-size:9px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;
+  white-space:nowrap}
+#seed-input{flex:1;min-width:0;font-family:inherit;font-size:11px;letter-spacing:2px;
+  color:var(--gold);background:var(--bg);border:1px solid var(--line);
+  padding:5px 8px;border-radius:2px;outline:none;text-transform:uppercase;
+  font-variant-numeric:tabular-nums}
+#seed-input::placeholder{color:var(--dim2);letter-spacing:1px;text-transform:none}
+#seed-input:focus{border-color:var(--gold);color:var(--gold)}
+#seed-input.custom{color:var(--dim);font-style:italic}
+.seed-btn{font-family:inherit;font-size:12px;line-height:1;color:var(--dim);
+  background:transparent;border:1px solid var(--line);cursor:pointer;
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  border-radius:2px;transition:all .12s;padding:0}
+.seed-btn:hover{color:var(--gold);border-color:var(--gold);background:rgba(255,170,68,.06)}
+.seed-prefix{color:var(--dim2);font-size:10px;letter-spacing:1px;user-select:none}
+
+#axes{flex:1;overflow-y:auto;padding:6px 0;min-height:0}
+#axes::-webkit-scrollbar{width:6px}
+#axes::-webkit-scrollbar-track{background:var(--bg2)}
+#axes::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+#axes::-webkit-scrollbar-thumb:hover{background:var(--dim2)}
+
+.axis{display:grid;grid-template-columns:1fr 36px 18px 18px;
+  gap:8px;align-items:center;padding:5px 14px;cursor:default;
+  border-left:2px solid transparent;transition:background .1s,border-color .1s}
+.axis:hover{background:var(--bg3)}
+.axis.sweeping{border-left-color:var(--sweep);background:rgba(255,136,170,.05)}
+.axis.locked{border-left-color:var(--accent2)}
+
+.axis-row{display:flex;flex-direction:column;gap:3px;min-width:0}
+.axis-label{font-size:10px;color:var(--text);letter-spacing:.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  cursor:text;padding:1px 3px;border-radius:2px;
+  background:transparent;border:1px solid transparent;
+  font-family:inherit}
+.axis-label:hover{background:var(--bg);border-color:var(--line)}
+.axis-label:focus{outline:none;background:var(--bg);
+  border-color:var(--accent);color:var(--accent)}
+.axis-label.renamed{color:var(--accent2);font-weight:500}
+.axis-label.renamed:hover{color:var(--accent2)}
+
+.axis-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;outline:none;
+  background:var(--bg);border:1px solid var(--line);cursor:pointer;border-radius:0}
+.axis-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:14px;
+  background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.axis-slider::-moz-range-thumb{width:10px;height:14px;
+  background:var(--text);border:none;cursor:pointer;border-radius:1px}
+.axis.sweeping .axis-slider::-webkit-slider-thumb{background:var(--sweep)}
+.axis.sweeping .axis-slider::-moz-range-thumb{background:var(--sweep)}
+.axis.locked .axis-slider::-webkit-slider-thumb{background:var(--accent2)}
+.axis.locked .axis-slider::-moz-range-thumb{background:var(--accent2)}
+
+.axis-val{font-size:10px;color:var(--dim);text-align:right;
+  font-variant-numeric:tabular-nums}
+.axis.sweeping .axis-val{color:var(--sweep)}
+.axis.locked .axis-val{color:var(--accent2)}
+
+.axis-sweep,.axis-lock{font-size:11px;line-height:1;color:var(--dim2);
+  background:transparent;border:1px solid transparent;cursor:pointer;
+  width:18px;height:18px;display:flex;align-items:center;
+  justify-content:center;border-radius:2px;transition:color .1s,border-color .1s;
+  font-family:inherit;padding:0}
+.axis-sweep:hover{color:var(--sweep);border-color:var(--sweep)}
+.axis.sweeping .axis-sweep{color:var(--sweep);border-color:var(--sweep)}
+.axis-lock:hover{color:var(--accent2);border-color:var(--accent2)}
+.axis.locked .axis-lock{color:var(--accent2);border-color:var(--accent2)}
+
+.group-head{padding:10px 14px 4px;font-size:9px;letter-spacing:2px;
+  color:var(--dim2);text-transform:uppercase;border-top:1px solid var(--line);
+  margin-top:4px;background:var(--bg2);position:sticky;top:0;z-index:1;
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
+.group-head:first-child{border-top:none;margin-top:0}
+.group-head .gh-rand{font-size:9px;letter-spacing:1px;color:var(--dim2);
+  background:transparent;border:1px solid transparent;cursor:pointer;
+  padding:2px 6px;border-radius:2px;font-family:inherit;text-transform:lowercase}
+.group-head .gh-rand:hover{color:var(--accent);border-color:var(--accent)}
+
+#file-input{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="stage">
+  <div id="topbar">
+    <span id="brand"><b>◆</b>&nbsp;EIDOLON FORGE<i>PRO</i></span>
+    <input id="name-field" type="text" value="Untitled" maxlength="32" spellcheck="false">
+    <span id="mode-pill" class="blob">BLOB</span>
+    <span id="sweep-indicator">SWEEPING</span>
+    <span id="axis-count">58 axes</span>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="canvas"></canvas>
+  </div>
+  <div id="stage-foot">
+    <button class="btn" onclick="randomize()">randomize</button>
+    <button class="btn" onclick="resetAll()">reset</button>
+    <button class="btn" onclick="document.getElementById('file-input').click()">load…</button>
+    <input id="file-input" type="file" accept=".json,application/json" onchange="onLoadFile(this)">
+    <div id="export-wrap">
+      <button class="btn" id="export-btn" onclick="toggleExportMenu(event)">export ▾</button>
+      <div id="export-menu">
+        <div class="em-row">
+          <span>frame size</span>
+          <select id="export-size">
+            <option value="128">128</option>
+            <option value="256" selected>256</option>
+            <option value="512">512</option>
+            <option value="1024">1024</option>
+          </select>
+        </div>
+        <button class="em-item" onclick="exportFrame()">png frame</button>
+        <button class="em-item" onclick="exportSpriteSheet(16)">sprite sheet · 16f</button>
+        <button class="em-item" onclick="exportSpriteSheet(32)">sprite sheet · 32f</button>
+      </div>
+    </div>
+    <button class="btn primary" onclick="saveCreature()">save</button>
+    <button class="btn mint" onclick="mintCreature()">mint</button>
+    <span id="status">ready</span>
+  </div>
+</div>
+
+<div id="controls">
+  <div class="panel-head">
+    <span>AXES</span>
+    <span class="ph-hint">click label to rename · ⇌ sweep · ◉ lock</span>
+  </div>
+  <div id="seed-row">
+    <span class="seed-label">SEED</span>
+    <span class="seed-prefix">0x</span>
+    <input id="seed-input" type="text" maxlength="8" spellcheck="false" placeholder="— CUSTOM —">
+    <button class="seed-btn" id="seed-random" title="New random seed">⚄</button>
+    <button class="seed-btn" id="seed-copy" title="Copy seed to clipboard">⎘</button>
+  </div>
+  <div id="axes"></div>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════════
+   AXES — 58 axes, FROZEN SCHEMA. IDs, groups, defaults, order
+   must never change. The Library and other tools rely on this.
+   ═══════════════════════════════════════════════════════════════ */
+const AXES = [
+  { id:'body_radius',     group:'body',  default:160, label:'body radius' },
+  { id:'body_stretch_x',  group:'body',  default:128, label:'body width' },
+  { id:'body_stretch_y',  group:'body',  default:128, label:'body height' },
+  { id:'body_lumpiness',  group:'body',  default: 50, label:'body lumpiness' },
+  { id:'body_lump_count', group:'body',  default:140, label:'body smoothness' },
+  { id:'body_outline',    group:'body',  default:140, label:'outline weight' },
+  { id:'body_shadow',     group:'body',  default:140, label:'shadow band' },
+
+  { id:'body_plan',           group:'structure', default: 60, label:'body plan (blob/biped/quad)' },
+  { id:'head_size',           group:'structure', default:110, label:'head size' },
+  { id:'head_shape',          group:'structure', default:128, label:'head shape (tall/squat)' },
+  { id:'neck_length',         group:'structure', default: 80, label:'neck length' },
+  { id:'neck_width',          group:'structure', default: 90, label:'neck width' },
+  { id:'torso_height',        group:'structure', default:140, label:'torso height' },
+  { id:'torso_width',         group:'structure', default:130, label:'torso width' },
+  { id:'shoulder_width',      group:'structure', default:150, label:'shoulder spread' },
+  { id:'shoulder_height',     group:'structure', default: 70, label:'shoulder height' },
+  { id:'hip_width',           group:'structure', default:130, label:'hip spread' },
+  { id:'arm_segments',        group:'structure', default:128, label:'elbow position' },
+  { id:'arm_bend',            group:'structure', default:100, label:'elbow bend' },
+  { id:'leg_segments',        group:'structure', default:128, label:'knee position' },
+  { id:'leg_bend',            group:'structure', default:110, label:'knee bend' },
+  { id:'posture',             group:'structure', default:128, label:'posture (lean)' },
+  { id:'bilateral_asymmetry', group:'structure', default:  0, label:'asymmetry' },
+  { id:'extremity_size',      group:'structure', default:130, label:'extremity size' },
+  { id:'extremity_shape',     group:'structure', default:100, label:'extremity shape' },
+
+  { id:'arm_count',       group:'appendages', default: 80, label:'appendage count' },
+  { id:'arm_length',      group:'appendages', default:128, label:'appendage length' },
+  { id:'arm_width',       group:'appendages', default:128, label:'appendage width' },
+  { id:'arm_taper',       group:'appendages', default:160, label:'appendage taper' },
+  { id:'arm_wobble',      group:'appendages', default:120, label:'appendage wobble' },
+  { id:'arm_wobble_rate', group:'appendages', default:128, label:'wobble speed' },
+  { id:'arm_curl',        group:'appendages', default: 60, label:'appendage curl' },
+  { id:'arm_droop',       group:'appendages', default:128, label:'appendage angle' },
+
+  { id:'eye_count',       group:'eyes', default:128, label:'eye count' },
+  { id:'eye_size',        group:'eyes', default:128, label:'eye size' },
+  { id:'eye_spacing',     group:'eyes', default:128, label:'eye spacing' },
+  { id:'eye_height',      group:'eyes', default:100, label:'eye position' },
+  { id:'eye_pupil',       group:'eyes', default:140, label:'pupil size' },
+  { id:'eye_glow',        group:'eyes', default:120, label:'eye glow' },
+
+  { id:'mark_runes',      group:'surface', default: 40, label:'rune marks' },
+  { id:'mark_spots',      group:'surface', default: 40, label:'glow spots' },
+  { id:'mark_drips',      group:'surface', default:  0, label:'surface drips' },
+  { id:'mark_facets',     group:'surface', default:  0, label:'crystal facets' },
+
+  { id:'particle_count',  group:'particles', default: 80, label:'particle count' },
+  { id:'particle_radius', group:'particles', default:140, label:'orbit radius' },
+  { id:'particle_size',   group:'particles', default:120, label:'particle size' },
+  { id:'particle_drift',  group:'particles', default:100, label:'drift speed' },
+  { id:'particle_turb',   group:'particles', default: 60, label:'particle turbulence' },
+
+  { id:'glow_radius',     group:'glow', default:140, label:'outer glow radius' },
+  { id:'glow_strength',   group:'glow', default:140, label:'outer glow strength' },
+  { id:'core_size',       group:'glow', default:120, label:'core size' },
+  { id:'core_brightness', group:'glow', default:160, label:'core brightness' },
+  { id:'pulse_rate',      group:'glow', default:128, label:'pulse rate' },
+
+  { id:'hue_primary',     group:'color', default:200, label:'primary hue' },
+  { id:'hue_accent',      group:'color', default: 80, label:'accent hue' },
+  { id:'hue_glow',        group:'color', default:140, label:'glow hue' },
+  { id:'saturation',      group:'color', default:170, label:'saturation' },
+  { id:'lightness',       group:'color', default:130, label:'lightness' },
+];
+
+const N = AXES.length;
+const ID_INDEX = Object.fromEntries(AXES.map((a,i)=>[a.id,i]));
+
+/* DNA canonical order: alphabetical by id (ASCII byte order).
+   The Library uses this to verify birthHash. Stable across UI refactoring. */
+const DNA_ORDER = AXES.map(a => a.id).slice().sort();
+
+const GROUPS = [];
+for(const a of AXES){ if(!GROUPS.includes(a.group)) GROUPS.push(a.group); }
+
+let values  = AXES.map(a => a.default);
+let labels  = AXES.map(a => a.label);
+let renamed = AXES.map(() => false);
+let locked  = AXES.map(() => false);
+let creatureName = 'Untitled';
+
+let sweepIdx     = -1;
+let sweepStart   = 0;
+let sweepBaseVal = 0;
+const SWEEP_PERIOD = 4.0;
+
+const t0 = performance.now();
+let prevT = 0;
+let blinkCd = 3, blinkP = 0, blinkActive = false;
+
+/* Cursor tracking — normalized -1..1 within canvas */
+let cursorTarget = { x: 0, y: 0.15 };
+let cursorWander = { x: 0, y: 0 };
+
+/* Currently-applied seed, or null when the creature has been edited manually */
+let currentSeed = null;
+
+function v(id){ return values[ID_INDEX[id]]; }
+function v01(id){ return values[ID_INDEX[id]] / 255; }
+function vN11(id){ return (values[ID_INDEX[id]] - 128) / 128; }
+function vRange(id, min, max){ return min + (values[ID_INDEX[id]]/255) * (max-min); }
+
+/* mulberry32 — FROZEN. Do not change. Contract with the Library. */
+function mulberry32(seed){
+  let t = seed >>> 0;
+  return () => {
+    t = (t + 0x6D2B79F5) >>> 0; let r = t;
+    r = Math.imul(r ^ (r >>> 15), r | 1);
+    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* Seed → all 58 axes. Expand in DNA_ORDER (alphabetical-by-id) so
+   the same seed produces the same vibe/1-compatible DNA on every machine. */
+function seedToDNA(seed32){
+  const rng = mulberry32(seed32 >>> 0);
+  const map = {};
+  for(const id of DNA_ORDER) map[id] = Math.floor(rng() * 256);
+  return AXES.map(a => map[a.id]);
+}
+
+function formatSeed(seed){
+  if(seed === null || seed === undefined) return '';
+  return (seed >>> 0).toString(16).toUpperCase().padStart(8, '0');
+}
+
+function parseSeed(text){
+  if(!text) return null;
+  const clean = text.replace(/[^0-9a-fA-F]/g, '').slice(0,8);
+  if(!clean) return null;
+  const n = parseInt(clean, 16);
+  return Number.isFinite(n) ? (n >>> 0) : null;
+}
+
+function setSeedFromInput(text){
+  const seed = parseSeed(text);
+  if(seed === null){
+    setStatus('seed: invalid hex');
+    refreshSeedUI();
+    return;
+  }
+  applySeed(seed);
+}
+
+function applySeed(seed){
+  if(sweepIdx !== -1) stopSweep();
+  currentSeed = seed >>> 0;
+  values = seedToDNA(currentSeed);
+  syncAllSliders();
+  refreshSeedUI();
+  setStatus(`seed: ${formatSeed(currentSeed)}`);
+  kernelEmitCreatureChange();
+}
+
+function clearSeedOnEdit(){
+  if(currentSeed !== null){
+    currentSeed = null;
+    refreshSeedUI();
+  }
+}
+
+function refreshSeedUI(){
+  const input = document.getElementById('seed-input');
+  if(!input) return;
+  if(currentSeed === null){
+    input.value = '';
+    input.classList.add('custom');
+    input.placeholder = '— CUSTOM —';
+  } else {
+    input.value = formatSeed(currentSeed);
+    input.classList.remove('custom');
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER ENTRY — dispatches to blob/biped/quad with alpha blending
+   ═══════════════════════════════════════════════════════════════ */
+function render(canvas, t){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const bp = v('body_plan');
+  let blobAlpha = 0, bipedAlpha = 0, quadAlpha = 0;
+  if(bp <= 80){ blobAlpha = 1; }
+  else if(bp < 120){ bipedAlpha = (bp - 80) / 40; blobAlpha = 1 - bipedAlpha; }
+  else if(bp <= 185){ bipedAlpha = 1; }
+  else if(bp < 220){ quadAlpha = (bp - 185) / 35; bipedAlpha = 1 - quadAlpha; }
+  else { quadAlpha = 1; }
+
+  const pill = document.getElementById('mode-pill');
+  if(pill){
+    if(blobAlpha === 1){ pill.textContent = 'BLOB';  pill.className = 'blob'; }
+    else if(bipedAlpha === 1){ pill.textContent = 'BIPED'; pill.className = 'biped'; }
+    else if(quadAlpha === 1){ pill.textContent = 'QUAD'; pill.className = 'quad'; }
+    else {
+      // morph phase — show dominant target
+      let target, pct;
+      if(blobAlpha > 0 && bipedAlpha > 0){ target = 'BIPED'; pct = bipedAlpha; }
+      else { target = 'QUAD'; pct = quadAlpha; }
+      pill.textContent = `MORPH ${target} ${Math.round(pct*100)}%`;
+      pill.className = 'morph';
+    }
+  }
+
+  // Lerp cursor wander toward target each frame
+  const wlerp = 0.08;
+  cursorWander.x += (cursorTarget.x - cursorWander.x) * wlerp;
+  cursorWander.y += (cursorTarget.y - cursorWander.y) * wlerp;
+
+  if(blobAlpha > 0){
+    ctx.save(); ctx.globalAlpha = blobAlpha; renderBlob(ctx, W, H, t); ctx.restore();
+  }
+  if(bipedAlpha > 0){
+    ctx.save(); ctx.globalAlpha = bipedAlpha; renderBiped(ctx, W, H, t); ctx.restore();
+  }
+  if(quadAlpha > 0){
+    ctx.save(); ctx.globalAlpha = quadAlpha; renderQuadruped(ctx, W, H, t); ctx.restore();
+  }
+}
+
+/* Soft radial ground-contact shadow */
+function drawGroundShadow(ctx, cx, gy, rx, ry, huePri, sat){
+  const g = ctx.createRadialGradient(cx, gy, 0, cx, gy, Math.max(rx, ry*2));
+  g.addColorStop(0,   `hsla(${huePri},${sat*0.4}%,4%,0.55)`);
+  g.addColorStop(0.45,`hsla(${huePri},${sat*0.4}%,4%,0.28)`);
+  g.addColorStop(1,   'transparent');
+  ctx.save();
+  ctx.translate(cx, gy);
+  ctx.scale(1, ry / Math.max(rx, 1));
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, rx, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BLOB MODE — radial creature. Marks with > 180 trigger advanced
+   sub-modes (halos, vein branches, scale overlays).
+   ═══════════════════════════════════════════════════════════════ */
+function renderBlob(ctx, W, H, t){
+  // expanded ranges per brief
+  const baseR     = vRange('body_radius',    W*0.04, W*0.40);
+  const stretchX  = vRange('body_stretch_x', 0.50,  1.50);
+  const stretchY  = vRange('body_stretch_y', 0.50,  1.50);
+  const lumpAmp   = vRange('body_lumpiness', 0.0,   55.0);
+  const lumpN     = 5 + Math.floor(v01('body_lump_count') * 13);
+  const outline   = vRange('body_outline',   0.5,   9.0);
+  const shadowPos = vRange('body_shadow',    0.20,  0.80);
+  const armN      = Math.floor(v01('arm_count') * 20);
+  const armLen    = vRange('arm_length', 0.15, 3.20);
+  const armW      = vRange('arm_width',  1.0,  10.0);
+  const armTaper  = v01('arm_taper');
+  const armWobAmp = vRange('arm_wobble',      0.0, 0.7);
+  const armWobRt  = vRange('arm_wobble_rate', 0.0, 3.0);
+  const armCurl   = vRange('arm_curl',        0.0, 1.4);
+  const armDroop  = vN11('arm_droop') * 0.6;
+  const eyeN      = Math.round(v01('eye_count') * 12);
+  const eyeSz     = vRange('eye_size',    0.04, 0.30);
+  const eyeSpace  = vRange('eye_spacing', 0.05, 0.85);
+  const eyeY      = vN11('eye_height') * 0.7;
+  const eyePupil  = v01('eye_pupil');
+  const eyeGlow   = v01('eye_glow');
+  const runeRaw   = v('mark_runes');
+  const spotRaw   = v('mark_spots');
+  const facetRaw  = v('mark_facets');
+  const runeN     = Math.floor(v01('mark_runes')  * 9);
+  const spotN     = Math.floor(v01('mark_spots')  * 9);
+  const dripN     = Math.floor(v01('mark_drips')  * 8);
+  const facetN    = Math.floor(v01('mark_facets') * 14);
+  const partN     = Math.floor(v01('particle_count') * 64);
+  const partR     = vRange('particle_radius', 1.0, 2.6);
+  const partSz    = vRange('particle_size',   0.4, 4.5);
+  const partDrift = vRange('particle_drift',  0.0, 1.5);
+  const partTurb  = vRange('particle_turb',   0.0, 1.2);
+  const glowR     = baseR * vRange('glow_radius',   1.2, 6.0);
+  const glowStr   = v01('glow_strength');
+  const coreSz    = baseR * vRange('core_size', 0.04, 0.45);
+  const coreBri   = v01('core_brightness');
+  const pulseRt   = vRange('pulse_rate', 0.0, 2.5);
+  const huePri    = Math.round(v01('hue_primary') * 359);
+  const hueAcc    = Math.round(v01('hue_accent')  * 359);
+  const hueGlow   = Math.round(v01('hue_glow')    * 359);
+  const sat       = Math.round(vRange('saturation', 0, 100));
+  const light     = Math.round(vRange('lightness',  20, 80));
+
+  // Idle animation stack — subtle for blob
+  const IDLE_PERIOD = 3.2;
+  const breathPhase = Math.sin(t * (pulseRt * 0.4 + 0.5));
+  const bobPhase    = Math.sin(t * 0.85);
+  const shiftPhase  = Math.sin(t * (2*Math.PI / IDLE_PERIOD));
+  const swayPhase   = Math.sin(t * 1.1 + 0.4);
+
+  const cx = W/2 + shiftPhase * baseR * 0.018;
+  const cy = H*0.50;
+  const pulse = breathPhase*0.5 + 0.5;
+  const bobY = bobPhase * baseR * 0.045;
+  const bcy = cy + bobY;
+  const breathW = 1 + breathPhase * 0.022;
+  const sx = stretchX * breathW;
+  const sy = stretchY;
+
+  // Outer glow
+  const og = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, glowR);
+  og.addColorStop(0, `hsla(${huePri},${sat}%,${light}%,${0.18*glowStr + pulse*0.06*glowStr})`);
+  og.addColorStop(0.4,`hsla(${hueAcc},${sat*0.8}%,${light*0.7}%,${0.10*glowStr})`);
+  og.addColorStop(1, 'transparent');
+  ctx.fillStyle = og;
+  ctx.beginPath();
+  ctx.ellipse(cx, bcy, glowR*sx, glowR*sy*0.85, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  function blobPts(bcx, bcyy, r){
+    const pts = [];
+    for(let i=0; i<lumpN; i++){
+      const a = (i/lumpN)*Math.PI*2 - Math.PI/2;
+      const n = Math.sin(t*0.7 + i*0.9)*lumpAmp + Math.sin(t*0.3 + i*1.5)*lumpAmp*0.4;
+      pts.push({ x: bcx + Math.cos(a)*(r+n)*sx, y: bcyy + Math.sin(a)*(r+n)*sy });
+    }
+    return pts;
+  }
+  const pts = blobPts(cx, bcy, baseR);
+
+  // Tentacle arms — replaced stroke approach with volumetric capsule curves
+  if(armN > 0){
+    for(let i=0; i<armN; i++){
+      const baseA = (i/armN)*Math.PI*2 + armDroop;
+      const wob = Math.sin(t*armWobRt + i*0.7 + i*0.35) * armWobAmp;
+      const curl = Math.sin(t*0.5 + i*0.9) * armCurl * 0.5;
+      const a = baseA + wob;
+      const len = baseR * armLen;
+      const tipX = cx + Math.cos(a + curl)*len*sx;
+      const tipY = bcy + Math.sin(a + curl)*len*sy;
+      const cpx = cx + Math.cos(baseA + wob*0.4)*len*0.5*sx;
+      const cpy = bcy + Math.sin(baseA + wob*0.4)*len*0.5*sy + curl*len*0.3;
+      drawVolumetricCurve(ctx, {x:cx,y:bcy}, {x:cpx,y:cpy}, {x:tipX,y:tipY},
+                          armW, armTaper, huePri, sat, light, outline);
+    }
+  }
+
+  // Body shadow underneath
+  ctx.save();
+  ctx.shadowColor = `hsla(${huePri},${sat}%,15%,0.55)`;
+  ctx.shadowBlur = 18; ctx.shadowOffsetY = 4;
+  splinePath(ctx, pts);
+  ctx.fillStyle = `hsla(${huePri},${sat*0.6}%,8%,0.4)`;
+  ctx.fill();
+  ctx.restore();
+
+  // Outline + base fill
+  splinePath(ctx, pts);
+  ctx.strokeStyle = 'rgba(0,0,0,0.92)';
+  ctx.lineWidth = outline;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  splinePath(ctx, pts);
+  ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`;
+  ctx.fill();
+
+  // Cel shade
+  ctx.save();
+  splinePath(ctx, pts);
+  ctx.clip();
+  const sg = ctx.createLinearGradient(cx, bcy-baseR, cx, bcy+baseR);
+  sg.addColorStop(Math.max(0, shadowPos - 0.04), 'transparent');
+  sg.addColorStop(shadowPos,        `hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.55)`);
+  sg.addColorStop(1.0,              `hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.65)`);
+  ctx.fillStyle = sg;
+  ctx.fillRect(cx-baseR*3, bcy-baseR*3, baseR*6, baseR*6);
+  const hg = ctx.createRadialGradient(cx-baseR*0.3, bcy-baseR*0.35, 0, cx-baseR*0.15, bcy-baseR*0.15, baseR*0.7);
+  hg.addColorStop(0,    `hsla(${huePri},${sat*0.4}%,92%,0.45)`);
+  hg.addColorStop(0.5,  'transparent');
+  ctx.fillStyle = hg;
+  ctx.fillRect(cx-baseR*3, bcy-baseR*3, baseR*6, baseR*6);
+
+  // Surface marks — with > 180 sub-modes
+  drawBlobMarks(ctx, cx, bcy, baseR, sx, sy, t,
+    spotN, runeN, facetN, spotRaw, runeRaw, facetRaw,
+    huePri, hueAcc, hueGlow, sat, pulse);
+
+  ctx.restore();
+
+  // Eyes (with cursor wander)
+  if(eyeN > 0){
+    const blinkSY = blinkActive ? Math.max(0.05, 1 - Math.sin(blinkP*Math.PI)*0.92) : 1;
+    const eR = baseR * eyeSz;
+    const ambientWander = Math.sin(t*0.55) * 0.4;
+    const wxRaw = (cursorWander.x * eR * 0.35) + ambientWander;
+    const wyRaw = (cursorWander.y * eR * 0.30);
+    const wlen = Math.sqrt(wxRaw*wxRaw + wyRaw*wyRaw);
+    const wmax = eR * 0.35;
+    const wScale = wlen > wmax ? (wmax / wlen) : 1;
+    const wx = wxRaw * wScale, wy = wyRaw * wScale;
+    const eyePos = [];
+    if(eyeN === 1){
+      eyePos.push([cx, bcy + baseR*eyeY]);
+    } else if(eyeN === 2){
+      const sep = baseR*eyeSpace;
+      eyePos.push([cx-sep, bcy + baseR*eyeY], [cx+sep, bcy + baseR*eyeY]);
+    } else {
+      const sep = baseR*eyeSpace*0.95;
+      const yOff = baseR*eyeY;
+      const ang = Math.PI;
+      for(let i=0; i<eyeN; i++){
+        const tt = eyeN === 1 ? 0.5 : i/(eyeN-1);
+        const a = -ang/2 + tt*ang;
+        eyePos.push([cx + Math.cos(a + Math.PI*1.5)*sep, bcy + Math.sin(a + Math.PI*1.5)*sep + yOff]);
+      }
+    }
+    for(const [ex,ey] of eyePos) drawEye(ctx, ex, ey, eR, blinkSY, wx, wy, eyePupil, eyeGlow, hueGlow, outline);
+  }
+
+  // Drips
+  if(dripN > 0){
+    const r4 = mulberry32(Math.floor(t*2) + dripN*17);
+    for(let i=0; i<dripN; i++){
+      const dx = cx + (r4()-0.5)*baseR*1.4*sx;
+      const dy = bcy + baseR*0.45*sy + ((t*40 + i*23) % 60) * baseR*0.018;
+      const ds = 1.5 + r4()*2.2;
+      ctx.fillStyle = `hsla(${huePri},85%,55%,${0.45 + r4()*0.3})`;
+      ctx.beginPath(); ctx.arc(dx, dy, ds, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Core glow
+  if(coreSz > 0.1 && coreBri > 0.05){
+    const cg = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, coreSz*4);
+    cg.addColorStop(0,    `hsla(${hueGlow},96%,94%,${0.85*coreBri})`);
+    cg.addColorStop(0.25, `hsla(${huePri},88%,70%,${0.45*coreBri})`);
+    cg.addColorStop(0.7,  `hsla(${huePri},78%,52%,${0.12*coreBri})`);
+    cg.addColorStop(1,    'transparent');
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(cx, bcy, coreSz*4, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Particles
+  if(partN > 0){
+    for(let p=0; p<partN; p++){
+      const seed = p*17;
+      const orR = baseR * partR + (seed%13)*(baseR*0.05);
+      const orA = (p/partN)*Math.PI*2 + t*partDrift*0.5 + Math.sin(t + seed*0.1)*0.4 + swayPhase*0.12;
+      const tu  = Math.sin(t*1.3 + seed*0.22) * partTurb * 8;
+      const px = cx + Math.cos(orA)*(orR+tu)*sx;
+      const py = bcy + Math.sin(orA)*(orR+tu)*sy*0.85;
+      const pSz = partSz * (0.6 + ((seed%5)/5)*0.8);
+      const pAl = 0.4 + Math.sin(t*1.8 + p*0.55)*0.3;
+      ctx.fillStyle = `hsla(${hueAcc},88%,75%,${pAl})`;
+      ctx.beginPath(); ctx.arc(px, py, pSz, 0, Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BIPED MODE — volumetric anatomy.
+   - Filled capsule limbs (no stroked lines)
+   - Joint AO under each articulation
+   - Idle stack: breath / bob / shift / sway
+   - Brow ridge, cheek highlight, jaw shadow on head
+   ═══════════════════════════════════════════════════════════════ */
+function renderBiped(ctx, W, H, t){
+  const baseR     = vRange('body_radius',    W*0.04, W*0.40);
+  const stretchX  = vRange('body_stretch_x', 0.50,  1.50);
+  const stretchY  = vRange('body_stretch_y', 0.50,  1.50);
+  const lumpAmp   = vRange('body_lumpiness', 0.0,   55.0);
+  const lumpN     = 5 + Math.floor(v01('body_lump_count') * 13);
+  const outline   = vRange('body_outline',   0.5,   9.0);
+  const shadowPos = vRange('body_shadow',    0.20,  0.80);
+  const headSize  = vRange('head_size',     0.0, 1.6);
+  const headShape = vN11('head_shape');
+  const neckLen   = vRange('neck_length',   0.0, 0.9);
+  const neckW     = vRange('neck_width',    0.06, 0.40);
+  const torsoH    = vRange('torso_height',  0.5, 1.6);
+  const torsoW    = vRange('torso_width',   0.4, 1.2);
+  const shoulderW = vRange('shoulder_width', 0.55, 1.4);
+  const shoulderY = v01('shoulder_height');
+  const hipW      = vRange('hip_width',     0.35, 1.15);
+  const armSeg    = v01('arm_segments');
+  const armBend   = vN11('arm_bend');
+  const legSeg    = v01('leg_segments');
+  const legBend   = vN11('leg_bend');
+  const posture   = vN11('posture') * 0.18;
+  const asymRaw   = v01('bilateral_asymmetry');
+  const extSize   = vRange('extremity_size',  0.0, 0.9);
+  const extShape  = v01('extremity_shape');
+  const armN      = Math.floor(v01('arm_count') * 20);
+  const armLen    = vRange('arm_length', 0.15, 3.20);
+  const armW      = vRange('arm_width',  1.0,  10.0);
+  const armTaper  = v01('arm_taper');
+  const armWobAmp = vRange('arm_wobble',      0.0, 0.7);
+  const armWobRt  = vRange('arm_wobble_rate', 0.0, 3.0);
+  const armDroop  = vN11('arm_droop') * 0.6;
+  const eyeN      = Math.round(v01('eye_count') * 12);
+  const eyeSz     = vRange('eye_size',    0.04, 0.30);
+  const eyeSpace  = vRange('eye_spacing', 0.05, 0.85);
+  const eyeY      = vN11('eye_height') * 0.7;
+  const eyePupil  = v01('eye_pupil');
+  const eyeGlow   = v01('eye_glow');
+  const runeRaw   = v('mark_runes');
+  const spotRaw   = v('mark_spots');
+  const facetRaw  = v('mark_facets');
+  const runeN     = Math.floor(v01('mark_runes')  * 9);
+  const spotN     = Math.floor(v01('mark_spots')  * 9);
+  const dripN     = Math.floor(v01('mark_drips')  * 8);
+  const facetN    = Math.floor(v01('mark_facets') * 14);
+  const partN     = Math.floor(v01('particle_count') * 64);
+  const partR     = vRange('particle_radius', 1.0, 2.6);
+  const partSz    = vRange('particle_size',   0.4, 4.5);
+  const partDrift = vRange('particle_drift',  0.0, 1.5);
+  const partTurb  = vRange('particle_turb',   0.0, 1.2);
+  const glowR     = baseR * vRange('glow_radius',   1.2, 6.0);
+  const glowStr   = v01('glow_strength');
+  const coreSz    = baseR * vRange('core_size', 0.04, 0.45);
+  const coreBri   = v01('core_brightness');
+  const pulseRt   = vRange('pulse_rate', 0.0, 2.5);
+  const huePri    = Math.round(v01('hue_primary') * 359);
+  const hueAcc    = Math.round(v01('hue_accent')  * 359);
+  const hueGlow   = Math.round(v01('hue_glow')    * 359);
+  const sat       = Math.round(vRange('saturation', 0, 100));
+  const light     = Math.round(vRange('lightness',  20, 80));
+
+  // Idle animation stack
+  const IDLE_PERIOD = 3.2;
+  const breathPhase = Math.sin(t * (pulseRt * 0.4 + 0.5));
+  const bobPhase    = Math.sin(t * 0.85);
+  const shiftPhase  = Math.sin(t * (2*Math.PI / IDLE_PERIOD));
+  const swayPhase   = Math.sin(t * 1.1 + 0.4);
+
+  const cxBase = W/2;
+  const cx = cxBase + shiftPhase * baseR * 0.022;
+  const ccy = H*0.50;
+  const sx = stretchX;
+  const sy = stretchY;
+  const pulse = breathPhase*0.5 + 0.5;
+  const bobY = bobPhase * baseR * 0.038;
+  const bcy = ccy + bobY;
+  const breathW = 1 + breathPhase * 0.018;
+  const swayRot = swayPhase * 0.018;
+
+  const tw = baseR * torsoW * sx * breathW;
+  const th = baseR * torsoH * sy;
+  const torsoTop = bcy - th;
+  const torsoBot = bcy + th;
+  const shoulderYabs = torsoTop + shoulderY * th * 0.6 + th * 0.05;
+  const shoulderHalfSpread = tw * shoulderW;
+  const hipHalfSpread = tw * hipW;
+  const pivotX = cx, pivotY = bcy;
+  const lean = posture + swayRot;
+  function leanPt(x, y){
+    const dx = x - pivotX, dy = y - pivotY;
+    const c = Math.cos(lean), s = Math.sin(lean);
+    return { x: pivotX + dx*c - dy*s, y: pivotY + dx*s + dy*c };
+  }
+  const headR = baseR * headSize;
+  const headStretchY = 1 + headShape * 0.45;
+  const headCenterPre = { x: cx, y: torsoTop - neckLen*baseR - headR*headStretchY*0.95 };
+  const neckBotPre = { x: cx, y: torsoTop };
+  const neckTopPre = { x: cx, y: headCenterPre.y + headR*headStretchY*0.6 };
+  const shoulderL_Pre = { x: cx - shoulderHalfSpread, y: shoulderYabs };
+  const shoulderR_Pre = { x: cx + shoulderHalfSpread, y: shoulderYabs };
+  const hipL_Pre = { x: cx - hipHalfSpread, y: torsoBot };
+  const hipR_Pre = { x: cx + hipHalfSpread, y: torsoBot };
+  const headCenter = leanPt(headCenterPre.x, headCenterPre.y);
+  const neckBot    = leanPt(neckBotPre.x, neckBotPre.y);
+  const neckTop    = leanPt(neckTopPre.x, neckTopPre.y);
+  const shoulderL  = leanPt(shoulderL_Pre.x, shoulderL_Pre.y);
+  const shoulderR  = leanPt(shoulderR_Pre.x, shoulderR_Pre.y);
+  const hipL       = leanPt(hipL_Pre.x, hipL_Pre.y);
+  const hipR       = leanPt(hipR_Pre.x, hipR_Pre.y);
+
+  const asymRng = mulberry32(Math.floor(asymRaw*9871) + 31);
+  const asym = {
+    armL_lenMul: 1 + (asymRng()-0.5)*asymRaw*0.5,
+    armR_lenMul: 1 + (asymRng()-0.5)*asymRaw*0.5,
+    legL_lenMul: 1 + (asymRng()-0.5)*asymRaw*0.35,
+    legR_lenMul: 1 + (asymRng()-0.5)*asymRaw*0.35,
+    armL_angOff: (asymRng()-0.5)*asymRaw*0.6,
+    armR_angOff: (asymRng()-0.5)*asymRaw*0.6,
+    legL_angOff: (asymRng()-0.5)*asymRaw*0.3,
+    legR_angOff: (asymRng()-0.5)*asymRaw*0.3,
+    shoulder_dy:  (asymRng()-0.5)*asymRaw*th*0.25,
+  };
+  shoulderL.y += asym.shoulder_dy;
+  shoulderR.y -= asym.shoulder_dy;
+  const legBaseLen = baseR * 1.0;
+  const armBaseLen = baseR * armLen;
+
+  function buildLimb(P0, baseAng, len, segFrac, bend, t_, idx, kind){
+    // Secondary motion: each limb's wobble phase offset by 0.35s (so they don't sync)
+    const wob = (kind==='arm') ? Math.sin((t_ + idx*0.35)*armWobRt + idx*0.7) * armWobAmp * 0.3 : 0;
+    const a = baseAng + wob;
+    const dx = Math.cos(a), dy = Math.sin(a);
+    const px = P0.x + dx*len, py = P0.y + dy*len;
+    const ex = P0.x + dx*len*segFrac, ey = P0.y + dy*len*segFrac;
+    const nx = -dy, ny = dx;
+    const bendAmt = bend * len * 0.45;
+    return { P0:P0, P1:{x:ex+nx*bendAmt, y:ey+ny*bendAmt}, P2:{x:px,y:py}, ang:a };
+  }
+  const figureTop = headCenter.y - headR*headStretchY;
+  const figureBot = hipR.y + legBaseLen + extSize*baseR*0.5;
+  const figureH = figureBot - figureTop;
+  function celShade(pathFn){
+    ctx.save();
+    pathFn(); ctx.clip();
+    const sg = ctx.createLinearGradient(cx, figureTop, cx, figureBot);
+    sg.addColorStop(Math.max(0, shadowPos - 0.04), 'transparent');
+    sg.addColorStop(shadowPos,        `hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.55)`);
+    sg.addColorStop(1.0,              `hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.65)`);
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, 0, W, H);
+    const hlx = cx - tw*0.45, hly = figureTop + figureH*0.2;
+    const hg = ctx.createRadialGradient(hlx, hly, 0, hlx + tw*0.1, hly + figureH*0.1, Math.max(tw, headR)*1.2);
+    hg.addColorStop(0,    `hsla(${huePri},${sat*0.4}%,92%,0.42)`);
+    hg.addColorStop(0.5,  'transparent');
+    ctx.fillStyle = hg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  // Outer glow
+  const og = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, glowR*1.1);
+  og.addColorStop(0, `hsla(${huePri},${sat}%,${light}%,${0.18*glowStr + pulse*0.06*glowStr})`);
+  og.addColorStop(0.4,`hsla(${hueAcc},${sat*0.8}%,${light*0.7}%,${0.10*glowStr})`);
+  og.addColorStop(1, 'transparent');
+  ctx.fillStyle = og;
+  ctx.beginPath();
+  ctx.ellipse(cx, bcy, glowR*sx*1.1, glowR*sy*1.0, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  const figEffR = Math.max(baseR*partR, figureH*0.45);
+
+  // Background particles (drawn behind body)
+  if(partN > 0){
+    for(let p=0; p<partN; p++){
+      const seed = p*17;
+      const orR = figEffR + (seed%13)*(baseR*0.05);
+      const orA = (p/partN)*Math.PI*2 + t*partDrift*0.5 + Math.sin(t + seed*0.1)*0.4 + swayPhase*0.12;
+      const tu  = Math.sin(t*1.3 + seed*0.22) * partTurb * 8;
+      const px = cx + Math.cos(orA)*(orR+tu)*sx;
+      const py = bcy + Math.sin(orA)*(orR+tu)*sy*0.85;
+      const pSz = partSz * (0.6 + ((seed%5)/5)*0.8);
+      const pAl = 0.4 + Math.sin(t*1.8 + p*0.55)*0.3;
+      if(py > bcy) continue;
+      ctx.fillStyle = `hsla(${hueAcc},88%,75%,${pAl*0.7})`;
+      ctx.beginPath(); ctx.arc(px, py, pSz, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  function torsoPathFn(){
+    const M = Math.max(8, lumpN);
+    const pts = [];
+    for(let i=0; i<M; i++){
+      const ang = (i/M)*Math.PI*2 - Math.PI/2;
+      const cosA = Math.cos(ang), sinA = Math.sin(ang);
+      const xRadius = sinA < 0
+        ? tw * (1 - 0.08*(1 - shoulderW))
+        : tw * (1 - 0.05*(1 - hipW));
+      const yRadius = th;
+      let x = cosA * xRadius;
+      let y = sinA * yRadius;
+      const n = Math.sin(t*0.6 + i*0.9 + 1)*lumpAmp*0.3;
+      x += cosA * n * 0.6;
+      y += sinA * n * 0.6;
+      const pt = leanPt(cx + x, bcy + y);
+      pts.push(pt);
+    }
+    splinePath(ctx, pts);
+  }
+  function headPathFn(){
+    const M = Math.max(7, Math.floor(lumpN*0.7));
+    const pts = [];
+    for(let i=0; i<M; i++){
+      const ang = (i/M)*Math.PI*2 - Math.PI/2;
+      const cosA = Math.cos(ang), sinA = Math.sin(ang);
+      let x = cosA * headR;
+      let y = sinA * headR * headStretchY;
+      const n = Math.sin(t*0.7 + i*1.3 + 4)*lumpAmp*0.25;
+      x += cosA * n * 0.5;
+      y += sinA * n * 0.5;
+      const ptPre = { x: headCenter.x + x, y: headCenter.y + y };
+      const dxh = ptPre.x - cx, dyh = ptPre.y - bcy;
+      const c = Math.cos(lean), s = Math.sin(lean);
+      pts.push({ x: cx + dxh*c - dyh*s, y: bcy + dxh*s + dyh*c });
+    }
+    splinePath(ctx, pts);
+  }
+  function neckPathFn(){
+    const baseW = neckW * baseR;
+    const topW  = baseW * 0.78;
+    const dx_ = (neckTop.x - neckBot.x);
+    const dy_ = (neckTop.y - neckBot.y);
+    const lenN = Math.sqrt(dx_*dx_ + dy_*dy_) || 1;
+    const nxv = -dy_/lenN, nyv = dx_/lenN;
+    ctx.beginPath();
+    ctx.moveTo(neckBot.x - nxv*baseW, neckBot.y - nyv*baseW);
+    ctx.lineTo(neckBot.x + nxv*baseW, neckBot.y + nyv*baseW);
+    ctx.lineTo(neckTop.x + nxv*topW,  neckTop.y + nyv*topW);
+    ctx.lineTo(neckTop.x - nxv*topW,  neckTop.y - nyv*topW);
+    ctx.closePath();
+  }
+
+  // Build limb structures
+  const legAngL = Math.PI/2 + asym.legL_angOff;
+  const legAngR = Math.PI/2 + asym.legR_angOff;
+  const legBendL = legBend + asym.legL_angOff*0.3;
+  const legBendR = -legBend + asym.legR_angOff*0.3;
+  const limbL_leg = buildLimb(hipL, legAngL, legBaseLen * asym.legL_lenMul, legSeg, legBendL, t, 0, 'leg');
+  const limbR_leg = buildLimb(hipR, legAngR, legBaseLen * asym.legR_lenMul, legSeg, legBendR, t, 1, 'leg');
+
+  const armBaseAngL = Math.PI - 0.35 + armDroop + asym.armL_angOff;
+  const armBaseAngR = 0.35 + armDroop + asym.armR_angOff;
+  const armBendSign = armBend;
+  const limbL_arm = (armN >= 1) ? buildLimb(shoulderL, armBaseAngL, armBaseLen * asym.armL_lenMul, armSeg, armBendSign, t, 2, 'arm') : null;
+  const limbR_arm = (armN >= 2) ? buildLimb(shoulderR, armBaseAngR, armBaseLen * asym.armR_lenMul, armSeg, -armBendSign, t, 3, 'arm') : null;
+
+  const extraN = Math.max(0, armN - 2);
+  const extraArms = [];
+  for(let i=0; i<extraN; i++){
+    const baseA = (i/Math.max(1,extraN))*Math.PI*2 + armDroop + 0.2;
+    const wob = Math.sin((t + (i+4)*0.35)*armWobRt + (i+10)*0.7) * armWobAmp;
+    const a = baseA + wob;
+    const len = armBaseLen * (0.7 + (i%3)*0.1);
+    const tipX = cx + Math.cos(a)*len*sx;
+    const tipY = bcy + Math.sin(a)*len*sy;
+    const cpx = cx + Math.cos(baseA + wob*0.4)*len*0.5*sx;
+    const cpy = bcy + Math.sin(baseA + wob*0.4)*len*0.5*sy;
+    extraArms.push({P0:{x:cx,y:bcy}, P1:{x:cpx,y:cpy}, P2:{x:tipX,y:tipY}, ang:a});
+  }
+
+  // Ground shadow (soft radial)
+  const groundY = Math.max(limbL_leg.P2.y, limbR_leg.P2.y) + extSize*baseR*0.4 + 4;
+  drawGroundShadow(ctx, cx, groundY, tw*1.5, tw*0.22, huePri, sat);
+
+  // Joint AO at hips BEFORE limbs/torso (so it appears under)
+  drawJointAO(ctx, hipL.x, hipL.y, armW * 1.2);
+  drawJointAO(ctx, hipR.x, hipR.y, armW * 1.2);
+
+  // Legs (volumetric)
+  drawVolumetricLimb(ctx, limbL_leg, armW, armTaper, huePri, sat, light, outline);
+  drawVolumetricLimb(ctx, limbR_leg, armW, armTaper, huePri, sat, light, outline);
+  drawExtremity(ctx, limbL_leg.P2.x, limbL_leg.P2.y, extSize*baseR, extShape, Math.PI/2, huePri, sat, light, outline, 'foot');
+  drawExtremity(ctx, limbR_leg.P2.x, limbR_leg.P2.y, extSize*baseR, extShape, Math.PI/2, huePri, sat, light, outline, 'foot');
+
+  // Extra arms — drawn behind body using volumetric curve sampling
+  for(const ea of extraArms){
+    drawVolumetricCurve(ctx, ea.P0, ea.P1, ea.P2, armW, armTaper, huePri, sat, light, outline);
+  }
+
+  // Shoulder AO underneath torso
+  drawJointAO(ctx, shoulderL.x, shoulderL.y, armW * 1.3);
+  drawJointAO(ctx, shoulderR.x, shoulderR.y, armW * 1.3);
+
+  // Torso
+  ctx.save();
+  ctx.shadowColor = `hsla(${huePri},${sat}%,15%,0.45)`;
+  ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+  torsoPathFn();
+  ctx.fillStyle = `hsla(${huePri},${sat*0.6}%,8%,0.4)`;
+  ctx.fill();
+  ctx.restore();
+  torsoPathFn(); ctx.strokeStyle = 'rgba(0,0,0,0.92)'; ctx.lineWidth = outline; ctx.lineJoin = 'round'; ctx.stroke();
+  torsoPathFn(); ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`; ctx.fill();
+  drawMarksInPath(ctx, torsoPathFn, cx, bcy, tw, th, lean, t,
+    Math.ceil(spotN*0.7), Math.ceil(runeN*0.65), Math.ceil(facetN*0.7),
+    spotRaw, runeRaw, facetRaw,
+    huePri, hueAcc, hueGlow, sat, pulse);
+  celShade(torsoPathFn);
+
+  // Arms (drawn over torso)
+  if(limbL_arm){
+    drawVolumetricLimb(ctx, limbL_arm, armW, armTaper, huePri, sat, light, outline);
+    drawExtremity(ctx, limbL_arm.P2.x, limbL_arm.P2.y, extSize*baseR*0.85, extShape, limbL_arm.ang, huePri, sat, light, outline, 'hand');
+  }
+  if(limbR_arm){
+    drawVolumetricLimb(ctx, limbR_arm, armW, armTaper, huePri, sat, light, outline);
+    drawExtremity(ctx, limbR_arm.P2.x, limbR_arm.P2.y, extSize*baseR*0.85, extShape, limbR_arm.ang, huePri, sat, light, outline, 'hand');
+  }
+
+  // Neck
+  if(neckLen * baseR > 1.5){
+    neckPathFn(); ctx.strokeStyle = 'rgba(0,0,0,0.92)'; ctx.lineWidth = outline; ctx.lineJoin = 'round'; ctx.stroke();
+    neckPathFn(); ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`; ctx.fill();
+    celShade(neckPathFn);
+    // Neck base AO ring
+    drawJointAO(ctx, neckBot.x, neckBot.y, neckW * baseR * 1.4);
+  }
+
+  // Head (with brow ridge, cheek highlight, jaw shadow)
+  if(headR > 2){
+    ctx.save();
+    ctx.shadowColor = `hsla(${huePri},${sat}%,15%,0.4)`;
+    ctx.shadowBlur = 12; ctx.shadowOffsetY = 3;
+    headPathFn();
+    ctx.fillStyle = `hsla(${huePri},${sat*0.6}%,8%,0.4)`;
+    ctx.fill();
+    ctx.restore();
+    headPathFn(); ctx.strokeStyle = 'rgba(0,0,0,0.92)'; ctx.lineWidth = outline; ctx.lineJoin = 'round'; ctx.stroke();
+    headPathFn(); ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`; ctx.fill();
+    drawMarksInPath(ctx, headPathFn, headCenter.x, headCenter.y, headR, headR*headStretchY, lean, t,
+      Math.floor(spotN*0.3), Math.floor(runeN*0.35), Math.floor(facetN*0.3),
+      spotRaw, runeRaw, facetRaw,
+      huePri, hueAcc, hueGlow, sat, pulse);
+    celShade(headPathFn);
+
+    // ── BROW RIDGE — horizontal dark gradient just above eyes
+    ctx.save();
+    headPathFn(); ctx.clip();
+    const c = Math.cos(lean), s = Math.sin(lean);
+    function leanAround(x, y){
+      const dxh = x - cx, dyh = y - bcy;
+      return [cx + dxh*c - dyh*s, bcy + dxh*s + dyh*c];
+    }
+    const browYrel = -headR * headStretchY * 0.08;
+    const [bx0, by0] = leanAround(headCenter.x, headCenter.y + browYrel - headR*0.18);
+    const [bx1, by1] = leanAround(headCenter.x, headCenter.y + browYrel + headR*0.22);
+    const browGrad = ctx.createLinearGradient(bx0, by0, bx1, by1);
+    browGrad.addColorStop(0, `hsla(${huePri},${sat}%,${Math.max(5,light-28)}%,0.55)`);
+    browGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = browGrad;
+    const [bcx_, bcy_] = leanAround(headCenter.x, headCenter.y + browYrel);
+    ctx.save();
+    ctx.translate(bcx_, bcy_);
+    ctx.rotate(lean);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, headR*0.85, headR*headStretchY*0.22, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // ── CHEEK HIGHLIGHT
+    const [chx0, chy0] = leanAround(headCenter.x - headR*0.52, headCenter.y - headR*0.28);
+    const [chx1, chy1] = leanAround(headCenter.x - headR*0.35, headCenter.y - headR*0.18);
+    const chkG = ctx.createRadialGradient(chx0, chy0, 0, chx1, chy1, headR*0.65);
+    chkG.addColorStop(0, `hsla(${huePri},${sat*0.3}%,94%,0.28)`);
+    chkG.addColorStop(1, 'transparent');
+    ctx.fillStyle = chkG;
+    ctx.fillRect(headCenter.x - headR*2, headCenter.y - headR*2, headR*4, headR*4);
+
+    // ── JAW / CHIN SHADOW — crescent at bottom of head
+    const [jx0, jy0] = leanAround(headCenter.x, headCenter.y + headR*headStretchY*0.55);
+    const [jx1, jy1] = leanAround(headCenter.x, headCenter.y + headR*headStretchY*1.05);
+    const jawG = ctx.createLinearGradient(jx0, jy0, jx1, jy1);
+    jawG.addColorStop(0, 'transparent');
+    jawG.addColorStop(0.65, `hsla(${huePri},${sat}%,${Math.max(5,light-30)}%,0.35)`);
+    jawG.addColorStop(1.0,  `hsla(${huePri},${sat}%,${Math.max(3,light-40)}%,0.55)`);
+    ctx.fillStyle = jawG;
+    ctx.fillRect(headCenter.x - headR*2, headCenter.y - headR*2, headR*4, headR*headStretchY*4);
+    ctx.restore();
+
+    // ── EYES
+    if(eyeN > 0){
+      const blinkSY = blinkActive ? Math.max(0.05, 1 - Math.sin(blinkP*Math.PI)*0.92) : 1;
+      const eR = headR * eyeSz * 1.3;
+      const ambientWander = Math.sin(t*0.55) * 0.3;
+      const wxRaw = (cursorWander.x * eR * 0.35) + ambientWander;
+      const wyRaw = (cursorWander.y * eR * 0.30);
+      const wlen = Math.sqrt(wxRaw*wxRaw + wyRaw*wyRaw);
+      const wmax = eR * 0.35;
+      const wScale = wlen > wmax ? (wmax / wlen) : 1;
+      const wx = wxRaw * wScale, wy = wyRaw * wScale;
+      const eYrel = eyeY * headR * 0.55;
+      const c2 = Math.cos(lean), s2 = Math.sin(lean);
+      function applyLean(x, y){
+        const dxh = x - cx, dyh = y - bcy;
+        return [cx + dxh*c2 - dyh*s2, bcy + dxh*s2 + dyh*c2];
+      }
+      const eyePos = [];
+      if(eyeN === 1){
+        eyePos.push(applyLean(headCenter.x, headCenter.y + eYrel));
+      } else {
+        const sep = Math.min(headR*0.85, headR * eyeSpace * 0.95);
+        if(eyeN === 2){
+          eyePos.push(applyLean(headCenter.x - sep, headCenter.y + eYrel));
+          eyePos.push(applyLean(headCenter.x + sep, headCenter.y + eYrel));
+        } else {
+          for(let i=0; i<eyeN; i++){
+            const tt = i/(eyeN-1);
+            const offX = (-1 + 2*tt) * sep;
+            const offY = eYrel + (offX*offX)/(headR*1.5) * (eyeY < 0 ? -1 : 1) * 4;
+            eyePos.push(applyLean(headCenter.x + offX, headCenter.y + offY));
+          }
+        }
+      }
+      for(const [ex, ey] of eyePos) drawEye(ctx, ex, ey, eR, blinkSY, wx, wy, eyePupil, eyeGlow, hueGlow, outline);
+    }
+  }
+
+  if(dripN > 0){
+    const r4 = mulberry32(Math.floor(t*2) + dripN*17);
+    for(let i=0; i<dripN; i++){
+      const dx = cx + (r4()-0.5)*tw*1.6;
+      const dy = bcy + th*0.9 + ((t*40 + i*23) % 60) * baseR*0.018;
+      const ds = 1.5 + r4()*2.2;
+      ctx.fillStyle = `hsla(${huePri},85%,55%,${0.45 + r4()*0.3})`;
+      ctx.beginPath(); ctx.arc(dx, dy, ds, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  if(coreSz > 0.1 && coreBri > 0.05){
+    const cg = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, coreSz*4);
+    cg.addColorStop(0,    `hsla(${hueGlow},96%,94%,${0.85*coreBri})`);
+    cg.addColorStop(0.25, `hsla(${huePri},88%,70%,${0.45*coreBri})`);
+    cg.addColorStop(0.7,  `hsla(${huePri},78%,52%,${0.12*coreBri})`);
+    cg.addColorStop(1,    'transparent');
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(cx, bcy, coreSz*4, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Foreground particles (below body line)
+  if(partN > 0){
+    for(let p=0; p<partN; p++){
+      const seed = p*17;
+      const orR = figEffR + (seed%13)*(baseR*0.05);
+      const orA = (p/partN)*Math.PI*2 + t*partDrift*0.5 + Math.sin(t + seed*0.1)*0.4 + swayPhase*0.12;
+      const tu  = Math.sin(t*1.3 + seed*0.22) * partTurb * 8;
+      const px = cx + Math.cos(orA)*(orR+tu)*sx;
+      const py = bcy + Math.sin(orA)*(orR+tu)*sy*0.85;
+      const pSz = partSz * (0.6 + ((seed%5)/5)*0.8);
+      const pAl = 0.4 + Math.sin(t*1.8 + p*0.55)*0.3;
+      if(py <= bcy) continue;
+      ctx.fillStyle = `hsla(${hueAcc},88%,75%,${pAl})`;
+      ctx.beginPath(); ctx.arc(px, py, pSz, 0, Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   QUADRUPED MODE — front-facing four-legged creature.
+   Wide horizontal body oval, four volumetric legs, head atop.
+   Painter's order: ground → back legs → body → front legs → neck → head → eyes/marks.
+   ═══════════════════════════════════════════════════════════════ */
+function renderQuadruped(ctx, W, H, t){
+  const baseR     = vRange('body_radius',    W*0.04, W*0.40);
+  const stretchX  = vRange('body_stretch_x', 0.50,  1.50);
+  const stretchY  = vRange('body_stretch_y', 0.50,  1.50);
+  const lumpAmp   = vRange('body_lumpiness', 0.0,   55.0);
+  const lumpN     = 5 + Math.floor(v01('body_lump_count') * 13);
+  const outline   = vRange('body_outline',   0.5,   9.0);
+  const shadowPos = vRange('body_shadow',    0.20,  0.80);
+  const headSize  = vRange('head_size',     0.0, 1.6);
+  const headShape = vN11('head_shape');
+  const neckLen   = vRange('neck_length',   0.0, 0.9);
+  const neckW     = vRange('neck_width',    0.06, 0.40);
+  const torsoH    = vRange('torso_height',  0.5, 1.6);
+  const torsoW    = vRange('torso_width',   0.4, 1.2);
+  const shoulderW = vRange('shoulder_width', 0.55, 1.4);
+  const hipW      = vRange('hip_width',     0.35, 1.15);
+  const legSeg    = v01('leg_segments');
+  const legBend   = vN11('leg_bend');
+  const posture   = vN11('posture') * 0.18;
+  const asymRaw   = v01('bilateral_asymmetry');
+  const extSize   = vRange('extremity_size',  0.0, 0.9);
+  const extShape  = v01('extremity_shape');
+  const armN      = Math.floor(v01('arm_count') * 20);
+  const armLenAx  = vRange('arm_length', 0.15, 3.20);
+  const armW      = vRange('arm_width',  1.0,  10.0);
+  const armTaper  = v01('arm_taper');
+  const armCurl   = vRange('arm_curl',        0.0, 1.4);
+  const eyeN      = Math.round(v01('eye_count') * 12);
+  const eyeSz     = vRange('eye_size',    0.04, 0.30);
+  const eyeSpace  = vRange('eye_spacing', 0.05, 0.85);
+  const eyeY      = vN11('eye_height') * 0.7;
+  const eyePupil  = v01('eye_pupil');
+  const eyeGlow   = v01('eye_glow');
+  const runeRaw   = v('mark_runes');
+  const spotRaw   = v('mark_spots');
+  const facetRaw  = v('mark_facets');
+  const runeN     = Math.floor(v01('mark_runes')  * 9);
+  const spotN     = Math.floor(v01('mark_spots')  * 9);
+  const dripN     = Math.floor(v01('mark_drips')  * 8);
+  const facetN    = Math.floor(v01('mark_facets') * 14);
+  const partN     = Math.floor(v01('particle_count') * 64);
+  const partR     = vRange('particle_radius', 1.0, 2.6);
+  const partSz    = vRange('particle_size',   0.4, 4.5);
+  const partDrift = vRange('particle_drift',  0.0, 1.5);
+  const partTurb  = vRange('particle_turb',   0.0, 1.2);
+  const glowR     = baseR * vRange('glow_radius',   1.2, 6.0);
+  const glowStr   = v01('glow_strength');
+  const coreSz    = baseR * vRange('core_size', 0.04, 0.45);
+  const coreBri   = v01('core_brightness');
+  const pulseRt   = vRange('pulse_rate', 0.0, 2.5);
+  const huePri    = Math.round(v01('hue_primary') * 359);
+  const hueAcc    = Math.round(v01('hue_accent')  * 359);
+  const hueGlow   = Math.round(v01('hue_glow')    * 359);
+  const sat       = Math.round(vRange('saturation', 0, 100));
+  const light     = Math.round(vRange('lightness',  20, 80));
+
+  // Idle stack — slightly reduced bob for quads (closer to ground)
+  const IDLE_PERIOD = 3.5;
+  const breathPhase = Math.sin(t * (pulseRt * 0.4 + 0.5));
+  const bobPhase    = Math.sin(t * 0.85);
+  const shiftPhase  = Math.sin(t * (2*Math.PI / IDLE_PERIOD));
+  const swayPhase   = Math.sin(t * (2*Math.PI / IDLE_PERIOD) + 0.4);
+
+  const cxBase = W/2;
+  const cx = cxBase + shiftPhase * baseR * 0.018;
+  const baseCy = H*0.5;
+  const sx = stretchX, sy = stretchY;
+  const pulse = breathPhase*0.5 + 0.5;
+  const bobY = bobPhase * baseR * 0.024;
+  const bcy = baseCy + bobY + baseR * 0.12; // body center slightly below biped's
+  const breathW = 1 + breathPhase * 0.02;
+  const swayRot = swayPhase * 0.026;
+
+  // Body oval geometry
+  const qBodyHx = baseR * torsoW * 1.45 * sx * breathW;
+  const qBodyHy = baseR * torsoH * 0.62 * sy;
+
+  // Head
+  const headR = baseR * headSize;
+  const headStretchY = 1 + headShape * 0.45;
+  // Neck shorter for quads
+  const qNeckLen = neckLen * 0.65;
+  const headCenterPre = { x: cx, y: bcy - qBodyHy - qNeckLen*baseR - headR*headStretchY*0.95 };
+  const neckBotPre = { x: cx, y: bcy - qBodyHy };
+  const neckTopPre = { x: cx, y: headCenterPre.y + headR*headStretchY*0.6 };
+
+  // Apply sway as small body rotation pivoting around body center
+  const pivotX = cx, pivotY = bcy;
+  const lean = posture + swayRot;
+  function leanPt(x, y){
+    const dx = x - pivotX, dy = y - pivotY;
+    const c = Math.cos(lean), s = Math.sin(lean);
+    return { x: pivotX + dx*c - dy*s, y: pivotY + dx*s + dy*c };
+  }
+  const headCenter = leanPt(headCenterPre.x, headCenterPre.y);
+  const neckBot    = leanPt(neckBotPre.x, neckBotPre.y);
+  const neckTop    = leanPt(neckTopPre.x, neckTopPre.y);
+
+  // Leg attachment points
+  const shoulderHalfSpread = qBodyHx * (shoulderW / 1.45) * 0.9; // normalized by oval width
+  const hipHalfSpread = qBodyHx * (hipW / 1.45) * 0.9;
+  // Per brief: front legs slightly outside spread, back legs slightly inside
+  const flAttach = leanPt(cx - shoulderHalfSpread*1.1, bcy - qBodyHy*0.05);
+  const frAttach = leanPt(cx + shoulderHalfSpread*1.1, bcy - qBodyHy*0.05);
+  const blAttach = leanPt(cx - hipHalfSpread*0.9,      bcy + qBodyHy*0.12);
+  const brAttach = leanPt(cx + hipHalfSpread*0.9,      bcy + qBodyHy*0.12);
+
+  // Asymmetry
+  const asymRng = mulberry32(Math.floor(asymRaw*9871) + 31);
+  const asym = {
+    fl: 1 + (asymRng()-0.5)*asymRaw*0.25,
+    fr: 1 + (asymRng()-0.5)*asymRaw*0.25,
+    bl: 1 + (asymRng()-0.5)*asymRaw*0.25,
+    br: 1 + (asymRng()-0.5)*asymRaw*0.25,
+  };
+
+  const legBaseLen = baseR * 1.0 * 0.85; // quads are lower
+  function buildQuadLimb(P0, baseAng, len, segFrac, bend, t_, idx){
+    // Independent secondary motion (back legs offset by 0.4s from front)
+    const phaseOff = (idx >= 2) ? 0.4 : 0.0;
+    const wob = Math.sin((t_ + phaseOff)*0.7 + idx*0.6) * 0.04;
+    const a = baseAng + wob;
+    const dx = Math.cos(a), dy = Math.sin(a);
+    const px = P0.x + dx*len, py = P0.y + dy*len;
+    const ex = P0.x + dx*len*segFrac, ey = P0.y + dy*len*segFrac;
+    const nx_ = -dy, ny_ = dx;
+    const bendAmt = bend * len * 0.45;
+    return { P0:P0, P1:{x:ex+nx_*bendAmt, y:ey+ny_*bendAmt}, P2:{x:px,y:py}, ang:a };
+  }
+
+  // Leg angles per brief
+  const flAng = Math.PI/2 - 0.22; // front-left, slight outward splay
+  const frAng = Math.PI/2 + 0.22;
+  const blAng = Math.PI/2 - 0.18;
+  const brAng = Math.PI/2 + 0.18;
+
+  const flLimb = buildQuadLimb(flAttach, flAng, legBaseLen*asym.fl, legSeg,  legBend, t, 0);
+  const frLimb = buildQuadLimb(frAttach, frAng, legBaseLen*asym.fr, legSeg, -legBend, t, 1);
+  const blLimb = buildQuadLimb(blAttach, blAng, legBaseLen*asym.bl, legSeg, -legBend, t, 2);
+  const brLimb = buildQuadLimb(brAttach, brAng, legBaseLen*asym.br, legSeg,  legBend, t, 3);
+
+  // Outer glow
+  const og = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, glowR*1.1);
+  og.addColorStop(0, `hsla(${huePri},${sat}%,${light}%,${0.18*glowStr + pulse*0.06*glowStr})`);
+  og.addColorStop(0.4,`hsla(${hueAcc},${sat*0.8}%,${light*0.7}%,${0.10*glowStr})`);
+  og.addColorStop(1, 'transparent');
+  ctx.fillStyle = og;
+  ctx.beginPath();
+  ctx.ellipse(cx, bcy, glowR*sx*1.1, glowR*sy*1.0, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Background particles
+  const figEffR = Math.max(baseR*partR, qBodyHx*1.3);
+  if(partN > 0){
+    for(let p=0; p<partN; p++){
+      const seed = p*17;
+      const orR = figEffR + (seed%13)*(baseR*0.05);
+      const orA = (p/partN)*Math.PI*2 + t*partDrift*0.5 + Math.sin(t + seed*0.1)*0.4 + swayPhase*0.12;
+      const tu  = Math.sin(t*1.3 + seed*0.22) * partTurb * 8;
+      const px = cx + Math.cos(orA)*(orR+tu)*sx;
+      const py = bcy + Math.sin(orA)*(orR+tu)*sy*0.85;
+      const pSz = partSz * (0.6 + ((seed%5)/5)*0.8);
+      const pAl = 0.4 + Math.sin(t*1.8 + p*0.55)*0.3;
+      if(py > bcy) continue;
+      ctx.fillStyle = `hsla(${hueAcc},88%,75%,${pAl*0.7})`;
+      ctx.beginPath(); ctx.arc(px, py, pSz, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Body oval path
+  function bodyPathFn(){
+    const M = Math.max(10, lumpN);
+    const pts = [];
+    for(let i=0; i<M; i++){
+      const ang = (i/M)*Math.PI*2 - Math.PI/2;
+      const cosA = Math.cos(ang), sinA = Math.sin(ang);
+      let x = cosA * qBodyHx;
+      let y = sinA * qBodyHy;
+      const n = Math.sin(t*0.55 + i*0.9 + 1)*lumpAmp*0.25;
+      x += cosA * n * 0.4;
+      y += sinA * n * 0.4;
+      pts.push(leanPt(cx + x, bcy + y));
+    }
+    splinePath(ctx, pts);
+  }
+  function headPathFn(){
+    const M = Math.max(7, Math.floor(lumpN*0.7));
+    const pts = [];
+    for(let i=0; i<M; i++){
+      const ang = (i/M)*Math.PI*2 - Math.PI/2;
+      const cosA = Math.cos(ang), sinA = Math.sin(ang);
+      let x = cosA * headR;
+      let y = sinA * headR * headStretchY;
+      const n = Math.sin(t*0.7 + i*1.3 + 4)*lumpAmp*0.25;
+      x += cosA * n * 0.5;
+      y += sinA * n * 0.5;
+      const ptPre = { x: headCenter.x + x, y: headCenter.y + y };
+      const dxh = ptPre.x - cx, dyh = ptPre.y - bcy;
+      const c = Math.cos(lean), s = Math.sin(lean);
+      pts.push({ x: cx + dxh*c - dyh*s, y: bcy + dxh*s + dyh*c });
+    }
+    splinePath(ctx, pts);
+  }
+  function neckPathFn(){
+    const baseW = neckW * baseR * 1.05; // wider neck on quads
+    const topW  = baseW * 0.78;
+    const dx_ = (neckTop.x - neckBot.x);
+    const dy_ = (neckTop.y - neckBot.y);
+    const lenN = Math.sqrt(dx_*dx_ + dy_*dy_) || 1;
+    const nxv = -dy_/lenN, nyv = dx_/lenN;
+    ctx.beginPath();
+    ctx.moveTo(neckBot.x - nxv*baseW, neckBot.y - nyv*baseW);
+    ctx.lineTo(neckBot.x + nxv*baseW, neckBot.y + nyv*baseW);
+    ctx.lineTo(neckTop.x + nxv*topW,  neckTop.y + nyv*topW);
+    ctx.lineTo(neckTop.x - nxv*topW,  neckTop.y - nyv*topW);
+    ctx.closePath();
+  }
+
+  // 1. Ground shadow
+  const groundY = Math.max(flLimb.P2.y, frLimb.P2.y, blLimb.P2.y, brLimb.P2.y) + extSize*baseR*0.4 + 4;
+  drawGroundShadow(ctx, cx, groundY, qBodyHx*1.25, qBodyHx*0.18, huePri, sat);
+
+  // 1.5 Tail (drawn BEHIND body)
+  if(armN > 120){
+    const tailLen = baseR * armLenAx * 0.9;
+    const tailSide = (asymRng() > 0.5) ? 1 : -1; // deterministic-ish side
+    const tailCurl = armCurl * 1.2;
+    const tailBase = leanPt(cx + tailSide*qBodyHx*0.3, bcy + qBodyHy*0.4);
+    const tailMid  = { x: tailBase.x + tailSide*tailLen*0.4 + Math.sin(t*0.7)*4,
+                       y: tailBase.y + tailLen*0.55 };
+    const tailTip  = { x: tailBase.x + tailSide*tailLen*0.7 + Math.cos(t*0.6)*tailCurl*15,
+                       y: tailBase.y + tailLen + Math.sin(t*0.6)*tailCurl*10 };
+    drawVolumetricCurve(ctx, tailBase, tailMid, tailTip, armW*0.9, Math.min(0.95, armTaper+0.15),
+                        huePri, sat, light*0.92, outline);
+  }
+
+  // 2. Back legs (drawn BEHIND body, slightly darker to suggest depth)
+  drawJointAO(ctx, blAttach.x, blAttach.y, armW * 1.1);
+  drawJointAO(ctx, brAttach.x, brAttach.y, armW * 1.1);
+  drawVolumetricLimb(ctx, blLimb, armW*0.95, armTaper, huePri, sat, Math.round(light*0.85), outline);
+  drawVolumetricLimb(ctx, brLimb, armW*0.95, armTaper, huePri, sat, Math.round(light*0.85), outline);
+  drawExtremity(ctx, blLimb.P2.x, blLimb.P2.y, extSize*baseR*0.9, extShape, Math.PI/2, huePri, sat, Math.round(light*0.85), outline, 'foot');
+  drawExtremity(ctx, brLimb.P2.x, brLimb.P2.y, extSize*baseR*0.9, extShape, Math.PI/2, huePri, sat, Math.round(light*0.85), outline, 'foot');
+
+  // 3. Body oval
+  ctx.save();
+  ctx.shadowColor = `hsla(${huePri},${sat}%,15%,0.45)`;
+  ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+  bodyPathFn();
+  ctx.fillStyle = `hsla(${huePri},${sat*0.6}%,8%,0.4)`;
+  ctx.fill();
+  ctx.restore();
+  bodyPathFn(); ctx.strokeStyle = 'rgba(0,0,0,0.92)'; ctx.lineWidth = outline; ctx.lineJoin = 'round'; ctx.stroke();
+  bodyPathFn(); ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`; ctx.fill();
+  drawMarksInPath(ctx, bodyPathFn, cx, bcy, qBodyHx, qBodyHy, lean, t,
+    Math.ceil(spotN*0.8), Math.ceil(runeN*0.7), Math.ceil(facetN*0.8),
+    spotRaw, runeRaw, facetRaw,
+    huePri, hueAcc, hueGlow, sat, pulse);
+  // Cel-shade body
+  ctx.save();
+  bodyPathFn(); ctx.clip();
+  const figureTop = bcy - qBodyHy*1.3;
+  const figureBot = groundY;
+  const sg = ctx.createLinearGradient(cx, figureTop, cx, figureBot);
+  sg.addColorStop(Math.max(0, shadowPos - 0.04), 'transparent');
+  sg.addColorStop(shadowPos,        `hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.55)`);
+  sg.addColorStop(1.0,              `hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.65)`);
+  ctx.fillStyle = sg;
+  ctx.fillRect(0, 0, W, H);
+  const hlx = cx - qBodyHx*0.4, hly = figureTop + (figureBot-figureTop)*0.25;
+  const hg = ctx.createRadialGradient(hlx, hly, 0, hlx + qBodyHx*0.1, hly + (figureBot-figureTop)*0.1, Math.max(qBodyHx, headR)*1.2);
+  hg.addColorStop(0,    `hsla(${huePri},${sat*0.4}%,92%,0.42)`);
+  hg.addColorStop(0.5,  'transparent');
+  ctx.fillStyle = hg;
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+
+  // 4. Front legs (drawn OVER body)
+  drawJointAO(ctx, flAttach.x, flAttach.y, armW * 1.2);
+  drawJointAO(ctx, frAttach.x, frAttach.y, armW * 1.2);
+  drawVolumetricLimb(ctx, flLimb, armW, armTaper, huePri, sat, light, outline);
+  drawVolumetricLimb(ctx, frLimb, armW, armTaper, huePri, sat, light, outline);
+  drawExtremity(ctx, flLimb.P2.x, flLimb.P2.y, extSize*baseR, extShape, Math.PI/2, huePri, sat, light, outline, 'foot');
+  drawExtremity(ctx, frLimb.P2.x, frLimb.P2.y, extSize*baseR, extShape, Math.PI/2, huePri, sat, light, outline, 'foot');
+
+  // 5. Neck
+  if(qNeckLen * baseR > 1.5 && headR > 2){
+    neckPathFn(); ctx.strokeStyle = 'rgba(0,0,0,0.92)'; ctx.lineWidth = outline; ctx.lineJoin = 'round'; ctx.stroke();
+    neckPathFn(); ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`; ctx.fill();
+    // Cel-shade neck
+    ctx.save();
+    neckPathFn(); ctx.clip();
+    const sgN = ctx.createLinearGradient(neckBot.x - baseR, neckBot.y, neckBot.x + baseR, neckBot.y);
+    sgN.addColorStop(0, 'transparent');
+    sgN.addColorStop(0.7, `hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.45)`);
+    sgN.addColorStop(1.0, `hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.55)`);
+    ctx.fillStyle = sgN;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+    drawJointAO(ctx, neckBot.x, neckBot.y, neckW * baseR * 1.4);
+  }
+
+  // 6. Head — same anatomy as biped (brow, cheek, jaw)
+  if(headR > 2){
+    ctx.save();
+    ctx.shadowColor = `hsla(${huePri},${sat}%,15%,0.4)`;
+    ctx.shadowBlur = 12; ctx.shadowOffsetY = 3;
+    headPathFn();
+    ctx.fillStyle = `hsla(${huePri},${sat*0.6}%,8%,0.4)`;
+    ctx.fill();
+    ctx.restore();
+    headPathFn(); ctx.strokeStyle = 'rgba(0,0,0,0.92)'; ctx.lineWidth = outline; ctx.lineJoin = 'round'; ctx.stroke();
+    headPathFn(); ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`; ctx.fill();
+    drawMarksInPath(ctx, headPathFn, headCenter.x, headCenter.y, headR, headR*headStretchY, lean, t,
+      Math.floor(spotN*0.3), Math.floor(runeN*0.35), Math.floor(facetN*0.3),
+      spotRaw, runeRaw, facetRaw,
+      huePri, hueAcc, hueGlow, sat, pulse);
+
+    // Brow / cheek / jaw — reuse biped's head detailing
+    ctx.save();
+    headPathFn(); ctx.clip();
+    const c = Math.cos(lean), s = Math.sin(lean);
+    function leanAround(x, y){
+      const dxh = x - cx, dyh = y - bcy;
+      return [cx + dxh*c - dyh*s, bcy + dxh*s + dyh*c];
+    }
+    const browYrel = -headR * headStretchY * 0.08;
+    const [bx0, by0] = leanAround(headCenter.x, headCenter.y + browYrel - headR*0.18);
+    const [bx1, by1] = leanAround(headCenter.x, headCenter.y + browYrel + headR*0.22);
+    const browGrad = ctx.createLinearGradient(bx0, by0, bx1, by1);
+    browGrad.addColorStop(0, `hsla(${huePri},${sat}%,${Math.max(5,light-28)}%,0.55)`);
+    browGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = browGrad;
+    const [bcx_, bcy_] = leanAround(headCenter.x, headCenter.y + browYrel);
+    ctx.save();
+    ctx.translate(bcx_, bcy_);
+    ctx.rotate(lean);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, headR*0.85, headR*headStretchY*0.22, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+    // Cheek
+    const [chx0, chy0] = leanAround(headCenter.x - headR*0.52, headCenter.y - headR*0.28);
+    const [chx1, chy1] = leanAround(headCenter.x - headR*0.35, headCenter.y - headR*0.18);
+    const chkG = ctx.createRadialGradient(chx0, chy0, 0, chx1, chy1, headR*0.65);
+    chkG.addColorStop(0, `hsla(${huePri},${sat*0.3}%,94%,0.28)`);
+    chkG.addColorStop(1, 'transparent');
+    ctx.fillStyle = chkG;
+    ctx.fillRect(headCenter.x - headR*2, headCenter.y - headR*2, headR*4, headR*4);
+    // Jaw
+    const [jx0, jy0] = leanAround(headCenter.x, headCenter.y + headR*headStretchY*0.55);
+    const [jx1, jy1] = leanAround(headCenter.x, headCenter.y + headR*headStretchY*1.05);
+    const jawG = ctx.createLinearGradient(jx0, jy0, jx1, jy1);
+    jawG.addColorStop(0, 'transparent');
+    jawG.addColorStop(0.65, `hsla(${huePri},${sat}%,${Math.max(5,light-30)}%,0.35)`);
+    jawG.addColorStop(1.0,  `hsla(${huePri},${sat}%,${Math.max(3,light-40)}%,0.55)`);
+    ctx.fillStyle = jawG;
+    ctx.fillRect(headCenter.x - headR*2, headCenter.y - headR*2, headR*4, headR*headStretchY*4);
+    ctx.restore();
+
+    // 7. Eyes (with cursor wander)
+    if(eyeN > 0){
+      const blinkSY = blinkActive ? Math.max(0.05, 1 - Math.sin(blinkP*Math.PI)*0.92) : 1;
+      const eR = headR * eyeSz * 1.3;
+      const ambientWander = Math.sin(t*0.55) * 0.3;
+      const wxRaw = (cursorWander.x * eR * 0.35) + ambientWander;
+      const wyRaw = (cursorWander.y * eR * 0.30);
+      const wlen = Math.sqrt(wxRaw*wxRaw + wyRaw*wyRaw);
+      const wmax = eR * 0.35;
+      const wScale = wlen > wmax ? (wmax / wlen) : 1;
+      const wx = wxRaw * wScale, wy = wyRaw * wScale;
+      const eYrel = eyeY * headR * 0.55;
+      const c2 = Math.cos(lean), s2 = Math.sin(lean);
+      function applyLean(x, y){
+        const dxh = x - cx, dyh = y - bcy;
+        return [cx + dxh*c2 - dyh*s2, bcy + dxh*s2 + dyh*c2];
+      }
+      const eyePos = [];
+      if(eyeN === 1){
+        eyePos.push(applyLean(headCenter.x, headCenter.y + eYrel));
+      } else {
+        const sep = Math.min(headR*0.85, headR * eyeSpace * 0.95);
+        if(eyeN === 2){
+          eyePos.push(applyLean(headCenter.x - sep, headCenter.y + eYrel));
+          eyePos.push(applyLean(headCenter.x + sep, headCenter.y + eYrel));
+        } else {
+          for(let i=0; i<eyeN; i++){
+            const tt = i/(eyeN-1);
+            const offX = (-1 + 2*tt) * sep;
+            const offY = eYrel + (offX*offX)/(headR*1.5) * (eyeY < 0 ? -1 : 1) * 4;
+            eyePos.push(applyLean(headCenter.x + offX, headCenter.y + offY));
+          }
+        }
+      }
+      for(const [ex, ey] of eyePos) drawEye(ctx, ex, ey, eR, blinkSY, wx, wy, eyePupil, eyeGlow, hueGlow, outline);
+    }
+  }
+
+  if(dripN > 0){
+    const r4 = mulberry32(Math.floor(t*2) + dripN*17);
+    for(let i=0; i<dripN; i++){
+      const dx = cx + (r4()-0.5)*qBodyHx*1.4;
+      const dy = bcy + qBodyHy*0.85 + ((t*40 + i*23) % 60) * baseR*0.018;
+      const ds = 1.5 + r4()*2.2;
+      ctx.fillStyle = `hsla(${huePri},85%,55%,${0.45 + r4()*0.3})`;
+      ctx.beginPath(); ctx.arc(dx, dy, ds, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  if(coreSz > 0.1 && coreBri > 0.05){
+    const cg = ctx.createRadialGradient(cx, bcy, 0, cx, bcy, coreSz*4);
+    cg.addColorStop(0,    `hsla(${hueGlow},96%,94%,${0.85*coreBri})`);
+    cg.addColorStop(0.25, `hsla(${huePri},88%,70%,${0.45*coreBri})`);
+    cg.addColorStop(0.7,  `hsla(${huePri},78%,52%,${0.12*coreBri})`);
+    cg.addColorStop(1,    'transparent');
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(cx, bcy, coreSz*4, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Foreground particles
+  if(partN > 0){
+    for(let p=0; p<partN; p++){
+      const seed = p*17;
+      const orR = figEffR + (seed%13)*(baseR*0.05);
+      const orA = (p/partN)*Math.PI*2 + t*partDrift*0.5 + Math.sin(t + seed*0.1)*0.4 + swayPhase*0.12;
+      const tu  = Math.sin(t*1.3 + seed*0.22) * partTurb * 8;
+      const px = cx + Math.cos(orA)*(orR+tu)*sx;
+      const py = bcy + Math.sin(orA)*(orR+tu)*sy*0.85;
+      const pSz = partSz * (0.6 + ((seed%5)/5)*0.8);
+      const pAl = 0.4 + Math.sin(t*1.8 + p*0.55)*0.3;
+      if(py <= bcy) continue;
+      ctx.fillStyle = `hsla(${hueAcc},88%,75%,${pAl})`;
+      ctx.beginPath(); ctx.arc(px, py, pSz, 0, Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARED DRAW HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+function splinePath(ctx, pts){
+  const M = pts.length;
+  ctx.beginPath();
+  for(let i=0; i<M; i++){
+    const p0 = pts[(i-1+M)%M], p1 = pts[i], p2 = pts[(i+1)%M], p3 = pts[(i+2)%M];
+    const c1x = p1.x + (p2.x-p0.x)/6, c1y = p1.y + (p2.y-p0.y)/6;
+    const c2x = p2.x - (p3.x-p1.x)/6, c2y = p2.y - (p3.y-p1.y)/6;
+    if(i===0) ctx.moveTo(p1.x, p1.y);
+    ctx.bezierCurveTo(c1x, c1y, c2x, c2y, p2.x, p2.y);
+  }
+  ctx.closePath();
+}
+
+/* drawEye — now takes wx/wy components (cursor-driven) instead of a scalar */
+function drawEye(ctx, ex, ey, eR, blinkSY, wx, wy, eyePupil, eyeGlow, hueGlow, outline){
+  if(eyeGlow > 0.05){
+    const eg = ctx.createRadialGradient(ex,ey,0, ex,ey, eR*2.2);
+    eg.addColorStop(0, `hsla(${hueGlow},90%,80%,${0.4*eyeGlow})`);
+    eg.addColorStop(1, 'transparent');
+    ctx.fillStyle = eg;
+    ctx.beginPath(); ctx.arc(ex,ey, eR*2.2, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = `hsl(${hueGlow}, 18%, 92%)`;
+  ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  ctx.lineWidth = Math.max(1.2, outline*0.45);
+  ctx.beginPath(); ctx.ellipse(ex, ey, eR, eR*blinkSY, 0, 0, Math.PI*2);
+  ctx.fill(); ctx.stroke();
+  if(blinkSY > 0.12 && eyePupil > 0.05){
+    ctx.fillStyle = `hsl(${hueGlow}, 84%, 38%)`;
+    const irisR = eR * (0.45 + eyePupil*0.4);
+    ctx.beginPath(); ctx.ellipse(ex+wx, ey+wy*blinkSY, irisR, irisR*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#020306';
+    const pR = eR * eyePupil * 0.55;
+    ctx.beginPath(); ctx.ellipse(ex+wx, ey+wy*blinkSY, pR, pR*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    const cR_ = eR * 0.12;
+    ctx.beginPath(); ctx.ellipse(ex - eR*0.22, ey - eR*0.22*blinkSY, cR_, cR_*blinkSY, 0, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+/* ── Volumetric capsule segment with outline, base, shadow, highlight ── */
+function drawLimbSegment(ctx, P0, P1, r0, r1, huePri, sat, light, outlineW){
+  const dx = P1.x-P0.x, dy = P1.y-P0.y;
+  const len = Math.sqrt(dx*dx+dy*dy) || 1;
+  const nx = -dy/len, ny = dx/len;
+
+  function capsule(R0, R1){
+    const a0 = Math.atan2(ny, nx);
+    const a1 = a0 + Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(P0.x + nx*R0, P0.y + ny*R0);
+    ctx.lineTo(P1.x + nx*R1, P1.y + ny*R1);
+    ctx.arc(P1.x, P1.y, R1, a0, a1);
+    ctx.lineTo(P0.x - nx*R0, P0.y - ny*R0);
+    ctx.arc(P0.x, P0.y, R0, a1, a0);
+    ctx.closePath();
+  }
+
+  // 1. Black outline
+  capsule(r0 + outlineW*0.55, r1 + outlineW*0.55);
+  ctx.fillStyle = 'rgba(0,0,0,0.9)';
+  ctx.fill();
+
+  // 2. Base fill
+  capsule(r0, r1);
+  ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`;
+  ctx.fill();
+
+  // 3. Clip and shade
+  ctx.save();
+  capsule(r0, r1);
+  ctx.clip();
+  const maxR = Math.max(r0, r1);
+  const shadowFrom = { x: P0.x + nx*(r0*1.1), y: P0.y + ny*(r0*1.1) };
+  const shadowTo   = { x: P0.x - nx*(r0*1.1), y: P0.y - ny*(r0*1.1) };
+  const sg = ctx.createLinearGradient(shadowFrom.x, shadowFrom.y, shadowTo.x, shadowTo.y);
+  sg.addColorStop(0.0, `hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.72)`);
+  sg.addColorStop(0.35, 'transparent');
+  sg.addColorStop(0.72, 'transparent');
+  sg.addColorStop(1.0, `hsla(${huePri},${sat*0.5}%,${Math.max(8,light-15)}%,0.25)`);
+  ctx.fillStyle = sg;
+  const bx = Math.min(P0.x,P1.x) - maxR*2;
+  const by = Math.min(P0.y,P1.y) - maxR*2;
+  const bw = Math.abs(P1.x-P0.x) + maxR*4;
+  const bh = Math.abs(P1.y-P0.y) + maxR*4;
+  ctx.fillRect(bx,by,bw,bh);
+
+  // Longitudinal shadow (dark at both ends)
+  const lg = ctx.createLinearGradient(P0.x, P0.y, P1.x, P1.y);
+  lg.addColorStop(0,   `hsla(${huePri},${sat}%,${Math.max(5,light-22)}%,0.3)`);
+  lg.addColorStop(0.2, 'transparent');
+  lg.addColorStop(0.8, 'transparent');
+  lg.addColorStop(1,   `hsla(${huePri},${sat}%,${Math.max(5,light-28)}%,0.35)`);
+  ctx.fillStyle = lg;
+  ctx.fillRect(bx,by,bw,bh);
+
+  // Specular highlight
+  const specX = P0.x - nx*r0*0.42 - (dx/len)*r0*0.15;
+  const specY = P0.y - ny*r0*0.42 - (dy/len)*r0*0.15;
+  const hg = ctx.createRadialGradient(specX,specY,0, specX,specY, r0*0.7);
+  hg.addColorStop(0, `hsla(${huePri},${Math.floor(sat*0.35)}%,96%,0.42)`);
+  hg.addColorStop(1, 'transparent');
+  ctx.fillStyle = hg;
+  ctx.fillRect(bx,by,bw,bh);
+
+  ctx.restore();
+}
+
+/* ── Joint ambient occlusion ── */
+function drawJointAO(ctx, x, y, r){
+  if(r < 0.5) return;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r*1.9);
+  g.addColorStop(0,   'rgba(0,0,0,0.50)');
+  g.addColorStop(0.4, 'rgba(0,0,0,0.20)');
+  g.addColorStop(1,   'transparent');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r*1.9, 0, Math.PI*2);
+  ctx.fill();
+}
+
+/* ── Volumetric limb (two segments + elbow AO) ── */
+function drawVolumetricLimb(ctx, limb, armW, armTaper, huePri, sat, light, outlineW){
+  const { P0, P1, P2 } = limb;
+  const r0 = armW;
+  const r1 = armW * (1 - armTaper * 0.38);
+  const r2 = armW * (1 - armTaper * 0.72);
+  drawLimbSegment(ctx, P0, P1, r0, r1, huePri, sat, light, outlineW);
+  drawJointAO(ctx, P1.x, P1.y, r1 * 1.15);
+  drawLimbSegment(ctx, P1, P2, r1, r2, huePri, sat, light, outlineW);
+}
+
+/* ── Volumetric curve: sample a quadratic bezier into N capsule segments ── */
+function drawVolumetricCurve(ctx, P0, P1, P2, armW, armTaper, huePri, sat, light, outlineW){
+  const SEGS = 6;
+  function bez(tt){
+    const u = 1 - tt;
+    return {
+      x: u*u*P0.x + 2*u*tt*P1.x + tt*tt*P2.x,
+      y: u*u*P0.y + 2*u*tt*P1.y + tt*tt*P2.y
+    };
+  }
+  // First pass: black outlines for all segments (so each one is fully outlined under fills)
+  // Then second pass: fills/shading. But to keep each capsule self-contained with full
+  // outline/fill/shade, just draw segment-by-segment with shrinking radii.
+  for(let s=0; s<SEGS; s++){
+    const t0_ = s/SEGS, t1_ = (s+1)/SEGS;
+    const r0 = armW * (1 - armTaper * t0_ * 0.85);
+    const r1 = armW * (1 - armTaper * t1_ * 0.85);
+    const A = bez(t0_), B = bez(t1_);
+    drawLimbSegment(ctx, A, B, Math.max(0.6,r0), Math.max(0.4,r1), huePri, sat, light, outlineW);
+  }
+}
+
+function drawExtremity(ctx, x, y, size, shape, alongAng, huePri, sat, light, outlineW, kind){
+  if(size < 0.5) return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(kind === 'foot' ? 0 : alongAng);
+  let widthMul, heightMul, isClaw = false;
+  if(shape < 0.33){
+    isClaw = true;
+    widthMul = 1.0 + shape*0.6;
+    heightMul = 0.5 + shape*1.2;
+  } else if(shape < 0.66){
+    const k = (shape - 0.33) / 0.33;
+    widthMul = 0.95 + k*0.2;
+    heightMul = 0.95 + k*0.05;
+  } else {
+    const k = (shape - 0.66) / 0.34;
+    widthMul = 1.15 + k*0.85;
+    heightMul = 0.95 - k*0.5;
+  }
+  const w = size * widthMul, h = size * heightMul;
+  ctx.lineWidth = outlineW;
+  ctx.strokeStyle = 'rgba(0,0,0,0.92)';
+  ctx.fillStyle = `hsl(${huePri},${sat}%,${light}%)`;
+  if(isClaw){
+    ctx.beginPath();
+    ctx.moveTo(-w*0.6, -h*0.65);
+    ctx.quadraticCurveTo(-w*0.2, -h*1.05, w*0.85, 0);
+    ctx.quadraticCurveTo(-w*0.2, h*1.05, -w*0.6, h*0.65);
+    ctx.closePath();
+  } else {
+    const xOff = (kind === 'foot') ? w*0.15 : 0;
+    const yOff = (kind === 'foot') ? -h*0.05 : 0;
+    ctx.beginPath();
+    ctx.ellipse(xOff, yOff, w, h, 0, 0, Math.PI*2);
+  }
+  ctx.fill(); ctx.stroke();
+  // Highlight
+  ctx.fillStyle = `hsla(${huePri},${sat*0.5}%,90%,0.25)`;
+  ctx.beginPath();
+  ctx.ellipse(-w*0.15, -h*0.25, w*0.4, h*0.3, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SURFACE MARKS — with > 180 sub-modes
+   - spots > 180  → ring halos (concentric glow rings)
+   - runes > 180  → vein branches (luminous root system)
+   - facets > 180 → scale overlays (overlapping semicircles)
+   ═══════════════════════════════════════════════════════════════ */
+function drawBlobMarks(ctx, cx, bcy, baseR, sx, sy, t,
+                       spotN, runeN, facetN,
+                       spotRaw, runeRaw, facetRaw,
+                       huePri, hueAcc, hueGlow, sat, pulse){
+  // SPOTS (or halo rings if > 180)
+  if(spotN > 0){
+    const r1 = mulberry32(spotN*53 + 1);
+    const haloMode = spotRaw > 180;
+    for(let i=0; i<spotN; i++){
+      const sa = r1()*Math.PI*2;
+      const sr_ = baseR * (0.15 + r1()*0.55);
+      const sxp = cx + Math.cos(sa)*sr_*sx;
+      const syp = bcy + Math.sin(sa)*sr_*sy;
+      const ssz = baseR * (0.05 + r1()*0.10);
+      // Core spot
+      const lg = ctx.createRadialGradient(sxp,syp,0, sxp,syp,ssz*2.5);
+      lg.addColorStop(0, `hsla(${hueGlow},95%,90%,${0.7+pulse*0.2})`);
+      lg.addColorStop(0.4,`hsla(${hueGlow},85%,75%,0.3)`);
+      lg.addColorStop(1,'transparent');
+      ctx.fillStyle = lg;
+      ctx.beginPath(); ctx.arc(sxp,syp, ssz*2.5, 0, Math.PI*2); ctx.fill();
+      // Halo rings on top
+      if(haloMode){
+        ctx.strokeStyle = `hsla(${hueGlow},95%,82%,${0.45+pulse*0.25})`;
+        ctx.lineWidth = 1.2;
+        for(let k=1; k<=3; k++){
+          ctx.beginPath();
+          ctx.arc(sxp, syp, ssz*2.5*(1 + k*0.55) + Math.sin(t*1.4 + i + k)*1.2, 0, Math.PI*2);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+  // RUNES (or vein branches if > 180)
+  if(runeN > 0){
+    const r2 = mulberry32(runeN*71 + 7);
+    if(runeRaw > 180){
+      // Vein branches: starting from center, branching outward
+      ctx.strokeStyle = `hsla(${hueGlow},92%,78%,${0.40 + pulse*0.18})`;
+      ctx.lineCap = 'round';
+      for(let i=0; i<runeN; i++){
+        const startA = r2()*Math.PI*2;
+        let x = cx + Math.cos(startA)*baseR*0.05*sx;
+        let y = bcy + Math.sin(startA)*baseR*0.05*sy;
+        let a = startA;
+        const steps = 4 + Math.floor(r2()*4);
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        for(let s=0; s<steps; s++){
+          const stepLen = baseR * (0.08 + r2()*0.18);
+          a += (r2() - 0.5) * 0.9;
+          x += Math.cos(a) * stepLen * sx;
+          y += Math.sin(a) * stepLen * sy;
+          ctx.lineTo(x, y);
+          // Branch off occasionally
+          if(r2() > 0.6 && s < steps-1){
+            const bx = x, by = y;
+            let ba = a + (r2()-0.5)*1.2;
+            ctx.save();
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(bx, by);
+            const bSteps = 2 + Math.floor(r2()*2);
+            let bxc = bx, byc = by;
+            for(let bs=0; bs<bSteps; bs++){
+              const bLen = baseR * (0.05 + r2()*0.10);
+              ba += (r2()-0.5)*0.8;
+              bxc += Math.cos(ba)*bLen*sx;
+              byc += Math.sin(ba)*bLen*sy;
+              ctx.lineTo(bxc, byc);
+            }
+            ctx.stroke();
+            ctx.restore();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineWidth = 2.0;
+          }
+        }
+        ctx.stroke();
+      }
+    } else {
+      ctx.strokeStyle = `hsla(${hueAcc},80%,70%,0.30)`;
+      ctx.lineWidth = 1.5;
+      for(let i=0; i<runeN; i++){
+        const ra = r2()*Math.PI*2;
+        const rr = baseR * (0.1 + r2()*0.45);
+        const rx = cx + Math.cos(ra)*rr*sx;
+        const ry = bcy + Math.sin(ra)*rr*sy;
+        const rs = baseR * (0.06 + r2()*0.12);
+        ctx.beginPath();
+        ctx.moveTo(rx, ry-rs); ctx.lineTo(rx+rs*0.6, ry+rs*0.5);
+        ctx.moveTo(rx, ry-rs); ctx.lineTo(rx-rs*0.6, ry+rs*0.5);
+        ctx.moveTo(rx-rs*0.4, ry+rs*0.1); ctx.lineTo(rx+rs*0.4, ry+rs*0.1);
+        ctx.stroke();
+      }
+    }
+  }
+  // FACETS (or scale overlays if > 180)
+  if(facetN > 0){
+    if(facetRaw > 180){
+      // Scale overlays: tile semicircles over the surface (already clipped to body)
+      const r3 = mulberry32(facetN * 89 + 13);
+      const scaleSize = baseR * (0.06 + r3() * 0.09);
+      const cols = Math.ceil((baseR * 2.5) / scaleSize);
+      const rows = Math.ceil((baseR * 2.5) / scaleSize);
+      const xStart = cx - cols*scaleSize/2;
+      const yStart = bcy - rows*scaleSize/2;
+      ctx.strokeStyle = `hsla(${hueGlow},80%,82%,0.32)`;
+      ctx.lineWidth = 1.0;
+      ctx.fillStyle = `hsla(${hueGlow},65%,${Math.max(20,Math.min(70,40))}%,0.10)`;
+      for(let row=0; row<rows; row++){
+        const y = yStart + row*scaleSize*0.7;
+        const offset = (row % 2) * scaleSize*0.5;
+        for(let col=0; col<cols; col++){
+          const x = xStart + col*scaleSize + offset;
+          ctx.beginPath();
+          ctx.arc(x, y, scaleSize*0.55, Math.PI, 0); // upward-opening half-circle (downward arc)
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+    } else {
+      const r3 = mulberry32(facetN*89 + 13);
+      ctx.strokeStyle = `hsla(${hueGlow},85%,88%,0.32)`;
+      ctx.lineWidth = 1.0;
+      for(let i=0; i<facetN; i++){
+        const fa = r3()*Math.PI*2;
+        const fr = baseR * (0.1 + r3()*0.7);
+        const fx = cx + Math.cos(fa)*fr*sx;
+        const fy = bcy + Math.sin(fa)*fr*sy;
+        const fs = baseR * (0.05 + r3()*0.10);
+        ctx.beginPath();
+        ctx.moveTo(fx, fy-fs); ctx.lineTo(fx+fs, fy);
+        ctx.lineTo(fx, fy+fs); ctx.lineTo(fx-fs, fy);
+        ctx.closePath(); ctx.stroke();
+      }
+    }
+  }
+}
+
+/* ── drawMarksInPath: same as blob marks but for biped/quad body parts.
+   Already wrapped in clip via pathFn, so we can stamp anywhere. ── */
+function drawMarksInPath(ctx, pathFn, cx, cy, hwid, hht, rot, t,
+                        spotN, runeN, facetN,
+                        spotRaw, runeRaw, facetRaw,
+                        huePri, hueAcc, hueGlow, sat, pulse){
+  ctx.save();
+  pathFn(); ctx.clip();
+  const c = Math.cos(rot), s = Math.sin(rot);
+  function R(lx, ly){ return [cx + lx*c - ly*s, cy + lx*s + ly*c]; }
+
+  if(spotN > 0){
+    const r1 = mulberry32(spotN*53 + 1);
+    const haloMode = spotRaw > 180;
+    for(let i=0; i<spotN; i++){
+      const sa = r1()*Math.PI*2;
+      const sr_ = (0.15 + r1()*0.7);
+      const lx = Math.cos(sa)*sr_*hwid;
+      const ly = Math.sin(sa)*sr_*hht;
+      const [sxp, syp] = R(lx, ly);
+      const ssz = Math.min(hwid, hht) * (0.08 + r1()*0.14);
+      const lg = ctx.createRadialGradient(sxp,syp,0, sxp,syp,ssz*2.5);
+      lg.addColorStop(0, `hsla(${hueGlow},95%,90%,${0.7+pulse*0.2})`);
+      lg.addColorStop(0.4,`hsla(${hueGlow},85%,75%,0.3)`);
+      lg.addColorStop(1,'transparent');
+      ctx.fillStyle = lg;
+      ctx.beginPath(); ctx.arc(sxp,syp, ssz*2.5, 0, Math.PI*2); ctx.fill();
+      if(haloMode){
+        ctx.strokeStyle = `hsla(${hueGlow},95%,82%,${0.45+pulse*0.25})`;
+        ctx.lineWidth = 1.2;
+        for(let k=1; k<=3; k++){
+          ctx.beginPath();
+          ctx.arc(sxp, syp, ssz*2.5*(1 + k*0.55) + Math.sin(t*1.4 + i + k)*1.2, 0, Math.PI*2);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+  if(runeN > 0){
+    const r2 = mulberry32(runeN*71 + 7);
+    if(runeRaw > 180){
+      ctx.strokeStyle = `hsla(${hueGlow},92%,78%,${0.40 + pulse*0.18})`;
+      ctx.lineCap = 'round';
+      const baseRad = Math.min(hwid, hht);
+      for(let i=0; i<runeN; i++){
+        const startA = r2()*Math.PI*2;
+        const [sxv, syv] = R(Math.cos(startA)*0.05*hwid, Math.sin(startA)*0.05*hht);
+        let x = sxv, y = syv;
+        let a = startA;
+        const steps = 4 + Math.floor(r2()*4);
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        for(let s_=0; s_<steps; s_++){
+          const stepLen = baseRad * (0.08 + r2()*0.18);
+          a += (r2() - 0.5) * 0.9;
+          x += Math.cos(a) * stepLen;
+          y += Math.sin(a) * stepLen;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    } else {
+      ctx.strokeStyle = `hsla(${hueAcc},80%,70%,0.30)`;
+      ctx.lineWidth = 1.5;
+      for(let i=0; i<runeN; i++){
+        const ra = r2()*Math.PI*2;
+        const rr = (0.1 + r2()*0.55);
+        const lx = Math.cos(ra)*rr*hwid;
+        const ly = Math.sin(ra)*rr*hht;
+        const [rx, ry] = R(lx, ly);
+        const rs = Math.min(hwid, hht) * (0.08 + r2()*0.14);
+        ctx.beginPath();
+        ctx.moveTo(rx, ry-rs); ctx.lineTo(rx+rs*0.6, ry+rs*0.5);
+        ctx.moveTo(rx, ry-rs); ctx.lineTo(rx-rs*0.6, ry+rs*0.5);
+        ctx.moveTo(rx-rs*0.4, ry+rs*0.1); ctx.lineTo(rx+rs*0.4, ry+rs*0.1);
+        ctx.stroke();
+      }
+    }
+  }
+  if(facetN > 0){
+    if(facetRaw > 180){
+      // Scale overlays inside this part's bounding region
+      const r3 = mulberry32(facetN * 89 + 13);
+      const scaleSize = Math.min(hwid, hht) * (0.13 + r3() * 0.10);
+      const cols = Math.ceil((hwid * 2.5) / scaleSize);
+      const rows = Math.ceil((hht * 2.5) / scaleSize);
+      ctx.strokeStyle = `hsla(${hueGlow},80%,82%,0.32)`;
+      ctx.lineWidth = 1.0;
+      ctx.fillStyle = `hsla(${hueGlow},65%,40%,0.10)`;
+      for(let row=0; row<rows; row++){
+        const lyy = -hht*1.2 + row*scaleSize*0.7;
+        const offset = (row % 2) * scaleSize*0.5;
+        for(let col=0; col<cols; col++){
+          const lxx = -hwid*1.2 + col*scaleSize + offset;
+          const [px, py] = R(lxx, lyy);
+          ctx.beginPath();
+          ctx.arc(px, py, scaleSize*0.55, Math.PI + rot, 0 + rot);
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+    } else {
+      const r3 = mulberry32(facetN*89 + 13);
+      ctx.strokeStyle = `hsla(${hueGlow},85%,88%,0.32)`;
+      ctx.lineWidth = 1.0;
+      for(let i=0; i<facetN; i++){
+        const fa = r3()*Math.PI*2;
+        const fr = (0.1 + r3()*0.8);
+        const lx = Math.cos(fa)*fr*hwid;
+        const ly = Math.sin(fa)*fr*hht;
+        const [fx, fy] = R(lx, ly);
+        const fs = Math.min(hwid, hht) * (0.07 + r3()*0.14);
+        ctx.beginPath();
+        ctx.moveTo(fx, fy-fs); ctx.lineTo(fx+fs, fy);
+        ctx.lineTo(fx, fy+fs); ctx.lineTo(fx-fs, fy);
+        ctx.closePath(); ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATION LOOP
+   ═══════════════════════════════════════════════════════════════ */
+function loop(){
+  const canvas = document.getElementById('canvas');
+  const now = (performance.now() - t0) / 1000;
+  const dt = Math.max(0, Math.min(0.1, now - prevT));
+  prevT = now;
+
+  // blink update
+  blinkCd -= dt;
+  if(!blinkActive && blinkCd <= 0){
+    blinkActive = true;
+    blinkP = 0;
+  }
+  if(blinkActive){
+    blinkP += dt / 0.15;
+    if(blinkP >= 1){
+      blinkActive = false;
+      blinkP = 0;
+      blinkCd = 2.5 + Math.random() * 4;
+    }
+  }
+
+  // sweep update
+  if(sweepIdx !== -1){
+    const elapsed = now - sweepStart;
+    const phase = (elapsed / SWEEP_PERIOD) * Math.PI * 2;
+    const w = (Math.sin(phase) + 1) * 0.5; // 0..1
+    const newVal = Math.round(w * 255);
+    values[sweepIdx] = newVal;
+    const sl = document.getElementById('slider-' + sweepIdx);
+    const vl = document.getElementById('val-' + sweepIdx);
+    if(sl) sl.value = newVal;
+    if(vl) vl.textContent = newVal;
+  }
+
+  if(canvas.width > 0 && canvas.height > 0){
+    render(canvas, now);
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UI: build axes + handlers
+   ═══════════════════════════════════════════════════════════════ */
+function buildAxes(){
+  const root = document.getElementById('axes');
+  while(root.firstChild) root.removeChild(root.firstChild);
+
+  // group axes by their group
+  const groupMap = {};
+  for(let i=0; i<AXES.length; i++){
+    const g = AXES[i].group;
+    if(!groupMap[g]) groupMap[g] = [];
+    groupMap[g].push(i);
+  }
+  for(const g of GROUPS){
+    const idxs = groupMap[g];
+    if(!idxs) continue;
+
+    const head = document.createElement('div');
+    head.className = 'group-head';
+    const title = document.createElement('span');
+    title.className = 'group-title';
+    title.textContent = g;
+    head.appendChild(title);
+    const rndBtn = document.createElement('button');
+    rndBtn.className = 'group-rand';
+    rndBtn.textContent = '⚄ rand';
+    rndBtn.title = 'Randomize this group only';
+    rndBtn.addEventListener('click', ()=>randomizeGroup(g));
+    head.appendChild(rndBtn);
+    root.appendChild(head);
+
+    for(const i of idxs){
+      const ax = AXES[i];
+      const row = document.createElement('div');
+      row.className = 'axis-row';
+
+      const lab = document.createElement('input');
+      lab.type = 'text';
+      lab.className = 'axis-label';
+      lab.value = labels[i];
+      lab.spellcheck = false;
+      lab.maxLength = 32;
+      lab.addEventListener('change', e => onLabelChange(i, e.target.value));
+      lab.addEventListener('blur',   e => onLabelChange(i, e.target.value));
+
+      const sl = document.createElement('input');
+      sl.type = 'range';
+      sl.min = 0; sl.max = 255; sl.step = 1;
+      sl.value = values[i];
+      sl.id = 'slider-' + i;
+      sl.className = 'axis-slider';
+      sl.addEventListener('input', e => onSlide(i, +e.target.value, true));
+
+      const val = document.createElement('span');
+      val.className = 'axis-val';
+      val.id = 'val-' + i;
+      val.textContent = values[i];
+
+      const sw = document.createElement('button');
+      sw.className = 'axis-btn sweep';
+      sw.textContent = '⇌';
+      sw.title = 'Sweep this axis';
+      sw.id = 'sw-' + i;
+      sw.addEventListener('click', ()=>toggleSweep(i));
+
+      const lk = document.createElement('button');
+      lk.className = 'axis-btn lock';
+      lk.textContent = locked[i] ? '◉' : '◯';
+      lk.title = 'Lock this axis (excluded from randomize)';
+      lk.id = 'lk-' + i;
+      if(locked[i]) lk.classList.add('on');
+      lk.addEventListener('click', ()=>toggleLock(i));
+
+      row.appendChild(lab);
+      row.appendChild(sl);
+      row.appendChild(val);
+      row.appendChild(sw);
+      row.appendChild(lk);
+      root.appendChild(row);
+    }
+  }
+}
+
+let _lastEmitT = 0;
+function maybeEmitChange(){
+  const now = performance.now();
+  if(now - _lastEmitT > 200){
+    _lastEmitT = now;
+    kernelEmitCreatureChange();
+  }
+}
+
+function onSlide(i, val, fromUser){
+  values[i] = val;
+  const vl = document.getElementById('val-' + i);
+  if(vl) vl.textContent = val;
+  if(fromUser){
+    if(sweepIdx === i) stopSweep();
+    clearSeedOnEdit();
+    maybeEmitChange();
+  }
+}
+
+function onLabelChange(i, text){
+  const t = (text || '').trim();
+  if(!t){
+    const el = document.querySelectorAll('.axis-label')[i];
+    if(el) el.value = labels[i];
+    return;
+  }
+  labels[i] = t;
+  renamed[i] = (t !== AXES[i].label);
+}
+
+function toggleSweep(i){
+  if(sweepIdx === i){ stopSweep(); return; }
+  // clear previous sweep button state
+  if(sweepIdx !== -1){
+    const prev = document.getElementById('sw-' + sweepIdx);
+    if(prev) prev.classList.remove('on');
+  }
+  sweepIdx = i;
+  sweepStart = (performance.now() - t0) / 1000;
+  sweepBaseVal = values[i];
+  const btn = document.getElementById('sw-' + i);
+  if(btn) btn.classList.add('on');
+  document.getElementById('sweep-indicator').classList.add('on');
+}
+
+function stopSweep(){
+  if(sweepIdx === -1) return;
+  const btn = document.getElementById('sw-' + sweepIdx);
+  if(btn) btn.classList.remove('on');
+  sweepIdx = -1;
+  document.getElementById('sweep-indicator').classList.remove('on');
+}
+
+function toggleLock(i){
+  locked[i] = !locked[i];
+  const btn = document.getElementById('lk-' + i);
+  if(btn){
+    btn.textContent = locked[i] ? '◉' : '◯';
+    btn.classList.toggle('on', locked[i]);
+  }
+}
+
+function syncAllSliders(){
+  for(let i=0; i<N; i++){
+    const sl = document.getElementById('slider-' + i);
+    const vl = document.getElementById('val-' + i);
+    if(sl) sl.value = values[i];
+    if(vl) vl.textContent = values[i];
+  }
+}
+
+function randomize(){
+  if(sweepIdx !== -1) stopSweep();
+  // If any axes are locked, randomize unlocked individually (preserve locks).
+  // Otherwise use a seed so it's reproducible.
+  const anyLocked = locked.some(Boolean);
+  if(anyLocked){
+    for(let i=0; i<N; i++){
+      if(!locked[i]) values[i] = Math.floor(Math.random() * 256);
+    }
+    currentSeed = null;
+    syncAllSliders();
+    refreshSeedUI();
+    setStatus('randomized (locks preserved)');
+    kernelEmitCreatureChange();
+  } else {
+    const seed = (Math.random() * 0xFFFFFFFF) >>> 0;
+    applySeed(seed);
+    setStatus(`randomized · seed ${formatSeed(currentSeed)}`);
+  }
+}
+
+function randomizeGroup(g){
+  if(sweepIdx !== -1) stopSweep();
+  for(let i=0; i<N; i++){
+    if(AXES[i].group === g && !locked[i]){
+      values[i] = Math.floor(Math.random() * 256);
+    }
+  }
+  clearSeedOnEdit();
+  syncAllSliders();
+  setStatus('randomized group: ' + g);
+  kernelEmitCreatureChange();
+}
+
+function resetAll(){
+  if(sweepIdx !== -1) stopSweep();
+  for(let i=0; i<N; i++){
+    values[i] = AXES[i].default;
+    labels[i] = AXES[i].label;
+    renamed[i] = false;
+    locked[i] = false;
+  }
+  currentSeed = null;
+  buildAxes();
+  refreshSeedUI();
+  setStatus('reset to defaults');
+  kernelEmitCreatureChange();
+}
+
+function setStatus(msg){
+  const el = document.getElementById('status');
+  if(el) el.textContent = msg;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPORT — frame + sprite sheet
+   ═══════════════════════════════════════════════════════════════ */
+function safeName(s){
+  return (s || 'untitled').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'untitled';
+}
+
+function toggleExportMenu(e){
+  e.stopPropagation();
+  const m = document.getElementById('export-menu');
+  if(m) m.classList.toggle('show');
+}
+
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+function exportFrame(){
+  document.getElementById('export-menu').classList.remove('show');
+  const size = parseInt(document.getElementById('export-size').value, 10) || 256;
+  const tmp = document.createElement('canvas');
+  tmp.width = size; tmp.height = size;
+  const now = (performance.now() - t0) / 1000;
+  render(tmp, now);
+  tmp.toBlob(blob => {
+    if(!blob){ setStatus('export failed'); return; }
+    const fn = safeName(creatureName) + '-' + size + 'px.png';
+    downloadBlob(blob, fn);
+    setStatus('exported: ' + fn);
+  }, 'image/png');
+}
+
+function exportSpriteSheet(frames){
+  document.getElementById('export-menu').classList.remove('show');
+  const frameSize = parseInt(document.getElementById('export-size').value, 10) || 256;
+  const ANIM_CYCLE = 3.2;
+  // Layout: 16 -> 4x4, 32 -> 8x4. Keep cols<=8 for reasonable sheet width.
+  let cols, rows;
+  if(frames === 16){ cols = 4; rows = 4; }
+  else if(frames === 32){ cols = 8; rows = 4; }
+  else { cols = Math.ceil(Math.sqrt(frames)); rows = Math.ceil(frames / cols); }
+
+  const sheetW = cols * frameSize;
+  const sheetH = rows * frameSize;
+  const sheet = document.createElement('canvas');
+  sheet.width = sheetW; sheet.height = sheetH;
+  const sctx = sheet.getContext('2d');
+
+  const tmp = document.createElement('canvas');
+  tmp.width = frameSize; tmp.height = frameSize;
+
+  // Save state we will temporarily override for deterministic frames
+  const savedBlinkCd = blinkCd;
+  const savedBlinkP = blinkP;
+  const savedBlinkActive = blinkActive;
+  const savedCursorTarget = { x: cursorTarget.x, y: cursorTarget.y };
+  const savedCursorWander = { x: cursorWander.x, y: cursorWander.y };
+  // Force eyes to center during export; suppress blinking
+  cursorTarget.x = 0; cursorTarget.y = 0;
+  cursorWander.x = 0; cursorWander.y = 0;
+  blinkCd = 999; blinkP = 0; blinkActive = false;
+
+  for(let f=0; f<frames; f++){
+    const tFrame = (f / frames) * ANIM_CYCLE;
+    render(tmp, tFrame);
+    const cx = (f % cols) * frameSize;
+    const cy = Math.floor(f / cols) * frameSize;
+    sctx.drawImage(tmp, cx, cy);
+  }
+
+  // Restore
+  blinkCd = savedBlinkCd;
+  blinkP = savedBlinkP;
+  blinkActive = savedBlinkActive;
+  cursorTarget.x = savedCursorTarget.x;
+  cursorTarget.y = savedCursorTarget.y;
+  cursorWander.x = savedCursorWander.x;
+  cursorWander.y = savedCursorWander.y;
+
+  const slug = safeName(creatureName);
+  const seedStr = currentSeed !== null ? formatSeed(currentSeed) : null;
+  const manifest = {
+    name: creatureName,
+    seed: seedStr,
+    frames: frames,
+    cols: cols,
+    rows: rows,
+    frameWidth: frameSize,
+    frameHeight: frameSize,
+    fps: Math.round(frames / ANIM_CYCLE),
+    loop: true,
+    dna: DNA_ORDER.map(id => values[ID_INDEX[id]]),
+    hues: [
+      Math.round((v('hue_primary')/255) * 359),
+      Math.round((v('hue_accent') /255) * 359),
+      Math.round((v('hue_glow')   /255) * 359)
+    ]
+  };
+
+  sheet.toBlob(blob => {
+    if(!blob){ setStatus('sprite export failed'); return; }
+    downloadBlob(blob, slug + '.sprite.png');
+    const jblob = new Blob([JSON.stringify(manifest, null, 2)], { type:'application/json' });
+    downloadBlob(jblob, slug + '.sprite.json');
+    setStatus(`exported sprite sheet: ${frames}f @ ${frameSize}px`);
+  }, 'image/png');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SAVE / LOAD — eidolon-forge/1 (with optional seed)
+   Backward compat with eidolon-forge/1 (no seed) and vibe/1 mints
+   ═══════════════════════════════════════════════════════════════ */
+function buildSpec(){
+  const axes = [];
+  for(let i=0; i<N; i++){
+    axes.push({
+      id: AXES[i].id,
+      value: values[i],
+      label: renamed[i] ? labels[i] : undefined,
+      locked: locked[i] ? true : undefined
+    });
+  }
+  return {
+    format: 'eidolon-forge/1',
+    name: creatureName,
+    seed: currentSeed !== null ? formatSeed(currentSeed) : null,
+    axes: axes
+  };
+}
+
+function saveCreature(){
+  const spec = buildSpec();
+  const blob = new Blob([JSON.stringify(spec, null, 2)], { type:'application/json' });
+  const safe = safeName(creatureName);
+  downloadBlob(blob, safe + '.eidolon.json');
+  const seedSfx = currentSeed !== null ? ' · seed ' + formatSeed(currentSeed) : '';
+  setStatus(`saved: ${safe}.eidolon.json${seedSfx}`);
+}
+
+function onLoadFile(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const txt = ev.target.result;
+      const data = JSON.parse(txt);
+      if(!data || typeof data !== 'object'){ setStatus('load: invalid file'); return; }
+      if(data.format === 'eidolon-forge/1' && Array.isArray(data.axes)){
+        // Reset to defaults first, then overlay
+        for(let i=0; i<N; i++){
+          values[i] = AXES[i].default;
+          labels[i] = AXES[i].label;
+          renamed[i] = false;
+          locked[i] = false;
+        }
+        for(const a of data.axes){
+          const idx = ID_INDEX[a.id];
+          if(idx === undefined) continue;
+          if(typeof a.value === 'number') values[idx] = Math.max(0, Math.min(255, a.value|0));
+          if(typeof a.label === 'string' && a.label.length){ labels[idx] = a.label; renamed[idx] = true; }
+          if(a.locked === true) locked[idx] = true;
+        }
+        if(typeof data.name === 'string' && data.name.length){
+          creatureName = data.name;
+          document.getElementById('name-field').value = creatureName;
+        }
+        // Seed: parse if present, otherwise null
+        if(typeof data.seed === 'string' && data.seed.length){
+          const s = parseSeed(data.seed);
+          currentSeed = (s !== null) ? s : null;
+        } else if(typeof data.seed === 'number'){
+          currentSeed = (data.seed >>> 0);
+        } else {
+          currentSeed = null;
+        }
+        buildAxes();
+        refreshSeedUI();
+        const seedSfx = currentSeed !== null ? ' · seed ' + formatSeed(currentSeed) : '';
+        setStatus(`loaded: ${file.name}${seedSfx}`);
+        kernelEmitCreatureChange();
+      } else if(data.format === 'vibe/1' && data.payload && Array.isArray(data.payload.dna)){
+        // Mint envelope: payload.dna is in DNA_ORDER (alphabetical)
+        for(let i=0; i<N; i++){
+          values[i] = AXES[i].default;
+          labels[i] = AXES[i].label;
+          renamed[i] = false;
+          locked[i] = false;
+        }
+        const dna = data.payload.dna;
+        for(let k=0; k<DNA_ORDER.length && k<dna.length; k++){
+          const idx = ID_INDEX[DNA_ORDER[k]];
+          if(idx === undefined) continue;
+          const vv = dna[k];
+          if(typeof vv === 'number') values[idx] = Math.max(0, Math.min(255, vv|0));
+        }
+        if(typeof data.name === 'string' && data.name.length){
+          creatureName = data.name;
+          document.getElementById('name-field').value = creatureName;
+        } else if(data.payload && typeof data.payload.name === 'string'){
+          creatureName = data.payload.name;
+          document.getElementById('name-field').value = creatureName;
+        }
+        if(data.payload && typeof data.payload.seed === 'string'){
+          const s = parseSeed(data.payload.seed);
+          currentSeed = (s !== null) ? s : null;
+        } else if(data.payload && typeof data.payload.seed === 'number'){
+          currentSeed = (data.payload.seed >>> 0);
+        } else {
+          currentSeed = null;
+        }
+        buildAxes();
+        refreshSeedUI();
+        setStatus(`loaded mint: ${file.name}`);
+        kernelEmitCreatureChange();
+      } else {
+        setStatus('load: unknown format');
+      }
+    } catch(err){
+      setStatus('load: parse error');
+    } finally {
+      input.value = '';
+    }
+  };
+  reader.onerror = ()=>{ setStatus('load: read error'); input.value=''; };
+  reader.readAsText(file);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MINT — vibe/1 envelope. Preserved birthHash semantics.
+   ═══════════════════════════════════════════════════════════════ */
+function canonical(obj){
+  // Stable JSON: sort keys recursively, no whitespace.
+  if(obj === null || typeof obj !== 'object') return JSON.stringify(obj);
+  if(Array.isArray(obj)){
+    return '[' + obj.map(canonical).join(',') + ']';
+  }
+  const keys = Object.keys(obj).sort();
+  const parts = [];
+  for(const k of keys){
+    parts.push(JSON.stringify(k) + ':' + canonical(obj[k]));
+  }
+  return '{' + parts.join(',') + '}';
+}
+
+async function sha256hex(str){
+  const enc = new TextEncoder();
+  const buf = enc.encode(str);
+  if(crypto && crypto.subtle && crypto.subtle.digest){
+    const h = await crypto.subtle.digest('SHA-256', buf);
+    const bytes = new Uint8Array(h);
+    let out = '';
+    for(let i=0; i<bytes.length; i++) out += bytes[i].toString(16).padStart(2,'0');
+    return out;
+  }
+  // Fallback (very unlikely path in modern browsers): a deterministic FNV-1a 256-ish digest.
+  // Not cryptographically strong, but provides a deterministic id so mint isn't blocked.
+  let h1 = 0x811c9dc5, h2 = 0xdeadbeef, h3 = 0x41c6ce57, h4 = 0x9e3779b9;
+  for(let i=0; i<buf.length; i++){
+    h1 ^= buf[i]; h1 = Math.imul(h1, 16777619) >>> 0;
+    h2 = (Math.imul(h2 ^ buf[i], 2654435761)) >>> 0;
+    h3 = (Math.imul(h3 ^ buf[i], 40503)) >>> 0;
+    h4 = (Math.imul(h4 ^ buf[i], 2246822507)) >>> 0;
+  }
+  return [h1,h2,h3,h4].map(x=>x.toString(16).padStart(8,'0')).join('').padEnd(64,'0').slice(0,64);
+}
+
+function makeNonce(){
+  const a = new Uint8Array(16);
+  if(crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+  else for(let i=0; i<16; i++) a[i] = Math.floor(Math.random()*256);
+  let out = '';
+  for(let i=0; i<a.length; i++) out += a[i].toString(16).padStart(2,'0');
+  return out;
+}
+
+function dnaArray(){
+  return DNA_ORDER.map(id => values[ID_INDEX[id]]);
+}
+
+async function mintCreature(){
+  try {
+    const dna = dnaArray();
+    const nonce = makeNonce();
+    // birthHash is computed over canonical({nonce, dna}) — UNCHANGED for compat with Library
+    const birthInput = canonical({ nonce: nonce, dna: dna });
+    const birthHash = await sha256hex(birthInput);
+    const hues = [
+      Math.round((v('hue_primary')/255) * 359),
+      Math.round((v('hue_accent') /255) * 359),
+      Math.round((v('hue_glow')   /255) * 359)
+    ];
+    const seedStr = currentSeed !== null ? formatSeed(currentSeed) : null;
+    const payload = {
+      name: creatureName,
+      dna: dna,
+      nonce: nonce,
+      hues: hues,
+      seed: seedStr
+    };
+    const contentInput = canonical(payload);
+    const contentHash = await sha256hex(contentInput);
+    const envelope = {
+      format: 'vibe/1',
+      id: birthHash,
+      name: creatureName,
+      birthHash: birthHash,
+      contentHash: contentHash,
+      payload: payload,
+      mintedAt: new Date().toISOString()
+    };
+    // Self-verify
+    const verifyHash = await sha256hex(canonical({ nonce: nonce, dna: dna }));
+    if(verifyHash !== birthHash){
+      setStatus('mint: hash mismatch (aborted)');
+      return;
+    }
+    const blob = new Blob([JSON.stringify(envelope, null, 2)], { type:'application/json' });
+    const safe = safeName(creatureName);
+    downloadBlob(blob, safe + '.vibe.json');
+    const seedSfx = currentSeed !== null ? ' · seed ' + formatSeed(currentSeed) : '';
+    setStatus(`minted ${birthHash.slice(0,24)}…${seedSfx}`);
+    kernelEmit('nexus.notify', { className:'commit', title:'Creature minted', body: creatureName });
+  } catch(err){
+    setStatus('mint: error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MANAGED-BLOCK HANDSHAKE — degrades silently with no kernel
+   ═══════════════════════════════════════════════════════════════ */
+const MANIFEST = {
+  emits: ['nexus.notify', 'nexus.launch', 'eidolon.creature.selected'],
+  consumes: [],
+  app: {
+    title: 'Eidolon Forge Pro',
+    icon: '◆',
+    description: 'Creature forge — pro edition',
+    visible: true
+  }
+};
+let _kernelPort = null;
+window.addEventListener('message', e => {
+  const d = e.data;
+  if(!d || d.type !== 'BOOT') return;
+  if(!e.ports || !e.ports.length) return;
+  _kernelPort = e.ports[0];
+  _kernelPort.onmessage = ev => {
+    const m = ev.data;
+    if(!m) return;
+    if(m.type === 'PING'){
+      try { _kernelPort.postMessage({ type:'PONG', nonce: m.nonce }); } catch(_){}
+    }
+  };
+  try { _kernelPort.postMessage({ type:'DECLARE', manifest: MANIFEST }); } catch(_){}
+  try { _kernelPort.postMessage({ type:'MOUNT_ACK' }); } catch(_){}
+});
+
+function kernelEmit(channel, payload){
+  if(!_kernelPort) return;
+  try { _kernelPort.postMessage({ type:'PUB', channel: channel, payload: payload }); } catch(_){}
+}
+
+function kernelEmitCreatureChange(){
+  if(!_kernelPort) return;
+  kernelEmit('eidolon.creature.selected', {
+    dna: dnaArray(),
+    hues: [
+      Math.round((v('hue_primary')/255) * 359),
+      Math.round((v('hue_accent') /255) * 359),
+      Math.round((v('hue_glow')   /255) * 359)
+    ],
+    name: creatureName,
+    seed: currentSeed !== null ? formatSeed(currentSeed) : null
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOT
+   ═══════════════════════════════════════════════════════════════ */
+buildAxes();
+document.getElementById('axis-count').textContent = N + ' axes';
+
+// Name field
+document.getElementById('name-field').addEventListener('input', e => {
+  creatureName = (e.target.value || '').slice(0, 32) || 'Untitled';
+  maybeEmitChange();
+});
+
+// Seed input wiring
+const seedInput = document.getElementById('seed-input');
+seedInput.addEventListener('keydown', e => {
+  if(e.key === 'Enter'){
+    setSeedFromInput(e.target.value);
+    e.target.blur();
+  }
+});
+seedInput.addEventListener('blur', e => {
+  const txt = (e.target.value || '').trim();
+  if(txt){ setSeedFromInput(txt); }
+  else { refreshSeedUI(); }
+});
+document.getElementById('seed-random').addEventListener('click', ()=>{
+  applySeed((Math.random() * 0xFFFFFFFF) >>> 0);
+});
+document.getElementById('seed-copy').addEventListener('click', ()=>{
+  if(currentSeed === null){ setStatus('no seed to copy'); return; }
+  const s = formatSeed(currentSeed);
+  try {
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(s).then(
+        ()=>setStatus('seed copied: ' + s),
+        ()=>setStatus('clipboard blocked')
+      );
+    } else {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = s; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); setStatus('seed copied: ' + s); }
+      catch(_){ setStatus('clipboard unavailable'); }
+      document.body.removeChild(ta);
+    }
+  } catch(_){
+    setStatus('clipboard unavailable');
+  }
+});
+
+// Export menu close on outside click
+document.addEventListener('click', e => {
+  const m = document.getElementById('export-menu');
+  const b = document.getElementById('export-btn');
+  if(m && m.classList.contains('show') && !m.contains(e.target) && e.target !== b){
+    m.classList.remove('show');
+  }
+});
+
+// ResizeObserver on canvas-wrap — canvas buffer follows wrap content size * DPR
+const _canvasEl = document.getElementById('canvas');
+const _canvasWrap = document.getElementById('canvas-wrap');
+function _resizeCanvasFromRect(rect){
+  const dpr = window.devicePixelRatio || 1;
+  const W = Math.max(64, Math.round(rect.width  * dpr));
+  const H = Math.max(64, Math.round(rect.height * dpr));
+  if(_canvasEl.width  !== W) _canvasEl.width  = W;
+  if(_canvasEl.height !== H) _canvasEl.height = H;
+  _canvasEl.style.width  = rect.width  + 'px';
+  _canvasEl.style.height = rect.height + 'px';
+}
+if(typeof ResizeObserver !== 'undefined'){
+  const ro = new ResizeObserver(entries => {
+    for(const ent of entries){ _resizeCanvasFromRect(ent.contentRect); break; }
+  });
+  ro.observe(_canvasWrap);
+}
+// initial size
+_resizeCanvasFromRect(_canvasWrap.getBoundingClientRect());
+window.addEventListener('resize', ()=>{
+  _resizeCanvasFromRect(_canvasWrap.getBoundingClientRect());
+});
+
+// Mousemove → cursor target (normalized -1..1)
+_canvasEl.addEventListener('mousemove', e => {
+  const r = _canvasEl.getBoundingClientRect();
+  if(r.width <= 0 || r.height <= 0) return;
+  cursorTarget.x = ((e.clientX - r.left) / r.width  - 0.5) * 2;
+  cursorTarget.y = ((e.clientY - r.top ) / r.height - 0.5) * 2;
+});
+_canvasEl.addEventListener('mouseleave', ()=>{
+  cursorTarget.x = 0;
+  cursorTarget.y = 0.15;
+});
+
+refreshSeedUI();
+loop();
+setStatus(`forge pro ready · ${N} axes · DNA order: alphabetical`);
+
+</script>
+</body>
+</html>

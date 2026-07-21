@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drift</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #060608; --surface: #0c0c10; --surface-2: #18181f;
+  --border: #2a2a38; --border-hi: #3d3d52;
+  --ink: #ddd8cc; --ink-2: #999084; --ink-3: #524e48;
+  --amber: #c9920a;
+  --r: 6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'JetBrains Mono','SF Mono',monospace;font-size:12px}
+body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+
+#nx-boot-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#nx-boot-icon{font-size:38px;color:var(--amber)}
+#nx-boot-title{font-size:14px;font-weight:600}
+#nx-boot-state{font-size:10px;color:var(--ink-2);letter-spacing:1px}
+#nx-app{display:none;width:100%;height:100%;flex-direction:column;overflow:hidden}
+body.nx-mounted #nx-app, body.nx-standalone #nx-app{display:flex}
+body.nx-mounted #nx-boot-screen, body.nx-standalone #nx-boot-screen{display:none}
+
+#topbar{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+#topbar h1{font-size:12px;font-weight:600;letter-spacing:.06em}
+#topbar h1 .sub{color:var(--ink-2);font-weight:400;margin-left:6px}
+.spacer{flex:1}
+.btn{
+  padding:5px 10px;background:var(--surface-2);color:var(--ink-2);
+  border:1px solid var(--border);border-radius:var(--r);cursor:pointer;
+  font-family:inherit;font-size:11px;transition:all .12s;
+}
+.btn:hover{color:var(--ink);border-color:var(--border-hi)}
+.btn.primary{color:var(--amber);border-color:var(--amber)}
+
+#seed-input{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);
+  padding:5px 10px;font-family:inherit;font-size:11px;color:var(--ink);
+  width:200px;
+}
+#seed-input:focus{outline:none;border-color:var(--amber)}
+#seed-label{font-size:10px;color:var(--ink-2);letter-spacing:.1em;text-transform:uppercase}
+
+#stage{
+  flex:1;position:relative;overflow:hidden;background:#000;
+  display:flex;align-items:center;justify-content:center;
+}
+canvas{display:block;width:100%;height:100%}
+#info-strip{
+  position:absolute;bottom:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 14px;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);
+  font-size:10px;color:var(--ink-2);pointer-events:none;
+  letter-spacing:.06em;
+}
+#info-strip .seed-label{color:var(--amber);font-weight:600}
+#info-strip .params{display:flex;gap:14px}
+#info-strip .params span{color:var(--ink-3)}
+#info-strip .params .v{color:var(--ink)}
+.fade-in{animation:fadeIn .8s ease-out}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+<div id="nx-boot-screen">
+  <div id="nx-boot-icon">◇</div>
+  <div id="nx-boot-title">Drift</div>
+  <div id="nx-boot-state">BOOTING</div>
+</div>
+
+<div id="nx-app">
+  <div id="topbar">
+    <h1>DRIFT <span class="sub">deterministic generative art</span></h1>
+    <span id="seed-label">seed</span>
+    <input id="seed-input" type="text" placeholder="any text or number" spellcheck="false">
+    <button class="btn" id="btn-randomize">Randomize</button>
+    <button class="btn primary" id="btn-share">Share seed</button>
+    <div class="spacer"></div>
+  </div>
+  <div id="stage">
+    <canvas id="canvas"></canvas>
+    <div id="info-strip">
+      <div><span class="seed-label" id="info-seed">—</span></div>
+      <div class="params">
+        <span>bodies <span class="v" id="info-bodies">—</span></span>
+        <span>palette <span class="v" id="info-palette">—</span></span>
+        <span>field <span class="v" id="info-field">—</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────
+   DRIFT
+   Pure deterministic generative art. Same seed → same artwork
+   forever, on any machine. The seed is the entire piece.
+
+   Architecture: mulberry32 PRNG (matches engines/substrate.js)
+   seeded from FNV1a hash of the seed string. All visual choices
+   (body count, hues, motion field, pulse rate) are floats drawn
+   from this single PRNG in a fixed order. Anyone with the seed
+   string regenerates the identical artwork.
+   ───────────────────────────────────────────────────────── */
+
+// ── Determinism primitives (same shape as engines/substrate.js) ──
+function fnv1a(str){
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+function mulberry32(seed){
+  let s = seed >>> 0;
+  return function(){
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ── Composition derivation ────────────────────────────────
+// Given a seed string, derive a complete visual specification.
+// IMPORTANT: order of rng() calls is part of the contract — changing
+// it means the same seed produces a different image.
+function compose(seedStr){
+  const seed = fnv1a(String(seedStr));
+  const rng = mulberry32(seed);
+
+  // Palette: pick a base hue + two complements within a controlled range
+  // so the result reads as a coherent piece, not random soup.
+  const baseHue = rng() * 360;
+  const palette = [
+    baseHue,
+    (baseHue + 30 + rng()*60) % 360,
+    (baseHue + 180 + (rng()-0.5)*40) % 360
+  ];
+  const sat = 35 + rng() * 50; // 35..85
+  const lum = 45 + rng() * 30; // 45..75
+
+  // Bodies: 12..48 orbiting points. Each has its own orbit radius, phase,
+  // angular velocity, size, hue index.
+  const N = 12 + Math.floor(rng() * 36);
+  const bodies = [];
+  for (let i = 0; i < N; i++) {
+    bodies.push({
+      r:     0.05 + rng() * 0.45,        // orbit radius (norm units)
+      phase: rng() * Math.PI * 2,
+      omega: (rng() - 0.5) * 0.018,      // angular velocity (rad/frame)
+      size:  0.5 + rng() * 5,
+      hueIx: Math.floor(rng() * 3),
+      drift: (rng() - 0.5) * 0.0008,     // slow radial drift
+      trail: 0.92 + rng() * 0.06,        // per-body trail decay
+    });
+  }
+
+  // Motion field: pick from named archetypes so info strip can label them.
+  const fieldKinds = ["spiral", "lissajous", "field-flow", "petal", "vortex"];
+  const fieldKind = fieldKinds[Math.floor(rng() * fieldKinds.length)];
+  const fieldA = 1 + rng() * 4;
+  const fieldB = 1 + rng() * 4;
+
+  // Global pulse: slow rhythm that scales body sizes.
+  const pulseSpeed = 0.003 + rng() * 0.012;
+  const pulseDepth = rng() * 0.3;
+
+  // Background gradient origin angle.
+  const bgAngle = rng() * 360;
+
+  return {
+    seed, seedStr, palette, sat, lum,
+    bodies, fieldKind, fieldA, fieldB,
+    pulseSpeed, pulseDepth, bgAngle,
+  };
+}
+
+// ── Renderer ──────────────────────────────────────────────
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let comp = null, frame = 0, rafId = 0;
+
+function fitCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = Math.floor(rect.width * dpr);
+  canvas.height = Math.floor(rect.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener("resize", () => { fitCanvas(); });
+
+function clearWithFade(c){
+  // Trail effect: paint a low-alpha background rect each frame instead of clear.
+  const rect = canvas.getBoundingClientRect();
+  ctx.fillStyle = "rgba(6,6,8,0.08)";
+  ctx.fillRect(0, 0, rect.width, rect.height);
+}
+
+function render(){
+  if (!comp) return;
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+  const cx = W / 2, cy = H / 2;
+  const R = Math.min(W, H) * 0.45;
+
+  clearWithFade();
+
+  const t = frame;
+  const pulse = 1 + Math.sin(t * comp.pulseSpeed) * comp.pulseDepth;
+
+  // Composite mode: lighter for bloom-like layering.
+  ctx.globalCompositeOperation = "lighter";
+
+  for (const b of comp.bodies) {
+    const phase = b.phase + t * b.omega;
+    const radius = (b.r + Math.sin(t * 0.001 + b.phase) * 0.05) * R;
+
+    // Field shape: deformations of a base circle.
+    let x, y;
+    switch (comp.fieldKind) {
+      case "spiral":
+        x = cx + Math.cos(phase) * radius * (1 + 0.1 * Math.sin(phase * comp.fieldA));
+        y = cy + Math.sin(phase) * radius * (1 + 0.1 * Math.cos(phase * comp.fieldB));
+        break;
+      case "lissajous":
+        x = cx + Math.sin(phase * comp.fieldA) * radius;
+        y = cy + Math.sin(phase * comp.fieldB + Math.PI / 3) * radius;
+        break;
+      case "field-flow":
+        x = cx + Math.cos(phase) * radius + Math.sin(phase * comp.fieldA + t * 0.005) * 12;
+        y = cy + Math.sin(phase) * radius + Math.cos(phase * comp.fieldB + t * 0.005) * 12;
+        break;
+      case "petal":
+        const r2 = radius * (1 + Math.sin(phase * Math.round(comp.fieldA + 2)) * 0.3);
+        x = cx + Math.cos(phase) * r2;
+        y = cy + Math.sin(phase) * r2;
+        break;
+      case "vortex":
+        const tw = phase + t * 0.0008 * comp.fieldA;
+        x = cx + Math.cos(tw) * radius;
+        y = cy + Math.sin(tw) * radius * (1 + Math.sin(tw * comp.fieldB) * 0.15);
+        break;
+      default:
+        x = cx + Math.cos(phase) * radius;
+        y = cy + Math.sin(phase) * radius;
+    }
+
+    const hue = comp.palette[b.hueIx];
+    const size = b.size * pulse;
+
+    // Soft glow body.
+    const grd = ctx.createRadialGradient(x, y, 0, x, y, size * 4);
+    grd.addColorStop(0,   `hsla(${hue}, ${comp.sat}%, ${comp.lum}%, 0.9)`);
+    grd.addColorStop(0.4, `hsla(${hue}, ${comp.sat}%, ${comp.lum}%, 0.25)`);
+    grd.addColorStop(1,   `hsla(${hue}, ${comp.sat}%, ${comp.lum}%, 0)`);
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(x, y, size * 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+
+  frame++;
+  rafId = requestAnimationFrame(render);
+}
+
+// ── UI plumbing ───────────────────────────────────────────
+const seedInput = document.getElementById("seed-input");
+const infoSeed  = document.getElementById("info-seed");
+const infoBodies = document.getElementById("info-bodies");
+const infoPalette = document.getElementById("info-palette");
+const infoField = document.getElementById("info-field");
+
+function loadSeed(seedStr){
+  if (rafId) cancelAnimationFrame(rafId);
+  comp = compose(seedStr);
+  frame = 0;
+  // Initial fade-clear so trails from previous composition don't bleed in.
+  const rect = canvas.getBoundingClientRect();
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, rect.width, rect.height);
+  // Update info strip.
+  infoSeed.textContent = seedStr;
+  infoBodies.textContent = comp.bodies.length;
+  infoPalette.textContent = comp.palette.map(h => Math.round(h) + "°").join(" / ");
+  infoField.textContent = comp.fieldKind;
+  // Persist last seed (best-effort; localStorage may fail in some sandboxes).
+  try { localStorage.setItem("drift.lastSeed", seedStr); } catch (_) {}
+  // Update URL hash so the seed is shareable as a link.
+  try { history.replaceState(null, "", "#" + encodeURIComponent(seedStr)); } catch (_) {}
+  // Begin render.
+  render();
+}
+
+function pickRandomSeed(){
+  // Use crypto for good entropy when picking; the artwork is still deterministic
+  // once the seed is chosen.
+  const buf = new Uint8Array(4);
+  if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(buf);
+  else for (let i = 0; i < 4; i++) buf[i] = Math.floor(Math.random()*256);
+  // Render as a short hex token so the seed is human-typeable on share.
+  return Array.from(buf).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+document.getElementById("btn-randomize").addEventListener("click", () => {
+  const s = pickRandomSeed();
+  seedInput.value = s;
+  loadSeed(s);
+});
+
+let shareTimer = null;
+document.getElementById("btn-share").addEventListener("click", async () => {
+  const s = seedInput.value.trim() || pickRandomSeed();
+  const link = window.location.href.split("#")[0] + "#" + encodeURIComponent(s);
+  let copied = false;
+  try { await navigator.clipboard.writeText(link); copied = true; } catch (_) {}
+  const btn = document.getElementById("btn-share");
+  const old = btn.textContent;
+  btn.textContent = copied ? "Link copied" : "Seed: " + s;
+  if (shareTimer) clearTimeout(shareTimer);
+  shareTimer = setTimeout(() => { btn.textContent = old; }, 1500);
+});
+
+seedInput.addEventListener("change", () => {
+  const s = seedInput.value.trim();
+  if (s) loadSeed(s);
+});
+seedInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const s = seedInput.value.trim();
+    if (s) loadSeed(s);
+  }
+});
+
+// ── Standalone vs hosted boot ─────────────────────────────
+// Drift is deliberately self-sufficient: it works inside Nexus and outside.
+// Manifest is empty (it neither emits nor consumes anything), but it still
+// completes the handshake when hosted so the kernel doesn't reap it.
+
+const APP = {
+  title: "Drift",
+  icon: "◇",
+  description: "Deterministic generative art",
+  emits: [],
+  consumes: []
+};
+let _port = null, _hosted = false;
+
+function _setBootState(s){ const el = document.getElementById("nx-boot-state"); if (el) el.textContent = s; }
+
+function startApp(hosted){
+  document.body.classList.add(hosted ? "nx-mounted" : "nx-standalone");
+  fitCanvas();
+  // Pick initial seed: URL hash > localStorage > random
+  let initial = "";
+  try { initial = decodeURIComponent((location.hash || "").replace(/^#/, "")); } catch (_) {}
+  if (!initial) {
+    try { initial = localStorage.getItem("drift.lastSeed") || ""; } catch (_) {}
+  }
+  if (!initial) initial = pickRandomSeed();
+  seedInput.value = initial;
+  // Defer to next frame so getBoundingClientRect() returns real dimensions.
+  requestAnimationFrame(() => loadSeed(initial));
+}
+
+window.addEventListener("message", evt => {
+  if (!evt.data || evt.data.type !== "BOOT") return;
+  if (!evt.ports || !evt.ports[0]) return;
+  _port = evt.ports[0];
+  _port.onmessage = ev => {
+    const msg = ev.data;
+    if (!msg || typeof msg.type !== "string") return;
+    if (msg.type === "MOUNT_CHALLENGE") { _port.postMessage({ type: "MOUNT_ACK", nonce: msg.nonce }); _setBootState("MOUNT_ACK"); }
+    else if (msg.type === "MOUNTED")   { _hosted = true; startApp(true); }
+    else if (msg.type === "PING")      { _port.postMessage({ type: "PONG", nonce: msg.nonce }); }
+  };
+  _port.postMessage({
+    type: "DECLARE",
+    manifest: { emits: APP.emits, consumes: APP.consumes },
+    app: { title: APP.title, icon: APP.icon, description: APP.description, visible: true }
+  });
+  _setBootState("DECLARED");
+});
+
+// Standalone fallback: if no BOOT arrives within 800ms, we run free.
+setTimeout(() => { if (!_hosted) startApp(false); }, 800);
+
+// Refit canvas if hosted block window is resized (kernel doesn't notify; we poll on window resize).
+window.addEventListener("resize", fitCanvas);
+</script>
+</body>
+</html>

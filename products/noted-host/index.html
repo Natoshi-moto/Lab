@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Noted v0.01</title>
+    <script>
+      // First-paint theme bootstrap. src/theme.ts is canonical; this tiny parser mirrors
+      // legacy compatibility before React loads and stays file:// safe.
+      (function(){
+        var allowedPresets = { matrix: true, paper: true, midnight: true };
+        var allowedTokens = {
+          '--bg': true, '--surface': true, '--surface-2': true, '--surface-3': true, '--line': true,
+          '--ink': true, '--ink-dim': true, '--ink-soft': true, '--ink-faint': true,
+          '--accent': true, '--accent-bright': true, '--accent-dim': true, '--accent-soft': true, '--accent-contrast': true,
+          '--danger': true, '--warning': true, '--info': true, '--warn': true, '--bad': true, '--good': true
+        };
+        function isRgbTriplet(value) {
+          if (typeof value !== 'string') return false;
+          var parts = value.trim().split(/\s+/);
+          if (parts.length !== 3) return false;
+          for (var i = 0; i < parts.length; i++) {
+            if (!/^\d{1,3}$/.test(parts[i])) return false;
+            var n = Number(parts[i]);
+            if (!Number.isInteger(n) || n < 0 || n > 255) return false;
+          }
+          return true;
+        }
+        function normalize(raw) {
+          if (raw === 'dark') return { preset: 'midnight' };
+          if (raw === 'light') return { preset: 'paper' };
+          if (!raw) return { preset: 'matrix' };
+          try {
+            var parsed = JSON.parse(raw);
+            var preset = parsed && allowedPresets[parsed.preset] ? parsed.preset : 'matrix';
+            var out = { preset: preset };
+            if (parsed && parsed.overrides && typeof parsed.overrides === 'object') {
+              out.overrides = {};
+              for (var token in parsed.overrides) {
+                if (allowedTokens[token] && isRgbTriplet(parsed.overrides[token])) {
+                  out.overrides[token] = parsed.overrides[token].trim().replace(/\s+/g, ' ');
+                }
+              }
+            }
+            return out;
+          } catch(e) {
+            return { preset: 'matrix' };
+          }
+        }
+        try {
+          var settings = normalize(localStorage.getItem('verse-studio:theme'));
+          var root = document.documentElement;
+          root.dataset.theme = settings.preset;
+          root.classList.remove('dark');
+          if (settings.overrides) {
+            for (var key in settings.overrides) {
+              root.style.setProperty(key, settings.overrides[key]);
+            }
+          }
+        } catch(e) {
+          document.documentElement.dataset.theme = 'matrix';
+        }
+      })();
+    </script>
+    <!-- Sweep 60 — Inline SVG favicon, hub-and-spoke launcher geometry,
+         matrix-aligned palette, file:// safe. -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E1411'/%3E%3Cpolygon points='32,10 15,40 49,40' fill='none' stroke='%2341D880' stroke-width='0.8' opacity='0.22' stroke-linejoin='round'/%3E%3Cline x1='32' y1='29' x2='32' y2='10' stroke='%2341D880' stroke-width='1.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='32' y1='29' x2='15' y2='40' stroke='%2341D880' stroke-width='1.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='32' y1='29' x2='49' y2='40' stroke='%2341D880' stroke-width='1.5' stroke-linecap='round' opacity='0.7'/%3E%3Ccircle cx='32' cy='29' r='6.2' fill='none' stroke='%2341D880' stroke-width='1.5'/%3E%3Ccircle cx='32' cy='29' r='2.8' fill='%2341D880'/%3E%3Ccircle cx='32' cy='10' r='4' fill='none' stroke='%2341D880' stroke-width='1.5'/%3E%3Ccircle cx='32' cy='10' r='1.6' fill='%2341D880'/%3E%3Ccircle cx='15' cy='40' r='4' fill='none' stroke='%2341D880' stroke-width='1.5'/%3E%3Ccircle cx='15' cy='40' r='1.6' fill='%2341D880'/%3E%3Ccircle cx='49' cy='40' r='4' fill='none' stroke='%2341D880' stroke-width='1.5'/%3E%3Ccircle cx='49' cy='40' r='1.6' fill='%2341D880'/%3E%3C/svg%3E">
+    <!-- Sweep 59-R — boot splash: presentation-only, removed by React mount.
+         Inline so it paints on first frame before /src/main.tsx evaluates,
+         keeping cold boot calm instead of flashing the bare body background. -->
+    <style id="n-boot-style">
+      #n-boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+        background: rgb(var(--bg, 10 14 12)); color: rgb(var(--ink-faint, 65 88 74));
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+        opacity: 1; transition: opacity 220ms ease; }
+      #n-boot[data-leaving="true"] { opacity: 0; pointer-events: none; }
+      #n-boot .n-boot-mark { width: 48px; height: 48px; border-radius: 12px;
+        background: rgb(var(--accent, 65 216 128) / 0.06);
+        box-shadow: inset 0 0 0 1px rgb(var(--accent, 65 216 128) / 0.18);
+        display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
+        filter: drop-shadow(0 0 16px rgb(var(--accent, 65 216 128) / 0.14)); }
+      #n-boot svg { width: 32px; height: 32px; color: rgb(var(--accent, 65 216 128)); opacity: 0.85; }
+      @media (prefers-reduced-motion: reduce) {
+        #n-boot { transition-duration: 0.001ms; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="n-boot" aria-hidden="true">
+        <div style="text-align:center">
+          <div class="n-boot-mark">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <!-- Sweep 60 — boot splash glyph mirrors AppMark's hub-and-spoke launcher geometry. -->
+              <polygon points="32,10 15,40 49,40" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.22" stroke-linejoin="round" />
+              <line x1="32" y1="29" x2="32" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="32" y1="29" x2="15" y2="40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="32" y1="29" x2="49" y2="40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <circle cx="32" cy="29" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5" />
+              <circle cx="32" cy="29" r="2.8" fill="currentColor" />
+              <circle cx="32" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1.5" />
+              <circle cx="32" cy="10" r="1.6" fill="currentColor" />
+              <circle cx="15" cy="40" r="4" fill="none" stroke="currentColor" stroke-width="1.5" />
+              <circle cx="15" cy="40" r="1.6" fill="currentColor" />
+              <circle cx="49" cy="40" r="4" fill="none" stroke="currentColor" stroke-width="1.5" />
+              <circle cx="49" cy="40" r="1.6" fill="currentColor" />
+            </svg>
+          </div>
+          <div>Noted · private workspace</div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

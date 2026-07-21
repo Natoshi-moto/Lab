@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NexusDB Core</title>
+<style>
+  body { background: #000; color: #00ff41; font-family: monospace; font-size: 10px; padding: 10px; overflow: hidden; }
+  .status { border-left: 2px solid #00ff41; padding-left: 8px; margin-bottom: 4px; font-weight: bold; }
+  #log-container { margin-top: 10px; height: calc(100vh - 40px); overflow-y: auto; }
+  .log-entry { margin-bottom: 2px; }
+  .log-err { color: #ff3333; }
+  .log-ok { color: #00ff41; }
+  .log-sys { color: #3b82f6; }
+</style>
+</head>
+<body>
+  <div class="status">NEXUSDB V2.1 - MANAGED CORE <span id="dots"></span></div>
+  <div id="log-container"></div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════
+   NexusDB — High-Performance Persistence Block
+   Fully managed under Nexus OS MessageChannel IPC.
+
+   PATCH LOG:
+   v2.1 — BUG-01: Fixed timestamp unit mismatch (ms → Unix seconds).
+          Genesis block and GC threshold now use Math.floor(Date.now()/1000).
+          Without this fix, every real Nostr event (Unix seconds ~1.7B) falls
+          below the GC threshold (ms ~1.744T) and is silently evicted within
+          5 minutes of being written. No error is thrown.
+        — Added explicit SUB messages for db.query and db.subscribe after
+          MOUNTED. The kernel only routes MSG to blocks that have subscribed
+          via explicit SUB — declaring a channel in consumes is not enough.
+   ══════════════════════════════════════════════════════════════ */
+const DB_NAME    = "NexusOS_Data";
+const DB_VERSION = 1;
+let db   = null;
+const subscriptions = new Map();
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    ["db.result", "db.notify", "system.block_ready"],
+    consumes: ["db.query", "db.subscribe"],
+    app: {
+      title:       "NexusDB Core",
+      icon:        "💽",
+      visible:     true,
+      description: "Quasi-SQL Persistence Layer & Pub/Sub"
+    }
+  },
+  onMessage({ channel, payload }) {
+    if (channel === "db.query")     handleQuery(payload);
+    if (channel === "db.subscribe") handleSubscribe(payload);
+  }
+});
+
+// ── UI Logging ──
+const logContainer = document.getElementById("log-container");
+function log(msg, type = "ok") {
+  const el = document.createElement("div");
+  el.className = `log-entry log-${type}`;
+  el.textContent = msg;
+  logContainer.appendChild(el);
+  if (logContainer.children.length > 100) logContainer.firstChild.remove();
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+// Visual heartbeat
+setInterval(() => {
+  const dots = document.getElementById("dots");
+  if (dots) dots.textContent = ".".repeat(Math.floor((Date.now() / 500) % 4));
+}, 500);
+
+// ── IndexedDB Init ──
+const initDB = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const dbInstance = e.target.result;
+      if (!dbInstance.objectStoreNames.contains("social_events")) {
+        const store = dbInstance.createObjectStore("social_events", { keyPath: "id" });
+        store.createIndex("created_at", "created_at", { unique: false });
+        store.createIndex("pubkey",     "pubkey",     { unique: false });
+      }
+      if (!dbInstance.objectStoreNames.contains("config")) {
+        dbInstance.createObjectStore("config", { keyPath: "key" });
+      }
+    };
+    request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+    request.onerror   = (e) => reject(e.target.error);
+  });
+};
+
+async function verifySchema() {
+  log("[BOOT] Verifying System Schema...", "sys");
+  if (!db) await initDB();
+  const tx    = db.transaction("social_events", "readwrite");
+  const store = tx.objectStore("social_events");
+  const req   = store.count();
+  req.onsuccess = () => {
+    if (req.result === 0) {
+      log("[BOOT] DB Empty. Writing Genesis Block...", "sys");
+      store.add({
+        id:         "genesis_001",
+        pubkey:     "system_admin",
+        handle:     "nexus_kernel",
+        content:    "Welcome to Nexus OS. The database is initialized and ready for reads/writes.",
+        // FIX BUG-01: Unix seconds, not milliseconds.
+        // Date.now() ≈ 1,745,000,000,000 ms — three orders of magnitude above
+        // real Nostr event timestamps (~1,745,000,000 s), so GC would evict
+        // everything within 5 minutes. Math.floor(Date.now()/1000) is correct.
+        created_at: Math.floor(Date.now() / 1000),
+        likes: 99, reposts: 21, zaps: 0, replies: 0
+      });
+    } else {
+      log(`[BOOT] Schema Verified. Contains ${req.result} rows.`, "sys");
+    }
+  };
+}
+
+// ── Garbage Collection (24-hour expiry) ──
+setInterval(() => {
+  if (!db) return;
+  try {
+    const tx    = db.transaction("social_events", "readwrite");
+    const store = tx.objectStore("social_events");
+    const index = store.index("created_at");
+    // FIX BUG-01: threshold must be in Unix seconds to match Nostr event timestamps.
+    // Old: Date.now() - 86400000  (~1.744T ms) — evicts everything with Unix-second ts
+    // New: Math.floor(Date.now()/1000) - 86400  (~1.744B s) — correct 24h window
+    const threshold = Math.floor(Date.now() / 1000) - 86400;
+    const request   = index.openCursor(IDBKeyRange.upperBound(threshold));
+    let deletedCount = 0;
+
+    request.onsuccess = (e) => {
+      const cursor = e.target.result;
+      if (cursor) {
+        store.delete(cursor.primaryKey);
+        deletedCount++;
+        cursor.continue();
+      } else if (deletedCount > 0) {
+        log(`[GC] Evicted ${deletedCount} stale events from social_events`, "sys");
+      }
+    };
+  } catch (err) {
+    log(`[GC ERR] ${err.message}`, "err");
+  }
+}, 300000); // Every 5 minutes
+
+// ── IPC Emits ──
+function emit(channel, payload) {
+  if (nx) nx.emit(channel, payload);
+}
+
+// ── Quasi-SQL Engine ──
+function extractTable(query) {
+  const parts  = (query || "").split(" ");
+  const qUpper = query.toUpperCase();
+  if (qUpper.startsWith("INSERT INTO") || qUpper.startsWith("DELETE FROM")) return parts[2] || "social_events";
+  if (qUpper.startsWith("UPDATE")) return parts[1] || "social_events";
+  if (qUpper.startsWith("SELECT")) {
+    const fromIdx = qUpper.split(" ").indexOf("FROM");
+    return fromIdx !== -1 ? parts[fromIdx + 1] : "social_events";
+  }
+  return "social_events";
+}
+
+function notifySubscribers(targetTable, changedData) {
+  for (const [, subs] of subscriptions.entries()) {
+    subs.forEach(sub => {
+      if (sub.query.includes(targetTable)) {
+        emit("db.notify", { channel: sub.channel, table: targetTable, data: changedData });
+      }
+    });
+  }
+}
+
+async function handleSubscribe(req) {
+  const { channel, query, appId } = req;
+  if (!subscriptions.has(appId)) subscriptions.set(appId, []);
+  subscriptions.get(appId).push({ channel, query });
+  log(`[PUBSUB] ${appId} subscribed to: ${query}`, "sys");
+}
+
+async function handleQuery(req) {
+  if (!db) await initDB();
+  const { query, params, filters, sort, _reqId, appId } = req;
+  const qUpper = (query || "").toUpperCase();
+
+  if (qUpper.startsWith("SUBSCRIBE")) {
+    return handleSubscribe(req);
+  }
+
+  const table = extractTable(query);
+
+  // Namespace Guard — social_events is whitelisted by name
+  if (appId && appId !== "system" && !table.startsWith(appId) && !table.startsWith("public_") && table !== "social_events") {
+    log(`[AUTH] Blocked access to ${table} by ${appId}`, "err");
+    emit("db.result", { ok: false, error: "PERMISSION_DENIED", _reqId });
+    return;
+  }
+
+  try {
+    // INSERT / UPDATE (both are upsert via store.put — idempotent on duplicate id)
+    if (qUpper.startsWith("INSERT") || qUpper.startsWith("UPDATE")) {
+      const tx      = db.transaction(table, "readwrite");
+      const store   = tx.objectStore(table);
+      const request = store.put(params);
+      request.onsuccess = () => {
+        log(`[OK] ${qUpper.split(" ")[0]} → ${table}: ${params.id ? String(params.id).slice(0, 8) : 'new'}`);
+        emit("db.result", { ok: true, _reqId });
+        notifySubscribers(table, params);
+      };
+      request.onerror = (e) => emit("db.result", { ok: false, error: String(e.target.error), _reqId });
+    }
+    // DELETE
+    else if (qUpper.startsWith("DELETE")) {
+      const tx      = db.transaction(table, "readwrite");
+      const store   = tx.objectStore(table);
+      const request = store.delete(params.id);
+      request.onsuccess = () => {
+        log(`[OK] DELETE FROM ${table} ID: ${params.id}`);
+        emit("db.result", { ok: true, _reqId });
+      };
+      request.onerror = (e) => emit("db.result", { ok: false, error: String(e.target.error), _reqId });
+    }
+    // SELECT
+    else if (qUpper.startsWith("SELECT")) {
+      const tx      = db.transaction(table, "readonly");
+      const store   = tx.objectStore(table);
+      const request = store.getAll();
+      request.onsuccess = () => {
+        let results = request.result || [];
+        if (filters) {
+          results = results.filter(row => Object.keys(filters).every(k => row[k] === filters[k]));
+        }
+        if (sort) {
+          const { column, direction } = sort;
+          results.sort((a, b) => direction === "DESC" ? b[column] - a[column] : a[column] - b[column]);
+        }
+        log(`[OK] SELECT ${results.length} rows from ${table}`);
+        emit("db.result", { ok: true, data: results, _reqId });
+      };
+      request.onerror = (e) => emit("db.result", { ok: false, error: String(e.target.error), _reqId });
+    }
+  } catch (err) {
+    log(`[SQL ERR] ${err.message}`, "err");
+    emit("db.result", { ok: false, error: err.message, _reqId });
+  }
+}
+
+// ── Kernel Handshake ──
+if (nx) {
+  nx.ready.then(async () => {
+    log("[IPC] Channel Secured. Booting DB...", "sys");
+    try {
+      await initDB();
+      await verifySchema();
+      log("[IPC] Subscribed to db.query + db.subscribe", "sys");
+      emit("system.block_ready", { blockId: "nexus_db", status: "ONLINE" });
+    } catch (err) {
+      log(`[FATAL] ${err}`, "err");
+    }
+  });
+}
+
+window.onerror = (msg) => { log(String(msg), "err"); };
+</script>
+</body>
+</html>

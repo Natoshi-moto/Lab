@@ -1,0 +1,20 @@
+{
+  "name": "nexus-lattice",
+  "version": "0.4.0-beauty",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "smoke": "npm run build && node dist/test/smoke.js",
+    "audit": "node scripts/audit.mjs",
+    "verify": "npm run typecheck && npm run smoke && npm run demo-flow && npm run share-export && npm run gameplay-read && npm run audit",
+    "demo-flow": "npm run build && node dist/test/demo-flow.js",
+    "share-export": "npm run build && node dist/test/share-export.js",
+    "gameplay-read": "npm run build && node dist/test/gameplay-read.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  },
+  "description": "Deterministic Nexus Lattice playable prototype with beauty-pass visuals and verified seams."
+}

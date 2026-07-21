@@ -1,0 +1,5603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #08080f;
+    --surface: rgba(255,255,255,0.06);
+    --border:  rgba(255,255,255,0.10);
+    --text:    rgba(255,255,255,0.80);
+    --dim:     rgba(255,255,255,0.22);
+    --accent:  #c8aaff;
+    --danger:  #ff6b8a;
+    --font:    'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #env-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    display: block;
+  }
+
+  #creature-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    display: block;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .creature-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: #050508;
+  }
+
+  #node-container {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  #ui {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .ctrl-cluster {
+    position: absolute;
+    pointer-events: auto;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 150ms ease;
+    pointer-events: none;
+  }
+  body.ctrl-held .ctrl-cluster {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Creature corner zone — JS-positioned, draggable */
+  .corner-zone {
+    position: absolute;
+    pointer-events: auto;
+  }
+  #creature-zone {
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    cursor: grab;
+  }
+  #creature-zone.dragging {
+    cursor: grabbing;
+  }
+  /* Show buttons when ctrl held anywhere in the zone */
+  body.ctrl-held .corner-zone .ctrl-cluster {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .env-controls {
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .ctrl-cluster button {
+    font-family: var(--font);
+    font-size: 11px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+
+  .ctrl-cluster button:hover {
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* Creature control cluster — positioned inside the corner zone */
+  .creature-controls {
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    justify-content: center;
+  }
+
+  /* Collection tab */
+  .collection-tab {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: right center;
+    pointer-events: none;
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    padding: 5px 10px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+  body.ctrl-held .collection-tab {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .collection-tab:hover { color: var(--text); }
+
+  /* Collection drawer */
+  #collection-drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 260px;
+    height: 100%;
+    background: rgba(8, 8, 18, 0.88);
+    backdrop-filter: blur(12px);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform 300ms ease;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    z-index: 20;
+  }
+
+  .coll-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+  .coll-header button {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    line-height: 1;
+  }
+  .coll-header button:hover { color: var(--text); }
+
+  #collection-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #collection-list::-webkit-scrollbar { width: 4px; }
+  #collection-list::-webkit-scrollbar-track { background: transparent; }
+  #collection-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .coll-empty {
+    color: var(--dim);
+    font-size: 11px;
+    text-align: center;
+    margin-top: 40px;
+    font-family: var(--font);
+  }
+
+  .coll-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: var(--surface);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .coll-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    background: #050508;
+    transition: opacity 150ms ease;
+  }
+  .coll-thumb:hover { opacity: 0.75; }
+
+  .coll-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .coll-name {
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--text);
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: 2px 0;
+    width: 100%;
+    transition: border-color 150ms ease;
+  }
+  .coll-name:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+
+  .coll-date {
+    font-size: 9px;
+    color: var(--dim);
+    font-family: var(--font);
+  }
+
+  .coll-delete {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    flex-shrink: 0;
+    transition: color 150ms ease;
+  }
+  .coll-delete:hover { color: var(--danger); }
+
+  /* Flash animation for save button */
+  @keyframes flash {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.5); color: var(--accent); }
+  }
+  .flashing { animation: flash 600ms ease; }
+
+  /* ============================================================
+     Sweep 3 — Node canvas
+     ============================================================ */
+
+  /* Node layer */
+  #nodes-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  #edges-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* touch-action on node-container prevents mobile scroll fighting pan */
+  #node-container {
+    touch-action: none;
+  }
+
+  /* Node tiles */
+  .node {
+    position: absolute;
+    width: fit-content;
+    min-width: 200px;
+    background: rgba(8, 8, 18, 0.82);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    font-family: var(--font);
+    font-size: 11px;
+    color: var(--text);
+    z-index: 2;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  .node-header {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px 4px 10px;
+    min-height: 28px;
+    cursor: grab;
+    border-bottom: 1px solid rgba(255,255,255,0.035);
+  }
+  .node-header:active { cursor: grabbing; }
+
+  .node-close {
+    background: none;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    font-family: var(--font);
+    margin-left: auto;
+    transition: color 150ms ease;
+  }
+  .node:hover .node-close { color: var(--dim); }
+  .node-close:hover { color: var(--danger) !important; }
+
+  .node-title {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 10px 5px;
+    outline: none;
+    letter-spacing: 0.02em;
+    box-sizing: border-box;
+  }
+  .node-title::placeholder { color: var(--dim); }
+
+  /* Resizable wrapper — this is what the user drags to resize */
+  .node-body-wrap {
+    resize: both;
+    overflow: hidden;
+    height: 132px;
+    min-height: 80px;
+    max-height: 420px;
+    min-width: 180px;
+  }
+
+  /* Contenteditable body */
+  .node-body {
+    width: 100%;
+    height: 100%;
+    min-height: 80px;
+    overflow: auto;
+    background: none;
+    color: rgba(255,255,255,0.74);
+    font-family: var(--font);
+    font-size: 10px;
+    padding: 4px 10px 10px;
+    outline: none;
+    line-height: 1.5;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .node-body:empty::before {
+    content: attr(data-placeholder);
+    color: var(--dim);
+    pointer-events: none;
+  }
+  .node-body b,
+  .node-body strong { color: var(--text); }
+
+  .node-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 0 6px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    opacity: 0;
+    transition: opacity 150ms ease;
+    cursor: grab;
+  }
+  .node:hover .node-footer { opacity: 1; }
+  .node-footer:active { cursor: grabbing; }
+
+  .node-drag {
+    width: 24px;
+    height: 10px;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 5px 5px;
+    background-position: center;
+    pointer-events: none;
+  }
+
+  /* Right-click edge drawing cursor hint */
+  .node:not(.dragging) {
+    cursor: context-menu;
+  }
+
+  /* Hint */
+  .companion-home-pill {
+    position:absolute;left:16px;bottom:16px;z-index:80;pointer-events:auto;
+    display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);
+    border-radius:999px;background:rgba(8,8,18,.68);backdrop-filter:blur(12px);
+    color:var(--text);font-size:10px;letter-spacing:.04em;
+  }
+  .companion-home-pill button{font-family:var(--font);font-size:10px;color:var(--accent);background:transparent;border:1px solid var(--border);border-radius:999px;padding:4px 8px;cursor:pointer}
+  .companion-home-pill button:hover{border-color:var(--accent);background:rgba(200,170,255,.08)}
+
+  #canvas-hint {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: rgba(255,255,255,0.12);
+    font-family: var(--font);
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* Restore session widget */
+  #restore-widget {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+  #restore-widget.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #restore-inner {
+    background: rgba(8, 8, 18, 0.88);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    padding: 32px 36px;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+
+  #restore-title {
+    font-family: var(--font);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 14px;
+    text-transform: lowercase;
+  }
+
+  #restore-body {
+    font-family: var(--font);
+    font-size: 11px;
+    color: var(--dim);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  #restore-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  #restore-btn {
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: opacity 150ms ease;
+  }
+  #restore-btn:hover { opacity: 0.85; }
+
+  #fresh-btn {
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 18px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: color 150ms ease;
+  }
+  #fresh-btn:hover { color: var(--text); }
+
+  /* Floating format toolbar */
+  #fmt-toolbar {
+    position: fixed;
+    display: none;
+    align-items: center;
+    gap: 2px;
+    background: rgba(8,8,18,0.95);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 5px 7px;
+    z-index: 9999;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    pointer-events: auto;
+  }
+
+  #fmt-toolbar button[data-cmd] {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    transition: color 100ms ease, background 100ms ease;
+  }
+  #fmt-toolbar button[data-cmd]:hover {
+    color: var(--text);
+    background: var(--surface);
+  }
+  #fmt-toolbar [data-cmd="bold"]      { font-weight: 700; }
+  #fmt-toolbar [data-cmd="italic"]    { font-style: italic; }
+  #fmt-toolbar [data-cmd="underline"] { text-decoration: underline; }
+
+  .fmt-sep {
+    width: 1px;
+    height: 18px;
+    background: rgba(255,255,255,0.10);
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .fmt-swatches {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: transform 100ms ease;
+  }
+  .swatch:hover { transform: scale(1.2); }
+
+  .clear-swatch {
+    background: none !important;
+    font-size: 9px;
+    color: var(--dim);
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font);
+  }
+
+  /* ============================================================
+     Sweep 5 — Edge style panel + connect mode
+     ============================================================ */
+
+  /* Edge style panel */
+  .edge-style-panel {
+    bottom: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: 8px;
+    background: rgba(8,8,18,0.82);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    backdrop-filter: blur(8px);
+  }
+
+  .panel-label {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    font-family: var(--font);
+  }
+
+  .edge-style-panel input[type=color] {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  .edge-style-panel input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
+  .edge-style-panel input[type=color]::-webkit-color-swatch { border-radius: 50%; border: none; }
+
+  .edge-style-panel input[type=range] {
+    width: 64px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* Connect mode cursor */
+  body.connect-mode .node { cursor: crosshair; }
+
+  /* Source node highlight when in connect mode */
+  .node.connecting {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(200,170,255,0.25), 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* Animated edge */
+  @keyframes dash-flow {
+    to { stroke-dashoffset: -24; }
+  }
+  .edge-animated {
+    animation: dash-flow 1s linear infinite;
+  }
+
+  /* ============================================================
+     Sweep 7 — Multiple workspaces
+     ============================================================ */
+  #ws-switcher {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 150ms ease;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  body.ctrl-held #ws-switcher {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #ws-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .ws-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: border-color 150ms ease, background 150ms ease;
+    cursor: default;
+  }
+  .ws-item.ws-active {
+    border-color: var(--accent);
+    background: rgba(200,170,255,0.08);
+  }
+
+  .ws-name {
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--text);
+    cursor: pointer;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  .ws-rename {
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--text);
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--accent);
+    outline: none;
+    width: 120px;
+    padding: 0;
+  }
+
+  .ws-delete {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 150ms ease;
+  }
+  .ws-delete:hover { color: var(--danger); }
+
+  #ws-add {
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: color 150ms ease;
+    align-self: flex-start;
+  }
+  #ws-add:hover { color: var(--text); }
+
+  /* ============================================================
+     Sweep 8 — Pop-out editor + per-note style + global style
+     ============================================================ */
+
+  /* ctrl-only: visible only when Ctrl is held */
+  .ctrl-only {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 150ms ease;
+  }
+  body.ctrl-held .ctrl-only {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Settings gear on node */
+  .node-settings {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 11px;
+    padding: 0 2px;
+    line-height: 1;
+    font-family: var(--font);
+  }
+  .node-settings:hover { color: var(--text); }
+
+  /* Expand button in footer */
+  .node-expand {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    margin-left: 8px;
+    line-height: 1;
+    font-family: var(--font);
+  }
+  .node-expand:hover { color: var(--accent); }
+
+  /* Per-note style panel */
+  #note-style-panel {
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(8,8,18,0.96);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    z-index: 9999;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    min-width: 210px;
+    pointer-events: auto;
+  }
+  .nsp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nsp-label {
+    font-family: var(--font);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+    min-width: 28px;
+  }
+  #nsp-reset {
+    font-family: var(--font);
+    font-size: 9px;
+    color: var(--dim);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: color 150ms ease;
+  }
+  #nsp-reset:hover { color: var(--text); }
+
+  /* Global style panel */
+  .global-style-panel {
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    background: rgba(8,8,18,0.82);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Backdrop */
+  #note-editor-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 200;
+    display: none;
+    opacity: 0;
+    transition: opacity 250ms ease;
+    pointer-events: auto;
+  }
+  #note-editor-backdrop.visible { opacity: 1; }
+
+  /* Pop-out editor */
+  #note-editor {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.94);
+    width: 38vw;
+    height: 55vh;
+    min-width: 340px;
+    min-height: 300px;
+    background: rgba(8,8,18,0.97);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+    z-index: 201;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 250ms ease, transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: auto;
+  }
+  #note-editor.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  #ne-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  #ne-title {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    letter-spacing: 0.02em;
+  }
+  #ne-title::placeholder { color: var(--dim); }
+  #ne-close {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    line-height: 1;
+    transition: color 150ms ease;
+    flex-shrink: 0;
+    font-family: var(--font);
+  }
+  #ne-close:hover { color: var(--text); }
+
+  #ne-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  #ne-toolbar button[data-cmd] {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    transition: color 100ms ease, background 100ms ease;
+  }
+  #ne-toolbar button[data-cmd]:hover { color: var(--text); background: var(--surface); }
+  #ne-toolbar [data-cmd="bold"]      { font-weight: 700; }
+  #ne-toolbar [data-cmd="italic"]    { font-style: italic; }
+  #ne-toolbar [data-cmd="underline"] { text-decoration: underline; }
+  #ne-toolbar input[type=color] {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  #ne-toolbar input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
+  #ne-toolbar input[type=color]::-webkit-color-swatch { border-radius: 50%; border: none; }
+  #ne-toolbar select {
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 6px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  #ne-body {
+    flex: 1;
+    padding: 16px;
+    outline: none;
+    overflow-y: auto;
+    line-height: 1.7;
+    font-family: var(--font);
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 0;
+  }
+  #ne-body:empty::before {
+    content: attr(data-placeholder);
+    color: var(--dim);
+    pointer-events: none;
+  }
+
+  #ne-footer {
+    padding: 8px 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  #ne-node-label {
+    font-family: var(--font);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* Global style panel color/range inputs */
+  .global-style-panel input[type=color],
+  .nsp-row input[type=color] {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  .global-style-panel input[type=color]::-webkit-color-swatch-wrapper,
+  .nsp-row input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
+  .global-style-panel input[type=color]::-webkit-color-swatch,
+  .nsp-row input[type=color]::-webkit-color-swatch { border-radius: 50%; border: none; }
+  .global-style-panel input[type=range],
+  .nsp-row input[type=range] {
+    width: 64px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* ============================================================
+     Companion Sweep 1 — scrap UI, legend popover, tile indicator
+     ============================================================ */
+
+  /* Scrap input row inside the editor — visible only when ctrl/meta held */
+  #ne-scraps {
+    display: none;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 8px 12px;
+    flex-shrink: 0;
+    max-height: 40%;
+    overflow-y: auto;
+  }
+  /* Show when ctrl is held (input row), or when there are scrap rows to display */
+  body.ctrl-held #ne-scraps,
+  #ne-scraps:has(.ne-scrap-row) {
+    display: block;
+  }
+
+  #ne-scrap-input-row {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+  }
+  body.ctrl-held #ne-scrap-input-row {
+    display: flex;
+  }
+
+  #ne-scrap-input-row .scrap-label {
+    font-family: var(--font);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    flex-shrink: 0;
+  }
+  #ne-scrap-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    outline: none;
+  }
+  #ne-scrap-input::placeholder { color: var(--dim); }
+  #ne-scrap-input:focus { border-color: var(--accent); }
+
+  #ne-scraps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #ne-scraps-list:empty { display: none; }
+
+  .ne-scrap-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    font-family: var(--font);
+    font-size: 11px;
+    color: var(--text);
+  }
+  .ne-scrap-row .scrap-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ne-scrap-row .scrap-time {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .ne-scrap-row .scrap-del {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    padding: 0 4px;
+    font-size: 12px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 100ms ease, color 100ms ease;
+    flex-shrink: 0;
+  }
+  .ne-scrap-row:hover .scrap-del { opacity: 1; }
+  .ne-scrap-row .scrap-del:hover { color: var(--danger); }
+
+  /* Tile indicator — small lavender dot when a node has scraps */
+  .scrap-indicator {
+    position: absolute;
+    top: 6px;
+    right: 30px;       /* sit left of the close × button */
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(200,170,255,0.4);
+  }
+
+  /* Legend popover */
+  #legend-popover {
+    position: fixed;
+    top: 64px;
+    left: 14px;
+    z-index: 150;
+    background: rgba(8,8,18,0.97);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    min-width: 240px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #legend-popover.visible { display: flex; }
+  #legend-popover .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #legend-popover .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  #legend-popover .legend-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 3px;
+    outline: none;
+  }
+  #legend-popover .legend-input:focus { border-color: var(--accent); }
+  #legend-popover .legend-input::placeholder { color: var(--dim); font-style: italic; }
+  #legend-popover .legend-clear {
+    margin-top: 4px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-family: var(--font);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: color 100ms ease, border-color 100ms ease;
+  }
+  #legend-popover .legend-clear:hover { color: var(--text); border-color: var(--text); }
+
+  /* Brief options popover */
+  #brief-popover {
+    position: fixed;
+    top: 64px;
+    left: 280px;
+    z-index: 150;
+    background: rgba(8,8,18,0.97);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    min-width: 240px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #brief-popover.visible { display: flex; }
+  #brief-popover .brief-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font);
+    font-size: 11px;
+    color: var(--text);
+  }
+  #brief-popover .brief-row label {
+    flex: 1;
+    cursor: pointer;
+  }
+  #brief-popover .brief-row .brief-row-label {
+    flex: 0 0 70px;
+    color: var(--dim);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+  }
+  #brief-popover select {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  #brief-popover input[type=checkbox] {
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  #brief-popover .brief-generate-btn {
+    margin-top: 6px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: stretch;
+    transition: background 100ms ease;
+    letter-spacing: 0.04em;
+  }
+  #brief-popover .brief-generate-btn:hover {
+    background: rgba(200,170,255,0.15);
+  }
+
+  /* ============================================================
+     Companion Sweep 3 — late visualization, tooltip, preview, override
+     ============================================================ */
+
+  /* Late variant of the scrap indicator — amber instead of lavender */
+  .scrap-indicator.late {
+    background: rgba(255, 180, 50, 0.95);
+    box-shadow: 0 0 4px rgba(255, 180, 50, 0.55);
+  }
+
+  /* Late edge indicator — small amber circle at the bezier midpoint */
+  .edge-late-indicator {
+    fill: rgba(255, 180, 50, 0.95);
+    /* SVG circles inherit pointer-events from svg parent unless set; we set
+       pointer-events="none" inline so the underlying hit path stays clickable */
+  }
+
+  /* Highlight legend tooltip — dark surface, small, near the cursor */
+  #highlight-tooltip {
+    position: fixed;
+    z-index: 250;
+    pointer-events: none;
+    background: rgba(8,8,18,0.97);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 5px 9px;
+    border-radius: 5px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    max-width: 280px;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transition: opacity 100ms ease;
+    display: none;
+  }
+  #highlight-tooltip.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  /* Brief popover preamble row — textarea for override + reset */
+  #brief-popover .brief-preamble-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  #brief-preamble {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    outline: none;
+    resize: vertical;
+    min-height: 64px;
+    max-height: 240px;
+    line-height: 1.5;
+    box-sizing: border-box;
+  }
+  #brief-preamble::placeholder {
+    color: var(--dim);
+    font-style: italic;
+  }
+  #brief-preamble:focus { border-color: var(--accent); }
+  .brief-preamble-reset {
+    align-self: flex-end;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-family: var(--font);
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 100ms ease;
+  }
+  .brief-preamble-reset:hover { color: var(--text); }
+
+  /* Brief preview modal — backdrop + centered card */
+  #brief-preview-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 220;
+    display: none;
+    opacity: 0;
+    transition: opacity 200ms ease;
+    pointer-events: auto;
+  }
+  #brief-preview-backdrop.visible { opacity: 1; }
+
+  #brief-preview {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: 56vw;
+    height: 70vh;
+    min-width: 380px;
+    min-height: 320px;
+    max-width: 900px;
+    background: rgba(8,8,18,0.97);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+    z-index: 221;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: auto;
+  }
+  #brief-preview.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  #bp-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  #bp-title {
+    flex: 1;
+    font-family: var(--font);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    text-transform: lowercase;
+  }
+  #bp-close {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    line-height: 1;
+    transition: color 100ms ease;
+    font-family: var(--font);
+  }
+  #bp-close:hover { color: var(--text); }
+
+  #bp-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 18px;
+    margin: 0;
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: rgba(0,0,0,0.18);
+  }
+  #bp-body::-webkit-scrollbar { width: 6px; }
+  #bp-body::-webkit-scrollbar-track { background: transparent; }
+  #bp-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  #bp-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  #bp-footer button {
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    letter-spacing: 0.04em;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  }
+  #bp-footer button:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  #bp-download {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  #bp-download:hover {
+    background: rgba(200,170,255,0.15);
+  }
+  #bp-copy.copied {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ============================================================
+     Companion Sweep 5 — menu lock (double-tap Ctrl) + brief flow polish
+     ============================================================ */
+
+  /* Indicator chip — shown only when menu is locked. Click to unlock. */
+  #menu-lock-indicator {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: rgba(20,20,30,0.88);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    z-index: 250;
+    display: none;
+    cursor: pointer;
+    pointer-events: auto;
+    user-select: none;
+    transition: background 120ms ease;
+  }
+  #menu-lock-indicator.visible { display: block; }
+  #menu-lock-indicator:hover { background: rgba(40,30,60,1); }
+
+  /* Brief flash toast for menu-lock state changes. */
+  #menu-lock-toast {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20,20,30,0.92);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    z-index: 260;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  #menu-lock-toast.visible { opacity: 1; }
+
+  /* Brief popover — direct-copy button (primary action) + help line */
+  #brief-popover .brief-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  #brief-popover .brief-direct-copy-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: rgba(200,170,255,0.12);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--font);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  #brief-popover .brief-direct-copy-btn:hover {
+    background: rgba(200,170,255,0.22);
+  }
+  #brief-popover .brief-direct-copy-btn.flashed {
+    background: rgba(120,220,140,0.18);
+    border-color: #6FCB85;
+    color: #6FCB85;
+  }
+  #brief-popover .brief-generate-btn {
+    flex: 1;
+  }
+  #brief-popover .brief-help {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  #brief-popover .brief-help code {
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    padding: 1px 4px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 10px;
+  }
+
+  /* ============================================================
+     Companion Sweep 6 — noob mode + guide + tooltips
+     ============================================================
+     Two UI modes:
+       - calm  (default for returning users): minimalist, current 11px buttons,
+               no tooltips, no first-launch guide.
+       - noob  (default for first-time users): bigger buttons, tooltips on hover,
+               guide modal on launch with a "don't show again" toggle.
+     The mode is stored in localStorage under `companion:ui-mode:v1`.
+     A first-time visit (no key set) defaults to noob.
+  */
+
+  /* Bigger, friendlier buttons in noob mode */
+  body.ui-noob .ctrl-cluster button {
+    font-size: 13px;
+    padding: 9px 16px;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  body.ui-noob .ctrl-cluster button:hover {
+    background: rgba(200,170,255,0.18);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    transition: background 150ms ease, transform 100ms ease, border-color 150ms ease;
+  }
+  body.ui-noob .ctrl-cluster {
+    gap: 6px;
+  }
+
+  /* Help (?) button — always present in toolbar; styled to match toolbar */
+  #help-btn {
+    background: rgba(200,170,255,0.10);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+  }
+  body.ui-noob #help-btn {
+    background: rgba(200,170,255,0.18);
+  }
+  #help-btn:hover {
+    background: rgba(200,170,255,0.28);
+    border-color: var(--accent);
+  }
+
+  /* Tooltip system — only renders in noob mode. Pure CSS, attached via title=
+     attribute equivalent on data-help. Noob-mode-only via body class. */
+  body.ui-noob [data-help]:hover::after {
+    content: attr(data-help);
+    position: absolute;
+    background: rgba(20,20,30,0.96);
+    color: var(--text);
+    border: 1px solid rgba(200,170,255,0.4);
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-line;
+    max-width: 260px;
+    z-index: 300;
+    margin-top: 6px;
+    pointer-events: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    /* Position below button. Top-bar buttons use this; left side will overflow off
+       canvas-left, but in practice the toolbar is left-aligned so it stays in-bounds. */
+    left: 0;
+    top: 100%;
+  }
+  body.ui-noob .ctrl-cluster button[data-help] {
+    position: relative;
+  }
+
+  /* First-launch guide modal — friendly tone, generous padding */
+  #guide-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 320;
+    display: none;
+    pointer-events: auto; /* parent #ui has pointer-events:none, override here */
+  }
+  #guide-backdrop.visible { display: block; }
+
+  #guide-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(180deg, rgba(35,28,50,0.98) 0%, rgba(20,15,30,0.98) 100%);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 32px;
+    width: min(560px, 90vw);
+    max-height: 84vh;
+    overflow-y: auto;
+    z-index: 330;
+    display: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    color: var(--text);
+    font-family: var(--font);
+    pointer-events: auto; /* parent #ui has pointer-events:none, override here */
+  }
+  #guide-modal.visible { display: block; }
+
+  #guide-modal h2 {
+    margin: 0 0 8px 0;
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  #guide-modal .guide-subtitle {
+    color: var(--dim);
+    font-size: 13px;
+    margin-bottom: 22px;
+    font-style: italic;
+  }
+  #guide-modal h3 {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    margin: 22px 0 8px 0;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 6px;
+  }
+  #guide-modal p, #guide-modal li {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    line-height: 1.65;
+    margin: 8px 0;
+  }
+  #guide-modal ul, #guide-modal ol {
+    padding-left: 22px;
+    margin: 8px 0;
+  }
+  #guide-modal kbd {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: var(--font);
+    font-size: 12px;
+    color: var(--accent);
+  }
+  #guide-modal .guide-emphasis {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  #guide-modal .guide-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  #guide-modal .guide-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--dim);
+    font-size: 12px;
+  }
+  #guide-modal .guide-checkbox-row input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent);
+  }
+  #guide-modal .guide-close-btn {
+    background: var(--accent);
+    color: #1a1325;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: transform 100ms ease, box-shadow 100ms ease;
+  }
+  #guide-modal .guide-close-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(200,170,255,0.3);
+  }
+  #guide-modal .guide-mode-toggle {
+    background: transparent;
+    color: var(--dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: var(--font);
+    font-size: 11px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 150ms ease;
+  }
+  #guide-modal .guide-mode-toggle:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  /* Mode indicator chip — bottom-right, click to toggle */
+  #mode-chip {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    cursor: pointer;
+    user-select: none;
+    z-index: 220;
+    background: rgba(20,20,30,0.85);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    transition: all 150ms ease;
+    pointer-events: auto; /* parent #ui has pointer-events:none, override here */
+  }
+  #mode-chip:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  body.ui-noob #mode-chip {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+</style>
+</head>
+<body>
+  <canvas id="env-canvas"></canvas>
+  <div id="node-container">
+    <div id="nodes-layer"></div>
+    <svg id="edges-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div id="ui">
+    <div class="ctrl-cluster env-controls">
+      <button onclick="rerollEnv()" data-help="Reroll the procedural creature in the background.&#10;(Cosmetic — doesn't touch your notes.)">↺ world</button>
+      <button onclick="exportEnv()" data-help="Save the current creature/environment as a JSON file.&#10;Re-import later via ⬆ import.">⬇ env</button>
+      <button id="env-pause-btn" onclick="toggleEnvPause()" data-help="Pause / unpause the background world animation.">⏸ world</button>
+      <button id="creature-pause-btn" onclick="toggleCreaturePause()" data-help="Pause / unpause the creature itself.">⏸ creature</button>
+      <button onclick="exportCanvas()" data-help="Save your canvas (notes + edges + scraps) as a JSON file.&#10;Re-import later, or send to Verse Studio.">⬇ canvas</button>
+      <button onclick="toggleBriefPopover()" data-help="Open the brief panel.&#10;From there: copy a Markdown brief of your canvas to send to Claude / GPT / etc.">⬆ brief</button>
+      <button onclick="triggerImport()" data-help="Load a previously-exported JSON file (canvas or env).">⬆ import</button>
+      <button onclick="toggleLegendPopover()" data-help="Edit the labels for your highlight colors.&#10;Highlight text in any note to color it.">legend</button>
+      <button onclick="clearWorkspace()" data-help="Wipe all notes and edges.&#10;Asks for confirmation first.">✕ clear</button>
+      <button id="help-btn" onclick="showGuide()" data-help="Show the welcome guide again.&#10;Tip: double-tap Ctrl to lock menus open.">? help</button>
+    </div>
+    <input type="file" id="import-file-input" accept=".json" style="display:none" />
+
+    <!-- Sweep 5 — Edge style panel -->
+    <div class="ctrl-cluster edge-style-panel">
+      <span class="panel-label">edge</span>
+      <input type="color" id="edge-color-pick" value="#c8aaff" title="Edge color" />
+      <input type="range" id="edge-width-pick" min="0.5" max="6" step="0.5" value="1.5" title="Thickness" />
+      <button id="edge-dash-btn" title="Dashed">– –</button>
+      <button id="edge-anim-btn" title="Animated">▶</button>
+    </div>
+
+    <!-- Single creature zone — draggable, JS-positioned -->
+    <div class="corner-zone" id="creature-zone">
+      <canvas id="creature-canvas"></canvas>
+      <img id="creature-thumb" class="creature-thumb" style="display:none" />
+      <div class="ctrl-cluster creature-controls">
+        <button onclick="rerollCreature()">↺</button>
+        <button id="save-creature" onclick="saveCreature()">♡</button>
+        <button onclick="exportCreature()">⬇</button>
+        <button onclick="minimizeCreature()">–</button>
+      </div>
+    </div>
+
+    <!-- Collection tab -->
+    <button class="collection-tab" onclick="toggleCollection()">collection</button>
+
+    <!-- Collection drawer -->
+    <div id="collection-drawer">
+      <div class="coll-header">
+        <span>saved</span>
+        <button onclick="toggleCollection()">×</button>
+      </div>
+      <div id="collection-list"></div>
+    </div>
+
+    <!-- Sweep 7 — Workspace switcher (ctrl-gated) -->
+    <div id="ws-switcher">
+      <div id="ws-list"></div>
+      <button id="ws-add" onclick="createWorkspace()" title="New workspace">+</button>
+    </div>
+
+    <!-- Permanent faint hint -->
+    <div class="companion-home-pill"><span>Companion is your home notes layer.</span><button onclick="createHomeNote()">+ note</button><button onclick="rerollEnv()">↺ world</button></div>
+    <div id="canvas-hint">dblclick to place · drag note header to move · right-click drag to connect · ctrl for controls</div>
+
+    <!-- Restore session widget -->
+    <div id="restore-widget">
+      <div id="restore-inner">
+        <div id="restore-title">welcome back</div>
+        <div id="restore-body"></div>
+        <div id="restore-actions">
+          <button id="restore-btn" onclick="restoreSession()">restore session</button>
+          <button id="fresh-btn" onclick="dismissRestore()">start fresh</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating format toolbar — one global instance -->
+    <div id="fmt-toolbar">
+      <button data-cmd="bold"      title="Bold">B</button>
+      <button data-cmd="italic"    title="Italic">I</button>
+      <button data-cmd="underline" title="Underline">U</button>
+      <div class="fmt-sep"></div>
+      <div class="fmt-swatches">
+        <button class="swatch" data-color="rgba(255,198,41,0.4)"  title="Amber"    style="background:rgba(255,198,41,0.5)"></button>
+        <button class="swatch" data-color="rgba(255,100,130,0.4)" title="Pink"     style="background:rgba(255,100,130,0.5)"></button>
+        <button class="swatch" data-color="rgba(100,220,180,0.4)" title="Mint"     style="background:rgba(100,220,180,0.5)"></button>
+        <button class="swatch" data-color="rgba(200,170,255,0.4)" title="Lavender" style="background:rgba(200,170,255,0.5)"></button>
+        <button class="swatch" data-color="rgba(100,180,255,0.4)" title="Sky"      style="background:rgba(100,180,255,0.5)"></button>
+        <button class="swatch clear-swatch" data-color="" title="Remove highlight">✕</button>
+      </div>
+    </div>
+
+    <!-- Sweep 8 — Global note style panel (ctrl-gated via .ctrl-cluster) -->
+    <div class="ctrl-cluster global-style-panel">
+      <span class="panel-label">notes</span>
+      <input type="color" id="g-bg-color"   value="#08080f" title="Note background color" />
+      <input type="range" id="g-bg-opacity" min="0" max="1" step="0.05" value="0.82" title="Background opacity" />
+      <input type="color" id="g-text-color" value="#a6a6a6" title="Text color" />
+      <input type="range" id="g-font-size"  min="8" max="24" step="1" value="10" title="Font size" />
+      <span class="panel-label">px</span>
+    </div>
+
+    <!-- Sweep 8 — Per-note style panel (floating, opened by ⚙ button) -->
+    <div id="note-style-panel">
+      <div class="nsp-row">
+        <span class="nsp-label">bg</span>
+        <input type="color" id="nsp-bg-color" />
+        <input type="range" id="nsp-bg-opacity" min="0" max="1" step="0.05" value="0.82" />
+      </div>
+      <div class="nsp-row">
+        <span class="nsp-label">text</span>
+        <input type="color" id="nsp-text-color" />
+        <input type="range" id="nsp-font-size" min="8" max="24" step="1" value="10" />
+        <span class="nsp-label">px</span>
+      </div>
+      <button id="nsp-reset">reset to global</button>
+    </div>
+
+    <!-- Sweep 8 — Pop-out editor backdrop and editor -->
+    <div id="note-editor-backdrop"></div>
+    <div id="note-editor">
+      <div id="ne-header">
+        <input id="ne-title" placeholder="title..." />
+        <button id="ne-close">×</button>
+      </div>
+      <div id="ne-toolbar">
+        <button data-cmd="bold">B</button>
+        <button data-cmd="italic">I</button>
+        <button data-cmd="underline">U</button>
+        <div class="fmt-sep"></div>
+        <button class="swatch" data-color="rgba(255,198,41,0.4)"  style="background:rgba(255,198,41,0.5)"></button>
+        <button class="swatch" data-color="rgba(255,100,130,0.4)" style="background:rgba(255,100,130,0.5)"></button>
+        <button class="swatch" data-color="rgba(100,220,180,0.4)" style="background:rgba(100,220,180,0.5)"></button>
+        <button class="swatch" data-color="rgba(200,170,255,0.4)" style="background:rgba(200,170,255,0.5)"></button>
+        <button class="swatch" data-color="rgba(100,180,255,0.4)" style="background:rgba(100,180,255,0.5)"></button>
+        <button class="swatch clear-swatch" data-color="">✕</button>
+        <div class="fmt-sep"></div>
+        <input type="color" id="ne-text-color" title="Text color" />
+        <select id="ne-font-size" title="Font size">
+          <option value="8">8</option>
+          <option value="10" selected>10</option>
+          <option value="12">12</option>
+          <option value="14">14</option>
+          <option value="16">16</option>
+          <option value="20">20</option>
+          <option value="24">24</option>
+        </select>
+        <span class="panel-label">px</span>
+      </div>
+      <div id="ne-body" contenteditable="true" data-placeholder="write here..."></div>
+      <div id="ne-scraps">
+        <div id="ne-scrap-input-row">
+          <span class="scrap-label">scrap</span>
+          <input id="ne-scrap-input" type="text" placeholder="drop a half-thought, press enter to keep" />
+        </div>
+        <div id="ne-scraps-list"></div>
+      </div>
+      <div id="ne-footer">
+        <span id="ne-node-label"></span>
+      </div>
+    </div>
+
+    <!-- Companion Sweep 1 — highlight legend popover -->
+    <div id="legend-popover">
+      <div class="legend-row">
+        <div class="legend-swatch" style="background:rgba(255,198,41,0.5)"></div>
+        <input class="legend-input" data-color="amber" placeholder="amber means..." />
+      </div>
+      <div class="legend-row">
+        <div class="legend-swatch" style="background:rgba(255,100,130,0.5)"></div>
+        <input class="legend-input" data-color="pink" placeholder="pink means..." />
+      </div>
+      <div class="legend-row">
+        <div class="legend-swatch" style="background:rgba(100,220,180,0.5)"></div>
+        <input class="legend-input" data-color="mint" placeholder="mint means..." />
+      </div>
+      <div class="legend-row">
+        <div class="legend-swatch" style="background:rgba(200,170,255,0.5)"></div>
+        <input class="legend-input" data-color="lavender" placeholder="lavender means..." />
+      </div>
+      <div class="legend-row">
+        <div class="legend-swatch" style="background:rgba(100,180,255,0.5)"></div>
+        <input class="legend-input" data-color="sky" placeholder="sky means..." />
+      </div>
+      <button class="legend-clear" onclick="clearLegend()">clear all</button>
+    </div>
+
+    <!-- Companion Sweep 2 — brief options popover -->
+    <div id="brief-popover">
+      <div class="brief-row">
+        <span class="brief-row-label">task</span>
+        <select id="brief-task">
+          <option value="articulate">articulate</option>
+          <option value="plan">plan</option>
+          <option value="critique">critique</option>
+          <option value="synthesize">synthesize</option>
+          <option value="no_task">no task</option>
+        </select>
+      </div>
+      <div class="brief-row">
+        <input type="checkbox" id="brief-include-legend" />
+        <label for="brief-include-legend">include highlight legend</label>
+      </div>
+      <div class="brief-row">
+        <input type="checkbox" id="brief-include-scraps" />
+        <label for="brief-include-scraps">include scraps</label>
+      </div>
+      <div class="brief-row">
+        <input type="checkbox" id="brief-include-late" />
+        <label for="brief-include-late">include late markers</label>
+      </div>
+      <!-- Companion Sweep 4 — verse-map/1 instructions toggle -->
+      <div class="brief-row">
+        <input type="checkbox" id="brief-include-versemap" />
+        <label for="brief-include-versemap">include verse-map/1 instructions</label>
+      </div>
+      <!-- Companion Sweep 3 — preamble override -->
+      <div class="brief-row brief-preamble-row">
+        <span class="brief-row-label">preamble (optional)</span>
+        <textarea id="brief-preamble" rows="4" placeholder="leave empty to use the default framing — or write your own preamble…"></textarea>
+        <button class="brief-preamble-reset" id="brief-preamble-reset" type="button">reset to default</button>
+      </div>
+      <!-- Companion Sweep 5 — direct copy + preview side-by-side -->
+      <div class="brief-actions">
+        <button class="brief-generate-btn" id="brief-generate" type="button">preview…</button>
+        <button class="brief-direct-copy-btn" id="brief-direct-copy" type="button">copy brief for AI →</button>
+      </div>
+      <div class="brief-help">
+        <code>copy brief for AI</code> sends the whole brief to your clipboard — paste it directly into a Claude / GPT / etc. conversation. <code>preview</code> shows it first.<br/>
+        Tip: double-tap <code>Ctrl</code> to lock this menu open while you check your canvas.
+      </div>
+    </div>
+
+    <!-- Companion Sweep 3 — highlight legend tooltip (shown on hover over highlighted spans) -->
+    <div id="highlight-tooltip"></div>
+
+    <!-- Companion Sweep 3 — brief preview modal -->
+    <div id="brief-preview-backdrop"></div>
+    <div id="brief-preview" role="dialog" aria-label="brief preview">
+      <div id="bp-header">
+        <span id="bp-title">brief preview</span>
+        <button id="bp-close" type="button" title="Close">×</button>
+      </div>
+      <pre id="bp-body"></pre>
+      <div id="bp-footer">
+        <button id="bp-copy" type="button">copy for AI</button>
+        <button id="bp-close-btn" type="button">close</button>
+        <button id="bp-download" type="button">download</button>
+      </div>
+    </div>
+
+    <!-- Companion Sweep 5 — menu lock indicator (shows when locked; click to unlock) -->
+    <div id="menu-lock-indicator" title="Menu locked — click to unlock (or double-tap Ctrl)">🔒 menu locked (ctrl×2)</div>
+
+    <!-- Companion Sweep 6 — first-launch guide modal + mode chip -->
+    <div id="guide-backdrop"></div>
+    <div id="guide-modal" role="dialog" aria-label="Welcome guide">
+      <h2>Welcome to Companion 👋</h2>
+      <div class="guide-subtitle">A canvas for thinking before you have words for it.</div>
+
+      <p>Companion is a place to dump half-formed thoughts, link them, and let the AI help you find what you're actually trying to say. Here's the short version:</p>
+
+      <h3>1. Make notes</h3>
+      <ul>
+        <li><span class="guide-emphasis">Double-click</span> anywhere on the canvas to make a new note.</li>
+        <li>Type freely. Don't try to be tidy. Half-thoughts are the point.</li>
+        <li><span class="guide-emphasis">Drag the edge</span> of a note to draw a line connecting it to another.</li>
+        <li><span class="guide-emphasis">Highlight text</span> inside a note to color-code it. The <kbd>legend</kbd> button lets you label what each color means to you.</li>
+      </ul>
+
+      <h3>2. Send it to an AI</h3>
+      <ul>
+        <li>When the canvas has enough thought in it, click <kbd>⬆ brief</kbd>.</li>
+        <li>Click <span class="guide-emphasis">copy brief for AI →</span> — that puts a full Markdown summary on your clipboard.</li>
+        <li>Paste it into a chat with Claude, GPT, or whatever AI you use. Ask the AI to help you articulate, plan, critique, or synthesize.</li>
+      </ul>
+
+      <h3>3. Useful keyboard tricks</h3>
+      <ul>
+        <li><span class="guide-emphasis">Double-tap <kbd>Ctrl</kbd></span> to <strong>lock menus open</strong> while you look at your canvas. Double-tap again to unlock. (A 🔒 chip appears top-right when locked.)</li>
+        <li><kbd>Esc</kbd> closes any open menu (when not locked).</li>
+        <li>Hold <kbd>Ctrl</kbd> while moving the mouse to reveal extra controls in the corners.</li>
+      </ul>
+
+      <h3>4. About these modes</h3>
+      <p>You're currently in <span class="guide-emphasis">noob mode</span>: bigger buttons, hover tooltips, this guide on first open. When you feel comfortable, switch to <span class="guide-emphasis">calm mode</span> — same app, smaller and more minimal. The chip in the bottom-right corner toggles between them.</p>
+
+      <div class="guide-actions">
+        <label class="guide-checkbox-row">
+          <input type="checkbox" id="guide-dont-show-again" />
+          <span>don't show this on next launch</span>
+        </label>
+        <button class="guide-close-btn" id="guide-close-btn">got it — let me play</button>
+      </div>
+
+      <button class="guide-mode-toggle" id="guide-mode-toggle">switch to calm mode</button>
+    </div>
+
+    <div id="mode-chip" title="Click to toggle UI mode">noob mode</div>
+  </div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+(function(){
+  'use strict';
+  if (!window.NexusBlockClient) return;
+  window.nx = window.NexusBlockClient.bootBlock({
+    manifest: {
+      emits:    ['companion.canvas.export', 'companion.brief.copied'],
+      consumes: [],
+      undoable: ['companion.canvas.export'],
+      app: {
+        title: 'Companion',
+        icon: '◈',
+        description: 'Pre-articulate thought capture',
+        visible: true,
+        defaultWidth: 1100,
+        defaultHeight: 700
+      }
+    }
+  });
+  window.nx.ready.then(() => console.log('[companion] Nexus block mounted'));
+})();
+</script>
+
+<script>
+// ============================================================
+// 1. SHARED UTILITIES
+// ============================================================
+
+function mulberry32(seed) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let r = s;
+    r = Math.imul(r ^ (r >>> 15), r | 1);
+    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seedVals(axes, seed) {
+  const rng = mulberry32(seed >>> 0);
+  return axes.map(() => Math.floor(rng() * 256));
+}
+
+function rerollLayer(axes) {
+  const seed = (Math.random() * 0xFFFFFFFF) >>> 0;
+  return { seed, vals: seedVals(axes, seed) };
+}
+
+function layerFromStored(key, axes) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!raw || typeof raw !== 'object') return null;
+    const axisIds = axes.map(a => a.id);
+    let vals = Array.isArray(raw.vals) ? raw.vals.map(v => Number(v) || 0).slice(0, axes.length) : null;
+    // Sweep 15: selected companion/world may now be canonical Eidolon specs with an axes object.
+    if (!vals && raw.axes && typeof raw.axes === 'object') vals = axisIds.map(id => Math.max(0, Math.min(255, Number(raw.axes[id] || 0))));
+    if (!vals && raw.payload && raw.payload.axes && typeof raw.payload.axes === 'object') vals = axisIds.map(id => Math.max(0, Math.min(255, Number(raw.payload.axes[id] || 0))));
+    if (!vals && raw.payload && Array.isArray(raw.payload.vals)) vals = raw.payload.vals.map(v => Number(v) || 0).slice(0, axes.length);
+    const seed = Number(raw.seed || (raw.payload && raw.payload.seed) || 0) >>> 0;
+    if (vals && vals.length === axes.length) return { seed, vals };
+    if (seed) return { seed, vals: seedVals(axes, seed) };
+  } catch {}
+  return null;
+}
+
+function persistSelectedLayer(key, layer, extra = {}) {
+  try {
+    localStorage.setItem(key, JSON.stringify(Object.assign({
+      version: 1,
+      seed: layer.seed >>> 0,
+      vals: Array.isArray(layer.vals) ? layer.vals : [],
+      updatedAt: Date.now()
+    }, extra)));
+  } catch {}
+}
+
+function setupCanvas(canvas, cssW, cssH) {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.width  = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  // Do NOT ctx.scale(dpr,dpr) — renderers use canvas.width/height internally
+}
+
+function downloadJSON(obj, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(
+    new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })
+  );
+  a.download = filename;
+  a.click();
+}
+
+function nanoid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// ============================================================
+// 2. ENV_AXES + EID
+// ============================================================
+
+const CREATURE_AXES = [
+  {id:'body_radius',    group:'body',       default:160},
+  {id:'body_stretch_x', group:'body',       default:128},
+  {id:'body_stretch_y', group:'body',       default:128},
+  {id:'body_lumpiness', group:'body',       default: 50},
+  {id:'body_lump_count',group:'body',       default:140},
+  {id:'body_outline',   group:'body',       default:140},
+  {id:'body_shadow',    group:'body',       default:140},
+  {id:'arm_count',      group:'appendages', default: 80},
+  {id:'arm_length',     group:'appendages', default:128},
+  {id:'arm_width',      group:'appendages', default:128},
+  {id:'arm_taper',      group:'appendages', default:160},
+  {id:'arm_wobble',     group:'appendages', default:120},
+  {id:'arm_wobble_rate',group:'appendages', default:128},
+  {id:'arm_curl',       group:'appendages', default: 60},
+  {id:'arm_droop',      group:'appendages', default:128},
+  {id:'eye_count',      group:'eyes',       default:128},
+  {id:'eye_size',       group:'eyes',       default:128},
+  {id:'eye_spacing',    group:'eyes',       default:128},
+  {id:'eye_height',     group:'eyes',       default:100},
+  {id:'eye_pupil',      group:'eyes',       default:140},
+  {id:'eye_glow',       group:'eyes',       default:120},
+  {id:'mark_runes',     group:'surface',    default: 40},
+  {id:'mark_spots',     group:'surface',    default: 40},
+  {id:'mark_drips',     group:'surface',    default:  0},
+  {id:'mark_facets',    group:'surface',    default:  0},
+  {id:'particle_count', group:'particles',  default: 80},
+  {id:'particle_radius',group:'particles',  default:140},
+  {id:'particle_size',  group:'particles',  default:120},
+  {id:'particle_drift', group:'particles',  default:100},
+  {id:'particle_turb',  group:'particles',  default: 60},
+  {id:'glow_radius',    group:'glow',       default:140},
+  {id:'glow_strength',  group:'glow',       default:140},
+  {id:'core_size',      group:'glow',       default:120},
+  {id:'core_brightness',group:'glow',       default:160},
+  {id:'pulse_rate',     group:'glow',       default:128},
+  {id:'hue_primary',    group:'color',      default:200},
+  {id:'hue_accent',     group:'color',      default: 80},
+  {id:'hue_glow',       group:'color',      default:140},
+  {id:'saturation',     group:'color',      default:170},
+  {id:'lightness',      group:'color',      default:130},
+];
+const CID = Object.fromEntries(CREATURE_AXES.map((a,i) => [a.id, i]));
+
+const ENV_AXES = [
+  {id:'sky_top_hue',      group:'deep_bg',   default:148},
+  {id:'sky_top_lightness',group:'deep_bg',   default: 45},
+  {id:'sky_bot_hue',      group:'deep_bg',   default:200},
+  {id:'sky_bot_lightness',group:'deep_bg',   default:120},
+  {id:'sky_saturation',   group:'deep_bg',   default:120},
+  {id:'sky_band_position',group:'deep_bg',   default:140},
+  {id:'sky_pulse_rate',   group:'deep_bg',   default:  0},
+  {id:'star_count',       group:'deep_bg',   default:  0},
+  {id:'star_brightness',  group:'deep_bg',   default:128},
+  {id:'far_count',        group:'far',       default: 80},
+  {id:'far_height',       group:'far',       default:100},
+  {id:'far_jitter',       group:'far',       default:140},
+  {id:'far_darkness',     group:'far',       default:140},
+  {id:'far_haze',         group:'far',       default:120},
+  {id:'mid_count',        group:'mid',       default: 60},
+  {id:'mid_height',       group:'mid',       default:140},
+  {id:'mid_jitter',       group:'mid',       default:150},
+  {id:'mid_darkness',     group:'mid',       default:180},
+  {id:'ground_y',         group:'ground',    default:170},
+  {id:'ground_hue',       group:'ground',    default:128},
+  {id:'ground_lightness', group:'ground',    default: 80},
+  {id:'ground_texture',   group:'ground',    default: 80},
+  {id:'ground_glow',      group:'ground',    default: 40},
+  {id:'fg_count',         group:'foreground',default: 30},
+  {id:'fg_size',          group:'foreground',default:120},
+  {id:'fg_speed',         group:'foreground',default:128},
+  {id:'fg_direction',     group:'foreground',default:128},
+  {id:'fg_opacity',       group:'foreground',default:140},
+  {id:'fog_density',      group:'ambient',   default: 30},
+  {id:'fog_hue',          group:'ambient',   default:150},
+  {id:'vignette',         group:'ambient',   default: 80},
+  {id:'scene_tint',       group:'ambient',   default: 60},
+];
+const EID = Object.fromEntries(ENV_AXES.map((a,i) => [a.id, i]));
+
+// ============================================================
+// 3. renderEnvironment
+// ============================================================
+
+function renderCreature(canvas, vals, t){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const v01 =id=>vals[CID[id]]/255;
+  const vN11=id=>(vals[CID[id]]-128)/128;
+  const vR  =(id,a,b)=>a+(vals[CID[id]]/255)*(b-a);
+
+  const baseR    =vR('body_radius',W*0.06,W*0.28);
+  const stretchX =vR('body_stretch_x',0.50,1.50);
+  const stretchY =vR('body_stretch_y',0.50,1.50);
+  const lumpAmp  =vR('body_lumpiness',0.0,30.0);
+  const lumpN    =5+Math.floor(v01('body_lump_count')*13);
+  const outline  =vR('body_outline',0.5,9.0);
+  const shadowPos=vR('body_shadow',0.20,0.80);
+  const armN     =Math.floor(v01('arm_count')*14);
+  const armLen   =vR('arm_length',0.20,2.40);
+  const armW     =vR('arm_width',1.0,10.0);
+  const armTaper =v01('arm_taper');
+  const armWobAmp=vR('arm_wobble',0.0,0.7);
+  const armWobRt =vR('arm_wobble_rate',0.0,3.0);
+  const armCurl  =vR('arm_curl',0.0,1.4);
+  const armDroop =vN11('arm_droop')*0.6;
+  const eyeN     =Math.round(v01('eye_count')*8);
+  const eyeSz    =vR('eye_size',0.04,0.30);
+  const eyeSpace =vR('eye_spacing',0.05,0.85);
+  const eyeY     =vN11('eye_height')*0.7;
+  const eyePupil =v01('eye_pupil');
+  const eyeGlow  =v01('eye_glow');
+  const runeN    =Math.floor(v01('mark_runes')*9);
+  const spotN    =Math.floor(v01('mark_spots')*9);
+  const dripN    =Math.floor(v01('mark_drips')*8);
+  const facetN   =Math.floor(v01('mark_facets')*14);
+  const partN    =Math.floor(v01('particle_count')*36);
+  const partR    =vR('particle_radius',1.0,2.6);
+  const partSz   =vR('particle_size',0.4,4.5);
+  const partDrift=vR('particle_drift',0.0,1.5);
+  const partTurb =vR('particle_turb',0.0,1.2);
+  const glowR    =baseR*vR('glow_radius',1.4,4.5);
+  const glowStr  =v01('glow_strength');
+  const coreSz   =baseR*vR('core_size',0.04,0.45);
+  const coreBri  =v01('core_brightness');
+  const pulseRt  =vR('pulse_rate',0.0,2.5);
+  const huePri   =Math.round(v01('hue_primary')*359);
+  const hueAcc   =Math.round(v01('hue_accent')*359);
+  const hueGlow  =Math.round(v01('hue_glow')*359);
+  const sat      =Math.round(vR('saturation',0,100));
+  const light    =Math.round(vR('lightness',20,80));
+
+  const cx=W/2,cy=H*0.50;
+  const pulse=Math.sin(t*pulseRt)*0.5+0.5;
+  const bcy=cy+Math.sin(t*0.85)*baseR*0.05;
+  const sx=stretchX,sy=stretchY;
+
+  const bPhase=((t*0.28)+(canvas._bOff||0))%1;
+  const blinkSY=bPhase<0.05?Math.max(0.05,1-Math.sin((bPhase/0.05)*Math.PI)*0.9):1.0;
+
+  const og=ctx.createRadialGradient(cx,bcy,0,cx,bcy,glowR);
+  og.addColorStop(0,`hsla(${huePri},${sat}%,${light}%,${0.18*glowStr+pulse*0.06*glowStr})`);
+  og.addColorStop(0.4,`hsla(${hueAcc},${sat*0.8}%,${light*0.7}%,${0.10*glowStr})`);
+  og.addColorStop(1,'transparent');
+  ctx.fillStyle=og;ctx.beginPath();ctx.ellipse(cx,bcy,glowR*sx,glowR*sy*0.85,0,0,Math.PI*2);ctx.fill();
+
+  function bPts(r){
+    const p=[];
+    for(let i=0;i<lumpN;i++){
+      const a=(i/lumpN)*Math.PI*2-Math.PI/2;
+      const n=Math.sin(t*0.7+i*0.9)*lumpAmp+Math.sin(t*0.3+i*1.5)*lumpAmp*0.4;
+      p.push({x:cx+Math.cos(a)*(r+n)*sx,y:bcy+Math.sin(a)*(r+n)*sy});
+    }
+    return p;
+  }
+  function bPath(c,p){
+    const M=p.length;c.beginPath();
+    for(let i=0;i<M;i++){
+      const p0=p[(i-1+M)%M],p1=p[i],p2=p[(i+1)%M],p3=p[(i+2)%M];
+      const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+      const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+      if(i===0)c.moveTo(p1.x,p1.y);
+      c.bezierCurveTo(c1x,c1y,c2x,c2y,p2.x,p2.y);
+    }
+    c.closePath();
+  }
+  const pts=bPts(baseR);
+
+  if(armN>0){
+    for(let i=0;i<armN;i++){
+      const ba=(i/armN)*Math.PI*2+armDroop;
+      const wob=Math.sin(t*armWobRt+i*0.7)*armWobAmp;
+      const curl=Math.sin(t*0.5+i*0.9)*armCurl*0.5;
+      const a=ba+wob,len=baseR*armLen;
+      const tx=cx+Math.cos(a+curl)*len*sx,ty=bcy+Math.sin(a+curl)*len*sy;
+      const cpx=cx+Math.cos(ba+wob*0.4)*len*0.5*sx,cpy=bcy+Math.sin(ba+wob*0.4)*len*0.5*sy+curl*len*0.3;
+      ctx.lineCap='round';ctx.strokeStyle='rgba(0,0,0,0.85)';ctx.lineWidth=armW+3;
+      ctx.beginPath();ctx.moveTo(cx,bcy);ctx.quadraticCurveTo(cpx,cpy,tx,ty);ctx.stroke();
+      for(let s=0;s<6;s++){
+        const t0_=s/6,t1_=(s+1)/6,w0=armW*(1-armTaper*t0_*0.85);
+        const x0=(1-t0_)*(1-t0_)*cx+2*(1-t0_)*t0_*cpx+t0_*t0_*tx;
+        const y0=(1-t0_)*(1-t0_)*bcy+2*(1-t0_)*t0_*cpy+t0_*t0_*ty;
+        const x1=(1-t1_)*(1-t1_)*cx+2*(1-t1_)*t1_*cpx+t1_*t1_*tx;
+        const y1=(1-t1_)*(1-t1_)*bcy+2*(1-t1_)*t1_*cpy+t1_*t1_*ty;
+        ctx.strokeStyle=`hsla(${huePri},${sat}%,${light+10}%,0.85)`;ctx.lineWidth=w0;
+        ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+      }
+    }
+  }
+
+  ctx.save();ctx.shadowColor=`hsla(${huePri},${sat}%,15%,0.55)`;ctx.shadowBlur=18;ctx.shadowOffsetY=4;
+  bPath(ctx,pts);ctx.fillStyle=`hsla(${huePri},${sat*0.6}%,8%,0.4)`;ctx.fill();ctx.restore();
+
+  bPath(ctx,pts);ctx.strokeStyle='rgba(0,0,0,0.92)';ctx.lineWidth=outline;ctx.lineJoin='round';ctx.stroke();
+  bPath(ctx,pts);ctx.fillStyle=`hsl(${huePri},${sat}%,${light}%)`;ctx.fill();
+
+  ctx.save();bPath(ctx,pts);ctx.clip();
+  const sg=ctx.createLinearGradient(cx,bcy-baseR,cx,bcy+baseR);
+  sg.addColorStop(shadowPos-0.04,'transparent');
+  sg.addColorStop(shadowPos,`hsla(${huePri},${sat}%,${Math.max(8,light-30)}%,0.55)`);
+  sg.addColorStop(1,`hsla(${huePri},${sat}%,${Math.max(5,light-40)}%,0.65)`);
+  ctx.fillStyle=sg;ctx.fillRect(cx-baseR*3,bcy-baseR*3,baseR*6,baseR*6);
+  const hg=ctx.createRadialGradient(cx-baseR*0.3,bcy-baseR*0.35,0,cx-baseR*0.15,bcy-baseR*0.15,baseR*0.7);
+  hg.addColorStop(0,`hsla(${huePri},${sat*0.4}%,92%,0.45)`);hg.addColorStop(0.5,'transparent');
+  ctx.fillStyle=hg;ctx.fillRect(cx-baseR*3,bcy-baseR*3,baseR*6,baseR*6);
+
+  if(spotN>0){const r1=mulberry32(spotN*53+1);for(let i=0;i<spotN;i++){const sa=r1()*Math.PI*2,sr_=baseR*(0.15+r1()*0.55),sxp=cx+Math.cos(sa)*sr_*sx,syp=bcy+Math.sin(sa)*sr_*sy,ssz=baseR*(0.05+r1()*0.10);const lg=ctx.createRadialGradient(sxp,syp,0,sxp,syp,ssz*2.5);lg.addColorStop(0,`hsla(${hueGlow},95%,90%,${0.7+pulse*0.2})`);lg.addColorStop(0.4,`hsla(${hueGlow},85%,75%,0.3)`);lg.addColorStop(1,'transparent');ctx.fillStyle=lg;ctx.beginPath();ctx.arc(sxp,syp,ssz*2.5,0,Math.PI*2);ctx.fill();}}
+  if(runeN>0){const r2=mulberry32(runeN*71+7);ctx.strokeStyle=`hsla(${hueAcc},80%,70%,0.30)`;ctx.lineWidth=1.5;for(let i=0;i<runeN;i++){const ra=r2()*Math.PI*2,rr=baseR*(0.1+r2()*0.45),rx=cx+Math.cos(ra)*rr*sx,ry=bcy+Math.sin(ra)*rr*sy,rs=baseR*(0.06+r2()*0.12);ctx.beginPath();ctx.moveTo(rx,ry-rs);ctx.lineTo(rx+rs*0.6,ry+rs*0.5);ctx.moveTo(rx,ry-rs);ctx.lineTo(rx-rs*0.6,ry+rs*0.5);ctx.moveTo(rx-rs*0.4,ry+rs*0.1);ctx.lineTo(rx+rs*0.4,ry+rs*0.1);ctx.stroke();}}
+  if(facetN>0){const r3=mulberry32(facetN*89+13);ctx.strokeStyle=`hsla(${hueGlow},85%,88%,0.32)`;ctx.lineWidth=1.0;for(let i=0;i<facetN;i++){const fa=r3()*Math.PI*2,fr=baseR*(0.1+r3()*0.7),fx=cx+Math.cos(fa)*fr*sx,fy=bcy+Math.sin(fa)*fr*sy,fs=baseR*(0.05+r3()*0.10);ctx.beginPath();ctx.moveTo(fx,fy-fs);ctx.lineTo(fx+fs,fy);ctx.lineTo(fx,fy+fs);ctx.lineTo(fx-fs,fy);ctx.closePath();ctx.stroke();}}
+  ctx.restore();
+
+  if(eyeN>0){
+    const wander=Math.sin(t*0.55)*2.5,eR=baseR*eyeSz,eyePos=[];
+    if(eyeN===1){eyePos.push([cx,bcy+baseR*eyeY]);}
+    else if(eyeN===2){const sep=baseR*eyeSpace;eyePos.push([cx-sep,bcy+baseR*eyeY],[cx+sep,bcy+baseR*eyeY]);}
+    else{const sep=baseR*eyeSpace*0.95,yOff=baseR*eyeY,ang=Math.PI;for(let i=0;i<eyeN;i++){const tt=i/(eyeN-1),a=-ang/2+tt*ang;eyePos.push([cx+Math.cos(a+Math.PI*1.5)*sep,bcy+Math.sin(a+Math.PI*1.5)*sep+yOff]);}}
+    for(const[ex,ey]of eyePos){
+      if(eyeGlow>0.05){const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,eR*2.2);eg.addColorStop(0,`hsla(${hueGlow},90%,80%,${0.4*eyeGlow})`);eg.addColorStop(1,'transparent');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(ex,ey,eR*2.2,0,Math.PI*2);ctx.fill();}
+      ctx.fillStyle=`hsl(${hueGlow},18%,92%)`;ctx.strokeStyle='rgba(0,0,0,0.85)';ctx.lineWidth=Math.max(1.2,outline*0.45);
+      ctx.beginPath();ctx.ellipse(ex,ey,eR,eR*blinkSY,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      if(blinkSY>0.12&&eyePupil>0.05){ctx.fillStyle=`hsl(${hueGlow},84%,38%)`;const iR=eR*(0.45+eyePupil*0.4);ctx.beginPath();ctx.ellipse(ex+wander*0.3,ey,iR,iR*blinkSY,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#020306';const pR=eR*eyePupil*0.55;ctx.beginPath();ctx.ellipse(ex+wander*0.3,ey,pR,pR*blinkSY,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,0.85)';const cR=eR*0.12;ctx.beginPath();ctx.ellipse(ex-eR*0.22,ey-eR*0.22*blinkSY,cR,cR*blinkSY,0,0,Math.PI*2);ctx.fill();}
+    }
+  }
+
+  if(dripN>0){const r4=mulberry32(Math.floor(t*2)+dripN*17);for(let i=0;i<dripN;i++){const dx=cx+(r4()-0.5)*baseR*1.4*sx,dy=bcy+baseR*0.45*sy+((t*40+i*23)%60)*baseR*0.018,ds=1.5+r4()*2.2;ctx.fillStyle=`hsla(${huePri},85%,55%,${0.45+r4()*0.3})`;ctx.beginPath();ctx.arc(dx,dy,ds,0,Math.PI*2);ctx.fill();}}
+
+  if(coreSz>0.1&&coreBri>0.05){const cg=ctx.createRadialGradient(cx,bcy,0,cx,bcy,coreSz*4);cg.addColorStop(0,`hsla(${hueGlow},96%,94%,${0.85*coreBri})`);cg.addColorStop(0.25,`hsla(${huePri},88%,70%,${0.45*coreBri})`);cg.addColorStop(0.7,`hsla(${huePri},78%,52%,${0.12*coreBri})`);cg.addColorStop(1,'transparent');ctx.fillStyle=cg;ctx.beginPath();ctx.arc(cx,bcy,coreSz*4,0,Math.PI*2);ctx.fill();}
+  if(partN>0){for(let p=0;p<partN;p++){const seed=p*17,orR=baseR*partR+(seed%13)*(baseR*0.05),orA=(p/partN)*Math.PI*2+t*partDrift*0.5+Math.sin(t+seed*0.1)*0.4,tu=Math.sin(t*1.3+seed*0.22)*partTurb*8,px=cx+Math.cos(orA)*(orR+tu)*sx,py=bcy+Math.sin(orA)*(orR+tu)*sy*0.85,pSz=partSz*(0.6+((seed%5)/5)*0.8),pAl=0.4+Math.sin(t*1.8+p*0.55)*0.3;ctx.fillStyle=`hsla(${hueAcc},88%,75%,${pAl})`;ctx.beginPath();ctx.arc(px,py,pSz,0,Math.PI*2);ctx.fill();}}
+}
+
+function renderEnvironment(canvas, vals, t){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+
+  const v01 =id=>vals[EID[id]]/255;
+  const vN11=id=>(vals[EID[id]]-128)/128;
+  const vR  =(id,a,b)=>a+(vals[EID[id]]/255)*(b-a);
+
+  const skyTopH =Math.round(v01('sky_top_hue')*359);
+  const skyTopL =Math.round(vR('sky_top_lightness',0,60));
+  const skyBotH =Math.round(v01('sky_bot_hue')*359);
+  const skyBotL =Math.round(vR('sky_bot_lightness',0,80));
+  const skySat  =Math.round(vR('sky_saturation',0,100));
+  const skyBand =vR('sky_band_position',0.15,0.85);
+  const skyPulse=vR('sky_pulse_rate',0,2.5);
+  const starN   =Math.floor(v01('star_count')*280);
+  const starBri =v01('star_brightness');
+  const farN    =Math.floor(v01('far_count')*32);
+  const farH    =vR('far_height',0.05,0.45);
+  const farJit  =vR('far_jitter',0.0,1.0);
+  const farDark =vR('far_darkness',0.05,0.65);
+  const farHaze =v01('far_haze');
+  const midN    =Math.floor(v01('mid_count')*22);
+  const midH    =vR('mid_height',0.08,0.55);
+  const midJit  =vR('mid_jitter',0.0,1.0);
+  const midDark =vR('mid_darkness',0.10,0.85);
+  const groundY =vR('ground_y',0.45,0.95);
+  const groundH =Math.round(v01('ground_hue')*359);
+  const groundL =Math.round(vR('ground_lightness',4,50));
+  const groundTx=Math.floor(v01('ground_texture')*320);
+  const groundGl=v01('ground_glow');
+  const fgN     =Math.floor(v01('fg_count')*80);
+  const fgSize  =vR('fg_size',0.5,6.0);
+  const fgSpeed =vR('fg_speed',-2.5,2.5);
+  const fgDir   =vN11('fg_direction')*1.2;
+  const fgOp    =v01('fg_opacity');
+  const fogD    =v01('fog_density');
+  const fogH    =Math.round(v01('fog_hue')*359);
+  const vigAmt  =v01('vignette');
+  const tintStr =v01('scene_tint');
+
+  const pulseT=Math.sin(t*skyPulse)*0.5+0.5;
+  const skyTopLi=skyTopL+(skyPulse>0.05?pulseT*8:0);
+
+  const skyG=ctx.createLinearGradient(0,0,0,H*groundY);
+  skyG.addColorStop(0,`hsl(${skyTopH},${skySat}%,${Math.max(0,skyTopLi)}%)`);
+  skyG.addColorStop(skyBand,`hsl(${Math.round((skyTopH+skyBotH)/2)%360},${skySat}%,${Math.round((skyTopLi+skyBotL)/2)}%)`);
+  skyG.addColorStop(1,`hsl(${skyBotH},${skySat}%,${skyBotL}%)`);
+  ctx.fillStyle=skyG;ctx.fillRect(0,0,W,H*groundY);
+
+  if(starN>0){const sr=mulberry32(starN*131+7);for(let i=0;i<starN;i++){const x=sr()*W,y=sr()*H*groundY*0.85,sz=0.5+sr()*1.5,tw=0.6+Math.sin(t*1.4+i*0.6)*0.4;ctx.fillStyle=`hsla(${skyTopH},20%,95%,${starBri*tw*0.9})`;ctx.beginPath();ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();}}
+
+  if(farN>0){
+    const fr=mulberry32(farN*97+13);const bY=H*groundY;ctx.save();
+    ctx.fillStyle=`hsla(${skyTopH},${Math.round(skySat*0.4)}%,${Math.round(skyTopL*0.7)}%,${1-farHaze*0.5})`;
+    ctx.beginPath();ctx.moveTo(0,bY);const step=W/farN;let prev=bY-H*farH*(0.5+fr()*0.5);ctx.lineTo(0,prev);
+    for(let i=0;i<farN;i++){const x=i*step+step,pk=H*farH*(0.5+fr()*0.8)*(1+(fr()-0.5)*farJit*1.2),y=bY-Math.max(0,pk);ctx.lineTo(x-step*0.5,(prev+y)/2);ctx.lineTo(x,y);prev=y;}
+    ctx.lineTo(W,bY);ctx.closePath();ctx.fill();ctx.fillStyle=`rgba(0,0,0,${farDark})`;ctx.fill();ctx.restore();
+  }
+
+  if(midN>0){
+    const mr=mulberry32(midN*71+19);const bY=H*groundY;ctx.save();
+    ctx.fillStyle=`hsla(${skyBotH},${Math.round(skySat*0.5)}%,${Math.round(skyBotL*0.4)}%,1)`;
+    ctx.beginPath();ctx.moveTo(0,bY);const step=W/midN;let prev=bY-H*midH*(0.4+mr()*0.6);ctx.lineTo(0,prev);
+    for(let i=0;i<midN;i++){const x=i*step+step,pk=H*midH*(0.4+mr()*0.9)*(1+(mr()-0.5)*midJit*1.4),y=bY-Math.max(0,pk);ctx.lineTo(x-step*0.3,prev);ctx.lineTo(x,y);prev=y;}
+    ctx.lineTo(W,bY);ctx.closePath();ctx.fill();ctx.fillStyle=`rgba(0,0,0,${midDark})`;ctx.fill();ctx.restore();
+  }
+
+  const bY=H*groundY;
+  const gG=ctx.createLinearGradient(0,bY,0,H);
+  gG.addColorStop(0,`hsl(${groundH},${skySat}%,${groundL}%)`);
+  gG.addColorStop(1,`hsl(${groundH},${Math.round(skySat*0.6)}%,${Math.max(2,Math.round(groundL*0.3))}%)`);
+  ctx.fillStyle=gG;ctx.fillRect(0,bY,W,H-bY);
+  if(groundGl>0.05){const gg=ctx.createLinearGradient(0,bY-8,0,bY+16);gg.addColorStop(0,'transparent');gg.addColorStop(0.5,`hsla(${skyBotH},${skySat}%,75%,${groundGl*0.6})`);gg.addColorStop(1,'transparent');ctx.fillStyle=gg;ctx.fillRect(0,bY-8,W,24);}
+  if(groundTx>0){const gr=mulberry32(groundTx*53+41);ctx.fillStyle=`hsla(${groundH},${skySat}%,${Math.max(2,groundL*0.5)}%,0.7)`;for(let i=0;i<groundTx;i++){const tx=gr()*W,ty_=gr(),ty=bY+ty_*(H-bY),persp=0.3+ty_*1.2,sz=(0.4+gr()*1.0)*persp;ctx.fillRect(tx,ty,sz,sz);}}
+
+  if(fgN>0&&fgOp>0.05){for(let i=0;i<fgN;i++){const speed=fgSpeed*(0.6+((i%7)/7)*0.8),rawX=(i*137.5+t*speed*60)%W,x=rawX<0?rawX+W:rawX,baseYP=i*71.7%H,y=(baseYP+t*fgDir*40)%H,yW=y<0?y+H:y,sz=fgSize*(0.5+((i%5)/5)*0.8),al=fgOp*(0.5+Math.sin(t*1.1+i*0.7)*0.4);ctx.fillStyle=`hsla(${skyTopH},20%,90%,${Math.max(0,al)})`;ctx.beginPath();ctx.arc(x,yW,sz,0,Math.PI*2);ctx.fill();}}
+
+  if(fogD>0.03){const fg=ctx.createLinearGradient(0,0,0,H);fg.addColorStop(0,`hsla(${fogH},35%,60%,0)`);fg.addColorStop(0.5,`hsla(${fogH},35%,60%,${fogD*0.35})`);fg.addColorStop(1,`hsla(${fogH},25%,40%,${fogD*0.45})`);ctx.fillStyle=fg;ctx.fillRect(0,0,W,H);}
+  if(vigAmt>0.03){const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3,W/2,H/2,Math.max(W,H)*0.7);vg.addColorStop(0,'transparent');vg.addColorStop(1,`rgba(0,0,0,${vigAmt*0.7})`);ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);}
+  if(tintStr>0.03){ctx.fillStyle=`hsla(${skyTopH},${skySat}%,${skyTopLi+30}%,${tintStr*0.18})`;ctx.globalCompositeOperation='overlay';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';}
+}
+
+// ============================================================
+// 4. STATE
+// ============================================================
+
+let envLayer = { seed: 0, vals: [] };
+let creatureR = { seed: 0, vals: [] };
+let collection = [];
+const COLL_KEY = 'companion:collection:v1';
+const POS_KEY  = 'companion:creature-pos:v1';
+const SELECTED_ENV_KEY = 'nexus:selected-environment:v1';
+const SELECTED_COMPANION_KEY = 'nexus:selected-companion:v1';
+const HOME_NOTE_INBOX_KEY = 'nexus:home-note-inbox:v1';
+
+// Sweep 3 — node canvas state
+let nodes = []; // [{id, title, body, x, y, createdAt, updatedAt}]
+let edges = []; // [{id, sourceId, targetId, createdAt, style}]
+let vp = { x: 0, y: 0, scale: 1 };
+
+// Sweep 7 — multiple workspaces (replaces NODES_KEY / EDGES_KEY)
+const WS_KEY = 'companion:workspaces:v2';
+let activeWsId = null;
+let workspaces = []; // [{ id, name, nodes, edges }]
+
+const T0 = performance.now();
+let animId = null;
+
+// Sweep 5 — edge styling state
+const DEFAULT_EDGE_STYLE = {
+  color:    'rgba(200,170,255,0.5)',
+  width:    1.5,
+  animated: false,
+  dash:     false,
+};
+let edgeStyle = { ...DEFAULT_EDGE_STYLE }; // style applied to newly created edges
+
+// Sweep 8 — global note style state
+const GLOBAL_STYLE_KEY = 'companion:global-style:v1';
+let globalNodeStyle = {
+  bgColor:   '#08080f',
+  bgOpacity: 0.82,
+  textColor: '#a6a6a6',
+  fontSize:  10,
+};
+
+// ============================================================
+// Companion Sweep 1 — scraps, highlight legend, late markers
+// ============================================================
+// Threshold beyond which an edge or scrap counts as "late" — added
+// significantly after its container was first formed. 30 minutes.
+const LATE_THRESHOLD_MS = 30 * 60 * 1000;
+
+// Default empty highlight legend. Workspaces store their own.
+const HIGHLIGHT_COLORS = ['amber', 'pink', 'mint', 'lavender', 'sky'];
+const EMPTY_LEGEND = () => ({ amber: '', pink: '', mint: '', lavender: '', sky: '' });
+
+// Map the existing rgba palette to legend keys (for inline-tag conversion later
+// in Sweep 2; for now these are referenced in CSS and the legend popover).
+const LEGEND_SWATCH_RGBA = {
+  amber:    'rgba(255,198,41,0.4)',
+  pink:     'rgba(255,100,130,0.4)',
+  mint:     'rgba(100,220,180,0.4)',
+  lavender: 'rgba(200,170,255,0.4)',
+  sky:      'rgba(100,180,255,0.4)',
+};
+
+function isEdgeLate(edge, sourceNode, targetNode) {
+  if (!sourceNode || !targetNode) return false;
+  const newer = Math.max(sourceNode.createdAt || 0, targetNode.createdAt || 0);
+  return (edge.createdAt - newer) >= LATE_THRESHOLD_MS;
+}
+
+function isScrapLate(scrap, parentNode) {
+  if (!parentNode) return false;
+  return (scrap.createdAt - (parentNode.updatedAt || parentNode.createdAt || 0)) >= LATE_THRESHOLD_MS;
+}
+
+function relativeTime(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 0) return 'just now';
+  if (diff < 60_000) return 'just now';
+  if (diff < 3_600_000) return Math.floor(diff / 60_000) + 'm ago';
+  if (diff < 86_400_000) return Math.floor(diff / 3_600_000) + 'h ago';
+  return Math.floor(diff / 86_400_000) + 'd ago';
+}
+
+// Tickle disturbance state
+let disturbR = null; // { t0, fromVals, toVals, duration }
+
+// Creature position + throttle
+let creaturePos = { x: 0, y: 0 };
+let lastCreatureRender = 0;
+const CREATURE_MS = 1000 / 30; // 30fps
+let creatureMinimized = false;
+
+const DEFAULT_POS = () => ({
+  x: 24,
+  y: Math.max(24, window.innerHeight - 304)
+});
+
+// ============================================================
+// 5. APP FUNCTIONS
+// ============================================================
+
+function resizeEnv() {
+  const dpr = window.devicePixelRatio || 1;
+  const canvas = document.getElementById('env-canvas');
+  canvas.width  = Math.round(window.innerWidth  * dpr);
+  canvas.height = Math.round(window.innerHeight * dpr);
+  // CSS is already 100vw/100vh — no style change needed
+}
+
+function renderEnvSafe(canvas, vals, t) {
+  // IMPORTANT: renderEnvironment does not fully clearRect in all cases.
+  // Always pre-fill with base color.
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#050508';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  renderEnvironment(canvas, vals, t);
+}
+
+function toggleEnvPause() {
+  envPaused = !envPaused;
+  document.getElementById('env-pause-btn').textContent = envPaused ? '▶ world' : '⏸ world';
+}
+
+function toggleCreaturePause() {
+  creaturePaused = !creaturePaused;
+  document.getElementById('creature-pause-btn').textContent = creaturePaused ? '▶ creature' : '⏸ creature';
+}
+
+function rerollEnv() {
+  envLayer = rerollLayer(ENV_AXES);
+  persistSelectedLayer(SELECTED_ENV_KEY, envLayer, { name: 'Companion Drift', source: 'companion' });
+}
+
+function exportEnv() {
+  downloadJSON(
+    { version: 'environment/1', seed: envLayer.seed, vals: envLayer.vals },
+    'environment.json'
+  );
+}
+
+let envPaused      = false;
+let creaturePaused = false;
+
+function loop() {
+  const t = (performance.now() - T0) / 1000;
+  const envCanvas = document.getElementById('env-canvas');
+  if (!envPaused) renderEnvSafe(envCanvas, envLayer.vals, t);
+
+  if (!creatureMinimized && !creaturePaused) {
+    const now = performance.now();
+    if (now - lastCreatureRender > CREATURE_MS) {
+      const cc = document.getElementById('creature-canvas');
+      if (cc) renderCreature(cc, getDisplayVals(creatureR, disturbR), t);
+      lastCreatureRender = now;
+    }
+  }
+
+  animId = requestAnimationFrame(loop);
+}
+
+function init() {
+  envLayer = layerFromStored(SELECTED_ENV_KEY, ENV_AXES) || rerollLayer(ENV_AXES);
+  resizeEnv();
+
+  // Initialize single creature canvas
+  const cc = document.getElementById('creature-canvas');
+  setupCanvas(cc, 200, 200);
+  cc._bOff = 0;
+
+  // Initialize creature state
+  creatureR = layerFromStored(SELECTED_COMPANION_KEY, CREATURE_AXES) || rerollLayer(CREATURE_AXES);
+
+  // Load + apply saved position
+  loadCreaturePos();
+  applyCreaturePos();
+
+  // Sweep 3 — node canvas
+  initNodeCanvas();
+  loadGlobalStyle(); // Sweep 8 — must run before checkForSavedSession so loadCanvas applies styles correctly
+  checkForSavedSession(); // shows restore widget if saved data exists, else clean slate
+  importHomeNoteInbox(); // desktop home-note bridge imports one movable note, then clears inbox
+  window.addEventListener('storage', (event) => { if (event.key === HOME_NOTE_INBOX_KEY) importHomeNoteInbox(); });
+  setInterval(importHomeNoteInbox, 1500); // same-tab iframe fallback: desktop writes do not always trigger storage events
+
+  // Load saved collection
+  loadCollection();
+
+  // Wire up drag + thumb-click-to-restore
+  initCreatureDrag();
+  const thumb = document.getElementById('creature-thumb');
+  if (thumb) thumb.addEventListener('click', restoreCreature);
+
+  // Sweep 4 — rich text toolbar
+  initToolbar();
+
+  // Sweep 5 — edge style panel
+  initEdgePanel();
+
+  // Sweep 8 — global style panel, per-note style panel, pop-out editor
+  initGlobalStylePanel();
+  initNoteStylePanel();
+  initEditor();
+
+  // Companion Sweep 1 — legend popover
+  initLegendPopover();
+
+  // Companion Sweep 2 — brief options
+  loadBriefOptions();
+  initBriefPopover();
+
+  // Companion Sweep 3 — highlight tooltip + brief preview modal
+  initHighlightTooltip();
+  initBriefPreview();
+
+  // Import file input
+  const importInput = document.getElementById('import-file-input');
+  if (importInput) importInput.addEventListener('change', e => handleImport(e.target.files[0]));
+
+  window.addEventListener('resize', () => {
+    resizeEnv();
+    creaturePos.x = Math.min(creaturePos.x, window.innerWidth  - 280);
+    creaturePos.y = Math.min(creaturePos.y, window.innerHeight - 280);
+    applyCreaturePos();
+  });
+
+  loop();
+}
+
+function loadCreaturePos() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(POS_KEY));
+    if (saved && typeof saved.x === 'number' && typeof saved.y === 'number') {
+      creaturePos = saved;
+    } else {
+      creaturePos = DEFAULT_POS();
+    }
+  } catch {
+    creaturePos = DEFAULT_POS();
+  }
+}
+
+function saveCreaturePos() {
+  localStorage.setItem(POS_KEY, JSON.stringify(creaturePos));
+}
+
+function applyCreaturePos() {
+  const zone = document.getElementById('creature-zone');
+  if (zone) {
+    zone.style.left = creaturePos.x + 'px';
+    zone.style.top  = creaturePos.y + 'px';
+  }
+}
+
+function loadCollection() {
+  try { collection = JSON.parse(localStorage.getItem(COLL_KEY)) || []; }
+  catch { collection = []; }
+}
+
+function persistCollection() {
+  localStorage.setItem(COLL_KEY, JSON.stringify(collection));
+}
+
+function saveCreature() {
+  const entry = {
+    id: nanoid(),
+    seed: creatureR.seed,
+    vals: creatureR.vals,
+    name: `Keeper ${collection.length + 1}`,
+    savedAt: Date.now(),
+  };
+  collection.push(entry);
+  persistSelectedLayer(SELECTED_COMPANION_KEY, creatureR, { name: entry.name, id: entry.id, source: 'companion' });
+  persistCollection();
+  renderCollectionDrawer();
+  flashBtn('save-creature');
+}
+
+function rerollCreature() {
+  creatureR = rerollLayer(CREATURE_AXES);
+  persistSelectedLayer(SELECTED_COMPANION_KEY, creatureR, { name: 'Live Companion', source: 'companion' });
+}
+
+function deleteFromCollection(id) {
+  collection = collection.filter(c => c.id !== id);
+  persistCollection();
+  renderCollectionDrawer();
+}
+
+function renameInCollection(id, name) {
+  const entry = collection.find(c => c.id === id);
+  if (entry) { entry.name = name; persistCollection(); }
+}
+
+function loadCreatureFromCollection(id) {
+  const entry = collection.find(c => c.id === id);
+  if (!entry) return;
+  creatureR = { seed: entry.seed, vals: [...entry.vals] };
+  persistSelectedLayer(SELECTED_COMPANION_KEY, creatureR, { name: entry.name || 'Saved Companion', id: entry.id, source: 'companion.collection' });
+  // If minimized, refresh the thumbnail to reflect the loaded creature
+  if (creatureMinimized) {
+    const thumb = document.getElementById('creature-thumb');
+    if (thumb) thumb.src = renderThumbnail(creatureR.vals);
+  }
+}
+
+function exportCreature() {
+  downloadJSON(
+    { version: 'eidolon/1', seed: creatureR.seed, vals: creatureR.vals },
+    `creature-${creatureR.seed.toString(16)}.json`
+  );
+}
+
+function renderThumbnail(vals) {
+  const c = document.createElement('canvas');
+  c.width = 100; c.height = 100;
+  c._bOff = 0.25;
+  renderCreature(c, vals, 2.5);
+  return c.toDataURL();
+}
+
+function renderCollectionDrawer() {
+  const list = document.getElementById('collection-list');
+  if (!list) return;
+  if (collection.length === 0) {
+    list.innerHTML = '<p class="coll-empty">nothing saved yet</p>';
+    return;
+  }
+  list.innerHTML = '';
+  for (const entry of [...collection].reverse()) {
+    const item = document.createElement('div');
+    item.className = 'coll-item';
+    const thumb = renderThumbnail(entry.vals);
+    item.innerHTML = `
+      <img class="coll-thumb" src="${thumb}" title="load into creature" />
+      <div class="coll-meta">
+        <input class="coll-name" value="${entry.name}" />
+        <span class="coll-date">${new Date(entry.savedAt).toLocaleDateString()}</span>
+      </div>
+      <button class="coll-delete" title="remove">×</button>
+    `;
+    item.querySelector('.coll-thumb').addEventListener('click', () => {
+      loadCreatureFromCollection(entry.id);
+      toggleCollection();
+    });
+    item.querySelector('.coll-name').addEventListener('change', e => {
+      renameInCollection(entry.id, e.target.value);
+    });
+    item.querySelector('.coll-delete').addEventListener('click', () => {
+      deleteFromCollection(entry.id);
+    });
+    list.appendChild(item);
+  }
+}
+
+let collectionOpen = false;
+function toggleCollection() {
+  collectionOpen = !collectionOpen;
+  const drawer = document.getElementById('collection-drawer');
+  drawer.style.transform = collectionOpen ? 'translateX(0)' : 'translateX(100%)';
+  if (collectionOpen) renderCollectionDrawer();
+}
+
+function flashBtn(id) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.add('flashing');
+  setTimeout(() => btn.classList.remove('flashing'), 600);
+}
+
+// ============================================================
+// SWEEP 5 — EDGE STYLE PANEL
+// ============================================================
+
+function initEdgePanel() {
+  const colorPick = document.getElementById('edge-color-pick');
+  const widthPick = document.getElementById('edge-width-pick');
+  const dashBtn   = document.getElementById('edge-dash-btn');
+  const animBtn   = document.getElementById('edge-anim-btn');
+  if (!colorPick) return;
+
+  colorPick.addEventListener('input', e => {
+    const hex = e.target.value;
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    edgeStyle.color = `rgba(${r},${g},${b},0.6)`;
+  });
+
+  widthPick.addEventListener('input', e => {
+    edgeStyle.width = parseFloat(e.target.value);
+  });
+
+  dashBtn.addEventListener('click', () => {
+    edgeStyle.dash = !edgeStyle.dash;
+    dashBtn.style.opacity = edgeStyle.dash ? '1' : '0.4';
+  });
+
+  animBtn.addEventListener('click', () => {
+    edgeStyle.animated = !edgeStyle.animated;
+    animBtn.style.opacity = edgeStyle.animated ? '1' : '0.4';
+    // Animated implies dash (dasharray must be set for animation to show)
+    if (edgeStyle.animated && !edgeStyle.dash) {
+      edgeStyle.dash = true;
+      dashBtn.style.opacity = '1';
+    }
+  });
+
+  // Initial visual state for toggle buttons
+  dashBtn.style.opacity = edgeStyle.dash ? '1' : '0.4';
+  animBtn.style.opacity = edgeStyle.animated ? '1' : '0.4';
+}
+
+// ============================================================
+// 6. BOOT
+// ============================================================
+
+// ============================================================
+// TICKLE + CTRL REVEAL + DRAG + MINIMIZE
+// ============================================================
+
+// The wobbly axes that make a creature look disturbed
+const TICKLE_AXES = [
+  'body_lumpiness','arm_wobble','arm_wobble_rate','arm_curl',
+  'particle_turb','particle_drift','glow_strength','pulse_rate','mark_drips'
+];
+
+function tickleCreature() {
+  const jolted = [...creatureR.vals];
+  for (const id of TICKLE_AXES) {
+    jolted[CID[id]] = Math.floor(Math.random() * 256);
+  }
+  disturbR = {
+    t0: performance.now() / 1000,
+    fromVals: jolted,
+    toVals: [...creatureR.vals],
+    duration: 2.8
+  };
+}
+
+function getDisplayVals(layer, disturb) {
+  if (!disturb) return layer.vals;
+  const now = performance.now() / 1000;
+  const elapsed = now - disturb.t0;
+  if (elapsed >= disturb.duration) return layer.vals;
+  // Cubic ease-out: spasms fast, drifts slowly back to form
+  const progress = elapsed / disturb.duration;
+  const eased = 1 - Math.pow(1 - progress, 3);
+  return disturb.fromVals.map((v, i) =>
+    Math.round(v + (disturb.toVals[i] - v) * eased)
+  );
+}
+
+// Ctrl-held reveal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    // Sweep 8 priority order: editor → note style panel → connect mode → existing
+    if (editorNodeId) { closeEditor(); return; }
+    if (nspNodeId)    { closeNoteStylePanel(); return; }
+    if (connectMode)  { cancelConnect(); return; }
+  }
+  if (e.key === 'Control' || e.key === 'Meta') document.body.classList.add('ctrl-held');
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'Control' || e.key === 'Meta') document.body.classList.remove('ctrl-held');
+});
+// Safety: clear if focus leaves window
+window.addEventListener('blur', () => {
+  document.body.classList.remove('ctrl-held');
+});
+
+// ---------- Drag (handles tickle-on-click too) ----------
+let dragState = null; // { startX, startY, originX, originY, moved }
+const DRAG_THRESHOLD = 5;
+
+function initCreatureDrag() {
+  const zone = document.getElementById('creature-zone');
+  if (!zone) return;
+
+  zone.addEventListener('mousedown', e => {
+    if (e.ctrlKey || e.target.tagName === 'BUTTON' || e.target.tagName === 'IMG') return;
+    e.preventDefault();
+    dragState = {
+      startX: e.clientX,
+      startY: e.clientY,
+      originX: creaturePos.x,
+      originY: creaturePos.y,
+      moved: false
+    };
+    zone.classList.add('dragging');
+  });
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const dx = e.clientX - dragState.startX;
+  const dy = e.clientY - dragState.startY;
+  if (!dragState.moved && Math.hypot(dx, dy) > DRAG_THRESHOLD) dragState.moved = true;
+  if (dragState.moved) {
+    creaturePos.x = Math.max(0, Math.min(window.innerWidth  - 280, dragState.originX + dx));
+    creaturePos.y = Math.max(0, Math.min(window.innerHeight - 280, dragState.originY + dy));
+    applyCreaturePos();
+  }
+});
+
+document.addEventListener('mouseup', e => {
+  if (!dragState) return;
+  const zone = document.getElementById('creature-zone');
+  if (zone) zone.classList.remove('dragging');
+  if (!dragState.moved) {
+    // It was a click, not a drag → tickle
+    if (!e.ctrlKey && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'IMG') {
+      tickleCreature();
+    }
+  } else {
+    saveCreaturePos();
+  }
+  dragState = null;
+});
+
+// ---------- Minimize / restore ----------
+function minimizeCreature() {
+  const canvas = document.getElementById('creature-canvas');
+  const thumb  = document.getElementById('creature-thumb');
+  if (!canvas || !thumb) return;
+
+  // Capture current look (including any in-flight tickle)
+  thumb.src = renderThumbnail(getDisplayVals(creatureR, disturbR));
+
+  canvas.style.display = 'none';
+  thumb.style.display  = 'block';
+  creatureMinimized = true;
+}
+
+function restoreCreature() {
+  const canvas = document.getElementById('creature-canvas');
+  const thumb  = document.getElementById('creature-thumb');
+  if (!canvas || !thumb) return;
+  canvas.style.display = 'block';
+  thumb.style.display  = 'none';
+  creatureMinimized = false;
+  lastCreatureRender = 0; // force immediate re-render
+}
+
+// ============================================================
+// 7. NODE CANVAS (Sweep 3)
+// ============================================================
+
+// ---------- Coordinate system ----------
+
+function screenToCanvas(sx, sy) {
+  return { x: (sx - vp.x) / vp.scale, y: (sy - vp.y) / vp.scale };
+}
+
+function canvasToScreen(cx, cy) {
+  return { x: cx * vp.scale + vp.x, y: cy * vp.scale + vp.y };
+}
+
+function updateTransform() {
+  updateNodePositions();
+  redrawEdges();
+}
+
+function updateNodePositions() {
+  for (const node of nodes) {
+    const el = document.querySelector(`.node[data-id="${node.id}"]`);
+    if (!el) continue;
+    const s = canvasToScreen(node.x, node.y);
+    el.style.left = s.x + 'px';
+    el.style.top  = s.y + 'px';
+  }
+}
+
+// ---------- Node functions ----------
+
+function createHomeNote() {
+  const center = screenToCanvas(window.innerWidth * 0.5, window.innerHeight * 0.42);
+  createNode(center.x - 120, center.y - 70);
+}
+
+function createNode(x, y) {
+  const now = Date.now();
+  const node = { id: nanoid(), title: '', body: '', x, y, createdAt: now, updatedAt: now, style: {}, scraps: [] };
+  nodes.push(node);
+  renderNodeDOM(node);
+  scheduleAutosave();
+}
+
+function plainTextToNoteHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = String(text || '');
+  return div.innerHTML.replace(/\n/g, '<br>');
+}
+
+function importHomeNoteInbox() {
+  let item = null;
+  try { item = JSON.parse(localStorage.getItem(HOME_NOTE_INBOX_KEY) || 'null'); } catch {}
+  if (!item || typeof item.body !== 'string' || !item.body.trim()) return false;
+  const now = Date.now();
+  const center = screenToCanvas(window.innerWidth * 0.42, window.innerHeight * 0.34);
+  const node = {
+    id: nanoid(),
+    title: item.title || 'Home note',
+    body: plainTextToNoteHtml(item.body.trim()),
+    x: center.x - 130,
+    y: center.y - 70,
+    createdAt: item.at || now,
+    updatedAt: now,
+    style: {},
+    scraps: [{ id: nanoid(), text: 'Imported from desktop home notes', createdAt: now }]
+  };
+  nodes.push(node);
+  renderNodeDOM(node);
+  scheduleAutosave();
+  try { localStorage.removeItem(HOME_NOTE_INBOX_KEY); } catch {}
+  return true;
+}
+
+// ============================================================
+// Sweep 8 — Global style + per-note style resolution
+// ============================================================
+
+function loadGlobalStyle() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GLOBAL_STYLE_KEY));
+    if (saved) Object.assign(globalNodeStyle, saved);
+  } catch {}
+  // Sync the panel inputs to the loaded values (panel HTML defaults may differ)
+  const bgColor   = document.getElementById('g-bg-color');
+  const bgOpacity = document.getElementById('g-bg-opacity');
+  const textColor = document.getElementById('g-text-color');
+  const fontSize  = document.getElementById('g-font-size');
+  if (bgColor)   bgColor.value   = globalNodeStyle.bgColor;
+  if (bgOpacity) bgOpacity.value = globalNodeStyle.bgOpacity;
+  if (textColor) textColor.value = globalNodeStyle.textColor;
+  if (fontSize)  fontSize.value  = globalNodeStyle.fontSize;
+}
+
+function hexToRgba(hex, alpha) {
+  // Accept #rgb, #rrggbb. Return rgba(r,g,b,a).
+  const h = (hex || '').replace('#', '');
+  let r, g, b;
+  if (h.length === 3) {
+    r = parseInt(h[0] + h[0], 16);
+    g = parseInt(h[1] + h[1], 16);
+    b = parseInt(h[2] + h[2], 16);
+  } else {
+    r = parseInt(h.slice(0, 2), 16);
+    g = parseInt(h.slice(2, 4), 16);
+    b = parseInt(h.slice(4, 6), 16);
+  }
+  if ([r, g, b].some(v => isNaN(v))) return `rgba(8,8,18,${alpha})`;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function resolveNodeStyle(node) {
+  const s = node.style || {};
+  const useCustom = s.custom === true;
+  return {
+    bgColor:   useCustom && s.bgColor   != null ? s.bgColor   : globalNodeStyle.bgColor,
+    bgOpacity: useCustom && s.bgOpacity != null ? s.bgOpacity : globalNodeStyle.bgOpacity,
+    textColor: useCustom && s.textColor != null ? s.textColor : globalNodeStyle.textColor,
+    fontSize:  useCustom && s.fontSize  != null ? s.fontSize  : globalNodeStyle.fontSize,
+  };
+}
+
+function applyNodeStyle(node, el) {
+  if (!el) return;
+  const s = resolveNodeStyle(node);
+  el.style.background = hexToRgba(s.bgColor, s.bgOpacity);
+  const bodyEl  = el.querySelector('.node-body');
+  const titleEl = el.querySelector('.node-title');
+  if (bodyEl)  {
+    bodyEl.style.color    = s.textColor;
+    bodyEl.style.fontSize = s.fontSize + 'px';
+  }
+  if (titleEl) {
+    titleEl.style.color    = s.textColor;
+    titleEl.style.fontSize = Math.round(s.fontSize * 1.5) + 'px';
+  }
+}
+
+function renderNodeDOM(node) {
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.dataset.id = node.id;
+  const s = canvasToScreen(node.x, node.y);
+  el.style.left = s.x + 'px';
+  el.style.top  = s.y + 'px';
+
+  el.innerHTML = `
+    <div class="node-header">
+      <button class="node-close">×</button>
+      <button class="node-settings ctrl-only" title="Note style">⚙</button>
+    </div>
+    <input class="node-title" placeholder="title..." value="${escapeAttr(node.title)}" />
+    <div class="node-body-wrap">
+      <div class="node-body" contenteditable="true" data-placeholder="..."></div>
+    </div>
+    <div class="node-footer">
+      <div class="node-drag"></div>
+      <button class="node-expand ctrl-only" title="Open editor">⤢</button>
+    </div>
+  `;
+
+  // Sweep C1 — scrap indicator (small lavender dot when node has scraps)
+  updateScrapIndicator(node, el);
+
+  // Title editing
+  el.querySelector('.node-title').addEventListener('input', e => {
+    node.title = e.target.value;
+    node.updatedAt = Date.now();
+    scheduleAutosave();
+  });
+
+  // Body editing
+  const bodyEl = el.querySelector('.node-body');
+
+  // Set saved content — innerHTML handles both plain text and HTML
+  bodyEl.innerHTML = node.body || '';
+
+  // Save on input
+  bodyEl.addEventListener('input', () => {
+    node.body = bodyEl.innerHTML;
+    node.updatedAt = Date.now();
+    scheduleAutosave();
+  });
+
+  // Show toolbar on text selection
+  bodyEl.addEventListener('mouseup', () => setTimeout(showToolbar, 10));
+  bodyEl.addEventListener('keyup',   showToolbar);
+
+  // Strip formatting on paste — insert plain text only
+  bodyEl.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+
+  // Close button
+  el.querySelector('.node-close').addEventListener('click', e => {
+    e.stopPropagation();
+    deleteNode(node.id);
+  });
+
+  // Header and footer drag handles
+  el.querySelector('.node-header').addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    if (e.target.closest('button')) return;
+    e.stopPropagation();
+    startNodeDrag(e, node, el);
+  });
+
+  el.querySelector('.node-footer').addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    // Don't start drag from the expand button
+    if (e.target.closest('.node-expand')) return;
+    e.stopPropagation();
+    startNodeDrag(e, node, el);
+  });
+
+  // Prevent browser context menu on node chrome
+  el.addEventListener('contextmenu', e => {
+    e.stopPropagation(); // prevent container's cancelConnect from firing
+    if (!e.target.closest('.node-body')) e.preventDefault();
+  });
+
+  // Right-click on node chrome = start/complete connect
+  el.addEventListener('mousedown', e => {
+    if (e.button !== 2) return;
+    if (e.target.closest('.node-body')) return; // let browser handle in text
+    e.stopPropagation();
+    if (connectMode) {
+      completeConnect(node.id);
+    } else {
+      startConnect(node.id);
+    }
+  });
+
+  // Sweep 8 — apply resolved style and wire new buttons
+  applyNodeStyle(node, el);
+
+  el.querySelector('.node-settings').addEventListener('click', e => {
+    e.stopPropagation();
+    openNoteStylePanel(node.id, e.currentTarget);
+  });
+
+  el.querySelector('.node-expand').addEventListener('click', e => {
+    e.stopPropagation();
+    openEditor(node.id);
+  });
+
+  document.getElementById('nodes-layer').appendChild(el);
+}
+
+function deleteNode(id) {
+  nodes = nodes.filter(n => n.id !== id);
+  edges = edges.filter(e => e.sourceId !== id && e.targetId !== id);
+  const el = document.querySelector(`.node[data-id="${id}"]`);
+  if (el) el.remove();
+  redrawEdges();
+  scheduleAutosave();
+}
+
+function escapeAttr(str) {
+  return (str || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function stripHTML(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  return tmp.textContent || tmp.innerText || '';
+}
+
+// ---------- Edge functions ----------
+
+function createEdge(sourceId, targetId) {
+  if (edges.find(e =>
+    (e.sourceId === sourceId && e.targetId === targetId) ||
+    (e.sourceId === targetId && e.targetId === sourceId)
+  )) return;
+  edges.push({
+    id:        nanoid(),
+    sourceId,
+    targetId,
+    createdAt: Date.now(),
+    style:     { ...edgeStyle }, // snapshot — not a reference
+  });
+  redrawEdges();
+  scheduleAutosave();
+}
+
+function deleteEdge(id) {
+  edges = edges.filter(e => e.id !== id);
+  redrawEdges();
+  scheduleAutosave();
+}
+
+function getNodeBounds(nodeId) {
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) return null;
+  const el = document.querySelector(`.node[data-id="${nodeId}"]`);
+  const w  = (el ? el.offsetWidth  : 200) / vp.scale;
+  const h  = (el ? el.offsetHeight : 120) / vp.scale;
+  return {
+    left:   node.x,
+    right:  node.x + w,
+    top:    node.y,
+    bottom: node.y + h,
+    cx:     node.x + w / 2,
+    cy:     node.y + h / 2,
+    w, h
+  };
+}
+
+// Find exit point on 'fromBounds' border in direction of 'toBounds' center
+function getBorderAnchor(fromBounds, toBounds) {
+  const dx = toBounds.cx - fromBounds.cx;
+  const dy = toBounds.cy - fromBounds.cy;
+  if (dx === 0 && dy === 0) return { x: fromBounds.right, y: fromBounds.cy };
+  const sx = dx !== 0 ? (dx > 0 ? (fromBounds.right  - fromBounds.cx) : (fromBounds.left - fromBounds.cx)) / dx : Infinity;
+  const sy = dy !== 0 ? (dy > 0 ? (fromBounds.bottom - fromBounds.cy) : (fromBounds.top  - fromBounds.cy)) / dy : Infinity;
+  const t  = Math.min(Math.abs(sx), Math.abs(sy));
+  return { x: fromBounds.cx + dx * t, y: fromBounds.cy + dy * t };
+}
+
+// Find exit point on 'bounds' border toward a raw screen point
+function getBorderAnchorToPoint(bounds, sx, sy) {
+  const target = screenToCanvas(sx, sy);
+  return getBorderAnchor(bounds, { cx: target.x, cy: target.y });
+}
+
+// Get screen-space anchor points for both ends of an edge
+function getEdgeAnchors(sourceId, targetId) {
+  const sb = getNodeBounds(sourceId);
+  const tb = getNodeBounds(targetId);
+  if (!sb || !tb) return null;
+  const src = getBorderAnchor(sb, tb);
+  const tgt = getBorderAnchor(tb, sb);
+  return {
+    src: canvasToScreen(src.x, src.y),
+    tgt: canvasToScreen(tgt.x, tgt.y),
+  };
+}
+
+// Build a bezier path string between two screen-space points
+function buildEdgePath(src, tgt) {
+  const dx   = tgt.x - src.x;
+  const dy   = tgt.y - src.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const off  = Math.min(dist * 0.4, 120);
+  const cp1x = src.x + Math.sign(dx || 1) * off;
+  const cp1y = src.y;
+  const cp2x = tgt.x - Math.sign(dx || 1) * off;
+  const cp2y = tgt.y;
+  return `M${src.x},${src.y} C${cp1x},${cp1y} ${cp2x},${cp2y} ${tgt.x},${tgt.y}`;
+}
+
+function redrawEdges() {
+  const svg = document.getElementById('edges-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+
+  // Sweep 3 — for late detection per edge, an id→node map.
+  const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+
+  for (const edge of edges) {
+    const style   = edge.style || DEFAULT_EDGE_STYLE;
+    const anchors = getEdgeAnchors(edge.sourceId, edge.targetId);
+    if (!anchors) continue;
+
+    const d = buildEdgePath(anchors.src, anchors.tgt);
+
+    // Wide invisible hit path for click-to-delete
+    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hit.setAttribute('d', d);
+    hit.setAttribute('stroke', 'transparent');
+    hit.setAttribute('stroke-width', '14');
+    hit.setAttribute('fill', 'none');
+    hit.setAttribute('pointer-events', 'stroke');
+    hit.style.cursor = 'pointer';
+    hit.addEventListener('click', () => deleteEdge(edge.id));
+
+    // Visible path
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', style.color);
+    path.setAttribute('stroke-width', style.width);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('pointer-events', 'none');
+    if (style.dash || style.animated) path.setAttribute('stroke-dasharray', '8,6');
+    if (style.animated) path.classList.add('edge-animated');
+
+    svg.appendChild(hit);
+    svg.appendChild(path);
+
+    // Sweep 3 — late edge indicator. Always shown when the edge is late;
+    // independent of briefOptions.includeLate (which controls export only).
+    const src = nodeById[edge.sourceId];
+    const tgt = nodeById[edge.targetId];
+    if (src && tgt && isEdgeLate(edge, src, tgt)) {
+      let mid = null;
+      try {
+        const totalLen = path.getTotalLength();
+        if (totalLen > 0) mid = path.getPointAtLength(totalLen / 2);
+      } catch (_) { /* path geometry unavailable in some envs */ }
+      if (mid) {
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', mid.x);
+        dot.setAttribute('cy', mid.y);
+        dot.setAttribute('r', 3.5);
+        dot.setAttribute('class', 'edge-late-indicator');
+        dot.setAttribute('pointer-events', 'none');
+        dot.dataset.edgeId = edge.id;
+        svg.appendChild(dot);
+      } else {
+        // Geometry unavailable — emit a marker element anyway so callers (smoke
+        // tests, debugging) can detect that lateness was recognized for this edge.
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        marker.setAttribute('class', 'edge-late-indicator');
+        marker.setAttribute('pointer-events', 'none');
+        marker.setAttribute('r', 0);
+        marker.dataset.edgeId = edge.id;
+        svg.appendChild(marker);
+      }
+    }
+  }
+}
+
+// ---------- Three drag systems — one document mousemove ----------
+
+// --- Pan state ---
+let isPanning    = false;
+let panStart     = { x: 0, y: 0 };
+
+// --- Node drag state ---
+let isDraggingNode = false;
+let dragNodeData   = null; // the node data object
+let dragNodeEl     = null; // the DOM element
+let dragStart      = null; // { mx, my, nx, ny }
+
+// --- Edge connect state (Sweep 5) ---
+let connectMode  = false;
+let connectSrcId = null;
+let tempPath     = null;
+
+
+function startNodeDrag(e, node, el) {
+  isDraggingNode = true;
+  dragNodeData   = node;
+  dragNodeEl     = el;
+  dragStart      = { mx: e.clientX, my: e.clientY, nx: node.x, ny: node.y };
+  el.style.zIndex = 20;
+  document.body.style.userSelect = 'none';
+}
+
+function startConnect(nodeId) {
+  connectMode  = true;
+  connectSrcId = nodeId;
+  document.body.classList.add('connect-mode');
+
+  const el = document.querySelector(`.node[data-id="${nodeId}"]`);
+  if (el) el.classList.add('connecting');
+
+  const svg = document.getElementById('edges-svg');
+  tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  tempPath.setAttribute('stroke', edgeStyle.color);
+  tempPath.setAttribute('stroke-width', edgeStyle.width);
+  tempPath.setAttribute('stroke-dasharray', '5,5');
+  tempPath.setAttribute('fill', 'none');
+  tempPath.setAttribute('pointer-events', 'none');
+  svg.appendChild(tempPath);
+}
+
+function completeConnect(targetId) {
+  if (targetId && targetId !== connectSrcId) {
+    createEdge(connectSrcId, targetId);
+  }
+  cancelConnect();
+}
+
+function cancelConnect() {
+  connectMode = false;
+  connectSrcId = null;
+  document.body.classList.remove('connect-mode');
+  document.querySelectorAll('.node.connecting').forEach(el => el.classList.remove('connecting'));
+  if (tempPath) {
+    if (tempPath.parentNode) tempPath.parentNode.removeChild(tempPath);
+    tempPath = null;
+  }
+}
+
+
+// Single document mousemove — checks flags in priority order
+document.addEventListener('mousemove', e => {
+  if (connectMode && tempPath && connectSrcId) {
+    const sb = getNodeBounds(connectSrcId);
+    if (sb) {
+      const srcBorder = getBorderAnchorToPoint(sb, e.clientX, e.clientY);
+      const srcScreen = canvasToScreen(srcBorder.x, srcBorder.y);
+      const d = buildEdgePath(srcScreen, { x: e.clientX, y: e.clientY });
+      tempPath.setAttribute('d', d);
+    }
+    return;
+  }
+
+  if (isDraggingNode && dragNodeData && dragNodeEl) {
+    const dx = (e.clientX - dragStart.mx) / vp.scale;
+    const dy = (e.clientY - dragStart.my) / vp.scale;
+    dragNodeData.x = dragStart.nx + dx;
+    dragNodeData.y = dragStart.ny + dy;
+    const s = canvasToScreen(dragNodeData.x, dragNodeData.y);
+    dragNodeEl.style.left = s.x + 'px';
+    dragNodeEl.style.top  = s.y + 'px';
+    redrawEdges();
+    return;
+  }
+
+  if (isPanning) {
+    vp.x = e.clientX - panStart.x;
+    vp.y = e.clientY - panStart.y;
+    updateTransform();
+  }
+});
+
+
+// Single document mouseup — clears whichever drag was active
+document.addEventListener('mouseup', e => {
+  if (isDraggingNode) {
+    if (dragNodeEl) dragNodeEl.style.zIndex = '';
+    isDraggingNode = false;
+    dragNodeData   = null;
+    dragNodeEl     = null;
+    dragStart      = null;
+    document.body.style.userSelect = '';
+    scheduleAutosave();
+    return;
+  }
+
+  if (isPanning) {
+    isPanning = false;
+    document.body.style.userSelect = '';
+  }
+});
+
+// ---------- Pan initiation (on #node-container) ----------
+
+function initNodeCanvas() {
+  const container = document.getElementById('node-container');
+  const svg       = document.getElementById('edges-svg');
+
+  // Pan start — only when clicking empty background
+  container.addEventListener('mousedown', e => {
+    if (e.target !== container && e.target !== svg) return;
+    isPanning = true;
+    panStart  = { x: e.clientX - vp.x, y: e.clientY - vp.y };
+    document.body.style.userSelect = 'none';
+  });
+
+  // Right-click on empty space cancels connect mode
+  container.addEventListener('contextmenu', e => {
+    if (connectMode) {
+      e.preventDefault();
+      cancelConnect();
+    }
+  });
+
+  // Zoom — MUST be non-passive to call preventDefault
+  container.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.1 : 0.9;
+    vp.scale = Math.max(0.2, Math.min(3, vp.scale * factor));
+    vp.x = e.clientX - (e.clientX - vp.x) * factor;
+    vp.y = e.clientY - (e.clientY - vp.y) * factor;
+    updateTransform();
+  }, { passive: false });
+
+  // Create node on double-click on empty background
+  container.addEventListener('dblclick', e => {
+    if (e.target !== container && e.target !== svg) return;
+    const rect = container.getBoundingClientRect();
+    const pos  = screenToCanvas(e.clientX - rect.left, e.clientY - rect.top);
+    createNode(pos.x - 100, pos.y - 40);
+  });
+}
+
+// ---------- Autosave and load ----------
+
+let autosaveTimer = null;
+
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveWsState, 800);
+}
+
+function loadCanvas() {
+  // Clear existing DOM
+  const layer = document.getElementById('nodes-layer');
+  if (layer) layer.innerHTML = '';
+
+  // Load from active workspace
+  const ws = getActiveWs();
+  // Companion Sweep 1 — defensively default scraps and legend on hydrate.
+  if (ws && (typeof ws.highlightLegend !== 'object' || ws.highlightLegend === null)) {
+    ws.highlightLegend = EMPTY_LEGEND();
+  }
+  nodes = ws ? ws.nodes.map(n => ({
+    ...n,
+    style: n.style || {},
+    scraps: Array.isArray(n.scraps) ? n.scraps : [],
+  })) : [];
+  edges = ws ? ws.edges.map(e => ({ ...e, style: e.style || { ...DEFAULT_EDGE_STYLE } })) : [];
+
+  for (const node of nodes) renderNodeDOM(node);
+  updateNodePositions();
+  redrawEdges();
+}
+
+// ---------- Sweep 7 — Workspace utilities ----------
+
+function wsDefault() {
+  return { id: nanoid(), name: 'workspace 1', nodes: [], edges: [], highlightLegend: EMPTY_LEGEND() };
+}
+
+function getActiveWs() {
+  return workspaces.find(w => w.id === activeWsId) || null;
+}
+
+function saveWsState() {
+  // Snapshot current nodes/edges into the active workspace, then persist all workspaces.
+  const ws = getActiveWs();
+  if (ws) {
+    ws.nodes = nodes.map(n => ({ ...n }));
+    ws.edges = edges.map(e => ({ ...e }));
+  }
+  localStorage.setItem(WS_KEY, JSON.stringify({ active: activeWsId, workspaces }));
+}
+
+function loadWsState() {
+  // 1. Try the v2 workspace blob.
+  try {
+    const raw = JSON.parse(localStorage.getItem(WS_KEY));
+    if (raw && Array.isArray(raw.workspaces) && raw.workspaces.length > 0) {
+      workspaces = raw.workspaces;
+      activeWsId = raw.active || workspaces[0].id;
+      return true;
+    }
+  } catch {}
+
+  // 2. Migrate legacy v1 keys (companion:nodes:v1 / companion:edges:v1) into workspace 1.
+  try {
+    const oldNodes = JSON.parse(localStorage.getItem('companion:nodes:v1'));
+    const oldEdges = JSON.parse(localStorage.getItem('companion:edges:v1'));
+    if (oldNodes && oldNodes.length > 0) {
+      const ws = wsDefault();
+      ws.nodes = oldNodes;
+      ws.edges = (oldEdges || []).map(e => ({ ...e, style: e.style || { ...DEFAULT_EDGE_STYLE } }));
+      workspaces = [ws];
+      activeWsId = ws.id;
+      // Clean up legacy keys after a successful migration.
+      localStorage.removeItem('companion:nodes:v1');
+      localStorage.removeItem('companion:edges:v1');
+      saveWsState();
+      return true;
+    }
+  } catch {}
+
+  // 3. Fresh start — create a default workspace in memory.
+  const ws = wsDefault();
+  workspaces = [ws];
+  activeWsId = ws.id;
+  return false;
+}
+
+function switchWorkspace(id) {
+  if (id === activeWsId) return;
+
+  // Snapshot current state into the active workspace before switching.
+  saveWsState();
+
+  // Clear canvas DOM + in-memory arrays.
+  const layer = document.getElementById('nodes-layer');
+  if (layer) layer.innerHTML = '';
+  nodes = [];
+  edges = [];
+  redrawEdges();
+
+  // Switch + reset viewport (each workspace starts at the origin).
+  activeWsId = id;
+  vp = { x: 0, y: 0, scale: 1 };
+  updateTransform();
+
+  // Load target workspace.
+  loadCanvas();
+  renderWorkspaceSwitcher();
+}
+
+function createWorkspace() {
+  saveWsState(); // preserve current work before creating
+  const ws = { id: nanoid(), name: `workspace ${workspaces.length + 1}`, nodes: [], edges: [], highlightLegend: EMPTY_LEGEND() };
+  workspaces.push(ws);
+  activeWsId = ws.id;
+
+  // Clear canvas + reset viewport.
+  const layer = document.getElementById('nodes-layer');
+  if (layer) layer.innerHTML = '';
+  nodes = [];
+  edges = [];
+  vp = { x: 0, y: 0, scale: 1 };
+  redrawEdges();
+  updateTransform();
+  saveWsState();
+  renderWorkspaceSwitcher();
+}
+
+function deleteWorkspace(id) {
+  if (workspaces.length <= 1) return; // never delete the last one
+  workspaces = workspaces.filter(w => w.id !== id);
+  if (activeWsId === id) {
+    activeWsId = workspaces[0].id;
+    loadCanvas();
+  }
+  saveWsState();
+  renderWorkspaceSwitcher();
+}
+
+function renameWorkspace(id, name) {
+  const ws = workspaces.find(w => w.id === id);
+  if (ws) {
+    ws.name = name.trim() || ws.name;
+    saveWsState();
+  }
+}
+
+function renderWorkspaceSwitcher() {
+  const list = document.getElementById('ws-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  for (const ws of workspaces) {
+    const item = document.createElement('div');
+    item.className = 'ws-item' + (ws.id === activeWsId ? ' ws-active' : '');
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'ws-name';
+    nameEl.textContent = ws.name;
+    nameEl.title = 'click to switch · double-click to rename';
+
+    nameEl.addEventListener('click', () => switchWorkspace(ws.id));
+    nameEl.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      const input = document.createElement('input');
+      input.className = 'ws-rename';
+      input.value = ws.name;
+      nameEl.replaceWith(input);
+      input.focus();
+      input.select();
+      const commit = () => {
+        renameWorkspace(ws.id, input.value);
+        renderWorkspaceSwitcher();
+      };
+      input.addEventListener('blur', commit);
+      input.addEventListener('keydown', ev => {
+        if (ev.key === 'Enter')  { input.blur(); }
+        if (ev.key === 'Escape') { renderWorkspaceSwitcher(); }
+      });
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'ws-delete';
+    delBtn.textContent = '×';
+    delBtn.title = 'delete workspace';
+    delBtn.style.display = workspaces.length > 1 ? '' : 'none';
+    delBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (confirm(`delete "${ws.name}"?`)) deleteWorkspace(ws.id);
+    });
+
+    item.appendChild(nameEl);
+    item.appendChild(delBtn);
+    list.appendChild(item);
+  }
+}
+
+// ---------- Export ----------
+
+function exportCanvas() {
+  // canvas-exchange/2 — preserves scraps, highlight legend, late markers, full bodies.
+  const ws = getActiveWs();
+  const legend = (ws && ws.highlightLegend && typeof ws.highlightLegend === 'object')
+    ? ws.highlightLegend
+    : {};
+  const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+
+  const canvasJson = {
+    version:    'canvas-exchange/2',
+    origin: {
+      app:           'companion',
+      workspaceId:   ws ? ws.id : null,
+      workspaceName: ws ? ws.name : null,
+      exportedAt:    Date.now(),
+    },
+    highlightLegend: legend,
+    records: nodes.map((n, i) => ({
+      id:        n.id,
+      tileType:  'note',
+      order:     i + 1,
+      title:     n.title    || '',
+      body:      stripHTML(n.body),   // plain text — no truncation
+      bodyHtml:  n.body     || '',    // raw HTML with highlight spans
+      scraps:    (n.scraps || []).map(s => ({
+        id:        s.id,
+        text:      s.text,
+        createdAt: s.createdAt,
+        late:      isScrapLate(s, n),
+      })),
+      position:  { x: Math.round(n.x), y: Math.round(n.y) },
+      createdAt: n.createdAt,
+      updatedAt: n.updatedAt,
+      extra:     {},
+    })),
+    links: edges.map(e => ({
+      id:        e.id,
+      sourceId:  e.sourceId,
+      targetId:  e.targetId,
+      createdAt: e.createdAt,
+      late:      isEdgeLate(e, nodeById[e.sourceId], nodeById[e.targetId]),
+      style:     { ...(e.style || DEFAULT_EDGE_STYLE) },
+    })),
+  };
+  downloadJSON(canvasJson, `companion-${Date.now()}.json`);
+  if (window.nx) window.nx.emit('companion.canvas.export', { json: canvasJson, ts: Date.now() });
+}
+
+// ============================================================
+// SESSION RESTORE + CLEAR
+// ============================================================
+
+function checkForSavedSession() {
+  // loadWsState handles legacy migration + fresh-start defaults.
+  const hasSaved = loadWsState();
+
+  if (!hasSaved) {
+    renderWorkspaceSwitcher();
+    return;
+  }
+
+  // Populate widget body text from the active workspace.
+  const ws = getActiveWs();
+  const savedNodes = ws ? ws.nodes : [];
+  const savedEdges = ws ? ws.edges : [];
+
+  const noteWord = savedNodes.length === 1 ? 'note' : 'notes';
+  const connWord = savedEdges.length === 1 ? 'connection' : 'connections';
+  const bodyEl   = document.getElementById('restore-body');
+  if (bodyEl) {
+    bodyEl.innerHTML = savedNodes.length > 0
+      ? `${savedNodes.length} ${noteWord}${savedEdges.length > 0 ? ` and ${savedEdges.length} ${connWord}` : ''}<br>from your last session`
+      : 'from your last session';
+  }
+
+  renderWorkspaceSwitcher();
+  const widget = document.getElementById('restore-widget');
+  if (widget) setTimeout(() => widget.classList.add('visible'), 200);
+}
+
+function restoreSession() {
+  dismissRestore();
+  loadCanvas();
+}
+
+function dismissRestore() {
+  const widget = document.getElementById('restore-widget');
+  if (!widget) return;
+  widget.style.transition = 'opacity 300ms ease';
+  widget.style.opacity = '0';
+  setTimeout(() => {
+    widget.style.display = 'none';
+    widget.classList.remove('visible');
+  }, 300);
+}
+
+function clearWorkspace() {
+  if (!confirm('clear this workspace?')) return;
+  // Empty the active workspace in memory; saveWsState persists the empty state.
+  const layer = document.getElementById('nodes-layer');
+  if (layer) layer.innerHTML = '';
+  nodes = [];
+  edges = [];
+  redrawEdges();
+  saveWsState();
+}
+
+// ============================================================
+// RICH TEXT TOOLBAR
+// ============================================================
+
+function showToolbar() {
+  // Sweep 8 — editor open: don't show floating canvas toolbar (selection in editor body would trigger it in wrong place)
+  if (editorNodeId) return;
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+    hideToolbar();
+    return;
+  }
+  const range = sel.getRangeAt(0);
+  const rect  = range.getBoundingClientRect();
+  if (!rect || rect.width === 0) {
+    hideToolbar();
+    return;
+  }
+
+  const tb  = document.getElementById('fmt-toolbar');
+  tb.style.display = 'flex';
+
+  // Position: centered above selection, clamped to viewport
+  const tbW  = tb.offsetWidth || 200;
+  const left = Math.max(8, Math.min(window.innerWidth - tbW - 8, rect.left + rect.width / 2 - tbW / 2));
+  const top  = Math.max(8, rect.top - 42);
+
+  tb.style.left = left + 'px';
+  tb.style.top  = top  + 'px';
+}
+
+function hideToolbar() {
+  const tb = document.getElementById('fmt-toolbar');
+  if (tb) tb.style.display = 'none';
+}
+
+function initToolbar() {
+  const tb = document.getElementById('fmt-toolbar');
+  if (!tb) return;
+
+  // B / I / U buttons — mousedown so selection isn't lost before execCommand
+  tb.querySelectorAll('[data-cmd]').forEach(btn => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault(); // CRITICAL: keeps focus + selection in contenteditable
+      document.execCommand(btn.dataset.cmd, false, null);
+    });
+  });
+
+  // Highlight swatches
+  tb.querySelectorAll('.swatch').forEach(btn => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const color = btn.dataset.color;
+      if (color) {
+        document.execCommand('backColor', false, color);
+      } else {
+        // Remove highlight
+        document.execCommand('backColor', false, 'rgba(0,0,0,0)');
+      }
+      hideToolbar();
+    });
+  });
+
+  // Hide when clicking outside toolbar
+  document.addEventListener('mousedown', e => {
+    if (isMenuLocked()) return; // Sweep 5: lock guard
+    if (!tb.contains(e.target)) hideToolbar();
+  });
+}
+
+// ============================================================
+// IMPORT + CRASH PROTECTION
+// ============================================================
+
+function triggerImport() {
+  document.getElementById('import-file-input').click();
+}
+
+function handleImport(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let data;
+    try { data = JSON.parse(e.target.result); }
+    catch { alert('Could not read file — is it valid JSON?'); return; }
+
+    const version = data.version || '';
+
+    if (version === 'companion/1' || version === 'companion-full/1' || version === 'canvas-exchange/1' || version === 'canvas-exchange/2') {
+      const canvas = version === 'companion-full/1' ? data.canvas : data;
+      // Load into current workspace
+      const layer = document.getElementById('nodes-layer');
+      if (layer) layer.innerHTML = '';
+
+      if (version === 'canvas-exchange/2') {
+        // v2: scraps, position, full schema preserved. Drop derived `late` flags.
+        nodes = (canvas.records || []).map(r => ({
+          id:        r.id,
+          title:     r.title    || '',
+          body:      r.bodyHtml || r.body || '',
+          x:         (r.position && typeof r.position.x === 'number') ? r.position.x : 0,
+          y:         (r.position && typeof r.position.y === 'number') ? r.position.y : 0,
+          createdAt: r.createdAt || Date.now(),
+          updatedAt: r.updatedAt || Date.now(),
+          style:     {},
+          scraps:    Array.isArray(r.scraps)
+            ? r.scraps.map(s => ({ id: s.id || nanoid(), text: s.text || '', createdAt: s.createdAt || Date.now() }))
+            : [],
+        }));
+        edges = (canvas.links || []).map(l => ({
+          id:        l.id,
+          sourceId:  l.sourceId,
+          targetId:  l.targetId,
+          createdAt: l.createdAt || Date.now(),
+          style:     l.style ? { ...l.style } : { ...DEFAULT_EDGE_STYLE },
+        }));
+        // Update active workspace's legend from the import
+        const ws = getActiveWs();
+        if (ws) {
+          ws.highlightLegend = (canvas.highlightLegend && typeof canvas.highlightLegend === 'object')
+            ? { ...EMPTY_LEGEND(), ...canvas.highlightLegend }
+            : EMPTY_LEGEND();
+        }
+      } else {
+        // v1 paths — companion/1 / companion-full/1 / canvas-exchange/1
+        // canvas-exchange/1 uses plain id; companion/1 uses note:<id> prefix
+        nodes = (canvas.records || []).map(r => {
+          const pos = (canvas.positions || []).find(p => p.id === r.id || p.id === `note:${r.id}`) || {};
+          return {
+            id:        r.id,
+            title:     r.title  || '',
+            body:      r.bodyHtml || r.body || '',
+            x:         pos.x || 0,
+            y:         pos.y || 0,
+            createdAt: r.createdAt || Date.now(),
+            updatedAt: r.updatedAt || Date.now(),
+            style:     {},
+            scraps:    [], // v1 has no scraps; default empty
+          };
+        });
+        edges = (canvas.links || []).map(l => ({
+          id:        l.id,
+          sourceId:  l.sourceId,
+          targetId:  l.targetId,
+          createdAt: l.createdAt || Date.now(),
+          style:     { ...DEFAULT_EDGE_STYLE },
+        }));
+        // v1 has no legend; ensure active workspace has at least an empty one
+        const ws = getActiveWs();
+        if (ws && (!ws.highlightLegend || typeof ws.highlightLegend !== 'object')) {
+          ws.highlightLegend = EMPTY_LEGEND();
+        }
+      }
+
+      for (const node of nodes) renderNodeDOM(node);
+      updateNodePositions();
+      redrawEdges();
+      saveWsState();
+      // Refresh legend popover inputs if it happens to be open
+      if (typeof populateLegendInputs === 'function') populateLegendInputs();
+      // Load env/creature if full export
+      if (version === 'companion-full/1') {
+        if (data.environment) {
+          envLayer = { seed: data.environment.seed, vals: data.environment.vals };
+        }
+        if (data.creatureR) {
+          creatureR = { seed: data.creatureR.seed, vals: data.creatureR.vals };
+          lastCreatureRender = 0;
+        }
+      }
+    } else if (version === 'environment/1') {
+      envLayer = { seed: data.seed, vals: data.vals };
+    } else if (version === 'eidolon/1') {
+      creatureR = { seed: data.seed, vals: data.vals };
+      lastCreatureRender = 0;
+    } else {
+      alert('Unrecognised file format.');
+    }
+  };
+  reader.readAsText(file);
+  // Reset input so the same file can be re-imported
+  document.getElementById('import-file-input').value = '';
+}
+
+// Save synchronously on tab close / crash / refresh
+window.addEventListener('beforeunload', () => {
+  saveWsState();
+});
+
+window.onload = init;
+
+// ============================================================
+// Sweep 8 — GLOBAL STYLE PANEL
+// ============================================================
+
+function initGlobalStylePanel() {
+  const bgColor   = document.getElementById('g-bg-color');
+  const bgOpacity = document.getElementById('g-bg-opacity');
+  const textColor = document.getElementById('g-text-color');
+  const fontSize  = document.getElementById('g-font-size');
+  if (!bgColor) return;
+
+  // Sync inputs to currently-loaded global style (in case localStorage values differ from HTML defaults)
+  bgColor.value   = globalNodeStyle.bgColor;
+  bgOpacity.value = globalNodeStyle.bgOpacity;
+  textColor.value = globalNodeStyle.textColor;
+  fontSize.value  = globalNodeStyle.fontSize;
+
+  const apply = () => {
+    globalNodeStyle.bgColor   = bgColor.value;
+    globalNodeStyle.bgOpacity = parseFloat(bgOpacity.value);
+    globalNodeStyle.textColor = textColor.value;
+    globalNodeStyle.fontSize  = parseInt(fontSize.value);
+    // Re-apply to all non-custom nodes only
+    for (const node of nodes) {
+      if (!node.style?.custom) {
+        const el = document.querySelector(`.node[data-id="${node.id}"]`);
+        applyNodeStyle(node, el);
+      }
+    }
+    localStorage.setItem(GLOBAL_STYLE_KEY, JSON.stringify(globalNodeStyle));
+  };
+
+  bgColor.addEventListener('input',   apply);
+  bgOpacity.addEventListener('input', apply);
+  textColor.addEventListener('input', apply);
+  fontSize.addEventListener('input',  apply);
+}
+
+// ============================================================
+// Sweep 8 — PER-NOTE STYLE PANEL
+// ============================================================
+
+let nspNodeId = null;
+
+function openNoteStylePanel(nodeId, anchorEl) {
+  nspNodeId = nodeId;
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) return;
+
+  const s = resolveNodeStyle(node);
+  document.getElementById('nsp-bg-color').value   = s.bgColor;
+  document.getElementById('nsp-bg-opacity').value = s.bgOpacity;
+  document.getElementById('nsp-text-color').value = s.textColor;
+  document.getElementById('nsp-font-size').value  = s.fontSize;
+
+  const panel = document.getElementById('note-style-panel');
+  const rect  = anchorEl.getBoundingClientRect();
+  panel.style.display = 'flex';
+  panel.style.top  = (rect.bottom + 6) + 'px';
+  panel.style.left = rect.left + 'px';
+}
+
+function closeNoteStylePanel() {
+  document.getElementById('note-style-panel').style.display = 'none';
+  nspNodeId = null;
+}
+
+function initNoteStylePanel() {
+  const bgColor   = document.getElementById('nsp-bg-color');
+  const bgOpacity = document.getElementById('nsp-bg-opacity');
+  const textColor = document.getElementById('nsp-text-color');
+  const fontSize  = document.getElementById('nsp-font-size');
+  const resetBtn  = document.getElementById('nsp-reset');
+  if (!bgColor) return;
+
+  const apply = () => {
+    if (!nspNodeId) return;
+    const node = nodes.find(n => n.id === nspNodeId);
+    if (!node) return;
+    if (!node.style) node.style = {};
+    node.style.bgColor   = bgColor.value;
+    node.style.bgOpacity = parseFloat(bgOpacity.value);
+    node.style.textColor = textColor.value;
+    node.style.fontSize  = parseInt(fontSize.value);
+    node.style.custom    = true;
+    const el = document.querySelector(`.node[data-id="${nspNodeId}"]`);
+    applyNodeStyle(node, el);
+    scheduleAutosave();
+  };
+
+  bgColor.addEventListener('input',   apply);
+  bgOpacity.addEventListener('input', apply);
+  textColor.addEventListener('input', apply);
+  fontSize.addEventListener('input',  apply);
+
+  resetBtn.addEventListener('click', () => {
+    if (!nspNodeId) return;
+    const node = nodes.find(n => n.id === nspNodeId);
+    if (!node) return;
+    node.style = { custom: false };
+    const el = document.querySelector(`.node[data-id="${nspNodeId}"]`);
+    applyNodeStyle(node, el);
+    scheduleAutosave();
+    closeNoteStylePanel();
+  });
+
+  // Close when clicking outside
+  document.addEventListener('mousedown', e => {
+    if (isMenuLocked()) return; // Sweep 5: lock guard
+    const panel = document.getElementById('note-style-panel');
+    if (panel && panel.style.display !== 'none' && !panel.contains(e.target)) {
+      closeNoteStylePanel();
+    }
+  });
+}
+
+// ============================================================
+// Sweep 8 — POP-OUT EDITOR
+// ============================================================
+
+let editorNodeId = null;
+
+function openEditor(nodeId) {
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  editorNodeId = nodeId;
+
+  document.getElementById('ne-title').value = node.title || '';
+
+  const neBody = document.getElementById('ne-body');
+  neBody.innerHTML = node.body || '';
+
+  const s = resolveNodeStyle(node);
+  neBody.style.color    = s.textColor;
+  neBody.style.fontSize = s.fontSize + 'px';
+  document.getElementById('ne-text-color').value = s.textColor;
+  document.getElementById('ne-font-size').value  = s.fontSize;
+
+  const ws = getActiveWs();
+  const label = document.getElementById('ne-node-label');
+  if (label && ws) label.textContent = `${ws.name} · ${nodes.length} note${nodes.length !== 1 ? 's' : ''}`;
+
+  // Sweep C1 — render scraps for this node
+  renderScrapsList();
+  // Clear any leftover scrap input value
+  const scrapInput = document.getElementById('ne-scrap-input');
+  if (scrapInput) scrapInput.value = '';
+
+  const editor   = document.getElementById('note-editor');
+  const backdrop = document.getElementById('note-editor-backdrop');
+  editor.style.display   = 'flex';
+  backdrop.style.display = 'block';
+  // rAF guarantees display:flex has painted before the .visible class triggers the transition
+  requestAnimationFrame(() => {
+    editor.classList.add('visible');
+    backdrop.classList.add('visible');
+  });
+  setTimeout(() => neBody.focus(), 50);
+}
+
+function closeEditor() {
+  const editor   = document.getElementById('note-editor');
+  const backdrop = document.getElementById('note-editor-backdrop');
+  if (!editor) return;
+  editor.classList.remove('visible');
+  backdrop.classList.remove('visible');
+  setTimeout(() => {
+    editor.style.display   = 'none';
+    backdrop.style.display = 'none';
+  }, 260);
+  editorNodeId = null;
+}
+
+function initEditor() {
+  const neTitle  = document.getElementById('ne-title');
+  const neBody   = document.getElementById('ne-body');
+  const neClose  = document.getElementById('ne-close');
+  const backdrop = document.getElementById('note-editor-backdrop');
+  if (!neTitle) return;
+
+  // Title sync → canvas
+  neTitle.addEventListener('input', () => {
+    if (!editorNodeId) return;
+    const node = nodes.find(n => n.id === editorNodeId);
+    if (!node) return;
+    node.title = neTitle.value;
+    const canvasTitle = document.querySelector(`.node[data-id="${editorNodeId}"] .node-title`);
+    if (canvasTitle) canvasTitle.value = node.title;
+    node.updatedAt = Date.now();
+    scheduleAutosave();
+  });
+
+  // Body sync → canvas
+  neBody.addEventListener('input', () => {
+    if (!editorNodeId) return;
+    const node = nodes.find(n => n.id === editorNodeId);
+    if (!node) return;
+    node.body = neBody.innerHTML;
+    const canvasBody = document.querySelector(`.node[data-id="${editorNodeId}"] .node-body`);
+    if (canvasBody) canvasBody.innerHTML = node.body;
+    node.updatedAt = Date.now();
+    scheduleAutosave();
+  });
+
+  // Toolbar B/I/U — mousedown so selection isn't lost before execCommand
+  document.querySelectorAll('#ne-toolbar [data-cmd]').forEach(btn => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault();
+      document.execCommand(btn.dataset.cmd, false, null);
+    });
+  });
+
+  // Highlight swatches
+  document.querySelectorAll('#ne-toolbar .swatch').forEach(btn => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const color = btn.dataset.color;
+      document.execCommand('backColor', false, color || 'rgba(0,0,0,0)');
+    });
+  });
+
+  // Text color (locks to custom — affects whole-node color)
+  document.getElementById('ne-text-color').addEventListener('input', e => {
+    if (!editorNodeId) return;
+    const node = nodes.find(n => n.id === editorNodeId);
+    if (!node) return;
+    if (!node.style) node.style = {};
+    node.style.textColor = e.target.value;
+    node.style.custom    = true;
+    neBody.style.color   = e.target.value;
+    const el = document.querySelector(`.node[data-id="${editorNodeId}"]`);
+    applyNodeStyle(node, el);
+    scheduleAutosave();
+  });
+
+  // Font size (locks to custom — affects whole-note font size)
+  document.getElementById('ne-font-size').addEventListener('change', e => {
+    if (!editorNodeId) return;
+    const node = nodes.find(n => n.id === editorNodeId);
+    if (!node) return;
+    if (!node.style) node.style = {};
+    node.style.fontSize  = parseInt(e.target.value);
+    node.style.custom    = true;
+    neBody.style.fontSize = node.style.fontSize + 'px';
+    const el = document.querySelector(`.node[data-id="${editorNodeId}"]`);
+    applyNodeStyle(node, el);
+    scheduleAutosave();
+  });
+
+  // Paste strips formatting
+  neBody.addEventListener('paste', e => {
+    e.preventDefault();
+    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+  });
+
+  neClose.addEventListener('click', closeEditor);
+  backdrop.addEventListener('click', closeEditor);
+
+  // Sweep C1 — scrap input: Enter adds scrap, releases input
+  const scrapInput = document.getElementById('ne-scrap-input');
+  if (scrapInput) {
+    scrapInput.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' || e.shiftKey) return;
+      e.preventDefault();
+      const text = scrapInput.value.trim();
+      if (!text) return;
+      addScrap(editorNodeId, text);
+      scrapInput.value = '';
+    });
+  }
+}
+
+// ============================================================
+// Companion Sweep 1 — Scraps and highlight legend
+// ============================================================
+
+function addScrap(nodeId, text) {
+  if (!nodeId) return;
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  if (!Array.isArray(node.scraps)) node.scraps = [];
+  const scrap = { id: 'scrap_' + nanoid(), text, createdAt: Date.now() };
+  node.scraps.push(scrap);
+  // IMPORTANT: do NOT bump node.updatedAt here — updatedAt tracks body edits.
+  // Late-scrap detection depends on this distinction.
+  renderScrapsList();
+  const tileEl = document.querySelector(`.node[data-id="${nodeId}"]`);
+  if (tileEl) updateScrapIndicator(node, tileEl);
+  scheduleAutosave();
+}
+
+function deleteScrap(nodeId, scrapId) {
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node || !Array.isArray(node.scraps)) return;
+  node.scraps = node.scraps.filter(s => s.id !== scrapId);
+  renderScrapsList();
+  const tileEl = document.querySelector(`.node[data-id="${nodeId}"]`);
+  if (tileEl) updateScrapIndicator(node, tileEl);
+  scheduleAutosave();
+}
+
+function renderScrapsList() {
+  const list = document.getElementById('ne-scraps-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!editorNodeId) return;
+  const node = nodes.find(n => n.id === editorNodeId);
+  if (!node || !Array.isArray(node.scraps) || node.scraps.length === 0) return;
+
+  for (const scrap of node.scraps) {
+    const row = document.createElement('div');
+    row.className = 'ne-scrap-row';
+
+    const text = document.createElement('span');
+    text.className = 'scrap-text';
+    text.textContent = scrap.text;
+    text.title = scrap.text;
+
+    const time = document.createElement('span');
+    time.className = 'scrap-time';
+    time.textContent = relativeTime(scrap.createdAt);
+
+    const del = document.createElement('button');
+    del.className = 'scrap-del';
+    del.textContent = '×';
+    del.title = 'Delete scrap';
+    del.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      deleteScrap(editorNodeId, scrap.id);
+    });
+
+    row.appendChild(text);
+    row.appendChild(time);
+    row.appendChild(del);
+    list.appendChild(row);
+  }
+}
+
+function updateScrapIndicator(node, tileEl) {
+  if (!tileEl) return;
+  // Remove existing
+  const existing = tileEl.querySelector('.scrap-indicator');
+  if (existing) existing.remove();
+  // Add if scraps present
+  if (Array.isArray(node.scraps) && node.scraps.length > 0) {
+    const dot = document.createElement('div');
+    dot.className = 'scrap-indicator';
+    // Sweep 3 — flag late if any scrap is late. Pure render-time check:
+    // does NOT mutate node state. Always-on visualization independent of
+    // briefOptions.includeLate (which controls export, not display).
+    const lateCount = node.scraps.filter(s => isScrapLate(s, node)).length;
+    if (lateCount > 0) dot.classList.add('late');
+    const n = node.scraps.length;
+    dot.title = lateCount > 0
+      ? `${n} scrap${n !== 1 ? 's' : ''} (${lateCount} late)`
+      : `${n} scrap${n !== 1 ? 's' : ''}`;
+    tileEl.appendChild(dot);
+  }
+}
+
+// ---- Highlight legend popover ----
+
+function toggleLegendPopover() {
+  const pop = document.getElementById('legend-popover');
+  if (!pop) return;
+  if (pop.classList.contains('visible')) {
+    pop.classList.remove('visible');
+  } else {
+    populateLegendInputs();
+    pop.classList.add('visible');
+  }
+}
+
+function populateLegendInputs() {
+  const ws = getActiveWs();
+  const legend = (ws && ws.highlightLegend && typeof ws.highlightLegend === 'object')
+    ? ws.highlightLegend
+    : EMPTY_LEGEND();
+  for (const color of HIGHLIGHT_COLORS) {
+    const input = document.querySelector(`#legend-popover .legend-input[data-color="${color}"]`);
+    if (input) input.value = legend[color] || '';
+  }
+}
+
+function clearLegend() {
+  const ws = getActiveWs();
+  if (!ws) return;
+  ws.highlightLegend = EMPTY_LEGEND();
+  populateLegendInputs();
+  saveWsState();
+}
+
+function initLegendPopover() {
+  // Per-input change updates active workspace's legend
+  document.querySelectorAll('#legend-popover .legend-input').forEach(input => {
+    input.addEventListener('input', () => {
+      const ws = getActiveWs();
+      if (!ws) return;
+      if (typeof ws.highlightLegend !== 'object' || ws.highlightLegend === null) {
+        ws.highlightLegend = EMPTY_LEGEND();
+      }
+      const color = input.dataset.color;
+      if (color && HIGHLIGHT_COLORS.includes(color)) {
+        ws.highlightLegend[color] = input.value;
+        scheduleAutosave();
+      }
+    });
+  });
+  // Close on outside click
+  document.addEventListener('mousedown', e => {
+    if (isMenuLocked()) return; // Sweep 5: lock guard
+    const pop = document.getElementById('legend-popover');
+    if (!pop || !pop.classList.contains('visible')) return;
+    if (pop.contains(e.target)) return;
+    // Don't close when clicking the legend button itself (it'll toggle)
+    if (e.target.closest('button') && e.target.textContent.trim() === 'legend') return;
+    pop.classList.remove('visible');
+  });
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (isMenuLocked()) return; // Sweep 5: lock guard
+    const pop = document.getElementById('legend-popover');
+    if (pop && pop.classList.contains('visible')) {
+      pop.classList.remove('visible');
+    }
+  });
+}
+
+// ============================================================
+// Companion Sweep 2 — AI brief + brief options menu
+// ============================================================
+
+// ---- HTML to markdown-ish ----
+function htmlToMarkdownish(html) {
+  if (!html) return '';
+  const root = document.createElement('div');
+  root.innerHTML = html;
+  return walkBriefNode(root).replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function walkBriefNode(node) {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent;
+  if (node.nodeType !== Node.ELEMENT_NODE) return '';
+  const tag = node.tagName.toLowerCase();
+  const inner = Array.from(node.childNodes).map(walkBriefNode).join('');
+
+  // Highlight detection — inline background-color
+  if (node.style && node.style.backgroundColor) {
+    const colorName = rgbaToColorName(node.style.backgroundColor);
+    if (colorName) return `[${colorName}]${inner}[/${colorName}]`;
+  }
+
+  switch (tag) {
+    case 'b': case 'strong': return `**${inner}**`;
+    case 'i': case 'em':     return `_${inner}_`;
+    case 'u':                return `__${inner}__`;
+    case 'br':               return '\n';
+    case 'div': case 'p':    return inner + '\n';
+    default:                 return inner;
+  }
+}
+
+function rgbaToColorName(rgba) {
+  // Match RGB triplet, tolerant of whitespace and rgb()/rgba() variants
+  const m = rgba.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (!m) return null;
+  const r = m[1], g = m[2], b = m[3];
+  for (const [name, ref] of Object.entries(LEGEND_SWATCH_RGBA)) {
+    const m2 = ref.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+    if (m2 && m2[1] === r && m2[2] === g && m2[3] === b) return name;
+  }
+  return null;
+}
+
+// ---- Note label and pluralisation ----
+function noteLabel(node) {
+  if (node.title && node.title.trim()) return node.title.trim();
+  const plainBody = stripHTML(node.body || '').trim();
+  if (plainBody) {
+    return plainBody.length > 80 ? plainBody.slice(0, 80) + '…' : plainBody;
+  }
+  return null; // signal: untitled
+}
+
+function pluralise(n, singular, plural) {
+  return `${n} ${n === 1 ? singular : plural}`;
+}
+
+// ---- Brief options state + persistence ----
+const BRIEF_OPTIONS_KEY = 'companion:brief-options:v1';
+const VALID_TASKS = ['articulate', 'plan', 'critique', 'synthesize', 'no_task'];
+
+let briefOptions = {
+  task: 'articulate',
+  includeLegend: true,
+  includeScraps: true,
+  includeLate:   true,
+  includeVerseMap: true,
+  preambleOverride: '',
+};
+
+function loadBriefOptions() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(BRIEF_OPTIONS_KEY));
+    if (saved && typeof saved === 'object') {
+      if (VALID_TASKS.includes(saved.task)) briefOptions.task = saved.task;
+      if (typeof saved.includeLegend === 'boolean') briefOptions.includeLegend = saved.includeLegend;
+      if (typeof saved.includeScraps === 'boolean') briefOptions.includeScraps = saved.includeScraps;
+      if (typeof saved.includeLate === 'boolean')   briefOptions.includeLate   = saved.includeLate;
+      if (typeof saved.includeVerseMap === 'boolean') briefOptions.includeVerseMap = saved.includeVerseMap;
+      if (typeof saved.preambleOverride === 'string') briefOptions.preambleOverride = saved.preambleOverride;
+    }
+  } catch {}
+}
+
+function saveBriefOptions() {
+  try { localStorage.setItem(BRIEF_OPTIONS_KEY, JSON.stringify(briefOptions)); } catch {}
+}
+
+// ---- Verbatim framing text ----
+const BRIEF_PREAMBLE =
+  `This document was generated from a spatial note canvas. Each note is a
+fragment of thought. The connections between notes represent perceived
+relationships — the author linked these things together intentionally,
+but treat them as hypotheses, not commitments. They may have decayed in
+meaning since they were drawn, or no longer match the author's current
+thinking.`;
+
+const BRIEF_SCRAPS_EXPLANATION_BASE =
+  `Some notes carry **scraps** — fragments the author wrote down before
+they had words for them: half-formed phrases, single words, questions
+to self. Take scraps as evidence of what the note is reaching toward,
+not as commitments. If a note's body and its scraps seem to disagree,
+the scraps may be closer to the actual thinking.`;
+
+const BRIEF_SCRAPS_LATE_CLAUSE =
+  ` Late scraps (marked *late*) — added long after the body was last edited — are particularly worth attending to.`;
+
+const BRIEF_LATE_EXPLANATION =
+  `Connections and scraps marked *late* arrived well after their
+endpoints already existed. For edges, this means the link was drawn
+long after both notes were already there — a post-hoc realization
+rather than part of the original structure. For scraps, this means a
+fragment landed long after the note's body was last touched — a
+thought that didn't fit at the time.`;
+
+const BRIEF_CLOSING =
+  `Before responding, identify one to three connections or notes whose
+meaning would most change your reading if clarified, and ask about
+those first.`;
+
+const BRIEF_TASK_TEXT = {
+  articulate:
+    `Help me articulate this thinking — find clearer language for what I'm
+reaching toward. Take the canvas as evidence of half-formed thought,
+and help me find words for it. Don't summarise it; help me say what I
+mean.`,
+  plan:
+    `Help me plan from this thinking — what are the next moves, the open
+questions, what's missing, what needs attention? Use the topology and
+scraps as evidence of where the thinking is. Loose ends and unanswered
+questions are particularly important.`,
+  critique:
+    `Stress-test this thinking. Look for contradictions, weak inferences,
+ideas that don't survive scrutiny, and places where the connections
+seem forced. Be specific and direct. I'd rather hear three hard things
+than thirty surface ones.`,
+  synthesize:
+    `Synthesize this thinking into something coherent — find the through-line
+that connects these notes, name the thesis they're collectively reaching
+toward, and surface the structure that's implicit in the canvas.
+Distinguish what's actually a single idea expressed in multiple notes
+from what's genuinely separate. Don't smooth over real tensions; name them.`,
+};
+
+// Sweep 4 — verse-map/1 framing
+//
+// When briefOptions.includeVerseMap is true, briefs gain a footer section
+// telling the AI about a structured response format it may be asked to
+// produce. The AI must NOT produce verse-map/1 unless explicitly asked —
+// the framing makes this clear, since auto-producing structure would
+// conflict with the existing closing instruction (ask clarifying
+// questions first).
+//
+// The schema is canonical here as a string; the spec doc
+// COMPANION_SWEEP_4_PROMPT.md has the long-form description.
+
+const BRIEF_VERSE_MAP_HEADER = `## On structured responses`;
+
+function briefVerseMapBlock(briefId) {
+  // Note: triple-backticks below need to appear literally in the emitted
+  // markdown so the AI sees a code-block within the brief. Using a string
+  // concatenation with the fence as a separate token keeps this readable.
+  const fence = '```';
+  return [
+    `If I ask for a *verse-map/1*, return one JSON code block in exactly`,
+    `this shape:`,
+    ``,
+    fence,
+    `{`,
+    `  "version": "verse-map/1",`,
+    `  "brief_id": "${briefId}",`,
+    `  "annotations": [`,
+    `    { "kind": "edge", "from": "<note title>", "to": "<note title>", "text": "<why these belong together>" },`,
+    `    { "kind": "question", "note": "<note title>", "text": "<your clarifying question>" },`,
+    `    { "kind": "tension", "between": ["<note title>", "<note title>"], "text": "<the contradiction or strain>" },`,
+    `    { "kind": "observation", "note": "<note title>", "text": "<what you noticed>" }`,
+    `  ]`,
+    `}`,
+    fence,
+    ``,
+    `Use note titles exactly as they appear in the sections above. Include`,
+    `only annotations you have real grounds for — a few high-signal items`,
+    `are more useful than exhaustive coverage. Don't produce verse-map/1`,
+    `unless I explicitly ask for it.`,
+  ].join('\n');
+}
+
+// ---- Brief generation ----
+// generateBriefMarkdown returns the markdown string (or null if the workspace
+// is empty — in which case it also fires an alert, as the original exportBrief
+// did). Callers that want immediate download go through exportBrief; callers
+// that want preview-then-download (Sweep 3) go through previewBrief.
+function generateBriefMarkdown() {
+  if (!nodes.length) {
+    alert('Nothing in this workspace yet — add some notes first.');
+    return null;
+  }
+
+  const ws = getActiveWs();
+  const wsName = ws ? ws.name : 'workspace';
+  const opts = briefOptions;
+
+  // Topology — bidirectional adjacency
+  const edgeMap = new Map();
+  for (const n of nodes) edgeMap.set(n.id, new Set());
+  for (const e of edges) {
+    if (edgeMap.has(e.sourceId)) edgeMap.get(e.sourceId).add(e.targetId);
+    if (edgeMap.has(e.targetId)) edgeMap.get(e.targetId).add(e.sourceId);
+  }
+  const degree = id => (edgeMap.get(id) || new Set()).size;
+
+  const hubs = nodes.filter(n => degree(n.id) >= 3)
+    .sort((a, b) => degree(b.id) - degree(a.id) || a.createdAt - b.createdAt);
+  const supporting = nodes.filter(n => degree(n.id) >= 1 && degree(n.id) <= 2)
+    .sort((a, b) => a.createdAt - b.createdAt);
+  const orphans = nodes.filter(n => degree(n.id) === 0)
+    .sort((a, b) => a.createdAt - b.createdAt);
+
+  // Late detection
+  const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const anyLateEdge  = edges.some(e => isEdgeLate(e, nodeById[e.sourceId], nodeById[e.targetId]));
+  const anyLateScrap = nodes.some(n => (n.scraps || []).some(s => isScrapLate(s, n)));
+  const anyLate      = anyLateEdge || anyLateScrap;
+  const anyScraps    = nodes.some(n => Array.isArray(n.scraps) && n.scraps.length > 0);
+
+  // Legend — only colors with non-empty meanings
+  const legend = (ws && ws.highlightLegend) ? ws.highlightLegend : {};
+  const definedLegend = HIGHLIGHT_COLORS
+    .filter(c => legend[c] && legend[c].trim())
+    .map(c => ({ color: c, meaning: legend[c].trim() }));
+
+  const lines = [];
+
+  // Sweep 4 — unique brief identifier for round-trip pairing with verse-map/1
+  // responses. Format `cb-{Date.now()}` for grep/scan recognizability inside
+  // chat conversations. Same numeric value semantics as the download filename
+  // (companion-brief-{Date.now()}.md), but the two are allowed to differ by
+  // milliseconds; the body's `cb-` is the canonical id.
+  const briefId = 'cb-' + Date.now();
+
+  // Header
+  lines.push(`# Mental map — ${wsName}`);
+  const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  lines.push(`*${pluralise(nodes.length, 'note', 'notes')}, ${pluralise(edges.length, 'connection', 'connections')} — exported ${dateStr} — id: ${briefId}*`);
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+
+  // How to read this
+  lines.push('## How to read this');
+  lines.push('');
+  const preamble = (opts.preambleOverride && opts.preambleOverride.trim())
+    ? opts.preambleOverride.trim()
+    : BRIEF_PREAMBLE;
+  lines.push(preamble);
+  lines.push('');
+
+  if (opts.includeLegend && definedLegend.length > 0) {
+    lines.push('The author marked certain phrases with highlight colors. Their meanings');
+    lines.push('in this canvas:');
+    lines.push('');
+    for (const item of definedLegend) {
+      lines.push(`- ${item.color}: ${item.meaning}`);
+    }
+    lines.push('');
+  }
+
+  if (opts.includeScraps && anyScraps) {
+    let scrapsText = BRIEF_SCRAPS_EXPLANATION_BASE;
+    if (opts.includeLate && anyLateScrap) {
+      scrapsText += BRIEF_SCRAPS_LATE_CLAUSE;
+    }
+    lines.push(scrapsText);
+    lines.push('');
+  }
+
+  if (opts.includeLate && anyLate) {
+    lines.push(BRIEF_LATE_EXPLANATION);
+    lines.push('');
+  }
+
+  lines.push('---');
+  lines.push('');
+
+  // Render a single note
+  function renderNote(node, withDegree) {
+    const out = [];
+    const label = noteLabel(node);
+    const heading = label ? `**${label}**` : `*(untitled note)*`;
+    if (withDegree) {
+      out.push(`${heading} *(${pluralise(degree(node.id), 'connection', 'connections')})*`);
+    } else {
+      out.push(heading);
+    }
+    out.push('');
+
+    const bodyMd = htmlToMarkdownish(node.body || '');
+    if (bodyMd) {
+      out.push(bodyMd);
+      out.push('');
+    }
+
+    if (opts.includeScraps && Array.isArray(node.scraps) && node.scraps.length > 0) {
+      out.push('Scraps:');
+      for (const s of node.scraps) {
+        const lateMark = (opts.includeLate && isScrapLate(s, node)) ? ' *late*' : '';
+        out.push(`- "${s.text}"${lateMark}`);
+      }
+      out.push('');
+    }
+    return out;
+  }
+
+  if (hubs.length > 0) {
+    lines.push('## Central ideas (most connected)');
+    lines.push('');
+    for (const n of hubs) lines.push(...renderNote(n, true));
+    lines.push('---');
+    lines.push('');
+  }
+
+  if (supporting.length > 0) {
+    lines.push('## Supporting ideas');
+    lines.push('');
+    for (const n of supporting) lines.push(...renderNote(n, false));
+    lines.push('---');
+    lines.push('');
+  }
+
+  if (orphans.length > 0) {
+    lines.push('## Loose ends');
+    lines.push('');
+    for (const n of orphans) lines.push(...renderNote(n, false));
+    lines.push('---');
+    lines.push('');
+  }
+
+  if (edges.length > 0) {
+    lines.push('## Connections');
+    lines.push('');
+    for (const e of edges) {
+      const src = nodeById[e.sourceId];
+      const tgt = nodeById[e.targetId];
+      const srcLabel = src ? (noteLabel(src) || '[untitled]') : '[deleted]';
+      const tgtLabel = tgt ? (noteLabel(tgt) || '[untitled]') : '[deleted]';
+      const lateMark = (opts.includeLate && src && tgt && isEdgeLate(e, src, tgt)) ? ' *late*' : '';
+      lines.push(`- ${srcLabel} ↔ ${tgtLabel}${lateMark}`);
+    }
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+  }
+
+  // Task instruction + closing
+  if (opts.task !== 'no_task' && BRIEF_TASK_TEXT[opts.task]) {
+    lines.push('## What I want from you');
+    lines.push('');
+    lines.push(BRIEF_TASK_TEXT[opts.task]);
+    lines.push('');
+    lines.push(BRIEF_CLOSING);
+  } else {
+    // no_task: closing alone
+    lines.push(BRIEF_CLOSING);
+  }
+
+  // Sweep 4 — verse-map/1 framing (footer section, conditional on toggle).
+  // Position: AFTER the closing instruction. The closing tells the AI to ask
+  // clarifying questions before engaging; the verse-map/1 framing is metadata
+  // about an output format the user *may* request later. They're separate
+  // concerns, so the framing is in its own demarcated section.
+  if (opts.includeVerseMap) {
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    lines.push(BRIEF_VERSE_MAP_HEADER);
+    lines.push('');
+    lines.push(briefVerseMapBlock(briefId));
+  }
+
+  const md = lines.join('\n').replace(/\n{3,}/g, '\n\n') + '\n';
+  return md;
+}
+
+// downloadBriefMarkdown — trigger a Blob download of an already-built brief.
+function downloadBriefMarkdown(md) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+  a.download = `companion-brief-${Date.now()}.md`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// exportBrief — backward-compatible direct download. Generates and downloads.
+// Sweep 2 callers (smoke tests, etc.) invoke this directly. The Sweep 3 popover
+// button calls previewBrief() instead, which routes through the modal.
+function exportBrief() {
+  const md = generateBriefMarkdown();
+  if (md == null) return;
+  downloadBriefMarkdown(md);
+}
+
+// ---- Brief popover ----
+function toggleBriefPopover() {
+  const pop = document.getElementById('brief-popover');
+  if (!pop) return;
+  if (pop.classList.contains('visible')) {
+    pop.classList.remove('visible');
+  } else {
+    populateBriefInputs();
+    pop.classList.add('visible');
+  }
+}
+
+function populateBriefInputs() {
+  const taskSel = document.getElementById('brief-task');
+  if (taskSel) taskSel.value = briefOptions.task;
+  const lg = document.getElementById('brief-include-legend');
+  if (lg) lg.checked = briefOptions.includeLegend;
+  const sc = document.getElementById('brief-include-scraps');
+  if (sc) sc.checked = briefOptions.includeScraps;
+  const lt = document.getElementById('brief-include-late');
+  if (lt) lt.checked = briefOptions.includeLate;
+  // Sweep 4 — verse-map/1 toggle
+  const vm = document.getElementById('brief-include-versemap');
+  if (vm) vm.checked = briefOptions.includeVerseMap;
+  // Sweep 3 — preamble override
+  const pa = document.getElementById('brief-preamble');
+  if (pa) pa.value = briefOptions.preambleOverride || '';
+}
+
+function initBriefPopover() {
+  const taskSel = document.getElementById('brief-task');
+  if (taskSel) {
+    taskSel.addEventListener('change', () => {
+      briefOptions.task = taskSel.value;
+      saveBriefOptions();
+    });
+  }
+  const lg = document.getElementById('brief-include-legend');
+  if (lg) {
+    lg.addEventListener('change', () => { briefOptions.includeLegend = lg.checked; saveBriefOptions(); });
+  }
+  const sc = document.getElementById('brief-include-scraps');
+  if (sc) {
+    sc.addEventListener('change', () => { briefOptions.includeScraps = sc.checked; saveBriefOptions(); });
+  }
+  const lt = document.getElementById('brief-include-late');
+  if (lt) {
+    lt.addEventListener('change', () => { briefOptions.includeLate = lt.checked; saveBriefOptions(); });
+  }
+  // Sweep 4 — verse-map/1 toggle
+  const vm = document.getElementById('brief-include-versemap');
+  if (vm) {
+    vm.addEventListener('change', () => { briefOptions.includeVerseMap = vm.checked; saveBriefOptions(); });
+  }
+  // Sweep 3 — preamble override textarea + reset button
+  const pa = document.getElementById('brief-preamble');
+  if (pa) {
+    pa.addEventListener('input', () => {
+      briefOptions.preambleOverride = pa.value;
+      saveBriefOptions();
+    });
+  }
+  const paReset = document.getElementById('brief-preamble-reset');
+  if (paReset) {
+    paReset.addEventListener('click', () => {
+      briefOptions.preambleOverride = '';
+      if (pa) pa.value = '';
+      saveBriefOptions();
+    });
+  }
+  const gen = document.getElementById('brief-generate');
+  if (gen) {
+    gen.addEventListener('click', () => {
+      const pop = document.getElementById('brief-popover');
+      if (pop) pop.classList.remove('visible');
+      // Sweep 3 — preview-then-download instead of immediate download.
+      previewBrief();
+    });
+  }
+  // Close on outside click
+  document.addEventListener('mousedown', e => {
+    if (isMenuLocked()) return; // Sweep 5: lock guard
+    const pop = document.getElementById('brief-popover');
+    if (!pop || !pop.classList.contains('visible')) return;
+    if (pop.contains(e.target)) return;
+    if (e.target.closest('button') && e.target.textContent.trim() === '⬆ brief') return;
+    pop.classList.remove('visible');
+  });
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (isMenuLocked()) return; // Sweep 5: lock guard
+    const pop = document.getElementById('brief-popover');
+    if (pop && pop.classList.contains('visible')) {
+      pop.classList.remove('visible');
+    }
+  });
+}
+
+// ============================================================
+// Companion Sweep 3 — late visualization, tooltips, preview modal
+// ============================================================
+//
+// Visual extensions to existing surfaces (scrap indicator, edges) live in
+// the functions they extend (updateScrapIndicator, redrawEdges) and in the
+// CSS section. Self-contained additions live here.
+
+// ---- Highlight legend tooltip (hover meaning over highlighted spans) ----
+//
+// Uses event delegation at the document level. On mouseover we walk up
+// from the target looking for the nearest ancestor with a recognised
+// highlight background-color. If found AND that color has a meaning in
+// the active workspace's legend, we show the tooltip near the cursor.
+// Mouseout / leaving the highlighted ancestor hides it.
+//
+// The tooltip is purely informational, pointer-events: none. It does not
+// participate in selection, formatting, or any other behaviour.
+
+let _tipEl = null;
+let _tipCurrentHost = null; // the highlighted ancestor currently being hovered
+
+function _findHighlightAncestor(el) {
+  // Walk up to the nearest editable container (stop at .node-body or #ne-body).
+  // Only spans/elements inside an editable region count.
+  let n = el;
+  let crossedEditable = false;
+  while (n && n !== document.body) {
+    if (n.classList && (n.classList.contains('node-body') || n.id === 'ne-body')) {
+      crossedEditable = true;
+      break;
+    }
+    n = n.parentNode;
+  }
+  if (!crossedEditable) return null;
+  // Now walk from the original element up to that container, looking for
+  // the closest ancestor with a recognised highlight bg.
+  let cur = el;
+  while (cur && cur !== document.body) {
+    if (cur.classList && (cur.classList.contains('node-body') || cur.id === 'ne-body')) return null;
+    if (cur.style && cur.style.backgroundColor) {
+      const name = rgbaToColorName(cur.style.backgroundColor);
+      if (name) return { el: cur, color: name };
+    }
+    cur = cur.parentNode;
+  }
+  return null;
+}
+
+function _positionTooltip(clientX, clientY) {
+  if (!_tipEl) return;
+  const margin = 8;
+  const offX = 12;
+  const offY = 18;
+  // Render once to measure
+  _tipEl.style.left = '0px';
+  _tipEl.style.top  = '0px';
+  const rect = _tipEl.getBoundingClientRect();
+  const w = rect.width  || 200;
+  const h = rect.height || 40;
+  let x = clientX + offX;
+  let y = clientY + offY;
+  if (x + w + margin > window.innerWidth)  x = clientX - w - offX;
+  if (y + h + margin > window.innerHeight) y = clientY - h - offY;
+  if (x < margin) x = margin;
+  if (y < margin) y = margin;
+  _tipEl.style.left = x + 'px';
+  _tipEl.style.top  = y + 'px';
+}
+
+function _showTipFor(host, color, clientX, clientY) {
+  const ws = getActiveWs();
+  const meaning = (ws && ws.highlightLegend && ws.highlightLegend[color]) ? ws.highlightLegend[color].trim() : '';
+  if (!meaning) {
+    _hideTooltip();
+    return;
+  }
+  if (!_tipEl) return;
+  _tipEl.textContent = meaning;
+  _tipEl.classList.add('visible');
+  _tipCurrentHost = host;
+  _positionTooltip(clientX, clientY);
+}
+
+function _hideTooltip() {
+  if (!_tipEl) return;
+  _tipEl.classList.remove('visible');
+  _tipCurrentHost = null;
+}
+
+function _onHighlightMouseover(e) {
+  const found = _findHighlightAncestor(e.target);
+  if (!found) {
+    if (_tipCurrentHost) _hideTooltip();
+    return;
+  }
+  if (found.el === _tipCurrentHost) {
+    // Same host — just reposition to follow cursor a bit.
+    _positionTooltip(e.clientX, e.clientY);
+    return;
+  }
+  _showTipFor(found.el, found.color, e.clientX, e.clientY);
+}
+
+function _onHighlightMouseout(e) {
+  if (!_tipCurrentHost) return;
+  // Only hide if we're truly leaving the host (relatedTarget is outside it).
+  const rel = e.relatedTarget;
+  if (rel && _tipCurrentHost.contains(rel)) return;
+  _hideTooltip();
+}
+
+function _onHighlightMousemove(e) {
+  if (!_tipCurrentHost) return;
+  // Cheap follow-cursor while inside the host.
+  _positionTooltip(e.clientX, e.clientY);
+}
+
+function initHighlightTooltip() {
+  _tipEl = document.getElementById('highlight-tooltip');
+  if (!_tipEl) return;
+  document.addEventListener('mouseover', _onHighlightMouseover);
+  document.addEventListener('mouseout',  _onHighlightMouseout);
+  document.addEventListener('mousemove', _onHighlightMousemove);
+}
+
+// ---- Brief preview modal ----
+//
+// previewBrief() generates the markdown via generateBriefMarkdown(), then
+// populates and shows the modal. Buttons: copy (clipboard), close, download
+// (commits the actual file download). The existing exportBrief() remains
+// the direct-download path used by smoke tests and external callers.
+
+let _bpCurrentMd = null;
+
+function previewBrief() {
+  const md = generateBriefMarkdown();
+  if (md == null) return; // empty workspace; alert was already shown
+  _bpCurrentMd = md;
+  const body = document.getElementById('bp-body');
+  if (body) body.textContent = md;
+  const modal = document.getElementById('brief-preview');
+  const back  = document.getElementById('brief-preview-backdrop');
+  if (back) {
+    back.style.display = 'block';
+    requestAnimationFrame(() => back.classList.add('visible'));
+  }
+  if (modal) {
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => modal.classList.add('visible'));
+  }
+}
+
+function closeBriefPreview() {
+  const modal = document.getElementById('brief-preview');
+  const back  = document.getElementById('brief-preview-backdrop');
+  if (modal) {
+    modal.classList.remove('visible');
+    setTimeout(() => { if (!modal.classList.contains('visible')) modal.style.display = 'none'; }, 220);
+  }
+  if (back) {
+    back.classList.remove('visible');
+    setTimeout(() => { if (!back.classList.contains('visible')) back.style.display = 'none'; }, 220);
+  }
+  // Reset copy button label if it was flashed
+  const copyBtn = document.getElementById('bp-copy');
+  if (copyBtn) {
+    copyBtn.textContent = 'copy';
+    copyBtn.classList.remove('copied');
+  }
+}
+
+function _bpCopyToClipboard() {
+  if (_bpCurrentMd == null) return;
+  const copyBtn = document.getElementById('bp-copy');
+  const flash = () => {
+    if (!copyBtn) return;
+    copyBtn.textContent = 'copied';
+    copyBtn.classList.add('copied');
+    setTimeout(() => { copyBtn.textContent = 'copy'; copyBtn.classList.remove('copied'); }, 1200);
+  };
+  // Prefer the async clipboard API
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(_bpCurrentMd).then(() => {
+      flash();
+      if (window.nx) window.nx.emit('companion.brief.copied', { md: _bpCurrentMd, ts: Date.now() });
+    }, _bpCopyFallback);
+  } else {
+    _bpCopyFallback();
+  }
+}
+
+function _bpCopyFallback() {
+  // Last-resort: select the <pre> contents so the user can ctrl-c manually.
+  const body = document.getElementById('bp-body');
+  if (!body) return;
+  const range = document.createRange();
+  range.selectNodeContents(body);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  const copyBtn = document.getElementById('bp-copy');
+  if (copyBtn) copyBtn.textContent = 'select+copy';
+}
+
+function initBriefPreview() {
+  const closeX  = document.getElementById('bp-close');
+  const closeBt = document.getElementById('bp-close-btn');
+  const dl      = document.getElementById('bp-download');
+  const cp      = document.getElementById('bp-copy');
+  const back    = document.getElementById('brief-preview-backdrop');
+
+  if (closeX)  closeX.addEventListener('click', closeBriefPreview);
+  if (closeBt) closeBt.addEventListener('click', closeBriefPreview);
+  if (back)    back.addEventListener('click', () => {
+    if (isMenuLocked()) return; // Sweep 5: lock guard — backdrop click ignored when locked
+    closeBriefPreview();
+  });
+  if (cp)      cp.addEventListener('click', _bpCopyToClipboard);
+  if (dl) {
+    dl.addEventListener('click', () => {
+      if (_bpCurrentMd != null) downloadBriefMarkdown(_bpCurrentMd);
+      closeBriefPreview();
+    });
+  }
+  // Escape closes the modal (if open)
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (isMenuLocked()) return; // Sweep 5: lock guard
+    const modal = document.getElementById('brief-preview');
+    if (modal && modal.classList.contains('visible')) {
+      e.stopPropagation();
+      closeBriefPreview();
+    }
+  }, true); // capture so we beat the popover's own escape handler
+}
+
+// ============================================================
+// Companion Sweep 5 — Menu lock (double-tap Ctrl) + direct brief copy
+// ============================================================
+//
+// The menu-lock state is a global boolean. When true, every popover/modal's
+// outside-click and Escape close handlers no-op. The user toggles it by
+// tapping Ctrl (or Cmd on Mac) twice within 400ms — but ONLY when the second
+// tap is a fresh keydown (not a held key, not part of a Ctrl+X shortcut).
+//
+// The visual indicator chip (top-right) appears only while locked, doubles as
+// a click-to-unlock affordance, and a transient toast confirms each toggle.
+//
+// All existing close handlers consult `isMenuLocked()` via a guard added at
+// each callsite (legend popover mousedown/Escape, brief popover mousedown/
+// Escape, brief preview modal Escape/backdrop, note style panel mousedown,
+// toolbar outside-click).
+
+let _menuLocked = false;
+let _lastCtrlTap = 0;
+const MENU_LOCK_DOUBLE_TAP_MS = 400;
+
+function isMenuLocked() { return _menuLocked; }
+
+function setMenuLock(v) {
+  _menuLocked = !!v;
+  const indicator = document.getElementById('menu-lock-indicator');
+  if (indicator) indicator.classList.toggle('visible', _menuLocked);
+  document.body.classList.toggle('menu-locked', _menuLocked);
+  showMenuLockToast(_menuLocked ? '🔒 menu locked' : '🔓 menu unlocked');
+}
+
+function toggleMenuLock() { setMenuLock(!_menuLocked); }
+
+let _menuLockToastTimer = null;
+function showMenuLockToast(text) {
+  let t = document.getElementById('menu-lock-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'menu-lock-toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = text;
+  t.classList.add('visible');
+  if (_menuLockToastTimer) clearTimeout(_menuLockToastTimer);
+  _menuLockToastTimer = setTimeout(() => t.classList.remove('visible'), 1500);
+}
+
+// Single keydown listener tracks shortcut activity (Ctrl+other-key) and
+// auto-repeats — both reset the double-tap timer. The actual toggle fires
+// from keyup, which is the canonical pattern for double-modifier detection:
+// keyup fires exactly once per physical release and is immune to auto-repeat
+// or browser-level Ctrl interception.
+//
+// Reset cases:
+//   1. Any non-Ctrl key WITH Ctrl held (e.g. Ctrl+S) — that's a shortcut.
+//   2. A Ctrl auto-repeat (held for >500ms typically) — not a fresh tap.
+//
+// Trigger: TWO keyup events of Ctrl/Meta within MENU_LOCK_DOUBLE_TAP_MS.
+document.addEventListener('keydown', e => {
+  // Any non-Ctrl key while Ctrl is held → shortcut activity, kill the timer.
+  if (e.key !== 'Control' && e.key !== 'Meta') {
+    if (e.ctrlKey || e.metaKey) _lastCtrlTap = 0;
+    return;
+  }
+  // Ctrl/Meta keydown with auto-repeat → user is holding it, not tapping.
+  if (e.repeat) _lastCtrlTap = 0;
+});
+
+document.addEventListener('keyup', e => {
+  if (e.key !== 'Control' && e.key !== 'Meta') return;
+  // Don't toggle while focus is inside an editable surface — the user is
+  // actively typing and a stray Ctrl-Ctrl shouldn't hijack their flow.
+  // Exception: if menu is already locked, allow keyup detection so they
+  // can unlock without losing their cursor.
+  const ae = document.activeElement;
+  const inEditable = ae && (
+    ae.tagName === 'INPUT' ||
+    ae.tagName === 'TEXTAREA' ||
+    ae.isContentEditable === true ||
+    ae.contentEditable === 'true' ||
+    ae.contentEditable === 'plaintext-only'
+  );
+  if (inEditable && !_menuLocked) return;
+  const now = Date.now();
+  if (_lastCtrlTap !== 0 && now - _lastCtrlTap < MENU_LOCK_DOUBLE_TAP_MS) {
+    toggleMenuLock();
+    _lastCtrlTap = 0;
+    return;
+  }
+  _lastCtrlTap = now;
+});
+
+// Indicator click → unlock (escape hatch)
+document.addEventListener('click', e => {
+  if (e.target && e.target.id === 'menu-lock-indicator') {
+    setMenuLock(false);
+  }
+});
+
+// ---- Direct copy from popover ----
+//
+// One-click "copy brief for AI" — generates the brief markdown, copies to
+// clipboard, flashes a confirmation on the button. On clipboard failure
+// (e.g., insecure origin), falls back to opening the preview modal so the
+// user can copy manually.
+function initBriefDirectCopy() {
+  const btn = document.getElementById('brief-direct-copy');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const md = generateBriefMarkdown();
+    if (md == null) return; // empty workspace; alert already fired
+    const orig = btn.textContent;
+    const flashOk = (msg) => {
+      btn.textContent = msg;
+      btn.classList.add('flashed');
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.classList.remove('flashed');
+      }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(md).then(
+        () => {
+          flashOk('✓ copied — paste into AI chat');
+          if (window.nx) window.nx.emit('companion.brief.copied', { md, ts: Date.now() });
+        },
+        () => {
+          previewBrief();
+          alert('Could not auto-copy (browser security). Use the COPY button in the preview window.');
+        }
+      );
+    } else {
+      previewBrief();
+    }
+  });
+}
+
+// Wire the direct-copy button after DOM is ready. The existing init flow
+// runs `initBriefPopover()` already; this is a separate hook that cooperates.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initBriefDirectCopy);
+} else {
+  initBriefDirectCopy();
+}
+
+// ============================================================
+// Companion Sweep 6 — Noob mode + guide modal + tooltips
+// ============================================================
+//
+// Two UI modes — `noob` (default for first-time users; bigger buttons, tooltips,
+// guide on launch) and `calm` (current minimalist look). Mode persists in
+// localStorage. First-time-ever visitors land in noob mode and see the guide.
+// Returning users land in whatever mode they chose last.
+//
+// The mode is applied via body class `ui-noob` (calm = no class). All CSS
+// changes for mode-specific styling are gated on this class, so toggling
+// is purely additive — no DOM rebuild required.
+
+const UI_MODE_KEY = 'companion:ui-mode:v1';
+const GUIDE_DISMISSED_KEY = 'companion:guide-dismissed:v1';
+
+function loadUiMode() {
+  const saved = localStorage.getItem(UI_MODE_KEY);
+  if (saved === 'noob' || saved === 'calm') return saved;
+  return 'noob'; // first-time default
+}
+function saveUiMode(mode) { localStorage.setItem(UI_MODE_KEY, mode); }
+function isGuideDismissed() { return localStorage.getItem(GUIDE_DISMISSED_KEY) === 'true'; }
+function setGuideDismissed(v) { localStorage.setItem(GUIDE_DISMISSED_KEY, v ? 'true' : 'false'); }
+
+let _uiMode = 'noob'; // initialized properly by initSweep6
+
+function applyUiMode(mode) {
+  _uiMode = mode;
+  document.body.classList.toggle('ui-noob', mode === 'noob');
+  const chip = document.getElementById('mode-chip');
+  if (chip) chip.textContent = mode === 'noob' ? 'noob mode' : 'calm mode';
+  const guideToggleBtn = document.getElementById('guide-mode-toggle');
+  if (guideToggleBtn) {
+    guideToggleBtn.textContent = mode === 'noob' ? 'switch to calm mode' : 'switch to noob mode';
+  }
+}
+
+function toggleUiMode() {
+  const next = _uiMode === 'noob' ? 'calm' : 'noob';
+  applyUiMode(next);
+  saveUiMode(next);
+  showMenuLockToast(next === 'noob' ? '🌱 noob mode (bigger buttons, tooltips)' : '🍃 calm mode (minimal)');
+}
+
+function showGuide() {
+  const modal = document.getElementById('guide-modal');
+  const back  = document.getElementById('guide-backdrop');
+  if (!modal || !back) return;
+  // Sync the "don't show again" checkbox to current state
+  const cb = document.getElementById('guide-dont-show-again');
+  if (cb) cb.checked = isGuideDismissed();
+  modal.classList.add('visible');
+  back.classList.add('visible');
+}
+
+function hideGuide() {
+  const modal = document.getElementById('guide-modal');
+  const back  = document.getElementById('guide-backdrop');
+  if (modal) modal.classList.remove('visible');
+  if (back)  back.classList.remove('visible');
+  // Persist the "don't show again" choice on close
+  const cb = document.getElementById('guide-dont-show-again');
+  if (cb) setGuideDismissed(cb.checked);
+}
+
+function initSweep6() {
+  // Apply persisted mode on boot
+  applyUiMode(loadUiMode());
+
+  // Wire mode chip click → toggle
+  const chip = document.getElementById('mode-chip');
+  if (chip) chip.addEventListener('click', toggleUiMode);
+
+  // Wire guide close button
+  const closeBtn = document.getElementById('guide-close-btn');
+  if (closeBtn) closeBtn.addEventListener('click', hideGuide);
+
+  // Wire guide's mode-toggle convenience button
+  const modeToggleBtn = document.getElementById('guide-mode-toggle');
+  if (modeToggleBtn) modeToggleBtn.addEventListener('click', toggleUiMode);
+
+  // Wire backdrop click to close guide (respects menu lock)
+  const back = document.getElementById('guide-backdrop');
+  if (back) back.addEventListener('click', () => {
+    if (isMenuLocked()) return;
+    hideGuide();
+  });
+
+  // Esc closes guide (respects lock)
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (isMenuLocked()) return;
+    const modal = document.getElementById('guide-modal');
+    if (modal && modal.classList.contains('visible')) {
+      e.stopPropagation();
+      hideGuide();
+    }
+  }, true);
+
+  // First-launch behavior: show guide if not dismissed
+  if (!isGuideDismissed()) {
+    // Defer slightly so the rest of the canvas finishes wiring first
+    setTimeout(showGuide, 200);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSweep6);
+} else {
+  initSweep6();
+}
+</script>
+</body>
+</html>

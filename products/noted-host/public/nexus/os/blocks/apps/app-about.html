@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About</title>
+<style>
+:root { color-scheme: dark; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 13px; }
+body { background: #111318; color: #d2d5de; display: flex; flex-direction: column; }
+#nx-boot-screen {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px;
+}
+#nx-boot-icon  { font-size: 40px; }
+#nx-boot-title { font-size: 15px; font-weight: 600; }
+#nx-boot-state { font-size: 10px; color: #6b7089; letter-spacing: 1px; margin-top: 4px; }
+#nx-app { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; }
+body.nx-mounted #nx-boot-screen { display: none; }
+body.nx-mounted #nx-app         { display: flex; }
+/* Scrollbars */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #262a35; border-radius: 3px; }
+/* Shared surface tokens */
+:root {
+  --bg: #08090c; --surface: #111318; --surface-2: #181b22; --surface-3: #1f222b;
+  --border: #262a35; --border-hi: #363b4a; --text: #d2d5de; --text-dim: #6b7089;
+  --text-muted: #3e4255; --accent: #4dbb7a; --accent-dim: rgba(77,187,122,.10);
+  --danger: #ef4444; --warn: #f59e0b; --info: #3b82f6; --radius: 6px;
+}
+
+#about-body {
+  flex: 1; overflow-y: auto; padding: 28px 32px;
+  background: var(--bg); display: flex; flex-direction: column; gap: 20px;
+}
+.about-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 20px;
+}
+.about-card h2 { font-size: 11px; font-weight: 700; color: var(--accent);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+.about-row { display: flex; justify-content: space-between; padding: 5px 0;
+  border-bottom: 1px solid var(--border); font-size: 12px; }
+.about-row:last-child { border-bottom: none; }
+.about-row span:first-child { color: var(--text-dim); }
+.about-row span:last-child  { color: var(--text); font-weight: 500; }
+.about-logo { font-size: 48px; text-align: center; margin-bottom: 6px; }
+.about-tagline { text-align: center; font-size: 11px; color: var(--text-dim);
+  letter-spacing: 0.5px; }
+
+</style>
+</head>
+<body>
+
+<!-- Shown during protocol handshake -->
+<div id="nx-boot-screen">
+  <div id="nx-boot-icon">⬡</div>
+  <div id="nx-boot-title">About</div>
+  <div id="nx-boot-state">WAITING</div>
+</div>
+
+<!-- App UI — revealed on MOUNTED -->
+<div id="nx-app">
+  <div id="about-body">
+    <div class="about-card" style="text-align:center">
+      <div class="about-logo">⬡</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">Nexus OS</div>
+      <div class="about-tagline">Browser-native desktop environment</div>
+    </div>
+    <div class="about-card">
+      <h2>System</h2>
+      <div class="about-row"><span>Version</span><span id="ab-version">v3.0</span></div>
+      <div class="about-row"><span>Kernel</span><span>v4.1</span></div>
+      <div class="about-row"><span>Protocol</span><span>BOOT/DECLARE/MOUNT/PING</span></div>
+      <div class="about-row"><span>Uptime</span><span id="ab-uptime">—</span></div>
+    </div>
+    <div class="about-card">
+      <h2>Runtime</h2>
+      <div class="about-row"><span>Blocks running</span><span id="ab-blocks">—</span></div>
+      <div class="about-row"><span>Events received</span><span id="ab-events">0</span></div>
+      <div class="about-row"><span>User agent</span><span id="ab-ua" style="font-size:10px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span></div>
+    </div>
+    <div class="about-card">
+      <h2>Credits</h2>
+      <div class="about-row"><span>Built with</span><span>Vanilla JS · No frameworks</span></div>
+      <div class="about-row"><span>Font</span><span>JetBrains Mono</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="../../engines/nexus-block-client.js"></script>
+<script>
+"use strict";
+// ══════════════════════════════════════════════════════════════
+//  Nexus OS — Managed Block  |  About
+//  Uses engines/nexus-block-client.js for the kernel handshake.
+// ══════════════════════════════════════════════════════════════
+
+const APP_META = {
+  title:       "About",
+  icon:        "⬡",
+  description: "System information",
+  visible:     true
+};
+
+const nx = window.NexusBlockClient?.bootBlock({
+  manifest: {
+    emits:    [],
+    consumes: ["nexus.kernel.log"],
+    app:      APP_META
+  },
+  onMessage({ channel }) {
+    if (channel === "nexus.kernel.log") {
+      evCount++;
+      const el = document.getElementById("ab-events");
+      if (el) el.textContent = evCount;
+    }
+  }
+});
+
+
+let   bootAt  = null;
+let   evCount = 0;
+
+if (nx) {
+  nx.ready.then(() => {
+    document.body.classList.add("nx-mounted");
+    nx.subscribe("nexus.kernel.log");
+    document.getElementById("ab-ua").textContent = navigator.userAgent;
+    bootAt = Date.now();
+    setInterval(updateUptime, 1000);
+    updateUptime();
+  });
+}
+
+function updateUptime() {
+  if (!bootAt) return;
+  const sec = Math.floor((Date.now() - bootAt) / 1000);
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  document.getElementById("ab-uptime").textContent =
+    (h ? h + "h " : "") + (m ? m + "m " : "") + s + "s";
+}
+
+
+</script>
+</body>
+</html>

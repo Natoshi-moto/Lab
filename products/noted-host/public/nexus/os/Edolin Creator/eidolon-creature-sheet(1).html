@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIDOLON · CREATURE SHEET</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070b;--bg2:#0f0f14;--bg3:#161620;
+  --line:#1e1e28;--line2:#2e2e3c;
+  --text:#e0dcea;--dim:#7a7a88;--dim2:#3a3a48;
+  --accent:#ffcc44;--cyan:#aaeeff;
+  --mono:'JetBrains Mono','SF Mono','Cascadia Mono',Menlo,Consolas,monospace;
+  --phys:#ff8844;--spec:#44aaff;--stat:#aabb33;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;-webkit-font-smoothing:antialiased;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0,rgba(0,0,0,.08) 1px,transparent 1px,transparent 4px);pointer-events:none;z-index:999}
+
+/* ── LAYOUT ── */
+#app{height:100vh;display:grid;grid-template-rows:38px 1fr 44px;overflow:hidden}
+#topbar{display:flex;align-items:center;gap:9px;padding:0 14px;background:var(--bg2);border-bottom:1px solid var(--line)}
+#brand{font-size:11px;letter-spacing:3px;font-weight:700}
+#brand b{color:var(--accent)}
+#topbar-status{margin-left:auto;color:var(--dim);font-size:10px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+#main{display:grid;grid-template-columns:420px 1fr;overflow:hidden;min-height:0}
+#footer{display:flex;align-items:center;gap:7px;padding:0 12px;background:var(--bg2);border-top:1px solid var(--line);overflow:hidden}
+#footer-status{margin-left:auto;color:var(--dim);font-size:10px;letter-spacing:1px;white-space:nowrap}
+
+/* ── PREVIEW COLUMN ── */
+#preview-col{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--line);overflow:hidden;min-height:0}
+#canvas-wrap{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#040408 0%,#020205 100%);overflow:hidden}
+#preview-canvas{display:block;width:100%;height:100%;max-width:100%;max-height:100%}
+#canvas-info{flex:0 0 auto;padding:10px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;background:var(--bg2)}
+#type-chips-display{display:flex;flex-wrap:wrap;gap:5px;min-height:18px}
+.type-display-chip{font-size:9px;letter-spacing:1.5px;border:1px solid currentColor;padding:2px 7px;text-transform:uppercase;border-radius:1px}
+#ability-line{color:var(--dim);font-size:10px;letter-spacing:.5px;min-height:14px}
+
+/* ── PANEL COLUMN ── */
+#panel-col{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2);min-height:0}
+#tab-bar{display:flex;border-bottom:1px solid var(--line);flex-shrink:0}
+.tab-btn{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--dim);background:transparent;border:none;border-bottom:2px solid transparent;padding:10px 12px;cursor:pointer;text-transform:uppercase;transition:color .1s,border-color .1s;flex:1}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+#tab-content{flex:1;overflow-y:auto;padding:14px;min-height:0}
+
+/* ── BUTTONS ── */
+.btn{font-family:var(--mono);font-size:10px;letter-spacing:.8px;color:var(--dim);background:transparent;border:1px solid var(--line);padding:7px 10px;border-radius:2px;cursor:pointer;white-space:nowrap;transition:all .1s;text-transform:lowercase}
+.btn:hover{border-color:var(--line2);color:var(--text);background:var(--bg3)}
+.btn.primary{color:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent);color:#111}
+.btn.danger{color:#ff5566;border-color:#ff5566}
+.btn.danger:hover{background:#ff5566;color:#fff}
+.btn.sm{padding:4px 8px;font-size:9px}
+
+/* ── FORM ELEMENTS ── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:9px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.field input[type=text],.field textarea,.field select{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--line);color:var(--text);padding:6px 8px;width:100%;border-radius:1px}
+.field input[type=text]:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.field select{cursor:pointer}
+.field select option{background:var(--bg3)}
+.field textarea{resize:vertical}
+
+/* ── TYPE PICKER ── */
+.type-chip-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.type-chip{font-family:var(--mono);font-size:9px;letter-spacing:1.2px;border:1px solid var(--dim2);color:var(--dim);background:transparent;padding:4px 8px;cursor:pointer;text-transform:uppercase;transition:all .1s;border-radius:1px}
+.type-chip.tc-selected{border-width:2px}
+.type-chip-add{border-color:var(--dim2) !important;color:var(--dim2) !important;background:transparent !important}
+.type-chip-add:hover{border-color:var(--dim) !important;color:var(--dim) !important}
+
+/* ── STAT ROWS ── */
+.stat-row{display:grid;grid-template-columns:52px 1fr 48px;align-items:center;gap:8px;margin-bottom:7px}
+.stat-label{font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-align:right;white-space:nowrap}
+input[type=range]{appearance:none;width:100%;height:4px;background:var(--bg3);border:1px solid var(--line);outline:none;cursor:pointer;border-radius:0}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:10px;height:14px;background:var(--cyan);border:none;cursor:pointer}
+input[type=range].accent-thumb::-webkit-slider-thumb{background:var(--accent)}
+.stat-num{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--line);color:var(--cyan);padding:3px 5px;width:100%;text-align:right;border-radius:1px}
+.stat-num:focus{outline:none;border-color:var(--cyan)}
+#stat-total{font-size:10px;color:var(--dim);text-align:right;margin:4px 0 10px;letter-spacing:.5px}
+#stat-total b{color:var(--text)}
+
+/* ── MOVE CARDS ── */
+.move-card{border:1px solid var(--line);background:var(--bg3);margin-bottom:12px;border-left:3px solid var(--dim2);border-radius:2px}
+.move-card.physical{border-left-color:var(--phys)}
+.move-card.special{border-left-color:var(--spec)}
+.move-card.status{border-left-color:var(--stat)}
+.move-header{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
+.move-num{font-size:9px;color:var(--dim2);letter-spacing:1px;flex-shrink:0}
+.move-title{font-size:10px;letter-spacing:.8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.move-body{padding:10px}
+.move-body .field{margin-bottom:8px}
+.move-body .stat-row{margin-bottom:6px}
+.cat-btns{display:flex;gap:5px}
+.cat-btn{font-family:var(--mono);font-size:9px;letter-spacing:1px;border:1px solid var(--line);color:var(--dim);background:transparent;padding:4px 10px;cursor:pointer;border-radius:1px;transition:all .1s}
+.cat-btn:hover{color:var(--text);border-color:var(--line2)}
+.cat-btn.phys-active{color:var(--phys);border-color:var(--phys);background:rgba(255,136,68,.08)}
+.cat-btn.spec-active{color:var(--spec);border-color:var(--spec);background:rgba(68,170,255,.08)}
+.cat-btn.stat-active{color:var(--stat);border-color:var(--stat);background:rgba(170,187,51,.08)}
+.power-row-disabled{opacity:.4;pointer-events:none}
+
+/* ── FLAVOR ── */
+#catch-label{font-size:10px;color:var(--accent);margin-top:4px;letter-spacing:.5px}
+
+/* ── EVOLUTION ── */
+.evo-search{position:relative}
+.evo-search input{width:100%;font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--line);color:var(--text);padding:6px 8px;border-radius:1px}
+.evo-search input:focus{outline:none;border-color:var(--accent)}
+.evo-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--bg3);border:1px solid var(--line);border-top:none;z-index:50;max-height:160px;overflow-y:auto;display:none}
+.evo-opt{padding:7px 10px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .1s}
+.evo-opt:hover{background:var(--line)}
+.evo-opt span{color:var(--dim);font-size:9px}
+.evo-clear{font-size:9px;color:var(--dim);cursor:pointer;padding:3px 7px;border:1px solid var(--line);background:transparent;font-family:var(--mono);border-radius:1px;margin-top:4px}
+.evo-clear:hover{color:#ff5566;border-color:#ff5566}
+.evo-linked{margin-top:12px;font-size:9px;color:var(--dim);line-height:2;border-top:1px solid var(--line);padding-top:10px}
+.evo-linked b{color:var(--text)}
+
+/* ── ABILITY ── */
+#ability-desc-line{font-size:9px;color:var(--dim);margin-top:4px;line-height:1.5;min-height:14px}
+#custom-ability-fields{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+#custom-ability-fields input,#custom-ability-fields textarea{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--line);color:var(--text);padding:6px 8px;width:100%;border-radius:1px}
+#custom-ability-fields input:focus,#custom-ability-fields textarea:focus{outline:none;border-color:var(--accent)}
+
+/* ── ROSTER PANEL ── */
+#roster-panel{position:fixed;top:0;right:0;bottom:0;width:300px;background:var(--bg2);border-left:1px solid var(--line);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .18s cubic-bezier(.4,0,.2,1)}
+#roster-panel.open{transform:none}
+#roster-header{display:flex;align-items:center;justify-content:space-between;padding:0 14px;height:38px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:2px;color:var(--dim);flex-shrink:0}
+#roster-list{flex:1;overflow-y:auto;padding:10px}
+#roster-empty{color:var(--dim);font-size:10px;padding:12px 4px;letter-spacing:.5px}
+#roster-footer{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-shrink:0}
+.roster-item{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);margin-bottom:6px;background:var(--bg3);border-radius:2px;transition:border-color .1s}
+.roster-item:hover{border-color:var(--line2)}
+.roster-item.active-item{border-color:var(--accent)}
+.roster-mini-canvas{width:48px;height:48px;flex-shrink:0;background:#040408;border-radius:2px}
+.roster-info{flex:1;min-width:0}
+.roster-name{font-size:11px;letter-spacing:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.roster-species{font-size:9px;color:var(--dim);margin-top:2px}
+.roster-type-row{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap}
+.roster-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+
+/* ── DROP ZONE ── */
+#drop-zone{position:fixed;inset:0;background:rgba(5,5,8,.94);border:3px dashed var(--accent);display:none;align-items:center;justify-content:center;z-index:200;color:var(--accent);font-size:20px;letter-spacing:5px}
+#drop-zone.show{display:flex}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+
+/* ── MISC ── */
+.section-note{font-size:9px;color:var(--dim2);letter-spacing:1px;margin-bottom:12px;line-height:1.6}
+hr.rule{border:none;border-top:1px solid var(--line);margin:14px 0}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div id="brand"><b>◆</b> CREATURE SHEET EDITOR</div>
+    <button class="btn sm" onclick="loadFromSlot()">← load active</button>
+    <button class="btn sm" onclick="toggleRoster()">roster ▾</button>
+    <div id="topbar-status"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- PREVIEW COLUMN -->
+    <div id="preview-col">
+      <div id="canvas-wrap">
+        <canvas id="preview-canvas" width="400" height="400"></canvas>
+      </div>
+      <div id="canvas-info">
+        <div id="type-chips-display"></div>
+        <div id="ability-line"></div>
+      </div>
+    </div>
+
+    <!-- PANEL COLUMN -->
+    <div id="panel-col">
+      <div id="tab-bar">
+        <button class="tab-btn active" data-tab="identity" onclick="switchTab('identity')">Identity</button>
+        <button class="tab-btn" data-tab="stats"    onclick="switchTab('stats')">Stats</button>
+        <button class="tab-btn" data-tab="moves"    onclick="switchTab('moves')">Moves</button>
+        <button class="tab-btn" data-tab="flavor"   onclick="switchTab('flavor')">Flavor</button>
+        <button class="tab-btn" data-tab="evolution" onclick="switchTab('evolution')">Evolution</button>
+      </div>
+      <div id="tab-content"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <input type="text" id="footer-name" placeholder="CREATURE NAME" maxlength="32"
+      style="font-family:var(--mono);font-size:11px;letter-spacing:2px;background:var(--bg3);border:1px solid var(--line2);color:var(--text);padding:6px 10px;width:180px;text-transform:uppercase;border-radius:1px"
+      oninput="sheet.name=this.value;renderCanvasInfo();pushToSlotDebounced()"
+      onblur="if(document.activeElement!==this)this.value=sheet.name">
+    <button class="btn primary" onclick="saveToRoster()">save to roster</button>
+    <button class="btn" onclick="exportCreature()">export .json</button>
+    <label class="btn" style="cursor:pointer">import
+      <input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImportFile(event)">
+    </label>
+    <button class="btn" onclick="testInBattle()">test in battle ⚔</button>
+    <div id="footer-status"></div>
+  </div>
+</div>
+
+<!-- ROSTER PANEL -->
+<div id="roster-panel">
+  <div id="roster-header">
+    <span>ROSTER</span>
+    <button class="btn sm" onclick="toggleRoster()">× close</button>
+  </div>
+  <div id="roster-list"></div>
+  <div id="roster-footer">
+    <button class="btn sm" onclick="exportRoster()">export roster.json</button>
+  </div>
+</div>
+
+<!-- DROP ZONE -->
+<div id="drop-zone">DROP FILE</div>
+
+<script>
+'use strict';
+
+// ────────────────────────────────────────────────────────────────
+//  VERBATIM from eidolon-battle-theatre.html
+// ────────────────────────────────────────────────────────────────
+function mulberry32(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let r=s;r=Math.imul(r^(r>>>15),r|1);r^=r+Math.imul(r^(r>>>7),r|61);return((r^(r>>>14))>>>0)/4294967296}}
+
+function renderCreatureOn(ctx,b,x,y,size,t,flip=false,hit=0){ctx.save();ctx.translate(x,y);if(flip)ctx.scale(-1,1);const dna=b.dna,hues=b.hues;const baseR=size*(.18+dna[0]/255*.08),pulse=Math.sin(t*(.5+dna[4]/255*1.2))*.5+.5;const ecy=Math.sin(t*.9)*baseR*.05;const nT=2+Math.floor(dna[1]/255*5),len=baseR*(1+dna[2]/255*1.4),wob=dna[3]/255*.45;let glowR=baseR*(2.1+dna[14]/255*2);let ag=ctx.createRadialGradient(0,ecy,0,0,ecy,glowR);ag.addColorStop(0,`hsla(${hues[0]},80%,55%,${.16*(1+pulse*.3)})`);ag.addColorStop(1,'transparent');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(0,ecy,glowR,0,Math.PI*2);ctx.fill();for(let i=0;i<nT;i++){let a=i/nT*Math.PI*2+Math.sin(t*.5+i*.7)*wob,tx=Math.cos(a)*len,ty=ecy+Math.sin(a)*len*.85,cx=Math.cos(a+.3)*len*.5,cy=ecy+Math.sin(a+.3)*len*.45,tw=4+dna[(i+3)%16]/255*5;ctx.lineCap='round';ctx.strokeStyle='rgba(0,0,0,.9)';ctx.lineWidth=tw+4;ctx.beginPath();ctx.moveTo(0,ecy);ctx.quadraticCurveTo(cx,cy,tx,ty);ctx.stroke();ctx.strokeStyle=`hsla(${hues[i%3]},80%,60%,.78)`;ctx.lineWidth=tw;ctx.beginPath();ctx.moveTo(0,ecy);ctx.quadraticCurveTo(cx,cy,tx,ty);ctx.stroke()}let pts=[];for(let i=0;i<10;i++){let a=i/10*Math.PI*2-Math.PI/2,n=Math.sin(t*.85+i*.95)*(2+dna[3]/255*5);pts.push([Math.cos(a)*(baseR+n),ecy+Math.sin(a)*(baseR+n)])}function path(){ctx.beginPath();for(let i=0;i<pts.length;i++){let p0=pts[(i-1+10)%10],p1=pts[i],p2=pts[(i+1)%10],p3=pts[(i+2)%10],c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];if(!i)ctx.moveTo(p1[0],p1[1]);ctx.bezierCurveTo(c1[0],c1[1],c2[0],c2[1],p2[0],p2[1])}ctx.closePath()}path();ctx.fillStyle=`hsl(${hues[0]},65%,${47+hit*35}%)`;ctx.fill();path();ctx.lineWidth=5;ctx.strokeStyle='rgba(0,0,0,.92)';ctx.stroke();ctx.save();path();ctx.clip();let sg=ctx.createLinearGradient(0,-baseR,0,baseR);sg.addColorStop(.45,'transparent');sg.addColorStop(1,'rgba(0,0,0,.46)');ctx.fillStyle=sg;ctx.fillRect(-baseR*2,-baseR*2,baseR*4,baseR*4);ctx.restore();for(let e=-1;e<=1;e+=2){let ex=e*baseR*.32,ey=ecy-baseR*.14,er=baseR*.2;ctx.fillStyle=`hsl(${hues[2]},18%,93%)`;ctx.strokeStyle='rgba(0,0,0,.82)';ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(ex,ey,er,er,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#030305';ctx.beginPath();ctx.arc(ex+Math.sin(t*.55)*2,ey,er*.38,0,Math.PI*2);ctx.fill()}let cg=ctx.createRadialGradient(0,ecy,0,0,ecy,baseR*.6);cg.addColorStop(0,`hsla(${hues[2]},95%,90%,.75)`);cg.addColorStop(1,'transparent');ctx.fillStyle=cg;ctx.beginPath();ctx.arc(0,ecy,baseR*.65,0,Math.PI*2);ctx.fill();ctx.restore()}
+
+// ────────────────────────────────────────────────────────────────
+//  CONSTANTS  (from spec — identical to battle-theatre values)
+// ────────────────────────────────────────────────────────────────
+const TYPE_LIST = ['TOXIC','SPECTRAL','WILD','IRON','VOID','ANCIENT','LIGHT','SHADOW'];
+const TYPE_COLOR = {TOXIC:'#cc44ff',SPECTRAL:'#33eeff',WILD:'#44ff88',IRON:'#8899cc',VOID:'#5566ff',ANCIENT:'#ffaa44',LIGHT:'#ffdd33',SHADOW:'#aa55cc'};
+const BEATS = {TOXIC:['ANCIENT','WILD'],SPECTRAL:['ANCIENT','VOID'],WILD:['IRON','VOID'],IRON:['SPECTRAL','LIGHT'],VOID:['LIGHT','SHADOW'],ANCIENT:['SHADOW','SPECTRAL'],LIGHT:['TOXIC','ANCIENT'],SHADOW:['VOID','TOXIC']};
+const EFFECT_LIST = [null,'poison','burn','shock','sleep','frost','bleed','flinch','drain','recoil','heal25','heal40','protect','dodge','accDown','defUp2','boostAll','hazardGlyph','hazardSpikes','terrainBreak','echo','multi','pierceProtect'];
+const BASE_MOVES = [
+  {name:'PULSE',  type:'SPECTRAL', cat:'special',  power:40,   accuracy:100, pp:20, effect:null,     desc:'reliable 40'},
+  {name:'STRIKE', type:'WILD',     cat:'physical', power:45,   accuracy:95,  pp:20, effect:null,     desc:'solid physical'},
+  {name:'SHIELD', type:'IRON',     cat:'status',   power:null, accuracy:100, pp:10, effect:'defUp2', desc:'raise def'},
+  {name:'MEND',   type:'LIGHT',    cat:'status',   power:null, accuracy:100, pp:10, effect:'heal25', desc:'restore 25%'},
+];
+const ABILITY_POOL = [
+  {id:'pressure',      name:'Pressure',      desc:'drains extra PP from enemy moves'},
+  {id:'regen',         name:'Regenerator',   desc:'restores 18% HP on switch-out'},
+  {id:'swarm_logic',   name:'Swarm Logic',   desc:'multi-hit moves gain +1 hit'},
+  {id:'acid_blood',    name:'Acid Blood',    desc:'reduces self damage from status'},
+  {id:'phase_skin',    name:'Phase Skin',    desc:'+10 evasion under starlit or voidstorm'},
+  {id:'iron_hide',     name:'Iron Hide',     desc:'+12% def vs physical moves'},
+  {id:'resonator',     name:'Resonator',     desc:'special moves echo for 18% bonus dmg'},
+  {id:'crystal_guard', name:'Crystal Guard', desc:'reduces crit chance from attacks'},
+  {id:'phantom_limb',  name:'Phantom Limb',  desc:'can pierce protect once per battle'},
+  {id:'custom',        name:'Custom',        desc:''},
+];
+
+// battle-theatre TRAIT_NAMES — used for dict-dna → array conversion
+const TRAIT_NAMES = ['venomous','spectral','swarming','titanic','murky','resonant','vital','volatile','ethereal','crystalline','feral','ancient','luminous','toxic','phantom','armored'];
+
+// ────────────────────────────────────────────────────────────────
+//  SHARED STORAGE
+// ────────────────────────────────────────────────────────────────
+function sharedRead(key){try{return JSON.parse(localStorage.getItem(key))}catch{return null}}
+function sharedWrite(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch(e){console.warn('storage write failed',e)}}
+
+// ────────────────────────────────────────────────────────────────
+//  CUSTOM TYPES & EFFECTS
+// ────────────────────────────────────────────────────────────────
+let customTypes   = [];
+let customEffects = [];
+const KEY_CUSTOM_TYPES   = 'eidolon:custom-types:v1';
+const KEY_CUSTOM_EFFECTS = 'eidolon:custom-effects:v1';
+
+function loadCustomTypes(){
+  const s = sharedRead(KEY_CUSTOM_TYPES);
+  if(s?.types){ customTypes = s.types; Object.assign(TYPE_COLOR, s.colors||{}) }
+}
+function saveCustomTypes(){
+  sharedWrite(KEY_CUSTOM_TYPES, {types:customTypes, colors:TYPE_COLOR});
+}
+function loadCustomEffects(){
+  customEffects = sharedRead(KEY_CUSTOM_EFFECTS) || [];
+}
+function saveCustomEffects(){
+  sharedWrite(KEY_CUSTOM_EFFECTS, customEffects);
+}
+
+// ────────────────────────────────────────────────────────────────
+//  STATE
+// ────────────────────────────────────────────────────────────────
+let sheet = {
+  format:'eidolon-creature/1', id:null, name:'', species:'', flavor:'', catchRate:128,
+  dna:{}, seed:null, hues:[200,80,140],
+  types:[], ability:{...ABILITY_POOL[0]},
+  baseStats:{hp:80,atk:60,def:60,spAtk:60,spDef:60,spd:60},
+  moves:BASE_MOVES.map(m=>({...m})),
+  evolvesInto:null, evolvesFrom:null, createdAt:null, source:'creature-sheet',
+};
+let roster    = [];
+let activeTab = 'identity';
+
+// ────────────────────────────────────────────────────────────────
+//  UTILITIES
+// ────────────────────────────────────────────────────────────────
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function setStatus(msg){
+  ['footer-status','topbar-status'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=msg;
+  });
+}
+function download(name,blob){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function safeName(n){return n.replace(/[^a-z0-9_-]/gi,'_').toLowerCase()||'creature'}
+
+// ────────────────────────────────────────────────────────────────
+//  DNA HELPERS
+// ────────────────────────────────────────────────────────────────
+function dnaToRenderArray(dna){
+  if(!dna) return Array(16).fill(128);
+  if(Array.isArray(dna)){
+    const a = dna.slice(0,16).map(Number);
+    while(a.length < 16) a.push(128);
+    return a;
+  }
+  // dict-keyed: map by TRAIT_NAMES
+  return TRAIT_NAMES.map(n => dna[n] ?? 128);
+}
+
+function dnaToStatArray(dna){
+  function get(d,id){ return (d && d[id] != null) ? +d[id] : 128 }
+  function avg(a,b){ return Math.round((a+b)/2) }
+  return {
+    hp:    45 + Math.floor(avg(get(dna,'body_radius'),   get(dna,'core_brightness')) / 255 * 90),
+    atk:   20 + Math.floor(avg(get(dna,'arm_count'),     get(dna,'arm_length'))      / 255 * 75),
+    def:   20 + Math.floor(avg(get(dna,'body_outline'),  get(dna,'body_shadow'))     / 255 * 75),
+    spAtk: 20 + Math.floor(avg(get(dna,'glow_strength'), get(dna,'particle_count'))  / 255 * 75),
+    spDef: 20 + Math.floor(avg(get(dna,'glow_radius'),   get(dna,'core_size'))       / 255 * 75),
+    spd:   15 + Math.floor(avg(get(dna,'arm_wobble_rate'),get(dna,'pulse_rate'))     / 255 * 70),
+  };
+}
+
+// battle-theatre's computeStats() for array-format DNA
+function computeStatsFromArray(dna){
+  return{
+    hp:    45 + Math.floor(dna[7]/255*60),
+    atk:   20 + Math.floor(dna[3]/255*55),
+    def:   20 + Math.floor(dna[5]/255*55),
+    spAtk: 20 + Math.floor(dna[4]/255*55),
+    spDef: 20 + Math.floor(dna[6]/255*55),
+    spd:   15 + Math.floor(dna[2]/255*60),
+  };
+}
+
+function autoStats(){
+  const dna = sheet.dna;
+  if(!dna) return sheet.baseStats;
+  if(Array.isArray(dna)){ return computeStatsFromArray(dnaToRenderArray(dna)); }
+  return dnaToStatArray(dna);
+}
+
+function hueToType(hue){
+  hue = ((hue%360)+360)%360;
+  if(hue<30)  return 'ANCIENT';
+  if(hue<60)  return 'WILD';
+  if(hue<120) return 'TOXIC';
+  if(hue<180) return 'SPECTRAL';
+  if(hue<240) return 'VOID';
+  if(hue<300) return 'IRON';
+  if(hue<330) return 'LIGHT';
+  return 'SHADOW';
+}
+
+function dnaToAbility(dna){
+  const marks = {
+    mark_runes:  dna['mark_runes']  ?? 0,
+    mark_spots:  dna['mark_spots']  ?? 0,
+    mark_drips:  dna['mark_drips']  ?? 0,
+    mark_facets: dna['mark_facets'] ?? 0,
+  };
+  const top = Object.entries(marks).sort((a,b)=>b[1]-a[1])[0][0];
+  const map = {
+    mark_runes:  ABILITY_POOL.find(a=>a.id==='resonator'),
+    mark_spots:  ABILITY_POOL.find(a=>a.id==='pressure'),
+    mark_drips:  ABILITY_POOL.find(a=>a.id==='acid_blood'),
+    mark_facets: ABILITY_POOL.find(a=>a.id==='crystal_guard'),
+  };
+  return map[top] || ABILITY_POOL[0];
+}
+
+function catchRateLabel(v){
+  if(v<=30)  return 'Legendary';
+  if(v<=90)  return 'Very Rare';
+  if(v<=160) return 'Rare';
+  if(v<=210) return 'Uncommon';
+  return 'Common';
+}
+
+// ────────────────────────────────────────────────────────────────
+//  CANVAS / ANIMATION
+// ────────────────────────────────────────────────────────────────
+const previewCanvas = document.getElementById('preview-canvas');
+const previewCtx    = previewCanvas.getContext('2d');
+let t0 = performance.now();
+
+function buildRenderObj(){
+  return { dna: dnaToRenderArray(sheet.dna), hues: sheet.hues || [200,80,140] };
+}
+
+function renderPreviewFrame(){
+  const W = previewCanvas.width, H = previewCanvas.height;
+  const t = (performance.now() - t0) / 1000;
+  // deep-space background
+  previewCtx.fillStyle = '#040408';
+  previewCtx.fillRect(0,0,W,H);
+  const h0 = (sheet.hues||[200])[0];
+  const bg = previewCtx.createRadialGradient(W*.5,H*.52,0,W*.5,H*.52,W*.75);
+  bg.addColorStop(0,`hsla(${h0},45%,10%,.95)`);
+  bg.addColorStop(1,'#020205');
+  previewCtx.fillStyle = bg;
+  previewCtx.fillRect(0,0,W,H);
+  // stars
+  const rng = mulberry32(42);
+  for(let i=0;i<55;i++){
+    previewCtx.fillStyle=`hsla(${h0},40%,90%,${.04+rng()*.22})`;
+    previewCtx.beginPath();
+    previewCtx.arc(rng()*W, rng()*H*.78, .3+rng()*.8, 0, Math.PI*2);
+    previewCtx.fill();
+  }
+  renderCreatureOn(previewCtx, buildRenderObj(), W*.5, H*.62, W*.72, t, false, 0);
+  requestAnimationFrame(renderPreviewFrame);
+}
+
+function renderMiniCanvas(canvas48, dna, hues){
+  const c = canvas48, x = c.getContext('2d');
+  const W=48,H=48;
+  x.fillStyle='#040408'; x.fillRect(0,0,W,H);
+  renderCreatureOn(x, {dna:dnaToRenderArray(dna), hues:hues||[200,80,140]}, W*.5, H*.6, W*.65, performance.now()/1000, false, 0);
+}
+
+// ────────────────────────────────────────────────────────────────
+//  CANVAS INFO (below preview)
+// ────────────────────────────────────────────────────────────────
+function renderCanvasInfo(){
+  const tc = document.getElementById('type-chips-display');
+  if(tc){
+    tc.innerHTML = sheet.types.length
+      ? sheet.types.map(t=>{
+          const col = TYPE_COLOR[t] || '#aaaacc';
+          return `<span class="type-display-chip" style="color:${col}">${esc(t)}</span>`;
+        }).join('')
+      : '<span style="color:var(--dim2);font-size:9px">no type assigned</span>';
+  }
+  const al = document.getElementById('ability-line');
+  if(al){
+    const a = sheet.ability;
+    if(a) al.textContent = `⬡ ${a.id==='custom' ? (a.name||'Custom Ability') : a.name}`;
+    else al.textContent = '';
+  }
+  const fn = document.getElementById('footer-name');
+  if(fn && fn !== document.activeElement) fn.value = sheet.name;
+}
+
+// ────────────────────────────────────────────────────────────────
+//  SHARED SLOT
+// ────────────────────────────────────────────────────────────────
+const KEY_COMPANION = 'nexus:selected-companion:v1';
+let pushTimer;
+function pushToSlotDebounced(){ clearTimeout(pushTimer); pushTimer=setTimeout(pushToSlot,800); }
+function pushToSlot(){
+  sharedWrite(KEY_COMPANION, {
+    format:'eidolon/1', kind:'creature', name:sheet.name,
+    seed:sheet.seed, dna:sheet.dna, hues:sheet.hues,
+    source:'creature-sheet', ts:Date.now(),
+  });
+}
+
+function loadFromSlot(){
+  const raw = sharedRead(KEY_COMPANION);
+  if(!raw || raw.format!=='eidolon/1' || raw.kind!=='creature'){
+    setStatus('no active creature — send one from the forge first'); return;
+  }
+  sheet.dna   = raw.dna   || {};
+  sheet.hues  = raw.hues  || [200,80,140];
+  sheet.seed  = raw.seed  ?? null;
+  if(!sheet.name) sheet.name = raw.name || '';
+  sheet.baseStats = autoStats();
+  sheet.types  = [hueToType(sheet.hues[0])];
+  sheet.ability = Array.isArray(sheet.dna) ? ABILITY_POOL[0] : dnaToAbility(sheet.dna);
+  sheet.moves   = BASE_MOVES.map(m=>({...m}));
+  renderAll();
+  setStatus(`loaded: "${sheet.name||'unnamed'}" from ${raw.source||'forge'}`);
+}
+
+function loadSheetFrom(data){
+  sheet = Object.assign({}, sheet, data);
+  // ensure exactly 4 moves
+  if(!Array.isArray(sheet.moves) || sheet.moves.length < 4){
+    const mv = Array.isArray(sheet.moves) ? sheet.moves : [];
+    while(mv.length < 4) mv.push({...BASE_MOVES[mv.length % BASE_MOVES.length]});
+    sheet.moves = mv.slice(0,4);
+  }
+  renderAll();
+}
+
+// ────────────────────────────────────────────────────────────────
+//  ROSTER
+// ────────────────────────────────────────────────────────────────
+const KEY_ROSTER = 'eidolon:roster:v1';
+
+function saveToRoster(){
+  const nameEl = document.getElementById('footer-name');
+  const name   = (nameEl?.value || sheet.name || '').trim();
+  if(!name){ if(nameEl) nameEl.focus(); setStatus('enter a name first'); return; }
+  sheet.name      = name;
+  sheet.id        = sheet.id || Date.now().toString(36);
+  sheet.createdAt = sheet.createdAt || Date.now();
+  sheet.format    = 'eidolon-creature/1';
+  sheet.source    = 'creature-sheet';
+  const full = buildSheet();
+  const idx  = roster.findIndex(c => c.id === full.id);
+  if(idx >= 0) roster[idx] = {...full}; else roster.unshift({...full});
+  if(roster.length > 200) roster.length = 200;
+  sharedWrite(KEY_ROSTER, roster);
+  rebuildRosterPanel();
+  setStatus(`"${name}" saved to roster`);
+}
+
+function deleteFromRoster(id){
+  roster = roster.filter(c => c.id !== id);
+  sharedWrite(KEY_ROSTER, roster);
+  rebuildRosterPanel();
+  setStatus('deleted');
+}
+
+function loadFromRoster(id){
+  const c = roster.find(r => r.id === id);
+  if(!c) return;
+  loadSheetFrom({...c});
+  const fn = document.getElementById('footer-name');
+  if(fn) fn.value = sheet.name;
+  setStatus(`loaded: "${sheet.name}"`);
+  const rp = document.getElementById('roster-panel');
+  if(rp.classList.contains('open')) toggleRoster();
+}
+
+function rebuildRosterPanel(){
+  const list = document.getElementById('roster-list');
+  if(!list) return;
+  list.innerHTML = '';
+  if(!roster.length){
+    list.innerHTML = '<div id="roster-empty">no creatures in roster</div>'; return;
+  }
+  roster.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'roster-item' + (c.id === sheet.id ? ' active-item' : '');
+
+    const typeHtml = (c.types||[]).map(t =>
+      `<span style="font-size:8px;letter-spacing:1px;color:${TYPE_COLOR[t]||'#aaa'}">${esc(t)}</span>`
+    ).join(' ');
+
+    item.innerHTML =
+      `<canvas class="roster-mini-canvas" width="48" height="48"></canvas>` +
+      `<div class="roster-info">` +
+        `<div class="roster-name">${esc(c.name||'unnamed')}</div>` +
+        `<div class="roster-species">${esc(c.species||'—')}</div>` +
+        `<div class="roster-type-row">${typeHtml}</div>` +
+      `</div>` +
+      `<div class="roster-actions">` +
+        `<button class="btn sm" onclick="loadFromRoster('${esc(c.id)}')">load</button>` +
+        `<button class="btn sm danger" onclick="deleteFromRoster('${esc(c.id)}')">del</button>` +
+      `</div>`;
+
+    list.appendChild(item);
+    const mc = item.querySelector('.roster-mini-canvas');
+    if(mc) setTimeout(() => renderMiniCanvas(mc, c.dna, c.hues), 0);
+  });
+}
+
+function toggleRoster(){
+  const p = document.getElementById('roster-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')) rebuildRosterPanel();
+}
+
+// ────────────────────────────────────────────────────────────────
+//  BUILD SHEET OBJECT
+// ────────────────────────────────────────────────────────────────
+function buildSheet(){
+  return {
+    format:      'eidolon-creature/1',
+    id:          sheet.id || Date.now().toString(36),
+    name:        sheet.name,
+    species:     sheet.species,
+    flavor:      sheet.flavor,
+    catchRate:   sheet.catchRate,
+    dna:         sheet.dna,
+    seed:        sheet.seed,
+    hues:        sheet.hues,
+    types:       sheet.types,
+    ability:     sheet.ability,
+    baseStats:   sheet.baseStats,
+    moves:       sheet.moves.slice(0,4).map(m=>({...m})),
+    evolvesInto: sheet.evolvesInto,
+    evolvesFrom: sheet.evolvesFrom,
+    createdAt:   sheet.createdAt || Date.now(),
+    source:      'creature-sheet',
+  };
+}
+
+// ────────────────────────────────────────────────────────────────
+//  EXPORT / IMPORT
+// ────────────────────────────────────────────────────────────────
+function exportCreature(){
+  const name = (document.getElementById('footer-name')?.value || sheet.name || 'creature').trim();
+  sheet.name = name;
+  const blob = new Blob([JSON.stringify(buildSheet(),null,2)], {type:'application/json'});
+  download(`${safeName(name)}.creature.json`, blob);
+  setStatus(`exported "${name}"`);
+}
+
+function exportRoster(){
+  const blob = new Blob([JSON.stringify(roster,null,2)], {type:'application/json'});
+  download('eidolon-roster.json', blob);
+  setStatus(`exported ${roster.length} creatures`);
+}
+
+function handleImportFile(e){
+  const f = e.target.files[0];
+  e.target.value = '';
+  if(f) importFile(f);
+}
+
+async function importFile(file){
+  let data;
+  try { data = JSON.parse(await file.text()); }
+  catch { setStatus('invalid JSON'); return; }
+
+  if(Array.isArray(data)){
+    const valid = data.filter(c => c.format==='eidolon-creature/1' && c.name);
+    roster = [...valid, ...roster.filter(r=>!valid.find(v=>v.id===r.id))].slice(0,200);
+    sharedWrite(KEY_ROSTER, roster);
+    rebuildRosterPanel();
+    setStatus(`imported ${valid.length} creatures`);
+    return;
+  }
+  if(data.format === 'eidolon-creature/1'){
+    loadSheetFrom(data);
+    setStatus('loaded creature sheet');
+    return;
+  }
+  if(data.format === 'eidolon/1' && data.kind === 'creature'){
+    sheet.dna   = data.dna;
+    sheet.hues  = data.hues;
+    sheet.seed  = data.seed;
+    sheet.name  = data.name || '';
+    sheet.baseStats = autoStats();
+    sheet.types  = [hueToType(sheet.hues[0])];
+    sheet.ability = Array.isArray(sheet.dna) ? ABILITY_POOL[0] : dnaToAbility(sheet.dna);
+    sheet.moves   = BASE_MOVES.map(m=>({...m}));
+    renderAll();
+    setStatus('imported from forge format');
+    return;
+  }
+  setStatus('unrecognised file format');
+}
+
+// ────────────────────────────────────────────────────────────────
+//  TEST IN BATTLE
+// ────────────────────────────────────────────────────────────────
+function testInBattle(){
+  const full = buildSheet();
+  sharedWrite(KEY_COMPANION, {
+    format:'eidolon/1', kind:'creature', name:full.name,
+    seed:full.seed, dna:full.dna, hues:full.hues, source:'creature-sheet', ts:Date.now(),
+  });
+  if(window.nexus?.launch) window.nexus.launch('eidolon-battle-theatre');
+  else window.open('eidolon-battle-theatre.html','_blank');
+  setStatus('opening battle theatre...');
+}
+
+// ────────────────────────────────────────────────────────────────
+//  NEXUS OS
+// ────────────────────────────────────────────────────────────────
+window.addEventListener('message', e => {
+  if(e.data === 'PING') window.parent?.postMessage('PONG','*');
+});
+function emitCreatureSelected(){
+  window.parent?.postMessage({type:'eidolon.creature.selected', payload:buildSheet()},'*');
+}
+
+// ────────────────────────────────────────────────────────────────
+//  TYPE PICKER
+// ────────────────────────────────────────────────────────────────
+function renderTypePicker(containerId, selectedTypes, onChange, allowMulti=true){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const all = [...TYPE_LIST, ...customTypes];
+  container.innerHTML = '';
+
+  all.forEach(type => {
+    const col  = TYPE_COLOR[type] || '#aaaacc';
+    const sel  = selectedTypes.includes(type);
+    const chip = document.createElement('button');
+    chip.className   = 'type-chip' + (sel ? ' tc-selected' : '');
+    chip.textContent = type;
+    chip.style.cssText = `border-color:${col};color:${sel?col:'var(--dim)'};background:${sel?col+'22':'transparent'}`;
+    chip.onclick = () => {
+      let next;
+      if(sel)                            next = selectedTypes.filter(t=>t!==type);
+      else if(!allowMulti)              next = [type];
+      else if(selectedTypes.length < 2) next = [...selectedTypes, type];
+      else return;
+      onChange(next);
+      renderTypePicker(containerId, next, onChange, allowMulti);
+    };
+    container.appendChild(chip);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className   = 'type-chip type-chip-add';
+  addBtn.textContent = '＋ custom';
+  addBtn.onclick = () => {
+    const raw = prompt('New type name (e.g. PLASMA):');
+    if(!raw) return;
+    const clean = raw.trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+    if(!clean || TYPE_LIST.includes(clean) || customTypes.includes(clean)) return;
+    customTypes.push(clean);
+    const hue = clean.split('').reduce((h,c)=>(h*31+c.charCodeAt(0))%360,0);
+    TYPE_COLOR[clean] = `hsl(${hue},75%,70%)`;
+    saveCustomTypes();
+    renderTypePicker(containerId, selectedTypes, onChange, allowMulti);
+  };
+  container.appendChild(addBtn);
+}
+
+// ────────────────────────────────────────────────────────────────
+//  EFFECT DROPDOWN OPTIONS
+// ────────────────────────────────────────────────────────────────
+function effectOptions(selected){
+  const all = [...EFFECT_LIST, ...customEffects.map(e=>e.id)];
+  return all.map(e =>
+    `<option value="${esc(e??'')}" ${selected===e?'selected':''}>${e===null?'— none —':esc(e)}</option>`
+  ).join('') + `<option value="__custom__">＋ custom effect...</option>`;
+}
+
+// ────────────────────────────────────────────────────────────────
+//  TABS
+// ────────────────────────────────────────────────────────────────
+function switchTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tab)
+  );
+  renderTab();
+}
+
+function renderTab(){
+  const el = document.getElementById('tab-content');
+  if(!el) return;
+  if(activeTab==='identity')  el.innerHTML = identityHTML();
+  if(activeTab==='stats')     el.innerHTML = statsHTML();
+  if(activeTab==='moves')     el.innerHTML = movesHTML();
+  if(activeTab==='flavor')    el.innerHTML = flavorHTML();
+  if(activeTab==='evolution') el.innerHTML = evolutionHTML();
+
+  // post-render wiring
+  if(activeTab==='identity'){
+    renderTypePicker('type-picker-identity', sheet.types,
+      t=>{ sheet.types=t; renderCanvasInfo(); pushToSlotDebounced(); }, true);
+    syncAbilityCustom();
+  }
+  if(activeTab==='moves'){
+    for(let i=0;i<4;i++){
+      const mv = sheet.moves[i] || {};
+      renderTypePicker(`move-type-${i}`, [mv.type||'SPECTRAL'],
+        t=>{ if(t[0]) sheet.moves[i].type=t[0]; }, false);
+    }
+  }
+  if(activeTab==='evolution') setupEvoSearch();
+}
+
+// ── IDENTITY TAB ──────────────────────────────────────────────
+function identityHTML(){
+  const a = sheet.ability || ABILITY_POOL[0];
+  const abilOpts = ABILITY_POOL.map(p =>
+    `<option value="${esc(p.id)}" ${a.id===p.id?'selected':''}>${esc(p.name)}</option>`
+  ).join('');
+  return `
+  <div class="field">
+    <label>Name</label>
+    <input type="text" value="${esc(sheet.name)}" maxlength="32" placeholder="VEXLARON"
+      oninput="sheet.name=this.value;renderCanvasInfo();pushToSlotDebounced();const fn=document.getElementById('footer-name');if(fn)fn.value=this.value">
+  </div>
+  <div class="field">
+    <label>Species</label>
+    <input type="text" value="${esc(sheet.species)}" maxlength="48" placeholder="Void Phantom"
+      oninput="sheet.species=this.value">
+  </div>
+  <div class="field">
+    <label>Types <span style="color:var(--dim);font-size:8px">max 2</span></label>
+    <div id="type-picker-identity" class="type-chip-wrap"></div>
+  </div>
+  <div class="field">
+    <label>Ability</label>
+    <select onchange="onAbilityChange(this.value)">${abilOpts}</select>
+    <div id="ability-desc-line">${esc(a.id!=='custom'?a.desc:'')}</div>
+    <div id="custom-ability-fields" style="display:${a.id==='custom'?'flex':'none'}">
+      <input type="text" placeholder="Ability name (max 28 chars)" maxlength="28"
+        value="${a.id==='custom'?esc(a.name):''}"
+        oninput="sheet.ability.name=this.value;renderCanvasInfo()">
+      <textarea placeholder="Description (max 80 chars)" maxlength="80"
+        style="height:48px;resize:none;font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--line);color:var(--text);padding:6px 8px;width:100%"
+        oninput="sheet.ability.desc=this.value">${a.id==='custom'?esc(a.desc):''}</textarea>
+    </div>
+  </div>`;
+}
+
+function onAbilityChange(id){
+  const p = ABILITY_POOL.find(a=>a.id===id);
+  if(p) sheet.ability = {...p};
+  syncAbilityCustom();
+  renderCanvasInfo();
+  pushToSlotDebounced();
+}
+
+function syncAbilityCustom(){
+  const cf = document.getElementById('custom-ability-fields');
+  const ad = document.getElementById('ability-desc-line');
+  if(!cf) return;
+  const isCustom = sheet.ability?.id === 'custom';
+  cf.style.display = isCustom ? 'flex' : 'none';
+  if(ad) ad.textContent = isCustom ? '' : (sheet.ability?.desc||'');
+}
+
+// ── STATS TAB ─────────────────────────────────────────────────
+function statRow(key, label){
+  const v = Math.max(1, Math.min(255, sheet.baseStats[key]||1));
+  const pct = v/255*100;
+  return `
+  <div class="stat-row">
+    <div class="stat-label">${label}</div>
+    <input type="range" min="1" max="255" value="${v}"
+      style="--fill:${pct}%"
+      oninput="sheet.baseStats.${key}=+this.value;
+               this.nextElementSibling.value=this.value;
+               updateStatTotal()">
+    <input type="number" class="stat-num" min="1" max="255" value="${v}"
+      oninput="let v=Math.max(1,Math.min(255,+this.value||1));
+               sheet.baseStats.${key}=v;
+               this.previousElementSibling.value=v;
+               updateStatTotal()">
+  </div>`;
+}
+
+function statsHTML(){
+  const s = sheet.baseStats;
+  const total = Object.values(s).reduce((a,b)=>a+(+b||0),0);
+  return `
+  ${statRow('hp','HP')}
+  ${statRow('atk','ATK')}
+  ${statRow('def','DEF')}
+  ${statRow('spAtk','SP.ATK')}
+  ${statRow('spDef','SP.DEF')}
+  ${statRow('spd','SPD')}
+  <div id="stat-total">TOTAL <b>${total}</b> / 1530</div>
+  <button class="btn sm" onclick="applyAutoStats()">⟳ auto from DNA</button>
+  <div class="section-note" style="margin-top:10px">Derives stats from the creature's DNA axes. Requires a loaded creature.</div>`;
+}
+
+function updateStatTotal(){
+  const el = document.getElementById('stat-total');
+  if(!el) return;
+  const total = Object.values(sheet.baseStats).reduce((a,b)=>a+(+b||0),0);
+  el.innerHTML = `TOTAL <b>${total}</b> / 1530`;
+}
+
+function applyAutoStats(){
+  const dna = sheet.dna;
+  if(!dna || (typeof dna==='object' && !Array.isArray(dna) && !Object.keys(dna).length)){
+    setStatus('no DNA loaded — load a creature first'); return;
+  }
+  sheet.baseStats = autoStats();
+  renderTab();
+  setStatus('stats auto-filled from DNA');
+}
+
+// ── MOVES TAB ─────────────────────────────────────────────────
+function movesHTML(){
+  return sheet.moves.map((m,i) => {
+    const isStatus = m.cat==='status';
+    return `
+    <div class="move-card ${m.cat||'special'}" id="move-card-${i}">
+      <div class="move-header">
+        <span class="move-num">MOVE ${i+1}</span>
+        <span class="move-title" id="move-title-${i}">${esc(m.name||'—')}</span>
+      </div>
+      <div class="move-body">
+        <div class="field" style="margin-bottom:8px">
+          <label>Name</label>
+          <input type="text" maxlength="24" value="${esc(m.name||'')}" placeholder="VOID CLAW"
+            oninput="sheet.moves[${i}].name=this.value;
+                     const t=document.getElementById('move-title-${i}');
+                     if(t)t.textContent=this.value||'—'">
+        </div>
+        <div class="field" style="margin-bottom:8px">
+          <label>Type</label>
+          <div id="move-type-${i}" class="type-chip-wrap"></div>
+        </div>
+        <div class="field" style="margin-bottom:8px">
+          <label>Category</label>
+          <div class="cat-btns">
+            <button class="cat-btn ${m.cat==='physical'?'phys-active':''}" onclick="setMoveCat(${i},'physical',this)">physical</button>
+            <button class="cat-btn ${m.cat==='special'?'spec-active':''}"  onclick="setMoveCat(${i},'special',this)">special</button>
+            <button class="cat-btn ${m.cat==='status'?'stat-active':''}"   onclick="setMoveCat(${i},'status',this)">status</button>
+          </div>
+        </div>
+        <div class="stat-row ${isStatus?'power-row-disabled':''}" id="power-row-${i}">
+          <div class="stat-label">POWER</div>
+          <input type="range" min="1" max="250" value="${m.power||70}" ${isStatus?'disabled':''}
+            oninput="sheet.moves[${i}].power=+this.value;this.nextElementSibling.value=this.value">
+          <input type="number" class="stat-num" min="1" max="250" value="${m.power||70}" ${isStatus?'disabled':''}
+            oninput="let v=Math.max(1,Math.min(250,+this.value||1));sheet.moves[${i}].power=v;this.previousElementSibling.value=v">
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">ACC</div>
+          <input type="range" min="1" max="100" value="${m.accuracy??100}"
+            oninput="sheet.moves[${i}].accuracy=+this.value;this.nextElementSibling.value=this.value">
+          <input type="number" class="stat-num" min="1" max="100" value="${m.accuracy??100}"
+            oninput="let v=Math.max(1,Math.min(100,+this.value||1));sheet.moves[${i}].accuracy=v;this.previousElementSibling.value=v">
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">PP</div>
+          <input type="range" min="1" max="40" value="${m.pp||20}"
+            oninput="sheet.moves[${i}].pp=+this.value;this.nextElementSibling.value=this.value">
+          <input type="number" class="stat-num" min="1" max="40" value="${m.pp||20}"
+            oninput="let v=Math.max(1,Math.min(40,+this.value||1));sheet.moves[${i}].pp=v;this.previousElementSibling.value=v">
+        </div>
+        <div class="field" style="margin-top:8px;margin-bottom:8px">
+          <label>Effect</label>
+          <select onchange="onEffectChange(${i},this.value)">
+            ${effectOptions(m.effect)}
+          </select>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <input type="text" maxlength="60" value="${esc(m.desc||'')}" placeholder="short description shown in battle"
+            oninput="sheet.moves[${i}].desc=this.value">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setMoveCat(i, cat, btn){
+  sheet.moves[i].cat = cat;
+  const card = document.getElementById(`move-card-${i}`);
+  if(card) card.className = `move-card ${cat}`;
+  const btns = btn.closest('.cat-btns').querySelectorAll('.cat-btn');
+  btns.forEach(b => b.className = 'cat-btn');
+  btn.className = `cat-btn ${cat==='physical'?'phys-active':cat==='special'?'spec-active':'stat-active'}`;
+  const pr = document.getElementById(`power-row-${i}`);
+  if(pr){
+    if(cat === 'status'){
+      pr.classList.add('power-row-disabled');
+      pr.querySelectorAll('input').forEach(el=>el.disabled=true);
+      sheet.moves[i].power = null;
+    } else {
+      pr.classList.remove('power-row-disabled');
+      pr.querySelectorAll('input').forEach(el=>el.disabled=false);
+      if(!sheet.moves[i].power) sheet.moves[i].power = 70;
+    }
+  }
+}
+
+function onEffectChange(i, val){
+  if(val === '__custom__'){
+    const rawId = prompt('Effect ID (e.g. lifesteal):');
+    if(!rawId) { renderTab(); return; }
+    const label = prompt('Display label (optional):') || rawId;
+    const clean = rawId.trim().replace(/\s+/g,'_').replace(/[^a-z0-9_]/gi,'').slice(0,32);
+    if(clean && !EFFECT_LIST.includes(clean) && !customEffects.find(e=>e.id===clean)){
+      customEffects.push({id:clean, label});
+      saveCustomEffects();
+    }
+    sheet.moves[i].effect = clean || null;
+    renderTab(); return;
+  }
+  sheet.moves[i].effect = (val === '') ? null : val;
+}
+
+// ── FLAVOR TAB ────────────────────────────────────────────────
+function flavorHTML(){
+  const v   = sheet.catchRate ?? 128;
+  const txt = sheet.flavor || '';
+  return `
+  <div class="field">
+    <label>Flavor Text
+      <span id="char-count" style="color:var(--dim)">${txt.length}/160</span>
+    </label>
+    <textarea style="height:90px;font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--line);color:var(--text);padding:8px;width:100%;resize:vertical;border-radius:1px"
+      maxlength="160"
+      oninput="sheet.flavor=this.value;document.getElementById('char-count').textContent=this.value.length+'/160'"
+      placeholder="A predatory phantom of the void...">${esc(txt)}</textarea>
+  </div>
+  <hr class="rule">
+  <div class="field" style="margin-top:4px">
+    <label>Catch Rate <span style="color:var(--dim);font-size:8px">1=legendary · 255=common</span></label>
+    <div class="stat-row">
+      <div class="stat-label">RATE</div>
+      <input type="range" class="accent-thumb" min="1" max="255" value="${v}"
+        oninput="sheet.catchRate=+this.value;
+                 document.getElementById('catch-num').value=this.value;
+                 document.getElementById('catch-label').textContent=catchRateLabel(+this.value)">
+      <input type="number" id="catch-num" class="stat-num" style="color:var(--accent)" min="1" max="255" value="${v}"
+        oninput="let x=Math.max(1,Math.min(255,+this.value||1));sheet.catchRate=x;this.previousElementSibling.value=x;document.getElementById('catch-label').textContent=catchRateLabel(x)">
+    </div>
+    <div id="catch-label">${catchRateLabel(v)}</div>
+  </div>`;
+}
+
+// ── EVOLUTION TAB ─────────────────────────────────────────────
+function evolutionHTML(){
+  const fromName = roster.find(c=>c.id===sheet.evolvesFrom)?.name || '';
+  const intoName = roster.find(c=>c.id===sheet.evolvesInto)?.name || '';
+  return `
+  <div class="section-note">Link this creature to others in your roster to define its evolution chain.</div>
+  <div class="field">
+    <label>Evolves From</label>
+    <div class="evo-search">
+      <input type="text" id="evo-from-input" value="${esc(fromName)}"
+        placeholder="search roster by name..." autocomplete="off">
+      <div class="evo-dropdown" id="evo-from-drop"></div>
+    </div>
+    ${sheet.evolvesFrom
+      ? `<button class="evo-clear" onclick="sheet.evolvesFrom=null;renderTab()">× clear</button>`
+      : ''}
+  </div>
+  <div class="field" style="margin-top:4px">
+    <label>Evolves Into</label>
+    <div class="evo-search">
+      <input type="text" id="evo-into-input" value="${esc(intoName)}"
+        placeholder="search roster by name..." autocomplete="off">
+      <div class="evo-dropdown" id="evo-into-drop"></div>
+    </div>
+    ${sheet.evolvesInto
+      ? `<button class="evo-clear" onclick="sheet.evolvesInto=null;renderTab()">× clear</button>`
+      : ''}
+  </div>
+  ${(sheet.evolvesFrom||sheet.evolvesInto) ? `
+  <div class="evo-linked">
+    ${sheet.evolvesFrom ? `← FROM: <b>${esc(fromName||sheet.evolvesFrom)}</b><br>` : ''}
+    ${sheet.evolvesInto ? `→ INTO: <b>${esc(intoName||sheet.evolvesInto)}</b>` : ''}
+  </div>` : ''}`;
+}
+
+function setupEvoSearch(){
+  ['from','into'].forEach(dir => {
+    const input = document.getElementById(`evo-${dir}-input`);
+    const drop  = document.getElementById(`evo-${dir}-drop`);
+    if(!input || !drop) return;
+
+    function showDrop(){
+      const q = input.value.toLowerCase();
+      const matches = roster.filter(c => c.id!==sheet.id && c.name.toLowerCase().includes(q)).slice(0,8);
+      if(!matches.length){ drop.style.display='none'; return; }
+      drop.style.display = 'block';
+      drop.innerHTML = matches.map(c =>
+        `<div class="evo-opt" onclick="selectEvo('${dir}','${esc(c.id)}','${esc(c.name)}')">
+           <span>${esc(c.name)}</span>
+           <span>${esc(c.species||'')}</span>
+         </div>`
+      ).join('');
+    }
+
+    input.oninput = showDrop;
+    input.onfocus = showDrop;
+    input.onblur  = () => setTimeout(()=>{ drop.style.display='none'; }, 180);
+  });
+}
+
+function selectEvo(dir, id, name){
+  if(dir === 'from') sheet.evolvesFrom = id;
+  else               sheet.evolvesInto = id;
+  renderTab();
+}
+
+// ────────────────────────────────────────────────────────────────
+//  RENDER ALL
+// ────────────────────────────────────────────────────────────────
+function renderAll(){
+  renderCanvasInfo();
+  renderTab();
+  const fn = document.getElementById('footer-name');
+  if(fn) fn.value = sheet.name || '';
+  pushToSlotDebounced();
+  emitCreatureSelected();
+}
+
+// ────────────────────────────────────────────────────────────────
+//  DRAG & DROP
+// ────────────────────────────────────────────────────────────────
+let dragCount = 0;
+const dz = document.getElementById('drop-zone');
+window.addEventListener('dragenter', e => { e.preventDefault(); dragCount++; dz.classList.add('show'); });
+window.addEventListener('dragover',  e => e.preventDefault());
+window.addEventListener('dragleave', () => { if(--dragCount<=0){ dragCount=0; dz.classList.remove('show'); } });
+window.addEventListener('drop', async e => {
+  e.preventDefault(); dragCount=0; dz.classList.remove('show');
+  for(const f of e.dataTransfer.files){
+    if(f.name.endsWith('.json')) await importFile(f);
+  }
+});
+
+// ────────────────────────────────────────────────────────────────
+//  INIT
+// ────────────────────────────────────────────────────────────────
+loadCustomTypes();
+loadCustomEffects();
+roster = sharedRead(KEY_ROSTER) || [];
+
+// auto-load from companion slot if populated
+const _slot = sharedRead(KEY_COMPANION);
+if(_slot?.format==='eidolon/1' && _slot?.kind==='creature'){
+  sheet.dna    = _slot.dna   || {};
+  sheet.hues   = _slot.hues  || [200,80,140];
+  sheet.seed   = _slot.seed  ?? null;
+  if(_slot.name) sheet.name = _slot.name;
+  sheet.baseStats = autoStats();
+  sheet.types     = [hueToType(sheet.hues[0])];
+  sheet.ability   = Array.isArray(sheet.dna) ? ABILITY_POOL[0] : dnaToAbility(sheet.dna);
+  sheet.moves     = BASE_MOVES.map(m=>({...m}));
+}
+
+renderPreviewFrame();
+switchTab('identity');
+renderCanvasInfo();
+
+if(_slot?.format==='eidolon/1' && _slot?.kind==='creature'){
+  setStatus(`auto-loaded: "${sheet.name||'unnamed'}"`);
+}
+</script>
+</body>
+</html>
