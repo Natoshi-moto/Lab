@@ -67,3 +67,13 @@ It is **not** optional flavor text.
 ---
 
 *If this folder is “too much,” that is the product telling you the risk is real.*
+
+---
+
+## Deeper permanent distrust (not closable by patches)
+
+Hard gates can turn GREEN. **They do not erase** the Lab-wide load-bearing register:
+
+**[`WHY_NOT_TO_TRUST_THIS_PROJECT.md`](../../WHY_NOT_TO_TRUST_THIS_PROJECT.md)**
+
+Anonymous operator, non-coder, non-CS, AI-built machinery, `status_authority: NONE` — reasons that remain true if every T-ID closes. That document is the programme hinge: **push through with evidence, or break in public.**

@@ -27,6 +27,7 @@ End of THIS phase = system the sim is designed IN / FOR / BUILT INTO.
 
 | Order | File | Who must read |
 |-------|------|----------------|
+| 0 | Lab root: `../../WHY_NOT_TO_TRUST_THIS_PROJECT.md` | **All — permanent distrust register; anonymous non-coder operator; push-through-or-break** |
 | 1 | This README | All |
 | 2 | **`CANONICAL_DIRECTION.md`** | **All — north star / stage exit** |
 | 3 | **`DIAGNOSTIC_SUITE.md`** | **All — load-bearing operator test/diagnose UI + export packs** |
