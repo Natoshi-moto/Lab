@@ -1,0 +1,23 @@
+{
+  "allocation_rule": "capped_pro_rata",
+  "cap_sats_per_identity": 1000000,
+  "contributions": [
+    {
+      "donor_id": "whale",
+      "eligible_sats": 9000000,
+      "identity_id": "whale"
+    },
+    {
+      "donor_id": "a",
+      "eligible_sats": 500000
+    },
+    {
+      "donor_id": "b",
+      "eligible_sats": 500000
+    }
+  ],
+  "id": "22_capped_pro_rata_whale",
+  "identity_layer": false,
+  "pool": 1000000000,
+  "title": "Capped pro-rata against whale (identity-layer free)"
+}

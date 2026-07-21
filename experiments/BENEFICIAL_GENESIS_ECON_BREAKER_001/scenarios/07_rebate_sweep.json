@@ -1,0 +1,31 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "d1",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "d2",
+      "eligible_sats": 1000000
+    }
+  ],
+  "id": "07_rebate_sweep",
+  "pool": 1000000000,
+  "rebate": {
+    "access_probability": 1.0,
+    "detection_probability": 0.0,
+    "donations_by_charity": [
+      {
+        "charity_id": "CHARITY_ALPHA",
+        "colluding": true,
+        "donated_sats": 2000000,
+        "rebate_rate": 0.5
+      }
+    ],
+    "enforcement_probability": 1.0,
+    "include_rate_sweep": true,
+    "sweep_donated_sats": 2000000
+  },
+  "title": "Conditional rebate rate sweep 0-100%"
+}

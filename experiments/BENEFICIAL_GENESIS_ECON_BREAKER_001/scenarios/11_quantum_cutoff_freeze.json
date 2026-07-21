@@ -1,0 +1,18 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "pre_cutoff",
+      "eligible_sats": 3000000
+    },
+    {
+      "donor_id": "post_policy",
+      "eligible_sats": 1000000
+    }
+  ],
+  "id": "11_quantum_cutoff_freeze",
+  "pool": 1000000000,
+  "timing_game_present": true,
+  "timing_note": "quantum_compromise_cutoff_height is a policy input; classical auth after cutoff rejects in verifier; economic model notes adverse selection around declaration timing",
+  "title": "Classical-key compromise declared mid-epoch (timing residual)"
+}

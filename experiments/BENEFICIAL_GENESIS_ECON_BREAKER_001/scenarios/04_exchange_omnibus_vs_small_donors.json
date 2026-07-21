@@ -1,0 +1,517 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "exchange_omnibus",
+      "eligible_sats": 5000000,
+      "label": "exchange"
+    },
+    {
+      "donor_id": "d0000",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0001",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0002",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0003",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0004",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0005",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0006",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0007",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0008",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0009",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0010",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0011",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0012",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0013",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0014",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0015",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0016",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0017",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0018",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0019",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0020",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0021",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0022",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0023",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0024",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0025",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0026",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0027",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0028",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0029",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0030",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0031",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0032",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0033",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0034",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0035",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0036",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0037",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0038",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0039",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0040",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0041",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0042",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0043",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0044",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0045",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0046",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0047",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0048",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0049",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0050",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0051",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0052",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0053",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0054",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0055",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0056",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0057",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0058",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0059",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0060",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0061",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0062",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0063",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0064",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0065",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0066",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0067",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0068",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0069",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0070",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0071",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0072",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0073",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0074",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0075",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0076",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0077",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0078",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0079",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0080",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0081",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0082",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0083",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0084",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0085",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0086",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0087",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0088",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0089",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0090",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0091",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0092",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0093",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0094",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0095",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0096",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0097",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0098",
+      "eligible_sats": 50000,
+      "label": "small"
+    },
+    {
+      "donor_id": "d0099",
+      "eligible_sats": 50000,
+      "label": "small"
+    }
+  ],
+  "governance_rule_under_test": "none",
+  "id": "04_exchange_omnibus_vs_small_donors",
+  "notes": [
+    "population scaled to 100 small donors at equal mass for tractable manifests; concentration math identical at equal mass ratio"
+  ],
+  "pool": 1000000000,
+  "title": "Exchange omnibus claim vs 10000 small donors"
+}

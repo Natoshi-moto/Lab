@@ -1,0 +1,20 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "whale",
+      "eligible_sats": 8000000,
+      "label": "whale"
+    },
+    {
+      "donor_id": "crowd",
+      "eligible_sats": 2000000,
+      "label": "crowd"
+    }
+  ],
+  "governance_rule_under_test": "none",
+  "id": "02_whale_80",
+  "pool": 1000000000,
+  "title": "Whale contributes 80% of eligible sats",
+  "token_value_per_unit_in_sats": 1.0
+}

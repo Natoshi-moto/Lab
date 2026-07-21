@@ -1,0 +1,72 @@
+{
+  "schema": "bgen.econ-breaker-001.decision/v1",
+  "task": "TSK-BGEN-ECON-BREAKER-001",
+  "github_issue": 36,
+  "subject_pr": 35,
+  "subject_commit": "b5887791338b146daad8f5233ce0e25bf24fe357",
+  "status_authority": "NONE",
+  "cleanroom_freeze": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/CLEANROOM_FREEZE.json",
+  "differential_review": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/DIFFERENTIAL_REVIEW.md",
+  "required_final_decisions": {
+    "claude_package": {
+      "decision": "HOLD_FOR_REPAIR",
+      "aliases_considered": [
+        "REJECT_PACKAGE_AS_GATE_RESULT",
+        "ACCEPT_AS_GATE",
+        "HOLD_FOR_REPAIR"
+      ],
+      "rationale": [
+        "Package is valuable, scope-clean, and deterministic in its own model",
+        "Load-bearing FC triggers exceed executable evidence on REV-001..006 axes",
+        "REV-007 narrower findings independently confirmed and should be preserved",
+        "Not accepted as economic gate result; PR #35 remains draft"
+      ],
+      "controlling_review_items": {
+        "BGEN-ECON-REV-001": "CONFIRMED_OVERCLAIM",
+        "BGEN-ECON-REV-002": "CONFIRMED_OVERCLAIM",
+        "BGEN-ECON-REV-003": "CONFIRMED_OVERCLAIM",
+        "BGEN-ECON-REV-004": "CONFIRMED_OVERCLAIM",
+        "BGEN-ECON-REV-005": "CONFIRMED_IMPLEMENTATION_ISSUES",
+        "BGEN-ECON-REV-006": "CONFIRMED_WORDING_EXCEEDS_SEAT",
+        "BGEN-ECON-REV-007": "PRESERVED_AND_REDERIVED"
+      }
+    },
+    "underlying_mechanism": {
+      "decision": "CONTINUE_WITH_CONDITIONS",
+      "aliases_considered": [
+        "REJECT_OR_REDESIGN",
+        "CONTINUE_WITH_CONDITIONS",
+        "ECONOMIC_GATE_PASS"
+      ],
+      "rationale": [
+        "Charity-bound migration receipt concept not shown incoherent",
+        "Transferability not necessary for charity+receipt functions",
+        "Transferability necessity for full ledger functions remains open until functions specified",
+        "Caps/concavity without identity fail; linear pro-rata preserves whales",
+        "Stolen-key pathway residual remains; profitable laundering is assumption-conditional",
+        "Rebate incidence is conditional; not unconditional behavioral destruction",
+        "Governance capture conditional on integration rule"
+      ],
+      "conditions": [
+        "Specify target ledger functions before defending transferability",
+        "Prefer non-transferable or delayed-transfer claim if float not required",
+        "Do not default majority governance to raw allocation",
+        "If governance linked, use continuous caps or nontransferable gov",
+        "Do not sell concave/cap fairness without identity layer",
+        "Model stolen-fund economics with opportunity cost, not legal basis alone",
+        "Treat rebates as residual social/legal surface with access frictions",
+        "Use neutral floating-ratio wording; defer legal classification to Track F",
+        "Consider sealed/precommitment for denominator timing risk"
+      ],
+      "economic_gate_pass": false
+    }
+  },
+  "nonclaims": [
+    "no merge authority",
+    "no STATUS.json change",
+    "no R-round assignment",
+    "no live activity",
+    "no legal conclusions",
+    "no market price prediction"
+  ]
+}

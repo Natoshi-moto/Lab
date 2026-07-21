@@ -1,0 +1,114 @@
+{
+  "task_id": "TSK-BGEN-ECON-BREAKER-001",
+  "github_issue": 36,
+  "parent_issues": [33, 34, 35],
+  "seat": "Different-family Economics Breaker/Reproducer",
+  "provider_model_label": "xAI Grok interactive CLI (grok-4.5 class)",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / ECONOMIC_BREAKER",
+  "round_assignment": null,
+  "independent_review_claimed": true,
+  "independence_note": "Different provider family from Claude package; clean-room freeze before content review of PR #35",
+  "branch": "grok/bgen-econ-breaker-001",
+  "subject_repository": "Natoshi-moto/Lab",
+  "subject_commit": "b5887791338b146daad8f5233ce0e25bf24fe357",
+  "subject_pr": 35,
+  "subject_branch": "claude/bgen-econ-redteam-001",
+  "stacked_base_branch": "claude/bgen-econ-redteam-001",
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001/**"
+  ],
+  "scope_respected": true,
+  "paths_outside_scope_modified": [],
+  "status_json_modified": false,
+  "cryptographic_verifier_modified": false,
+  "real_charities_selected": false,
+  "live_funds_used": false,
+  "legal_conclusions_made": false,
+  "synthetic_only": true,
+  "secrets_committed": false,
+  "market_price_predicted": false,
+  "cleanroom": {
+    "freeze": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/CLEANROOM_FREEZE.json",
+    "interpretation": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/CLEANROOM_INTERPRETATION.md",
+    "forbidden_paths_content_not_opened_before_freeze": true,
+    "forbidden_inventory_count": 72,
+    "post_freeze_differential": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/DIFFERENTIAL_REVIEW.md"
+  },
+  "command_results": {
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py": {
+      "exit_code": 0,
+      "summary": "28 scenarios OK; SUMMARY.json and TABLES.md written"
+    },
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests -v": {
+      "exit_code": 0,
+      "summary": "25 tests OK"
+    },
+    "python3 -m unittest discover -s tests -v": {
+      "exit_code": 0,
+      "summary": "185 tests OK; existing lab suite unaffected"
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS with WARN WORKTREE_DIRTY before commit"
+    },
+    "git rev-parse HEAD at task start": {
+      "exit_code": 0,
+      "summary": "b5887791338b146daad8f5233ce0e25bf24fe357"
+    }
+  },
+  "commands_not_run": {
+    "./nexus verify": "R-round custody/exchange kernel scope; this task assigns no R-round",
+    "./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND": "out of scope; must not reopen R001 ledger",
+    "./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND": "out of scope; must not reopen R002 ledger"
+  },
+  "deliverables": {
+    "independent_model": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/**",
+    "scenarios": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/*.json (28)",
+    "results": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/**",
+    "docs": [
+      "CLEANROOM_INTERPRETATION.md",
+      "FORMAL_MODEL.md",
+      "MECHANISM_NECESSITY.md",
+      "FAILURE_CONDITIONS.md",
+      "ALTERNATIVES_COMPARISON.md",
+      "NONCLAIMS_AND_OPEN_QUESTIONS.md",
+      "REV_ITEM_RESPONSES.md"
+    ],
+    "decision": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/DECISION.json",
+    "audit_report": "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001/AUDIT_REPORT.md"
+  },
+  "required_final_decisions": {
+    "claude_package": "HOLD_FOR_REPAIR",
+    "underlying_mechanism": "CONTINUE_WITH_CONDITIONS",
+    "economic_gate_pass": false
+  },
+  "rev_item_dispositions": {
+    "BGEN-ECON-REV-001": "CONFIRMED_OVERCLAIM",
+    "BGEN-ECON-REV-002": "CONFIRMED_OVERCLAIM",
+    "BGEN-ECON-REV-003": "CONFIRMED_OVERCLAIM",
+    "BGEN-ECON-REV-004": "CONFIRMED_OVERCLAIM",
+    "BGEN-ECON-REV-005": "CONFIRMED_IMPLEMENTATION_ISSUES",
+    "BGEN-ECON-REV-006": "CONFIRMED_WORDING_EXCEEDS_SEAT",
+    "BGEN-ECON-REV-007": "PRESERVED_AND_REDERIVED"
+  },
+  "residual_risks": [
+    "secondary-market re-concentration not fully simulated",
+    "token value multipliers are modelling assumptions",
+    "ledger functions for transferability still unspecified in design pack",
+    "AML/sanctions and legal classification deferred to Track F"
+  ],
+  "nonclaims": [
+    "no merge or promotion authority",
+    "no R-round assignment",
+    "no change to STATUS.json",
+    "no live funds, real charity selection, or public solicitation",
+    "no legal conclusions",
+    "no market-price prediction",
+    "no cryptographic verifier change"
+  ],
+  "receipt_schema": "bgen.econ-breaker-001.receipt/v1",
+  "label": "SANITIZED_TASK_RECEIPT"
+}
