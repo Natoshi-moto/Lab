@@ -1,0 +1,93 @@
+{
+  "schema": "nexus.receipt/v1",
+  "receipt_id": "RCT-NOTED-PROJECT-OS-PHASE-1-001",
+  "operation": "noted-project-os-phase-1-host-bridge-smoke",
+  "status_authority": "NONE",
+  "seat": "SEAT-CODEX-IMPLEMENT",
+  "baseline_commit": "d5fff8a1e780818b3f00509633a51d37e9ae3413",
+  "verified_at_commit": "96cb4fa8a01fc7baf2e9f8bc042df59d3846f4b5",
+  "started_at": "2026-07-21T21:45:00+01:00",
+  "finished_at": "2026-07-21T22:54:15+01:00",
+  "exit_code": 0,
+  "inputs": [
+    { "path": "experiments/NOTED_PROJECT_OS_001/seats/CODEX_IMPLEMENTER.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/TECH_SPEC.md", "sections": "§6 Phase 1 and §8.2 A1-A3" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/CANONICAL_DIRECTION.md" },
+    { "path": "products/noted-host/src/bridges/nexusHostBridge.ts" },
+    { "path": "products/noted-host/src/studios/nexusRouter/NexusRouterStudio.tsx" }
+  ],
+  "outputs": [
+    {
+      "path": "products/noted-host/src/bridges/nexusHostBridge.ts",
+      "sha256": "7aac7df1012b33bd31c0c464301a96e9dc7a7e66b8d518bc3c956c74dd505467",
+      "change": "Protocol-shaped messages are accepted only from the known, non-null Nexus iframe contentWindow. Impersonation from any other source creates a local UNTRUSTED_SOURCE rejection receipt and is never answered with postMessage. The listener effect depends on the stable getTargetWindow callback instead of the fresh options object."
+    },
+    {
+      "path": "products/noted-host/scripts/bridge-smoke.mjs",
+      "sha256": "a61b41b438b2d6b4606e28a85c91814ae4d65448a9d236d402f11231ae31c1eb",
+      "change": "Committed Playwright smoke harness that launches dev or preview mode and checks the package iframe path, trusted diagnostic receipts, exact single-ping counting, local untrusted rejection, no receipt reply to the untrusted sender, and browser error streams."
+    },
+    {
+      "path": "products/noted-host/noted-v0.01.html",
+      "sha256": "2b3dace42096fb7d9f2360ee71051191f49ade405eafbacf5abb8c68813479b2",
+      "change": "Regenerated single-file artifact from the verified Phase 1 source."
+    },
+    {
+      "path": "products/noted-host/verse-studio.html",
+      "sha256": "2b3dace42096fb7d9f2360ee71051191f49ade405eafbacf5abb8c68813479b2",
+      "change": "Regenerated single-file artifact from the verified Phase 1 source."
+    }
+  ],
+  "claims": [
+    "The /nexus-router route mounts NexusRouterStudio and its iframe src is ./nexus/os/Nexus_OS.html; the source exists under public/nexus/os and the production build copies it to dist/nexus/os.",
+    "A diagnostic.ping originating in the tracked iframe is accepted and receives a NEXUS_HOST_BRIDGE_RECEIPT; a manual trusted ping increments the accepted counter exactly once.",
+    "A protocol-shaped diagnostic.ping from the parent window is not accepted, creates one local receipt with error UNTRUSTED_SOURCE, and receives no postMessage response.",
+    "The useEffect dependency is stable and the dev and preview smoke runs completed with no React maximum-depth error, console error, or uncaught page error.",
+    "The committed smoke harness passed against both the Vite development server and the production dist served by Vite preview."
+  ],
+  "non_claims": [
+    "This receipt has status_authority NONE and makes no claim of production readiness, security audit, or real-world value.",
+    "Phase 2, Agent import/scrub, ODS UI, creature work, Nostr publishing, and sim-frame work were not started.",
+    "TECH_SPEC §8.2 A1-A3 still require SEAT-GROK-DRIVE/operator manual acceptance; browser automation is runtime evidence, not operator acceptance.",
+    "npm audit reported 5 dependency findings (1 low, 3 moderate, 1 high); dependency remediation was outside this Phase 1 closeout.",
+    "The receipt is committed after the immutable verified runtime commit named by verified_at_commit; the receipt-only commit does not alter the verified product files."
+  ],
+  "checks": [
+    {
+      "command": "python3 experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py",
+      "exit_code": 0,
+      "result": "PASS registry: 3 package(s) ok"
+    },
+    {
+      "command": "cd products/noted-host && npm ci",
+      "exit_code": 0,
+      "result": "Added and audited 166 packages; npm audit reported 5 vulnerabilities (1 low, 3 moderate, 1 high)."
+    },
+    {
+      "command": "cd products/noted-host && npm run typecheck",
+      "exit_code": 0,
+      "result": "PASS; tsc --noEmit returned no errors."
+    },
+    {
+      "command": "cd products/noted-host && npm run build",
+      "exit_code": 0,
+      "result": "PASS; Vite transformed 295 modules, produced dist, and pack.js emitted verse-studio.html and noted-v0.01.html."
+    },
+    {
+      "command": "cd products/noted-host && npm run bridge:smoke",
+      "exit_code": 0,
+      "result": "PASS in dev mode: package path, trusted boot/manual ping, exact single increment, local untrusted rejection, no untrusted reply, and zero console/page errors."
+    },
+    {
+      "command": "cd products/noted-host && npm run bridge:smoke -- --preview",
+      "exit_code": 0,
+      "result": "PASS against production dist via Vite preview with the same assertions and zero console/page errors."
+    }
+  ],
+  "limitations": [
+    "The installed Playwright package expected a Chromium revision absent from this machine; the smoke harness reproducibly discovered and used the existing local chromium-1181 cache. PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH can explicitly select another executable.",
+    "The first npm ci attempt inside the managed sandbox failed with EPERM when executing esbuild; the identical required command passed outside that execution sandbox after approval.",
+    "The first registry invocation used the correct command from the wrong working directory and failed to locate the script; it was immediately rerun from the Lab root and passed."
+  ],
+  "next": "NEXT: SEAT-GROK-DRIVE for TECH_SPEC §8.2 A1-A3 acceptance. Do not begin Phase 2."
+}
