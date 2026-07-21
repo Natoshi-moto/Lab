@@ -9,11 +9,12 @@
 ## Mandatory reading (in order)
 
 1. `../README.md`  
-2. `../CONTAINMENT.md`  
-3. `../TECH_SPEC.md` §0–6, §11  
-4. `../LAUNCH_PLAN.md` §2–3  
-5. Lab `AGENTS.md`  
-6. Active phase task under `operations/tasks/` (when filed)  
+2. **`../CANONICAL_DIRECTION.md`** — system first; sim-frame next stage; do not treat embed as Phase exit  
+3. `../CONTAINMENT.md`  
+4. `../TECH_SPEC.md` §0–6, §11  
+5. `../LAUNCH_PLAN.md` §2–3  
+6. Lab `AGENTS.md`  
+7. Active phase task under `operations/tasks/` (when filed)  
 
 ---
 

@@ -8,10 +8,12 @@
 
 ## Mandatory reading
 
-1. Full package README + CONTAINMENT + TECH_SPEC + LAUNCH_PLAN  
+1. Full package README + **`CANONICAL_DIRECTION.md`** + CONTAINMENT + TECH_SPEC + LAUNCH_PLAN  
 2. `../AI_ROUTING.md`  
 3. `experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md`  
 4. Latest receipts under `operations/receipts/NOTED_PROJECT_OS_*`  
+
+**Direction guard:** refuse framing that makes “nexsim embedded” the success metric of the current stage. Success = system the sim is designed IN/FOR/BUILT INTO.
 
 ---
 

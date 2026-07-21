@@ -12,19 +12,31 @@ Noted is the system people work ON, IN, and THROUGH this project.
 Lab is the epistemic container. Nested packages expand infinitely without chaos.
 ```
 
+## Canonical direction (freeze)
+
+**Read `CANONICAL_DIRECTION.md` before implementing past Phase 0.**
+
+```text
+This stage builds the world for the simulator economy.
+The next stage puts the simulator into that world.
+End of THIS phase ≠ nexsim embedded.
+End of THIS phase = system the sim is designed IN / FOR / BUILT INTO.
+```
+
 ## Read order (all seats)
 
 | Order | File | Who must read |
 |-------|------|----------------|
 | 1 | This README | All |
-| 2 | `CONTAINMENT.md` | All — Lab expansion rules |
-| 3 | `TECH_SPEC.md` | All — full system + acceptance |
-| 4 | `LAUNCH_PLAN.md` | All — fat drop + clean launch |
-| 5 | `seats/CODEX_IMPLEMENTER.md` | Codex |
-| 6 | `seats/CLAUDE_DEBUGGER.md` | Claude Code |
-| 7 | `seats/GROK_DRIVER.md` | Grok (drive + test) |
-| 8 | `AI_ROUTING.md` | Operator + all seats |
-| 9 | Sister: `../BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md` | All |
+| 2 | **`CANONICAL_DIRECTION.md`** | **All — north star / stage exit** |
+| 3 | `CONTAINMENT.md` | All — Lab expansion rules |
+| 4 | `TECH_SPEC.md` | All — full system + acceptance |
+| 5 | `LAUNCH_PLAN.md` | All — fat drop + clean launch |
+| 6 | `seats/CODEX_IMPLEMENTER.md` | Codex |
+| 7 | `seats/CLAUDE_DEBUGGER.md` | Claude Code |
+| 8 | `seats/GROK_DRIVER.md` | Grok (drive + test) |
+| 9 | `AI_ROUTING.md` | Operator + all seats |
+| 10 | Sister: `../BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md` | All |
 
 ## Non-claims
 

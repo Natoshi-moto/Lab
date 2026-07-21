@@ -1,0 +1,27 @@
+{
+  "schema": "lab.programme-direction.receipt/v1",
+  "task_id": "TSK-NOTED-PROJECT-OS-CANONICAL-DIRECTION",
+  "programme_id": "NOTED_PROJECT_OS_001",
+  "title": "Log canonical direction: system for simulator economy; sim-frame is next stage",
+  "status_authority": "NONE",
+  "research_only": true,
+  "date_utc": "2026-07-21",
+  "document": "experiments/NOTED_PROJECT_OS_001/CANONICAL_DIRECTION.md",
+  "checkpoint_bind": "BGEN-CANONICAL-CHECKPOINT-001",
+  "direction_summary": [
+    "This stage builds the world for the simulator economy",
+    "Next stage puts the simulator into that world",
+    "End of this phase is not nexsim embedded",
+    "End of this phase is the system the sim is designed IN, FOR, and BUILT INTO",
+    "Shared verifiable results are load-bearing for synthetic participation",
+    "Anti real-world value firewall remains absolute"
+  ],
+  "non_claims": [
+    "Does not implement sim-frame",
+    "Does not vendor external nexsim trees",
+    "Does not authorize tokens or live funds",
+    "Does not cancel Phase 0-1 host/bridge substrate work"
+  ],
+  "seat": "Grok interactive CLI (operator-directed)",
+  "repo": "Natoshi-moto/Lab"
+}

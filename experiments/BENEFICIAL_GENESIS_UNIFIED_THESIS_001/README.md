@@ -41,7 +41,8 @@ This package freezes one operating doctrine and points all tracks at the same se
 8. `TRACK_INVENTORY.md` — GitHub PR/issue roles  
 9. Parent repair work: `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001` (R1 code)  
 10. Receipt: `operations/receipts/BGEN_CANONICAL_CHECKPOINT_001/RECEIPT.json`  
-11. **Host programme:** `experiments/NOTED_PROJECT_OS_001/` — tech spec: Noted as Project OS (Codex implement / Claude debug / Grok drive), Lab containment, cold drop
+11. **Host programme:** `experiments/NOTED_PROJECT_OS_001/` — tech spec: Noted as Project OS (Codex implement / Claude debug / Grok drive), Lab containment, cold drop  
+12. **Canonical direction:** `experiments/NOTED_PROJECT_OS_001/CANONICAL_DIRECTION.md` — this stage builds the system for the simulator economy; next stage admits the sim-frame (not “embed nexsim” as this phase’s end)
 
 ## Hard mandate (Checkpoint 001)
 

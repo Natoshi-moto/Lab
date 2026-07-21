@@ -8,10 +8,11 @@
 
 ## Mandatory reading
 
-1. `../TECH_SPEC.md` §4 (bridges), §8 (tests), §9 (security)  
-2. `../CONTAINMENT.md` §3–4 (rings)  
-3. Failing seat’s receipt + command transcript  
-4. Lab `AGENTS.md`  
+1. `../CANONICAL_DIRECTION.md` — do not “fix” by shipping premature sim embed as phase success  
+2. `../TECH_SPEC.md` §4 (bridges), §8 (tests), §9 (security)  
+3. `../CONTAINMENT.md` §3–4 (rings)  
+4. Failing seat’s receipt + command transcript  
+5. Lab `AGENTS.md`  
 
 ---
 
