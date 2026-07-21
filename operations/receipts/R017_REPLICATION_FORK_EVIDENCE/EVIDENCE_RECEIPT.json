@@ -1,0 +1,24 @@
+{
+  "baseline_commit": "6ad3b470d190eafdde97143c7df0c8334a754764",
+  "campaign_sha256": "2ad2409542cc28aa650449f35abbed0dc074ee6db22f78150cf14c0e661cf105",
+  "evidence_class": "TEST",
+  "expected_report_sha256": "979533322fd3ed6ae4b2bd82b0ff1f7ad83c0a05b94edbb52da48466598c3291",
+  "independent_verifier_sha256": "ce7780b172be113426b6dbd766883e3c9b17b4fc44a12ac2879f1f67b61559ab",
+  "nonclaims": [
+    "The logical hosts ran on one physical machine and do not prove host independence.",
+    "The deterministic schedule is bounded and does not prove liveness or availability.",
+    "Explicit fork evidence does not select, merge, reverse, or finalize a branch.",
+    "This is not money, economic security, operational custody, consensus, or production readiness."
+  ],
+  "report_id": "b67d6e09d422ec896298b01e850177bf910a787c807b66c174b2e86e485fcd1d",
+  "schema": "nexus.r017-evidence-receipt/v0",
+  "status": "PASS",
+  "status_authority": "NONE",
+  "test_results": {
+    "full_repository_tests": "192_PASS",
+    "nexus_doctor": "PASS_WITH_EXPECTED_DIRTY_WORKTREE_WARNING",
+    "nexus_verify": "PASS",
+    "r017_tests": "7_PASS"
+  },
+  "test_sha256": "c4faba95a36ed867febbefccd088c0b4d28d2dd07bff2ac61fb8ff379a4086ff"
+}

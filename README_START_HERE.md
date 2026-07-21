@@ -28,7 +28,10 @@ Then read:
 STATUS.md
 NEXT_ACTION.md
 AUDIT_START_HERE.md
+docs/PROTOCOL_V0.md
 ```
+
+`docs/PROTOCOL_V0.md` is the public **OPEN-GATE v0** protocol bet (open conserved transitions with dual verification and fail-closed PQ admission). It does not replace STATUS or authorize live funds.
 
 ## How an AI should enter
 
