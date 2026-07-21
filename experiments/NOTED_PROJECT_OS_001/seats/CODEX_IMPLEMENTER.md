@@ -10,11 +10,12 @@
 
 1. `../README.md`  
 2. **`../CANONICAL_DIRECTION.md`** — system first; sim-frame next stage; do not treat embed as Phase exit  
-3. `../CONTAINMENT.md`  
-4. `../TECH_SPEC.md` §0–6, §11  
-5. `../LAUNCH_PLAN.md` §2–3  
-6. Lab `AGENTS.md`  
-7. Active phase task under `operations/tasks/` (when filed)  
+3. **`../DIAGNOSTIC_SUITE.md`** — load-bearing Operator Diagnostic Suite; implement ODS-0 with/after Phase 1  
+4. `../CONTAINMENT.md`  
+5. `../TECH_SPEC.md` §0–6, §8, §11  
+6. `../LAUNCH_PLAN.md` §2–3  
+7. Lab `AGENTS.md`  
+8. Active phase task under `operations/tasks/` (when filed)  
 
 ---
 

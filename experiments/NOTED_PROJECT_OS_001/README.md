@@ -29,14 +29,15 @@ End of THIS phase = system the sim is designed IN / FOR / BUILT INTO.
 |-------|------|----------------|
 | 1 | This README | All |
 | 2 | **`CANONICAL_DIRECTION.md`** | **All — north star / stage exit** |
-| 3 | `CONTAINMENT.md` | All — Lab expansion rules |
-| 4 | `TECH_SPEC.md` | All — full system + acceptance |
-| 5 | `LAUNCH_PLAN.md` | All — fat drop + clean launch |
-| 6 | `seats/CODEX_IMPLEMENTER.md` | Codex |
-| 7 | `seats/CLAUDE_DEBUGGER.md` | Claude Code |
-| 8 | `seats/GROK_DRIVER.md` | Grok (drive + test) |
-| 9 | `AI_ROUTING.md` | Operator + all seats |
-| 10 | Sister: `../BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md` | All |
+| 3 | **`DIAGNOSTIC_SUITE.md`** | **All — load-bearing operator test/diagnose UI + export packs** |
+| 4 | `CONTAINMENT.md` | All — Lab expansion rules |
+| 5 | `TECH_SPEC.md` | All — full system + acceptance (§8 points at ODS) |
+| 6 | `LAUNCH_PLAN.md` | All — fat drop + clean launch |
+| 7 | `seats/CODEX_IMPLEMENTER.md` | Codex |
+| 8 | `seats/CLAUDE_DEBUGGER.md` | Claude Code |
+| 9 | `seats/GROK_DRIVER.md` | Grok (drive + test) |
+| 10 | `AI_ROUTING.md` | Operator + all seats |
+| 11 | Sister: `../BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md` | All |
 
 ## Non-claims
 

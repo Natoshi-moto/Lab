@@ -390,38 +390,68 @@ Import must record `source_path` + `content_hash` on each note for epistemic bin
 
 ## 8. Testing strategy
 
+### 8.0 Load-bearing: Operator Diagnostic Suite (ODS)
+
+**Canonical design:** `DIAGNOSTIC_SUITE.md` (read with this section).
+
+This stage is **system fitness** (host, bridges, later sim-frame hooks). Failures are often **runtime and interactive**. Therefore:
+
+| Layer | Role |
+|-------|------|
+| **ODS (interactive)** | You press cases, change knobs, force good/bad paths, **export a diagnosis pack** for AIs |
+| **ODS headless twin** | Same case IDs via Playwright (`npm run ods:p0`) for seats/CI |
+| **Unit / registry / Lab doctor** | Pure logic and corpus integrity — not replaced by ODS |
+
+**Operator loop when something breaks:**
+
+```text
+#/diagnostics → Run P0 suite or one case → Export MD+JSON → paste to Claude/Codex/Grok
+```
+
+**VERIFY (Phase 1+ target):**
+
+```bash
+python3 experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py
+cd products/noted-host && npm ci && npm run typecheck && npm run build
+cd products/noted-host && npm run ods:p0   # once ODS-1 lands; until then bridge-smoke.mjs
+```
+
+Does manual press-and-change help? **Yes, materially** for bridges, iframe timing, broker UX, IDB, pack-vs-dev paths, and AI handoff dumps. **No** as a substitute for pure unit tests, long sim runs, or registry checks. See `DIAGNOSTIC_SUITE.md` §1.
+
 ### 8.1 Automated
 
 | Layer | Owner seat | Commands |
 |-------|------------|----------|
 | Host typecheck/build | Codex | `npm run typecheck && npm run build` |
+| ODS P0 headless | Codex / CI | `npm run ods:p0` |
 | Creature engine unit | Codex | `node` test runners extracted |
 | Registry verify | Codex | `verify_registry.py` |
 | Lab doctor | any | `./nexus doctor` (must stay green) |
 | Bridge unit tests | Codex + Claude | mock iframe postMessage |
 
-### 8.2 Manual acceptance (Grok + human)
+### 8.2 Manual acceptance (Grok + human) — themes map to ODS
 
-| ID | Test | Pass criteria |
-|----|------|---------------|
-| A1 | Boot Noted host | UI loads, no console hard errors |
-| A2 | Open Nexus Router | OS iframe visible |
-| A3 | Bridge ping | ok receipt |
-| A4 | Open Agent block | chat UI; no leaked personal export |
-| A5 | Creature harness | battle runs locally |
-| A6 | Prompt import | record appears in Prompt Studio/Notes |
-| A7 | Action propose | appears in queue; reject works |
-| A8 | Non-claims visible | Checkpoint banner or seed note present |
-| A9 | Drop unpack | stranger can follow DROP_README in <15 min |
-| A10 | Anti-value | no UI path to “sell/redeem/list token” |
+| ID | Test | Pass criteria | ODS case (target) |
+|----|------|---------------|-------------------|
+| A1 | Boot Noted host | UI loads, no console hard errors | ODS-ENV-001, ODS-HOST-001 |
+| A2 | Open Nexus Router | OS iframe visible | ODS-HOST-001, ODS-PATH-001 |
+| A3 | Bridge ping | ok receipt | ODS-BR-001 |
+| A4 | Open Agent block | chat UI; no leaked personal export | ODS-AG-001 |
+| A5 | Creature harness | battle runs locally | ODS-CR-001 |
+| A6 | Prompt import | record appears in Prompt Studio/Notes | ODS-PR-001 |
+| A7 | Action propose | appears in queue; reject works | ODS-BK-001/002 |
+| A8 | Non-claims visible | Checkpoint banner or seed note present | ODS-H-001 (human) |
+| A9 | Drop unpack | stranger can follow DROP_README in <15 min | ODS-H-003 (human) |
+| A10 | Anti-value | no UI path to “sell/redeem/list token” | ODS-FW-001 |
 
 ### 8.3 Adversarial (Grok drive)
 
-- Attempt postMessage from parent page (must ignore)  
+- ODS-BR-002 foreign postMessage (must reject)  
 - Attempt Nostr publish without approval (must fail)  
 - Search drop for `sk-`, mnemonic dumps, private keys  
 - Search for Pokémon branding in user-visible strings  
 - Attempt to interpret tip as money in docs — docs must refuse  
+- Prefer an **ODS pack** over freeform “it feels broken”
 
 ---
 

@@ -15,6 +15,8 @@
 
 **Direction guard:** refuse framing that makes “nexsim embedded” the success metric of the current stage. Success = system the sim is designed IN/FOR/BUILT INTO.
 
+**ODS guard:** acceptance for Phase 1+ should include `npm run ods:p0` or a human-exported ODS pack for P0 cases (`DIAGNOSTIC_SUITE.md`). Prefer packs over “seems fine.”
+
 ---
 
 ## Standing orders

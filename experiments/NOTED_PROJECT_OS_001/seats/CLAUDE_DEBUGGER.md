@@ -9,10 +9,11 @@
 ## Mandatory reading
 
 1. `../CANONICAL_DIRECTION.md` — do not “fix” by shipping premature sim embed as phase success  
-2. `../TECH_SPEC.md` §4 (bridges), §8 (tests), §9 (security)  
-3. `../CONTAINMENT.md` §3–4 (rings)  
-4. Failing seat’s receipt + command transcript  
-5. Lab `AGENTS.md`  
+2. `../DIAGNOSTIC_SUITE.md` — prefer operator **ods-pack** JSON/MD over freeform bug chat  
+3. `../TECH_SPEC.md` §4 (bridges), §8 (tests), §9 (security)  
+4. `../CONTAINMENT.md` §3–4 (rings)  
+5. Failing seat’s receipt + command transcript + ODS case id if any  
+6. Lab `AGENTS.md`  
 
 ---
 
