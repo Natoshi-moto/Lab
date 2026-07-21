@@ -54,5 +54,6 @@
   "binding_commit": "7da34b3cefc9f54ab2cfddf2c40c1c7bcb462ef2",
   "seat": "Grok interactive CLI (operator-directed)",
   "repo": "Natoshi-moto/Lab",
-  "receipt_bind_commit": "3fd3beaa7ab82f80e3a10360e0d28f1f61354d28"
+  "receipt_bind_commit": "c8aa3076b9f2cba792d65666ea5e077e941a647b",
+  "canonical_tip_at_push": "c8aa3076b9f2cba792d65666ea5e077e941a647b"
 }
