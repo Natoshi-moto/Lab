@@ -20,8 +20,12 @@
   "package_commit": "48e53ce2d893641476cfd1f7ca0201e5184313a8",
   "audit_commits": [
     "895f8b54d68349e470ebf853ab841de45c5a8269",
-    "48e53ce2d893641476cfd1f7ca0201e5184313a8"
+    "48e53ce2d893641476cfd1f7ca0201e5184313a8",
+    "b311b263e5e3b72983b636140fba004b6ff15999"
   ],
+  "draft_pr": 45,
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/45",
+  "branch_tip_at_pr_open": "b311b263e5e3b72983b636140fba004b6ff15999",
   "authorized_write_paths": [
     "experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/**",
     "operations/audits/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/**",
