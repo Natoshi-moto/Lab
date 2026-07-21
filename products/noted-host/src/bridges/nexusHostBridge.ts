@@ -173,15 +173,45 @@ export function useNexusHostBridge(options: NexusHostBridgeOptions): NexusHostBr
 
     function onMessage(event: MessageEvent<unknown>) {
       const targetWindow = options.getTargetWindow()
-      if (targetWindow && event.source !== targetWindow) {
+      const fromTarget = targetWindow !== null && event.source === targetWindow
+
+      if (!fromTarget) {
+        if (!isNexusHostBridgeMessage(event.data)) {
+          // Untrusted origin sending unrelated noise: nothing to reject, just drop it.
+          setState((current) =>
+            appendLog(
+              { ...current, ignored: current.ignored + 1 },
+              {
+                id: makeId('ignored'),
+                createdAt: nowIso(),
+                direction: 'ignored',
+                summary: 'Ignored postMessage from outside the Nexus iframe.',
+              },
+              maxLogEntries,
+            ),
+          )
+          return
+        }
+
+        // Untrusted origin impersonating the bridge protocol: reject with a receipt,
+        // but never postMessage the receipt back to a window we don't trust.
+        const untrustedMessage = event.data as NexusHostBridgeMessage
+        const receipt = makeReceipt({
+          inbound: untrustedMessage.envelope,
+          ok: false,
+          summary: 'Rejected: message did not originate from the trusted Nexus iframe.',
+          error: 'UNTRUSTED_SOURCE',
+        })
         setState((current) =>
           appendLog(
-            { ...current, ignored: current.ignored + 1 },
+            { ...current, rejected: current.rejected + 1, lastReceipt: receipt },
             {
-              id: makeId('ignored'),
-              createdAt: nowIso(),
-              direction: 'ignored',
-              summary: 'Ignored postMessage from outside the Nexus iframe.',
+              id: makeId('rejected'),
+              createdAt: receipt.createdAt,
+              direction: 'rejected',
+              channel: untrustedMessage.envelope.channel,
+              ok: false,
+              summary: receipt.summary,
             },
             maxLogEntries,
           ),
@@ -222,7 +252,10 @@ export function useNexusHostBridge(options: NexusHostBridgeOptions): NexusHostBr
 
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
-  }, [maxLogEntries, options])
+    // Depend on getTargetWindow (expected stable via caller's useCallback) rather than the
+    // options object itself: callers commonly pass a fresh object literal every render, which
+    // would otherwise tear down and reinstall this effect on every render — an infinite loop.
+  }, [maxLogEntries, options.getTargetWindow])
 
   return useMemo(() => state, [state])
 }
@@ -234,7 +267,13 @@ export function useNexusHostBridge(options: NexusHostBridgeOptions): NexusHostBr
 //   - The bridge only accepts messages from the Nexus iframe contentWindow.
 //   - Diagnostic ping succeeds while registered future channels return explicit stub failure receipts.
 //   - Receipts are posted back to Nexus before any host data mutation exists.
+//   - Non-iframe senders impersonating the bridge protocol get a local rejection receipt
+//     (UNTRUSTED_SOURCE); unrelated postMessage noise from non-iframe senders is just ignored.
+//     Rejection receipts are never posted back to the untrusted sender's window.
+//   - The listener effect keys off options.getTargetWindow, not the options object itself,
+//     since callers may pass a fresh object literal every render.
 // OPEN: BB-04 will route prompt import requests to Noted state after approval and schema validation.
 // VERIFY: npm run typecheck
-// LAST-EDIT: GPT-5.5 Thinking · 2026-06-28 · added BB-01 host bridge listener stub.
+// LAST-EDIT: SEAT-CODEX-IMPLEMENT · 2026-07-21 · Phase 1: reject untrusted-source messages with a
+//   local receipt; fixed an infinite listener re-registration loop caused by an unstable dependency.
 // ─────────────────────────────────────────────────────────────
