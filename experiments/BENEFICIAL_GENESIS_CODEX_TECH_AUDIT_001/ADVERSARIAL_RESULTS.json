@@ -1,0 +1,28 @@
+{
+  "actual": {
+    "direct_allocation": {
+      "only_donor": 110
+    },
+    "direct_total_issued": 110,
+    "scenario_unissued_remainder": -10
+  },
+  "expected": "REJECT_INVALID_LOTTERY_SHARE_BPS",
+  "input": {
+    "donors": [
+      [
+        "only_donor",
+        1
+      ]
+    ],
+    "lottery_share_bps": -1000,
+    "pool": 100,
+    "seed": 1,
+    "winners": 1
+  },
+  "invariant": "total_issued <= pool and unissued_remainder >= 0",
+  "invariant_holds": false,
+  "probe": "NEGATIVE_LOTTERY_SHARE_SUPPLY_INVARIANT",
+  "schema": "bgen.codex-tech-audit.adversarial-results/v1",
+  "status_authority": "NONE",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca"
+}
