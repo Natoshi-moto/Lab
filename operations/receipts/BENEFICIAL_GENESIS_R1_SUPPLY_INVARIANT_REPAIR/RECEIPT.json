@@ -4,7 +4,11 @@
   "repair_id": "R1",
   "parent_tribunal": "BGEN-INTEGRATION-TRIBUNAL-001",
   "parent_pr": 46,
-  "findings_addressed": ["TRIB-F-001", "TRIB-F-002", "TRIB-F-008"],
+  "findings_addressed": [
+    "TRIB-F-001",
+    "TRIB-F-002",
+    "TRIB-F-008"
+  ],
   "seat": "Grok interactive CLI (grok-4.5 class)",
   "status_authority": "NONE",
   "mode": "PROPOSE_ONLY / BOUNDED_REPAIR",
@@ -22,8 +26,20 @@
     "thesis_package": "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/** operating map + protocol/Haven thesis + S1 brief"
   },
   "controlling_counterexample": {
-    "input": {"pool": 100, "lottery_share_bps": -1000, "donors": [["a", 100]]},
-    "pre_repair": {"total_issued": 110, "unissued_remainder": -10},
+    "input": {
+      "pool": 100,
+      "lottery_share_bps": -1000,
+      "donors": [
+        [
+          "a",
+          100
+        ]
+      ]
+    },
+    "pre_repair": {
+      "total_issued": 110,
+      "unissued_remainder": -10
+    },
     "post_repair": "ParticipantValidationError fail-closed before arithmetic"
   },
   "commands": {
@@ -48,5 +64,7 @@
     "No live funds, peg, or Haven-equivalent privacy money",
     "No claim multi-AI independence",
     "Thesis is research orientation only"
-  ]
+  ],
+  "repair_logic_commit": "3c83a13497be94f1cb5a05bec37f10ba81d8903b",
+  "receipt_binding_parent_commit": "3c83a13497be94f1cb5a05bec37f10ba81d8903b"
 }
