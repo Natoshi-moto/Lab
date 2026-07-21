@@ -1,0 +1,173 @@
+{
+  "schema": "bgen.epistemic-audit.adversarial-probes/v1",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "probes": [
+    {
+      "probe": "design.duplicate_nullifier",
+      "ok": true,
+      "detail": "rejected with AllocationError: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "probe": "design.bool_eligible",
+      "ok": true,
+      "detail": "rejected with AllocationError: eligible_sats must be int"
+    },
+    {
+      "probe": "design.zero_eligible",
+      "ok": true,
+      "detail": "rejected with AllocationError: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "probe": "design.negative_pool",
+      "ok": true,
+      "detail": "rejected with AllocationError: fixed_bitcoin_genesis_pool out of range"
+    },
+    {
+      "probe": "design.pool_bool",
+      "ok": true,
+      "detail": "rejected with AllocationError: fixed_bitcoin_genesis_pool must be int"
+    },
+    {
+      "probe": "design.huge_eligible_over_MAX_SATS",
+      "ok": true,
+      "detail": "rejected with AllocationError: eligible_sats out of range"
+    },
+    {
+      "probe": "design.rows_sorted_by_nullifier",
+      "ok": true,
+      "detail": "['0000000000000000000000000000000000000000000000000000000000000000']..."
+    },
+    {
+      "probe": "design.supply_conserved",
+      "ok": true,
+      "detail": "issued=999999999 rem=1"
+    },
+    {
+      "probe": "design.tampered_record_rejected",
+      "ok": true,
+      "detail": "rejected with AllocationError: sum mismatch"
+    },
+    {
+      "probe": "design.tampered_totals_rejected",
+      "ok": true,
+      "detail": "rejected with AllocationError: issued+remainder != pool"
+    },
+    {
+      "probe": "claude.duplicate_ids",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: duplicate participant id: 'd'"
+    },
+    {
+      "probe": "claude.bool_weight",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: contribution weight for 'd' must be an int, got True"
+    },
+    {
+      "probe": "claude.negative_weight",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: contribution weight for 'd' must be non-negative, got -1"
+    },
+    {
+      "probe": "claude.empty_id",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: participant id must be a non-empty string, got ''"
+    },
+    {
+      "probe": "claude.non_string_id",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: participant id must be a non-empty string, got 7"
+    },
+    {
+      "probe": "claude.negative_pool",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: pool must be a non-negative int, got -100"
+    },
+    {
+      "probe": "claude.bool_pool",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: pool must be a non-negative int, got True"
+    },
+    {
+      "probe": "claude.cap_bps_zero",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: cap_bps must be an int in (0, 10000], got 0"
+    },
+    {
+      "probe": "claude.cap_bps_over",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: cap_bps must be an int in (0, 10000], got 10001"
+    },
+    {
+      "probe": "claude.winners_zero",
+      "ok": true,
+      "detail": "rejected with ParticipantValidationError: winners must be a positive int, got 0"
+    },
+    {
+      "probe": "claude.zero_weight_gets_zero_huge_int_exact",
+      "ok": true,
+      "detail": "0, big==True"
+    },
+    {
+      "probe": "claude.order_invariance",
+      "ok": true,
+      "detail": "same mapping under reversed input order"
+    },
+    {
+      "probe": "claude.lottery_deterministic_same_seed",
+      "ok": true,
+      "detail": "identical results for seed 99"
+    },
+    {
+      "probe": "claude.lottery_winners_distinct_equal_prize",
+      "ok": true,
+      "detail": "10 distinct winners, prizes={10000}"
+    },
+    {
+      "probe": "claude.no_scheme_overissues_500_trials",
+      "ok": true,
+      "detail": "violations=0"
+    },
+    {
+      "probe": "grok.duplicate_ids",
+      "ok": true,
+      "detail": "rejected with AllocationError: d"
+    },
+    {
+      "probe": "grok.bool_weight",
+      "ok": true,
+      "detail": "rejected with AllocationError: contribution[0].eligible_sats must be exact int, got bool"
+    },
+    {
+      "probe": "grok.negative_weight",
+      "ok": true,
+      "detail": "rejected with AllocationError: contribution[0].eligible_sats out of range: -1"
+    },
+    {
+      "probe": "grok.zero_weight_rejected_min1",
+      "ok": true,
+      "detail": "rejected with AllocationError: contribution[0].eligible_sats out of range: 0"
+    },
+    {
+      "probe": "grok.huge_int_over_MAX_SATS",
+      "ok": true,
+      "detail": "rejected with AllocationError: pool out of range: 1000000000000000000"
+    },
+    {
+      "probe": "grok.order_invariance",
+      "ok": true,
+      "detail": "same mapping under reversed input order"
+    },
+    {
+      "probe": "grok.vs_claude_input_domain_differs",
+      "ok": true,
+      "detail": "documented semantic difference: zero weights and >MAX_SATS ints accepted by Claude model, rejected by Grok model (AUD-SEM-02)"
+    },
+    {
+      "probe": "differential.claude_vs_grok_pro_rata_300_vectors",
+      "ok": true,
+      "detail": "disagreements=0"
+    }
+  ],
+  "total": 33,
+  "failed": 0
+}

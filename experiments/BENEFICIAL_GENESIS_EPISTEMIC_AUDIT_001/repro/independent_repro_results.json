@@ -1,0 +1,253 @@
+{
+  "schema": "bgen.epistemic-audit.independent-repro/v1",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "checks": [
+    {
+      "name": "R1.floor_sum_never_exceeds_pool_2000_trials",
+      "ok": true,
+      "expected": "0",
+      "actual": "0",
+      "note": ""
+    },
+    {
+      "name": "R1.scn06_single_identity_share",
+      "ok": true,
+      "expected": "10791953/25000000",
+      "actual": "10791953/25000000",
+      "note": ""
+    },
+    {
+      "name": "R1.scn06_split_gain_is_tiny_negative",
+      "ok": true,
+      "expected": "-53/25000000",
+      "actual": "-53/25000000",
+      "note": "floor residue only; linear pro-rata is split-mass invariant up to floors"
+    },
+    {
+      "name": "R1.micro_split_no_gain",
+      "ok": true,
+      "expected": "<=999",
+      "actual": "999",
+      "note": ""
+    },
+    {
+      "name": "R2.scn05_concave_single_share",
+      "ok": true,
+      "expected": "3849009/100000000",
+      "actual": "3849009/100000000",
+      "note": ""
+    },
+    {
+      "name": "R2.scn05_concave_split_share",
+      "ok": true,
+      "expected": "111119/250000",
+      "actual": "111119/250000",
+      "note": ""
+    },
+    {
+      "name": "R2.scn05_split_gain",
+      "ok": true,
+      "expected": "40598591/100000000",
+      "actual": "40598591/100000000",
+      "note": "+40.6pp from free 400-way split"
+    },
+    {
+      "name": "R2.sqrt_split_weight_multiplier",
+      "ok": true,
+      "expected": ">1",
+      "actual": "31600/1581",
+      "note": "splitting multiplies concave weight ~sqrt(k)-fold"
+    },
+    {
+      "name": "R2.scn26_cap_single_share",
+      "ok": true,
+      "expected": "1/10",
+      "actual": "1/10",
+      "note": ""
+    },
+    {
+      "name": "R2.scn26_cap_split_gain",
+      "ok": true,
+      "expected": "176241/250000",
+      "actual": "176241/250000",
+      "note": "+70.5pp: 20 identities x 10% cap"
+    },
+    {
+      "name": "R3.scn19_single_tiny_donor_gets_full_pool",
+      "ok": true,
+      "expected": "100000000",
+      "actual": "100000000",
+      "note": "realized-total denominator: pool issues in full regardless of subscription"
+    },
+    {
+      "name": "R3.full_issuance_T=1",
+      "ok": true,
+      "expected": "True",
+      "actual": "True",
+      "note": ""
+    },
+    {
+      "name": "R3.full_issuance_T=1000000000000000",
+      "ok": true,
+      "expected": "True",
+      "actual": "True",
+      "note": ""
+    },
+    {
+      "name": "R3.zero_participants_zero_issued",
+      "ok": true,
+      "expected": "{}",
+      "actual": "{}",
+      "note": ""
+    },
+    {
+      "name": "R3.dust_donor_floors_to_zero",
+      "ok": true,
+      "expected": "0",
+      "actual": "0",
+      "note": "floors silently zero out donors below total_eligible/pool per unit"
+    },
+    {
+      "name": "R4.conditional_rebate_one_for_one",
+      "ok": true,
+      "expected": "2500000",
+      "actual": "2500000",
+      "note": ""
+    },
+    {
+      "name": "R4.expected_rebate_arbitrary_donor",
+      "ok": true,
+      "expected": "100000",
+      "actual": "100000",
+      "note": "5% access x 80% enforcement collapses 2.5M conditional to 100k expected"
+    },
+    {
+      "name": "R4.expected_rebate_colluding_donor",
+      "ok": true,
+      "expected": "2000000",
+      "actual": "2000000",
+      "note": ""
+    },
+    {
+      "name": "R4.colluding_donor_net",
+      "ok": true,
+      "expected": "1050000",
+      "actual": "1050000",
+      "note": ""
+    },
+    {
+      "name": "R4.retention_identity_all_rates_0_100",
+      "ok": true,
+      "expected": "True",
+      "actual": "True",
+      "note": ""
+    },
+    {
+      "name": "R5.scn10_total_eligible",
+      "ok": true,
+      "expected": "62847081",
+      "actual": "62847081",
+      "note": ""
+    },
+    {
+      "name": "R5.scn10_attacker_allocation",
+      "ok": true,
+      "expected": "15911637",
+      "actual": "15911637",
+      "note": ""
+    },
+    {
+      "name": "R5.scn10_net_profit_default_cell",
+      "ok": true,
+      "expected": "4749998969487149/2500000000",
+      "actual": "4749998969487149/2500000000",
+      "note": ""
+    },
+    {
+      "name": "R5.grid_has_both_signs",
+      "ok": true,
+      "expected": "{False, True}",
+      "actual": "{False, True}",
+      "note": "laundering profitability flips sign inside the published grid"
+    },
+    {
+      "name": "R5.grid_differential_vs_claude_absolute_semantics",
+      "ok": true,
+      "expected": "0 mismatches",
+      "actual": "0 mismatches",
+      "note": "grid reproduced exactly under absolute-unit-value semantics (AUD-SEM-01)"
+    },
+    {
+      "name": "R6.scn13_proportional_whale_share",
+      "ok": true,
+      "expected": "13121911/24999936",
+      "actual": "13121911/24999936",
+      "note": "~52.49%, crosses simple majority"
+    },
+    {
+      "name": "R6.scn13_crosses_majority",
+      "ok": true,
+      "expected": "True",
+      "actual": "True",
+      "note": ""
+    },
+    {
+      "name": "R6.scn13_equal_rule_share",
+      "ok": true,
+      "expected": "1/501",
+      "actual": "1/501",
+      "note": "501 recipients with positive allocation"
+    },
+    {
+      "name": "R6.scn13_none_rule",
+      "ok": true,
+      "expected": "0",
+      "actual": "0",
+      "note": ""
+    },
+    {
+      "name": "R6.weights_sum_to_1_proportional",
+      "ok": true,
+      "expected": "1",
+      "actual": "1",
+      "note": ""
+    },
+    {
+      "name": "R7.scn14_500bps_whale_final_weight_matches_committed",
+      "ok": true,
+      "expected": "99999749/1023769849",
+      "actual": "99999749/1023769849",
+      "note": ""
+    },
+    {
+      "name": "R7.scn14_final_exceeds_nominal_cap",
+      "ok": true,
+      "expected": "> 1/20",
+      "actual": "99999749/1023769849",
+      "note": "renormalization pushes final share above the nominal 5% clip"
+    },
+    {
+      "name": "R7.scn14_sums_to_1",
+      "ok": true,
+      "expected": "1",
+      "actual": "1",
+      "note": ""
+    },
+    {
+      "name": "R7.single_holder_renormalizes_to_1",
+      "ok": true,
+      "expected": "1",
+      "actual": "1",
+      "note": "a 5% 'cap' still yields 100% final weight for a lone holder"
+    },
+    {
+      "name": "R7.two_holders_both_at_50pct",
+      "ok": true,
+      "expected": "1/2",
+      "actual": "(Fraction(1, 2), Fraction(1, 2))",
+      "note": "both clipped to 5%, renormalized to 50/50: final >> nominal cap"
+    }
+  ],
+  "total": 35,
+  "failed": 0
+}
