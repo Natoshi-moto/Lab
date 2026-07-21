@@ -1,0 +1,648 @@
+{
+  "schema": "nexus.beneficial-genesis.grok-tech-audit.pre-audit-freeze/v1",
+  "audit_id": "BGEN-GROK-TECH-AUDIT-001",
+  "task_reference": "pasted_prompt_controlling_task_contract",
+  "working_branch": "grok/bgen-technical-audit-001",
+  "frozen_subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "status_authority": "NONE",
+  "freeze_timestamp_utc": "2026-07-21T14:14:39Z",
+  "binding_check": {
+    "git_rev_parse_HEAD": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+    "HEAD_matches_exact_subject": true,
+    "active_branch": "grok/bgen-technical-audit-001",
+    "branch_matches": true,
+    "git_status_short": "",
+    "working_tree_clean": true,
+    "result": "PASS"
+  },
+  "runtime_and_environment": {
+    "os": "Linux fedora 7.0.12-201.fc44.x86_64",
+    "python": "Python 3.14.6",
+    "git": "/usr/bin/git",
+    "node": "/home/anon/.nvm/versions/node/v24.14.0/bin/node",
+    "workspace": "/home/anon/Downloads/Lab-grok-tech",
+    "network": {
+      "github_com_reachable": true,
+      "github_api_http_status": 200
+    },
+    "repository_visibility": {
+      "name": "Lab",
+      "owner_repo": "Natoshi-moto/Lab",
+      "visibility": "PUBLIC",
+      "isPrivate": false
+    },
+    "tools_available": [
+      "git",
+      "python3",
+      "node",
+      "gh",
+      "sha256sum",
+      "./nexus (to be exercised post-freeze)"
+    ]
+  },
+  "STATUS_json_observed": {
+    "schema": "nexus.status/v2",
+    "lab_id": "NEXUS-LAB",
+    "current_round": "R016",
+    "current_mode": "R016_USER_AUTHORIZED_PROMOTION_MERGED",
+    "foundation_status": "OPERATIONAL",
+    "last_completed_action": "R016_EXACT_AUDITED_HEAD_USER_AUTHORIZED_AND_MERGED",
+    "next_action_id": "ACT-R017_DESIGN_MULTI_HOST_REPLICATION_AND_EXPLICIT_FORK_EVIDENCE",
+    "canonical_target_tag": "baseline-001",
+    "canonical_target_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+    "note": "STATUS.json was observed read-only; not modified. Beneficial Genesis is not assigned an R-round by this audit."
+  },
+  "exact_sources_inspected_pre_freeze": [
+    {
+      "path_or_ref": "STATUS.json",
+      "mode": "full_read",
+      "purpose": "binding/runtime record; confirm no mutation by this seat"
+    },
+    {
+      "path_or_ref": "AGENTS.md",
+      "mode": "full_read",
+      "purpose": "repository safety instructions required to operate"
+    },
+    {
+      "path_or_ref": "README_START_HERE.md",
+      "mode": "partial_read_first_80_lines",
+      "purpose": "repository entry/safety instructions"
+    },
+    {
+      "path_or_ref": "experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md",
+      "mode": "full_read",
+      "purpose": "design pack orientation and reproduction commands"
+    },
+    {
+      "path_or_ref": "experiments/BENEFICIAL_GENESIS_DESIGN_001/TECHNICAL_DESIGN.md",
+      "mode": "full_read",
+      "purpose": "normative technical design for independent reconstruction"
+    },
+    {
+      "path_or_ref": "experiments/BENEFICIAL_GENESIS_DESIGN_001/THREAT_MODEL_AND_NONCLAIMS.md",
+      "mode": "full_read",
+      "purpose": "threat model, residuals, non-claims"
+    },
+    {
+      "path_or_ref": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/constants.py",
+      "mode": "full_read",
+      "purpose": "domains, rejection codes, pool constants"
+    },
+    {
+      "path_or_ref": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/allocation.py",
+      "mode": "full_read",
+      "purpose": "allocation rule reference implementation surface"
+    },
+    {
+      "path_or_ref": "experiments/BENEFICIAL_GENESIS_DESIGN_001/schemas/protocol_constants.json",
+      "mode": "full_read",
+      "purpose": "machine-readable protocol constants"
+    },
+    {
+      "path_or_ref": "experiments/BENEFICIAL_GENESIS_DESIGN_001/** (path inventory only for remaining files)",
+      "mode": "directory_listing_and_tree_sha256",
+      "purpose": "know design pack extent; remaining protocol/tests/fixtures not deep-read before freeze",
+      "tree_sha256": "76c3199bb5ee0479199678c83a6e71567e55fafc20aad6af7af3bc73c098ab97",
+      "file_count": 72
+    },
+    {
+      "path_or_ref": "GitHub issue #33 (exact number only)",
+      "mode": "gh issue view 33 --json",
+      "title": "BENEFICIAL-GENESIS-PROGRAM-001 \u2014 primary research roadmap",
+      "state": "OPEN",
+      "purpose": "program roadmap and gates; not an economics implementation"
+    },
+    {
+      "path_or_ref": "GitHub issue #34 (exact number only)",
+      "mode": "gh issue view 34 --json",
+      "title": "BGEN-ECON-REDTEAM-001 \u2014 adversarial economics and mechanism necessity",
+      "state": "CLOSED",
+      "purpose": "economics red-team task contract requirements; content is task scope not implementation verdict"
+    },
+    {
+      "path_or_ref": "pasted_prompt_controlling_task_contract",
+      "mode": "full_read",
+      "purpose": "this audit's controlling task specification"
+    }
+  ],
+  "exact_sources_temporarily_unread": {
+    "economics_and_retest_packages": [
+      "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+      "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+      "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+      "experiments/BENEFICIAL_GENESIS_RETEST_002/**"
+    ],
+    "audits_and_receipts_unread_content": [
+      "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+      "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+      "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+      "operations/audits/BENEFICIAL_GENESIS_DIFF_RETEST_002/**",
+      "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+      "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+      "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+      "operations/receipts/BENEFICIAL_GENESIS_DIFF_RETEST_002/**",
+      "operations/receipts/BENEFICIAL_GENESIS_DESIGN_001/**"
+    ],
+    "design_pack_remaining_unread_deep_content": [
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/verifier.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/objects.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/encoding.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/nullifier.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/merkle.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/crypto_synth.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/generate_fixtures.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests/**",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/**",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/schemas/protocol_objects.schema.json",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/schemas/rejection_codes.json"
+    ],
+    "prs_and_ancestry_unread_until_post_freeze": [
+      "PR #35",
+      "PR #37",
+      "PR #39",
+      "historical issues beyond exact #33 and #34",
+      "commit ancestry of economics packages"
+    ],
+    "permanently_forbidden_for_entire_audit": [
+      "PR #40",
+      "PR #42",
+      "branch fable/bgen-epistemic-audit-001",
+      "branch codex/bgen-technical-audit-001",
+      "experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+      "operations/audits/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+      "operations/receipts/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+      "experiments/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+      "operations/audits/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+      "operations/receipts/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+      "every sibling 2x2 audit branch, PR, report, receipt, handoff, summary, or finding"
+    ],
+    "note": "Unread means content not opened for analysis. Path existence and SHA-256 file inventories were computed without reading file bodies into the audit reconstruction."
+  },
+  "sha256_inventory_temporarily_unread_relevant_packages": {
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001": {
+      "exists": true,
+      "file_count": 79,
+      "tree_sha256": "f7020124512187bbba876cdc3a5161dcc9c05e56291381da15557957258bc853",
+      "files": {
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/ALTERNATIVES_COMPARISON.md": "abcef764910692615eb1e853ab203da1591dfb7cfb4976a6bd872351bf1a9fee",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/CROSS_MODEL_COMPARISON.md": "46fc02566e75768028e8bdaf2d365d3c8a8b746013354f523b0ded37fc1f3b6d",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md": "0131f83385a5e938a04c024ab30bc77511daca3326bc43cfd2eeeb410570af2f",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FORMAL_MODEL.md": "5fdf637986e4d79eb3ad54877bb054b2cf2952a21deb9a8989cd36e4e46df010",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/MECHANISM_NECESSITY.md": "c130e11aeab376c0b61c77ce43962ae1eaebf25336a6f6568381b0a3eba7c148",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/NONCLAIMS_AND_OPEN_QUESTIONS.md": "b426a4c7bff1422ba96eb092cb72f48d6194cde38a0b77c4da79ade2eded18d8",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/README.md": "6c5f4582b835cd56d340b48694655e3ee11fbdd9edd7270bed8ec76f11805c41",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/__init__.py": "b605d3f241cf3014f4f387fc68c9b15bc8438c5878e77ff8c33d83eed591e6b7",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/allocation.py": "8d07ed1adabb9c33d0714d20eeb5f9eb3e7b520fcf9485199dcf55b4b5cba150",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/collusion.py": "7988ad12dc8271ee47e0f1bd93aa6737fa7ffe859ef064ff0051eedbd903193b",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/governance.py": "eb2a237cad657a99f2b5f56ff9d826285c242dad12bd7f1d4c4e9e23d29c211e",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/metrics.py": "adb1c6f8dc835ff4639de5ea8cb15531a4221a1c0d15757338a450c6ed06c156",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/population.py": "51dafefe9bd455337d84a0d412e76f9e85832a6668db038dfadee2ef91a2aae3",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/scenario.py": "892197a39b66e5208bb3edc06540c0369e9403c8bd7f068d5e585929a62fec28",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/tainted_funds.py": "7eb3952cf28e796be60919f9850a7dfdf387b8582445eb9fe96f51936375b209",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/01_whale_50.json": "68570b79fb5409d43bb859ac409dc3f5a2ef6b43bd613082118c025fd05b3849",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/02_whale_80.json": "8faa9144a465acee8878d015cac387a03c5ab288f86215499ebc4be499fcdc3e",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/03_whale_99.json": "f837f8366dce90867abf50e9c2aed77d19b8ababf8ed5c875f6ada11fe00a653",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/04_exchange_omnibus_vs_small_donors.json": "bde13d1e83f31ef8b3b3327da1b3a78f3e6e767fedf7864f096f4b033c55d778",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/05_sybil_split_concave.json": "cb61735500f3e73433b61abfc08ea1ca6d2bc608b493b8ded3783186db81be8c",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/06_sybil_split_control_pro_rata.json": "9f67cb40606d608091a145963c8d9f15f23281090e7b2ac773999a669a052b8c",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/07_rebate_sweep.json": "43776aa77593e4b4c9e85104f290a616ff4fbeb60b861d19787de136b51a1388",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/08_secret_rebate_whale.json": "e769c6b474e6fb25d60a17307e340cee3c3c422728aaa8fad0be1b4e77e77d90",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/09_denominator_doubles_final_block.json": "d2cecdd44fe3368481f1490d75b94087757ea045530a79255478aa95538b6f8e",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/10_stolen_key_donation.json": "3ddabb804d48495b61fd5f6dde05e2cddcf4968b2c54ce314d9ef1377b6b6ecd",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/11_quantum_cutoff_freeze.json": "838d80ec9ae581fed6edbd8b470a2c2204ad6359e5f6d026dddfee9d01ef9d78",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/12_token_value_below_equal_above.json": "b8927854d56f2fdc6ab500281effecf35a9104f4f516d5de96672e245371e467",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/13_governance_rules_comparison.json": "f13ab0edc47d086acb37d11c7a114097c584d51e1023ca0ab14e016e357e16a2",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/14_governance_cap_then_renormalize.json": "fb97f71fd3603f45e37a51eb99706ff2c5f36aba9807b68cb4ab03fbf092a02c",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/15_lockup_0_months.json": "f4e00c091202995539743563037244a829a0bc9d09140b9d612f55a27bcdee01",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/16_lockup_3_months.json": "03b6b79d78a553ed5ced3a842e4684182129c0591787d6f69a3fbe1e662f4a79",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/17_lockup_12_months.json": "c1328144f82d49be5ed0a9d46c951c68472b36ad9d8252ef4f348ad146686f3a",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/18_charity_set_single_vs_multi.json": "3bdeba6734cf14e6f913addcc8f06667fa4b84eb98ddee678beababe886cd07b",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/19_undersubscribed_pool.json": "24de2a8220ff03ee71d760d3da47aa2f01cc0812c6744b1b6168477a6214399f",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/20_oversubscribed_pool.json": "90d86ce1172d006757af576f15a4c8ea3f938e364353ee0d52cfda9f1f226965",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/21_no_token_baseline.json": "e53d61544407390ab7fed300d11697a4f3d7100a68acb4bff8967b438832f471",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/22_capped_pro_rata_whale.json": "1ac44a3ce8b3bc52c8b9fc7cc5cb07e3252cc0f6857c994ee9071a4b46de658e",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/23_time_weighted_late_donor_disadvantage.json": "614a956799e68c6d8160a02d8b3a298fff400ffd005a603f8cfb84fdc3b42a81",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/24_random_lottery_component.json": "a6fa6987f468df822a969f522aaaa20a848936bf126dd416aa489d31fdf27b82",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/25_concave_log_whale.json": "12568f5f82ffd194e63e63c33029fab4bef639cfc1cf1365473dbb04634d6d4c",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/26_sybil_split_capped_pro_rata.json": "3c6b353efd5099d16254fd3adfce93bd89d7524f9158ae99b584572545f9fbbc",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/27_rebate_access_frictions.json": "75e25e141508f575567486dd7ac4fa78b7e4582e30d50001a1ba7d100b3e295c",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/SUMMARY.json": "61e08e4fb748f5749084d89635f2ea67f7e926ffea2f58abf70906ae319087ca",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/TABLES.md": "0a1e7746304abf06f38d3219cea7fd6b0338da8d8c32374be8547ecc4308364e",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/01_whale_50.json": "d3e03322358241cc34fc6a10ec2bc1f5776eacac78acc8666a8c56c0c9eaf9c5",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/02_whale_80.json": "1b5004ac57a8dd042402440fb885b5ad1c3855a9e2c00416890fff649058c10a",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/03_whale_99.json": "778d87dbcb0daf3690ebc4805527182c5c51cb284d3e66c79cb89538682fb3b7",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/04_exchange_omnibus_vs_small_donors.json": "425f316f3d738dfb0b2b9232ac41ca1293aa0d6bcba819bf3e2d0e034c52c905",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/05_sybil_split_concave.json": "b6512c51e6eb068ab5be04a360b36d60d6473703508db84a9482fcceadbb4d21",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/06_sybil_split_control_pro_rata.json": "d48325f8fe56a1a9bb37354eb2adeba76fb205390d9bea83cef91fb3b39aaa3c",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/07_rebate_sweep.json": "86120f7a5c2451506612ccf98d0e7406c1fc6828fc424884a72dccf632a1c6a7",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/08_secret_rebate_whale.json": "9b2749c5f8cc573f7b6d17568bbaf0f28d0a1cc0a0ee985d71a36fa0a793f49d",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/09_denominator_doubles_final_block.json": "5803a99c764eef20bc8f8b4b2f7ff318e6200017fb7fe562d3768ca2107e42fb",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/10_stolen_key_donation.json": "2ff3cbdf79285201880713505d5b02b0edd3fc020aef1bfbbb1d0c13cb536da9",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/11_quantum_cutoff_freeze.json": "2f5687357e9980979374d645b1a7082112e720541917f01a1a24ba863ecd6e86",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/12_token_value_below_equal_above.json": "48fb4cf364a281b5da85faf65596f4220920101e594e01acae0c88283014fafb",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/13_governance_rules_comparison.json": "d7a9f3abad2dd4c83a1828130638a1ddf310cb8ba58d0204e229076da4e678e1",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/14_governance_cap_then_renormalize.json": "35215779e520558213f6537de84beab5ec100ce371624fe18acfb54a47690e64",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/15_lockup_0_months.json": "a6f8657f31a98d448e077738a35de35cd0761320cef08f02a3d74940b5df9268",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/16_lockup_3_months.json": "d391a6c1bb9b4f704256ea935ce199888296ea7e47c78d865cf0944a48896ca0",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/17_lockup_12_months.json": "e3113be9a3056a35a2c8bd8872b46a0bb1ba8ab5e2efc6836163fec983126865",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/18_charity_set_single_vs_multi.json": "efa79799602167516678f7a1a9263df1beaccb2c66327c38d19ca4ead069b708",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/19_undersubscribed_pool.json": "a9a634f07b5b656695dbd4301f24e5f37a5c80d27cc2a7b601d1e681cb62a8cf",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/20_oversubscribed_pool.json": "cd38f797f8225542769b5a1ad886da9e09d120332c21619af4460f666edd2626",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/21_no_token_baseline.json": "b0bcede6a7c3b6c175ffc31496241da26e69b30c0e33f556c648b67a926d57ac",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/22_capped_pro_rata_whale.json": "6bc1a8154ec0dbe238fb04986b54accc01c2af6fad998c10502a2dc8d4f62bc3",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/23_time_weighted_late_donor_disadvantage.json": "c8a62819a503c850b923aa5d026fd093b196e30c7b3ab316935bae4bf2485cec",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/24_random_lottery_component.json": "dcab6684312857b97f64041bcd1d6f5dbe0b0d9a9d42ab6c01b2d8eb77d5e24d",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/25_concave_log_whale.json": "6922915a204d89346bc401b84f66f9d771eb53af280bf7a59e43ec31459a6928",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/26_sybil_split_capped_pro_rata.json": "55f82e790c20cef1aec8f6ec6c2e691260c0f4964853b5c51170a09c0434e922",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/27_rebate_access_frictions.json": "2379b1ab7007855131b0bd4a1e856be1e3f734a147393318c4132970060e6dcf",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": "e270f6e74d15ceaeb3c4732057e6f9a3ebf11f15c2f768948b54b0fbee1b21d0",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_allocation.py": "2b633cd700ff02f2215191c1418df60816c571eafb463c8c23a52f72fa117509",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_collusion.py": "f809d77e72edec1330f9e4684244430a213eb9eab920aad2e81f56adc736c522",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_governance.py": "c5d7eb0f81e2cdaac5a64b17f33ef3a4b5d11c984009cb613850803ef719492b",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_metrics.py": "bbceb049fd43257a3cb695264d2808105ea8cd4bef4867a7c132ac1271b4f6e7",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_scenarios.py": "f5d2cd76bce5479825812b372907e2b975b8e7ba6ade1ef8ea1bf6d581c7d587",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_tainted_funds.py": "400f4329aa7b1287ab6a9220fa5c03cd7d7e471e12352ecae9c86c1034e80c60"
+      }
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001": {
+      "exists": true,
+      "file_count": 80,
+      "tree_sha256": "24cb221cb6fd54a7c375e482c12d6d4873b88263fb00169d05e67cf4807b6459",
+      "files": {
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/ALTERNATIVES_COMPARISON.md": "2374c3b8e632861a1e37215b40dfbd9ce6783dd88dbd2228443b91fc4f03fa6c",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/CLEANROOM_INTERPRETATION.md": "760e34c5f90986c963d7ca11be6abc2ee0a6f185a275541554d6a24da121760e",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/FAILURE_CONDITIONS.md": "1ffe9e94036d7727b03dfc531b50d7ccbf883050838aa376174b902077073a0e",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/FORMAL_MODEL.md": "c6b7b5ae2e9e7e4ddf980b1ff7a3e765281bdb7cb6c7ea77d47123a66cdb5881",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/MECHANISM_NECESSITY.md": "a223b20db5c88552c73192f6f0fe22d397e3169ff9fbb319a3423dd7f58130b9",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/NONCLAIMS_AND_OPEN_QUESTIONS.md": "a38986d35ca95f1fb4e3e89c0633848e2f00d1dd675a3746929504c8e846fe39",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/README.md": "453c1496b4ab7fcd04a01677481535bbf336328e36972b794ea9e35bfa19cffd",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/REV_ITEM_RESPONSES.md": "e5b951382275b7dc3364bf6b9a5ae2b3eb39117c62c967751faa2b54fa1d37c5",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__init__.py": "6ce73b0af4af68cfa92c4106f25f5e324f43795a6665f5e205809211e1ca8cc3",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/allocation.py": "58eb16f524146c9af3a56804e0df6c34c08507edae79e1155622c3db7bc37e35",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/governance.py": "e9474c400e6cca8214aaa7b93186ce4d41bde1cc5fe4c71dacf399f03463eac4",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/laundering.py": "3bad6a9eb3d8cf9028393b6675bff63d0ccfbc04cf336e842e83fa4946102e1b",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/metrics.py": "817cd570d11b73c4ac808e3dc1fa723f8dd49d26d705b35472ec370e1f4baf18",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/rebate.py": "025ec19beef5d7e3149f216347bcfca30ab3004ea416d9c9c6f2ab334ba2fe8b",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/scenario.py": "41929ce042e95906c9e0ede5997b6098f1cb99c28022fb8f1148be1fac53daeb",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/01_whale_50.json": "5ec67469c121b46cae8dfed40d48f8066256ff765aa583f080121a9d0acc1a41",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/02_whale_80.json": "afcd67becb853a59546c2bca0b469bbfff53b50782b77b4a1af3e16257eee86a",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/03_whale_99.json": "b81e09440b8e2953573ee3114045faa8f8a76082a5ba441f29ee8518ac8e1326",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/04_exchange_omnibus_vs_small_donors.json": "ffb3495c69cef038d2a8e36bcc792956913089f5c096d216f98331e6f8add3fa",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/05_sybil_split_concave.json": "a3afabe7ad90fe1ad13c501048f9d6f22a5bbf218d5d8ad9a293c17b0c50fb7b",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/06_sybil_split_control_pro_rata.json": "a50d0955d327fbac3edf96e7b8dc32668598d9b3c6a6d642a2abe311f0367c27",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/07_rebate_sweep.json": "aa7f150756f7900731ca6c4bf1188af904528f51c529771394a51bf5a3eaf7e0",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/08_secret_rebate_whale.json": "06a6e57aeaba0c8a0799d5f24949a5ead9046541b8ef2844ecaa51024e26a925",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/09_denominator_doubles_final_block.json": "50ca714e9e3d9b551f6b7c8c7cd3f514722ae7eae23263370d0d717faad06cc9",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/10_stolen_key_donation.json": "cde5ee6d0706fa74ea70dd6ec4653d8c901689a78551ad2edc934d8530c366af",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/11_quantum_cutoff_freeze.json": "032de37f12194e5364fcca2a72df5576ef294e1194b455eaf329b5a5c533ecea",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/12_token_value_assumptions.json": "30722251ed2f3c3cc17ce3298f72c8eb495e239cd9aada02861c0ac71ccf53c7",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/13_governance_proportional.json": "a00e476f2dab966392f889079be31958b2e6547a028ca98d76af5635f69c000f",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/14_governance_capped.json": "98f9764d0574a79073d83830a0abffdedd12f3cdfdda53722a0abdf4bc770616",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/15_lockup_0_months.json": "87e8c53e32310a9cf97a4a64e73324ab48f71b9e1662e0156c5f3b8eea719802",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/16_lockup_3_months.json": "e4c2b3a67c2f434aaf140dc4d57d0fa01e3058e029e1bfef39439b9b10a30995",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/17_lockup_12_months.json": "28cd988559086b7bd0cd51285f44aebb098cd24855d94579473b628d6a087520",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/18_charity_set_single_vs_multi.json": "4e564d72b8de6dac1178c0434945580867cd480db38fb2f036a9181c6644b977",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/19_undersubscribed_pool.json": "d7b6b4c5235359372e672702015a86fbf37e19064a7b1fc07c5d293860265226",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/20_oversubscribed_pool.json": "75fd079cdbb448aa8a74b3941fffbb82858002ded1d2ea2b37d173a119ee227e",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/21_no_token_baseline.json": "e936b09538432a1187304287abc30fd88709dc037c09f1dc11f93daa566758b5",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/22_capped_pro_rata_whale.json": "5ea511ba5d90a68dc7f68026400202e76227332f5faaf34e99708505586889e0",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/23_time_weighted_late_donor.json": "557fac1f2a54f20abcd5a9f4bb61c7a565b561e755d030c4e728c87fdc48272d",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/24_random_lottery_component.json": "5d61e6b5bbdf4860a07387fbb22bc7edf1eca99e701be6c9a1b36c13140df98a",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/25_concave_log_whale.json": "553a491508f601701d58bd33430b5e34c41358f4c2049a855710d9802394d3c8",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/26_sybil_split_capped_pro_rata.json": "f82872e6232e4cf5ff193a5dc20517dc89c86aa0a1035ca0ca62f25f9d483be6",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/27_laundering_opportunity_grid.json": "fb702e762662e79ce5ef91f46681300916154ec1a5d3a4545efde7dd6fe1ee1a",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/28_rebate_low_access_genesis_set.json": "908da541b506f894c5b9dfcfe016bab9c8a74662045a72da91e778b1d1cff037",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/CLEANROOM_FREEZE.json": "98e6907fa1c737b4c572a69a324b760ae41eec48f0ed246816631b2dfc219917",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/DECISION.json": "e859ffb8998cc7ab971a602913592f6f15dca4f6ae51fe837390df40b14f43aa",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/DIFFERENTIAL_REVIEW.md": "3a45f83f92836aa96b9e16ce4c40f3e1d4bffe9d18b3f0b3f57ca7dec906724e",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/SUMMARY.json": "2c27e9725d1924720206127c01f5e6b2b6efb62cb71dc797060bfa14bbdb1d30",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/TABLES.md": "7873183e9003ad5e1174731f65252c6682cff5b8a0bc4c7e77706481e6ec2d69",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/01_whale_50.json": "dd1bca8bead8e7fda9c3a0c2668bb850a5400dce146c85c3d0c0c767d5fce323",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/02_whale_80.json": "e1fb3e5cd3ce9302700fbe3ce566368be3cef382eef0a25f01cd9c8a35481659",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/03_whale_99.json": "f8fc48a0d4472066aa7c7095dc9e2f568be8aaaba675761c1f6c14c7fa6c3a7a",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/04_exchange_omnibus_vs_small_donors.json": "401269acd62a2c0f8815ad6d3b816ef2731206be58a6194fdea1fa2d42a29d76",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/05_sybil_split_concave.json": "26a377d58e0a308441ff52d09f973a93b0e440bdc87903fcc36c4ff50f393d20",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/06_sybil_split_control_pro_rata.json": "d8ab360610da5ad5df35fa616b61fe1a48ee56f8c768da3c3f25389e39e6f608",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/07_rebate_sweep.json": "5669acbbe03d84d7b6fe290b3e1fa7c7c0865c15d147380657037dac330bf3c5",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/08_secret_rebate_whale.json": "993e0d1e92d4a58a54e364e25fb72c65675c6a05ae4f5a4e4c1bcd515f56e53b",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/09_denominator_doubles_final_block.json": "e89c45096c241d49d96aedd80ef78d67b741fad6f595f00ca3e7b4036883da44",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/10_stolen_key_donation.json": "df66603df71aec06c212401c9831b6024d3c21ac039943b060b7d3938bd12e86",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/11_quantum_cutoff_freeze.json": "7d486e1410b897a2ad7346697d5455de150f3f6c9029fbba391bc32ff597aec7",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/12_token_value_assumptions.json": "c47dd9826d437c9316e282fac561d6803281d7c99fe49404ef2bfc640ee32f1e",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/13_governance_proportional.json": "2ecb7ff8750e072f283cba012f39c6651eeff51b9d7870514695e0b5bd1f3264",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/14_governance_capped.json": "fa3541722166650c58a277b80227c2268535423174554e982f5a2e0a96854b14",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/15_lockup_0_months.json": "d629ef4c037ce49c91b1aff9a4337a9617f6f4f50ea7c7fb1508a6bfaa3c3ce9",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/16_lockup_3_months.json": "4183929668187fad849300d426331af1e761f30adcfe93f5ab962f52097607c8",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/17_lockup_12_months.json": "2c73d0fa6aaaa8193ac150df01557022bc2dc0c73cf849e5b1b2e8536ea7d0ae",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/18_charity_set_single_vs_multi.json": "978e94b32707459aaeaa0667284e407642813c6864fa5202413f16e82db5683f",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/19_undersubscribed_pool.json": "342d6316c9a87bb9dd890e95bf2ace11d00c85c1d825db29c3497e7f705715db",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/20_oversubscribed_pool.json": "3ca7a8b55db7efa39a70e1269f7b3399e5a052565bd3552f4e618492e454a9b0",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/21_no_token_baseline.json": "93ef010b2f87ffffc00469df9f7d8ba4fd817bd36af69ed1878f76fe45fa1d40",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/22_capped_pro_rata_whale.json": "df120bcbd75ae55dbbe26bd9033ee24d2e7694f99346982805dca003ecaa3a23",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/23_time_weighted_late_donor.json": "53cd99ffde8e422c4ca9dca3c25f647b3aa0cde9bfd050a2026a9bbecb7f1d16",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/24_random_lottery_component.json": "783be084f6b1a31560e569f69e11533492323d4fb011668c8fabef155e5180aa",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/25_concave_log_whale.json": "021fe195c24853563121aaed825b717fd9498fc9455b565d7056a6b24143d34f",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/26_sybil_split_capped_pro_rata.json": "58fe3f20f054d8ba6cfc525a3041ac0d8763705eb2ede4c3dc98790244d97f7b",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/27_laundering_opportunity_grid.json": "0089d3735f087c93c5a4a9843abd48d63608d0f518f1528e0ed81e2de310508d",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/28_rebate_low_access_genesis_set.json": "17a92b98d794df413d9ba299a37675545984a913227d15cf89c26121668807f1",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py": "905a8d56b6420d8bad467ffc7e767df6d4e2b25a3fc3b4f6249197de56c057a8",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/__init__.py": "a449ec3232cbf02f684cf2a9c32e4823181ea7a7e976094fa4f4d33c535d510f",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/test_allocation.py": "ec59e0f58504c5e9b60b6cf81a91a22a5bf8f8691b38e535a1505594b414bbb4",
+        "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/test_metrics_gov_launder_rebate.py": "b5288f9833d48b7d24fdf7052d7752c6cbc560a552a78699960dd3ad776c056b"
+      }
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003": {
+      "exists": true,
+      "file_count": 3,
+      "tree_sha256": "e6cf2cd861e8fcc3468abb112363d6e6527f46acb777aa2f3f556c83ba510078",
+      "files": {
+        "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/README.md": "09836f2c124adc24b51d8d493ca0eb89923ac3d4e3be861c6bfd3a0dd1699974",
+        "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/results/DECISION.json": "36f800deefc2b670a4d3260a223799cc87d8c48f33f3f85b3b70ad8fded9e67e",
+        "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/results/VERIFICATION_MATRIX.json": "ea19a0c85d850b449e4564e412ee81dc13c82c12f0942eab975585f1f774e24a"
+      }
+    },
+    "experiments/BENEFICIAL_GENESIS_RETEST_002": {
+      "exists": true,
+      "file_count": 24,
+      "tree_sha256": "3a2bd86a32ad6d86893105a87c85a8ae1863a1c0c068ad5b2940f69b8a41cc15",
+      "files": {
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/CLEANROOM_INTERPRETATION.md": "c3a95f479dc1e7c0257e3232dccdf4456b8876ad14e61254f032ebede912a448",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/README.md": "f9a91df971ba6d99e7665b6791cbf78d80709a95346315ffdf9b3865138bd498",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/hostile_fixtures/commitment_version_true.json": "d61d5fb6958cc9e018509fa8ac2d8098575a3ff516854acaa1957b53701a12db",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/hostile_fixtures/duplicate_raw_keys.json": "a6c4c39cdefba6d91d3b067ac606c1d9b67757a564f2380aaf04772635d5785c",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/hostile_fixtures/nullifier_disagreement.json": "bcf8e58073e9fa56e862e4b22ba60b23978612137565693a03ceabea3c98d8b8",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/hostile_fixtures/pq_sig_domain_bytes_unknown.json": "ce744cf65f8ae76b010e32f1203eed861a677f68f19628b0b996fadbc8f71438",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/public_test_seeds.json": "829c7efa115a71670c6e80b2a13cd5c19feb3ca5ce7e0997765f66cc21a30c3b",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/results/CLEANROOM_FREEZE.json": "25dfd7a2bcec9f9779c14220df864a691cf6efee741012e8b4317ceb99d492ee",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/results/DIFFERENTIAL_DECISION_MATRIX.json": "dae1702a500b63c920fe704e2d62f8c10a21fd2dce3e5a5e820334427e65ef73",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/results/FIXTURE_COMPATIBILITY_REPORT.json": "86f485cb4c7c1306580e94ac2eada68dc316162345afb8d032f3a948d3a3c4ca",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/results/HOSTILE_FINDINGS.json": "82a79826009e78e0dba0f68a500d18bc9a0dbaf915ca760f54671e36a95cb369",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/results/MINIMIZED_COUNTEREXAMPLES.json": "1964c4e54e1e519c7f63442147da4d08eedc515478ffde977e4b8697ac4b4f8f",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/results/POST_FREEZE_PYTHON_PROBES.json": "1764471d45a46641292313386c09e9783935d11399db2ff42481aab88608cee0",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/allocation.mjs": "6843f4155411c990ff157a94318e4035460f2d337ba0d87211ef7dc0d11c3209",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/constants.mjs": "403440ca8b7b3c563f06b7e49407b38cd16660b42d05a1343a1a8a6fc860993d",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/crypto.mjs": "bdbfed2906eaa7f36267d868bf535baa1e600eeae0aa7e0a43631627794e43a6",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/encoding.mjs": "7db55f3e25c2c1746b1fb52002cced23b63dd0cfb02a2e5f820fc8ca5101eebc",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/index.mjs": "73fd0bc0aa06687deef485a8632e97ac14470099524d21ee8efc50044339fce4",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/merkle.mjs": "56ba65180abd4f6f9740f65591a72ccb7a8900fe25a6b67b4d4d2196772c818f",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/parser.mjs": "1e8da92783fd4ad06403f308390895853183b3b700fc11922486047673093aa9",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/src/verifier.mjs": "a32e60d1d9363330406736289a1d9830156c0a18e29d4799aa6ab18cfe292c7c",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/tests/core.test.mjs": "41f01aec7dbc2624021c34b03465e8b9335b5a505f4095cd0a3c97d332e3e629",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/tests/hostile.test.mjs": "18c6771baf094ead133328aad0fcb55c528d37aa133f30f60f1f95133f37acf6",
+        "experiments/BENEFICIAL_GENESIS_RETEST_002/verify.mjs": "7a5fea8d7f57c228ba961b3b7b02e6c48c4fef9f30af0560e8741e2fd9e310e4"
+      }
+    },
+    "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "108be54209e721ed49ae49a2c9fab066d8cd1322268b8bf4e0070b6d3a8859e2",
+      "files": {
+        "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/AUDIT_REPORT.md": "a92a5a2cb0ebedd55e095d47078d5a3e684620e6611d153c42d5c7958f405694"
+      }
+    },
+    "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "ac6925f78c2a3de3f5e8e4ce1db921b8d38c3b7f8187dccaca595e0e8dad9b1f",
+      "files": {
+        "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001/AUDIT_REPORT.md": "7c9d09f9aeac190ba6a2bfd6e40196c1fb207b7a9dea20c0b7763e6891b76bcf"
+      }
+    },
+    "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "90b84b1feea88451916aca269218753d6e85c3ef12a31d9c017011d5db19102b",
+      "files": {
+        "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003/AUDIT_REPORT.md": "8ad7c28ac2f5d05a73aa9d1d6676d9eeaf868ffb0b836d568e72b585a1b24481"
+      }
+    },
+    "operations/audits/BENEFICIAL_GENESIS_DIFF_RETEST_002": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "f4966137b2f8cf793283762f172c63f19affc83e7b12a7d9e876d6252701b06f",
+      "files": {
+        "operations/audits/BENEFICIAL_GENESIS_DIFF_RETEST_002/AUDIT_REPORT.md": "4a3ac592fd52ace65d9462f1ae0a3d2c12f17bce67a3a7d41a21dbb68a807df3"
+      }
+    },
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "d218603a5e88781528239d7c4f26b1d28a5ec7881e8dd7e556198d0ca11ee3ea",
+      "files": {
+        "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/RECEIPT.json": "844b845de2511f9a353d87f48dcbd3f39f87b6cd74cd14d4625dcbe4886046a3"
+      }
+    },
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "08b0e02d887f610c7680bca204c2a2d87ffaef29e928904661ccf15e61274a77",
+      "files": {
+        "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001/RECEIPT.json": "dbcf05cee325fca8fb59ab8bb2ec3c8d588ad29ba8b9a9e71b8aad15313997e3"
+      }
+    },
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_003": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "ef41e2ded31f388e8cd318083a808536c31ec57f721dee3f20d1e6f49891b204",
+      "files": {
+        "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_003/RECEIPT.json": "342dc8e7742d1aca1446f61b2bd258a7ab0c3a1fa98816fbe7199ee60f6702f7"
+      }
+    },
+    "operations/receipts/BENEFICIAL_GENESIS_DIFF_RETEST_002": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "8605464a56dc3038abba26d5c186e55ffb3baadc48afae5ece661bf3814c1ce9",
+      "files": {
+        "operations/receipts/BENEFICIAL_GENESIS_DIFF_RETEST_002/RECEIPT.json": "d77432a47b54069572794b8298726b1028324923827588bee3668254bd5c8c19"
+      }
+    },
+    "operations/receipts/BENEFICIAL_GENESIS_DESIGN_001": {
+      "exists": true,
+      "file_count": 1,
+      "tree_sha256": "841d87b05cdafeb881e91d6b2c0f573a7d1823274759571449b9e87a832659e9",
+      "files": {
+        "operations/receipts/BENEFICIAL_GENESIS_DESIGN_001/RECEIPT.json": "332799018930c404afa4ac4aca5ffe1de6431381b8372024d0218e9d8fb3a4c9"
+      }
+    }
+  },
+  "independent_reconstruction_of_the_mechanism": {
+    "evidence_class": "conditional_reconstruction_from_design_docs_and_partial_protocol_read_only",
+    "summary": "Beneficial Genesis (as reconstructed pre-freeze from design materials and issues #33/#34) is a finite-epoch genesis allocation admission mechanism, not ongoing consensus. A participant presents a claim that a synthetic Bitcoin-like transaction (1) shows source-chain control (synthetic HMAC stand-in), (2) pays exact genesis-committed charity scriptPubKey bytes (not address strings), and (3) binds a post-quantum destination key via an OP_RETURN commitment carrier 6a20||32-byte digest. After epoch close, a fixed integer genesis pool is allocated proportionally to eligible satoshis with floor division; remainder is unissued. Nullifiers prevent double claims of the same (source_chain, txid, vout).",
+    "lifecycle": [
+      "Genesis: commit charity set, fixed pool, epoch id, min confirmations, optional quantum cutoff",
+      "Open epoch: admit claims under fail-closed validation predicate; consume nullifiers",
+      "Close: freeze accepted tip height/hash and last-eligible inclusion height/hash; closed=true",
+      "Allocate: proportional floor over admitted eligible sats; publish GenesisAllocationRecord"
+    ],
+    "validation_predicate_expected": [
+      "supported source chain/version",
+      "header ancestry under accepted tip",
+      "valid Merkle inclusion",
+      "confirmations >= min from tip; inclusion height <= last_eligible",
+      "exact charity script matches active genesis entry",
+      "positive amount equals output value",
+      "commitment binds chain/epoch/charity/vout/amount/version/nonce/PQ key; present in same tx",
+      "PQ stand-in signature verifies under bound key and fixed domain",
+      "nullifier not previously consumed",
+      "no new admission after epoch close",
+      "optional reject classical source auth after quantum_compromise_cutoff_height",
+      "allocation arithmetic integer-only and supply-conserving when closed"
+    ],
+    "allocation_rule": {
+      "formula": "allocation_i = floor(pool * eligible_sats_i / total_eligible_sats)",
+      "remainder": "remainder_unissued = pool - sum(allocation_i); never issued",
+      "ordering": "claim rows ordered by nullifier_hex ascending",
+      "no_exchange_rate": "eligible sats are weights only; no fixed BTC-to-token rate"
+    },
+    "encoding_rules": {
+      "canonical_json": "UTF-8, sorted keys, separators (',', ':'), ensure_ascii=True, no NaN",
+      "binary_fields": "lowercase hex, no 0x",
+      "multi_byte_integers": "big-endian",
+      "duplicate_json_keys": "invalid at raw parser boundary",
+      "unknown_fields": "rejected on consensus objects",
+      "domain_hash": "SHA256(domain || 0x00 || u32be(len(part)) || part ...)"
+    },
+    "synthetic_crypto_labels": {
+      "pq": "SYNTHETIC_HMAC_SHA256_PQ_STANDIN_v1",
+      "source_auth": "SYNTHETIC_SOURCE_HMAC_v1",
+      "not_real_pq_or_bitcoin_script": true
+    },
+    "economics_track_from_issue_34_expected_not_yet_inspected": "Issue #34 defines a separate adversarial economics red-team with deterministic simulators, whale/rebate/Sybil/governance/tainted-fund scenarios, and a recommendation among REJECT_OR_REDESIGN / CONTINUE_WITH_CONDITIONS / ECONOMIC_GATE_PASS. Implementation packages exist on disk (SHA inventoried) but content is unread until post-freeze."
+  },
+  "expected_load_bearing_claims": [
+    {
+      "id": "CLAIM-DES-01",
+      "claim": "Design pack reference verifier admits only claims satisfying the published fail-closed predicate on synthetic fixtures.",
+      "source_surface": "TECHNICAL_DESIGN.md \u00a75; README reproduction commands"
+    },
+    {
+      "id": "CLAIM-DES-02",
+      "claim": "Allocation uses integer-only floor proportional rule with unissued remainder; total_issued + remainder = pool and total_issued <= pool.",
+      "source_surface": "TECHNICAL_DESIGN.md \u00a76; protocol/allocation.py"
+    },
+    {
+      "id": "CLAIM-DES-03",
+      "claim": "Nullifiers are domain-separated domain_hash(DOMAIN_NULLIFIER, source_chain, txid32, u32be(vout)) and prevent double-claim of same output.",
+      "source_surface": "TECHNICAL_DESIGN.md \u00a74.3"
+    },
+    {
+      "id": "CLAIM-DES-04",
+      "claim": "Commitment carrier is exact 34-byte script 6a20||commitment; address-string comparison is forbidden.",
+      "source_surface": "TECHNICAL_DESIGN.md \u00a74.2, \u00a712; THREAT_MODEL"
+    },
+    {
+      "id": "CLAIM-DES-05",
+      "claim": "Evidence gate regenerates fixtures and executes all executable invalid vectors; documentary scenarios are not counted as verifier passes.",
+      "source_surface": "README.md integration-adjudication repair section"
+    },
+    {
+      "id": "CLAIM-DES-06",
+      "claim": "Cryptography is synthetic stand-in; pack does not claim real PQ or real Bitcoin script/consensus.",
+      "source_surface": "THREAT_MODEL_AND_NONCLAIMS.md; README"
+    },
+    {
+      "id": "CLAIM-PROG-01",
+      "claim": "Program issue #33 positions Beneficial Genesis as primary research focus without promoting STATUS.json or authorizing live funds.",
+      "source_surface": "GitHub issue #33"
+    },
+    {
+      "id": "CLAIM-ECON-01",
+      "claim": "An economics red-team package and subsequent Breaker/retest packages exist under inventoried paths and claim to answer issue #34's mechanism-safety question with deterministic simulations.",
+      "source_surface": "path existence + SHA inventory only; content unread",
+      "pre_freeze_status": "UNREAD_REQUIRES_POST_FREEZE_VERIFICATION"
+    },
+    {
+      "id": "CLAIM-DIFF-01",
+      "claim": "A second-implementation differential retest package exists (BENEFICIAL_GENESIS_RETEST_002) relative to the design verifier.",
+      "source_surface": "path existence + SHA inventory only; content unread",
+      "pre_freeze_status": "UNREAD_REQUIRES_POST_FREEZE_VERIFICATION"
+    }
+  ],
+  "assumptions_requiring_evidence": [
+    "Committed design fixtures match regenerate_fixtures output byte-for-byte.",
+    "Verifier implementation matches TECHNICAL_DESIGN.md (not only tests).",
+    "Bools are rejected as integers at all type boundaries (allocation observed; full verifier unread).",
+    "Duplicate JSON keys and unknown fields are rejected at parser/object boundaries.",
+    "Economics simulators are deterministic under published seeds and conserve allocation invariants.",
+    "Breaker and retest packages independently reproduce or honestly disagree with red-team claims.",
+    "Receipts bind to exact commits and write scopes without unauthorized mutations.",
+    "Clean-environment reproduction succeeds with only documented prerequisites.",
+    "No load-bearing claim confuses synthetic pass with production Bitcoin/PQ readiness.",
+    "Cross-model economics comparison is not mere shared-premise circularity."
+  ],
+  "plausible_failure_modes": [
+    "Spec/code drift: verifier admits vectors design text forbids, or rejects valid design cases.",
+    "Parser weakness: duplicate keys, unknown fields, Unicode/NUL, malformed hex, bool-as-int accepted.",
+    "Nullifier domain omission or cross-chain/epoch collision accepted.",
+    "Commitment multiplicity ambiguity or carrier substring acceptance.",
+    "Cutoff off-by-one (height == last_clean+1 admitted).",
+    "Reorg leaves stale nullifier consumed after tip switch.",
+    "Allocation remainder gaming issues more than pool under alternate reimplementation.",
+    "Economics metrics use wrong denominators or non-deterministic lottery without fixed seeds.",
+    "Tests encode assumptions rather than properties; fixtures generate expected values circularly.",
+    "Receipts overstate independence, clean-room status, or pass/fail chronology.",
+    "Composition mismatch: design allocation vs economics models disagree on same inputs.",
+    "Environmental failures misclassified as product failures (or vice versa)."
+  ],
+  "falsifiers_for_each_major_claim": {
+    "CLAIM-DES-01": "Any executable valid fixture rejected, or executable invalid fixture admitted with wrong/missing rejection code under clean reproduction.",
+    "CLAIM-DES-02": "Construct eligible set where sum(floor allocations) > pool, or remainder_unissued + total_issued != pool, or float/bool accepted.",
+    "CLAIM-DES-03": "Two successful admits for same (source_chain,txid,vout), or domain-omitted nullifier accepted.",
+    "CLAIM-DES-04": "Claim admitted based on address string without exact script match, or non-6a20 carrier accepted for commitment.",
+    "CLAIM-DES-05": "verify_evidence.py exit 0 while fixture bytes diverge from generator or executable invalid vector skipped.",
+    "CLAIM-DES-06": "Any package claim of production PQ/Bitcoin security without replacement of stand-ins.",
+    "CLAIM-PROG-01": "STATUS.json modified by Beneficial Genesis packages or live funds authorized in artifacts.",
+    "CLAIM-ECON-01": "Simulator non-reproducible, missing required scenarios from issue #34, or recommendation unbacked by machine-readable results.",
+    "CLAIM-DIFF-01": "Second implementation systematically disagrees with reference on fixtures without documented minimized counterexamples, or cleanroom claim contradicted by provenance."
+  },
+  "planned_tests": {
+    "clean_environment_reproduction": [
+      "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_DESIGN_001/tests -v",
+      "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py",
+      "optional: python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/generate_fixtures.py (temp dir compare)",
+      "Claude economics simulator + tests (exact commands from package README post-freeze)",
+      "Breaker simulator + tests",
+      "differential verifier (RETEST_002)",
+      "python3 -m unittest discover -s tests -v",
+      "./nexus doctor",
+      "./nexus verify when relevant",
+      "git diff --check"
+    ],
+    "independent_hostile_probes": [
+      "duplicate JSON keys at raw boundary",
+      "unknown fields on consensus objects",
+      "bool-as-int / float at allocation and object parsers",
+      "malformed hex / uppercase hex / 0x prefix",
+      "Unicode and embedded NUL in string fields",
+      "nullifier domain omission and cross-domain variants",
+      "cutoff boundary height last_eligible+1",
+      "allocation extreme values and multi-claim remainder",
+      "commitment multiplicity and wrong carrier forms",
+      "reorg / checkpoint replacement nullifier consistency",
+      "economics public-function validators: negatives, zero, duplicates, bps, lottery",
+      "composition: design allocate_proportional vs economics pro-rata on shared numeric cases"
+    ],
+    "provenance_checks": [
+      "receipt commit binding vs git log ancestry",
+      "write-scope integrity of packages",
+      "chronology of redteam \u2192 breaker \u2192 retest",
+      "no subject path mutation after simulator runs"
+    ]
+  },
+  "freeze_independence_statement": "This PRE_AUDIT_FREEZE records independent reconstruction and planned tests before opening economics implementations, prior Breaker/retest packages, or PR #35/#37/#39. A freeze reduces anchoring to those later materials but does not prove perfect independence: the auditor has already seen design-pack documentation, partial protocol code (constants.py, allocation.py), STATUS.json, safety instructions, and exact issues #33 and #34; path names and SHA-256 inventories of unread packages were computed; the controlling task prompt itself describes expected package structure and audit dimensions. Residual anchoring risk remains. Permanently forbidden sibling 2x2 audit materials were not opened.",
+  "authorized_write_paths": [
+    "experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**"
+  ],
+  "non_actions": [
+    "do not modify STATUS.json",
+    "do not assign or imply an R-round",
+    "do not alter existing Beneficial Genesis subject packages",
+    "do not merge",
+    "do not use live funds, select real charities, solicit donations, issue a token, or deploy",
+    "do not make legal conclusions"
+  ]
+}
