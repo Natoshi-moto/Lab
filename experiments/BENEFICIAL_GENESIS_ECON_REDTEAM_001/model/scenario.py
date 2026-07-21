@@ -149,7 +149,7 @@ def _governance_block(allocation: dict[str, int], donors: list[dict[str, Any]], 
         cap_bps = req.get("cap_bps")
         weights = gov.governance_weights(grouped, rule, cap_bps=cap_bps)
         control = gov.majority_threshold_control(weights["weights"])
-        out[rule if cap_bps is None else f"{rule}_{cap_bps}bps"] = {
+        entry = {
             "rule": weights["rule"],
             "transferable": weights["transferable"],
             "notes": weights["notes"],
@@ -160,6 +160,23 @@ def _governance_block(allocation: dict[str, int], donors: list[dict[str, Any]], 
             "crosses_simple_majority": control["crosses"].get(str(Fraction(1, 2)), False),
             "crosses_blocking_third": control["crosses"].get(str(Fraction(1, 3)), False),
         }
+        if rule == "cap_then_renormalize":
+            # Report all three stages explicitly (micro-repair item 2): this
+            # is a cap-THEN-renormalize rule, not a hard final per-holder
+            # cap, and renormalization can push a holder's final weight
+            # back above the nominal cap fraction.
+            entry["raw_proportional_weights"] = {
+                k: str(v) for k, v in weights["raw_proportional_weights"].items()
+            }
+            entry["pre_normalization_clipped_weights"] = {
+                k: str(v) for k, v in weights["pre_normalization_clipped_weights"].items()
+            }
+            entry["final_normalized_weights"] = {k: str(v) for k, v in weights["weights"].items()}
+            entry["clipped_holders"] = weights["clipped_holders"]
+            entry["holders_exceeding_nominal_cap_after_renormalization"] = weights[
+                "holders_exceeding_nominal_cap_after_renormalization"
+            ]
+        out[rule if cap_bps is None else f"{rule}_{cap_bps}bps"] = entry
     return out
 
 

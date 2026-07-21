@@ -1,13 +1,13 @@
 {
-  "scenario_id": "14_governance_continuously_capped",
+  "scenario_id": "14_governance_cap_then_renormalize",
   "seed": 1014,
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
   "token_value_multipliers": [1.0],
   "governance_rules": [
-    {"rule": "continuously_capped", "cap_bps": 500},
-    {"rule": "continuously_capped", "cap_bps": 1000}
+    {"rule": "cap_then_renormalize", "cap_bps": 500},
+    {"rule": "cap_then_renormalize", "cap_bps": 1000}
   ],
   "donors": [
     {"id": "whale_01", "sats": 60000000, "role": "whale", "group": "whale_01"}

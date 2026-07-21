@@ -46,9 +46,9 @@ Beneficial Genesis, as specified, is an *allocation* mechanism; it does not itse
 | `none` | 0% | No |
 | `nontransferable_equal` (one vote per recipient) | 0.2% | No |
 | `nontransferable_proportional` / `token_weighted` | 52.488% | **Yes** |
-| `continuously_capped` (5% cap, `14_governance_continuously_capped`) | ~9.8% | No |
+| `cap_then_renormalize` (5% nominal clip, `14_governance_cap_then_renormalize`) | ~9.8% (exceeds the 5% nominal clip after renormalization — see note below) | No |
 
-Governance capture by donation size alone is **true if and only if** a proportional or token-weighted rule is the adopted integration choice — it is not a property of the allocation mechanism by itself. A continuously-enforced cap prevents it at allocation time; whether such a cap survives once tokens are transferable and lock-ups expire is a Track E question this seat cannot verify (see `NONCLAIMS_AND_OPEN_QUESTIONS.md`).
+Governance capture by donation size alone is **true if and only if** a proportional or token-weighted rule is the adopted integration choice — it is not a property of the allocation mechanism by itself. `cap_then_renormalize` reduced concentration below the majority/blocking-third thresholds **in this tested many-holder scenario only**; it is not a hard final per-holder cap — clipping a holder's raw weight and then renormalizing the clipped weights back up to sum to 1 can, and in this scenario does, push that holder's *final* weight above the nominal clip fraction (proven at 1/2/3-holder scale in `tests/test_governance.py::TestCapThenRenormalize`). Whether such a rule, hard-capped or otherwise, survives once tokens are transferable and lock-ups expire is a Track E question this seat cannot verify (see `NONCLAIMS_AND_OPEN_QUESTIONS.md`).
 
 **Disposition:** conditional on the integration rule adopted; not a default defect of the current allocation subject.
 

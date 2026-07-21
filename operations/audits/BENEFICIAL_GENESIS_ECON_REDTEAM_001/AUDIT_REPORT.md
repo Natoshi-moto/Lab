@@ -1,4 +1,4 @@
-# Audit report — TSK-BGEN-ECON-REDTEAM-001 (repaired under BGEN-ECON-REPAIR-002)
+# Audit report — TSK-BGEN-ECON-REDTEAM-001 (repaired under BGEN-ECON-REPAIR-002, plus micro-repair)
 
 ## Authority
 
@@ -51,6 +51,16 @@ See `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/README.md` "What changed in
 - Six independently-confirmed findings preserved and explicitly labelled (E-008).
 - Cross-model comparison against the frozen Grok package added; every required command run (E-009).
 
+## Micro-repair addendum (bounded follow-up on PR #35, exact prior head `a0358909c158d3599104b3634447d1320b49881d`)
+
+Three bounded corrections, made without reopening the E-001…E-009 scope:
+
+1. **Shared participant-input validator.** `model/allocation.py` now has one `validate_participants` function that every public allocation function (`exact_pro_rata`, `capped_pro_rata`, `concave_sqrt`, `concave_log`, `time_weighted`, `random_lottery_component`) calls directly. It rejects duplicate participant IDs; empty or non-string IDs; boolean, non-integer, or negative contribution weights; and invalid pool, cap, or winner-count values (`bool` is explicitly excluded from the integer checks since it is a subclass of `int` in Python). Direct tests (`tests/test_allocation.py::TestSharedParticipantValidator`) call the public functions themselves rather than relying only on `model/scenario.py`'s own duplicate-ID check.
+2. **Governance rule renamed `cap_then_renormalize`** (was `continuously_capped`). The old name could be read as describing a hard, final per-holder ceiling; it is not one. The rule clips each holder's raw proportional weight at the nominal fraction, then renormalizes the clipped weights to sum to 1 — and that renormalization can push an individual holder's *final* weight back above the nominal clip when several holders are clipped at once. `model/governance.py` and `model/scenario.py` now report all three stages explicitly (`raw_proportional_weights`, `pre_normalization_clipped_weights`, `weights`/`final_normalized_weights`), and `tests/test_governance.py::TestCapThenRenormalize` proves the exceeds-nominal-clip property at 1, 2, and 3 holders. Every document in this package now states only that this rule **reduced concentration in the tested many-holder scenario** (`14_governance_cap_then_renormalize`, renamed from `14_governance_continuously_capped`) — never that it is a durable or hard per-holder cap. Durable, continuously-enforced hard-capped governance remains open Track E work.
+3. **Receipt `branch_tip` field replaced.** A committed receipt cannot contain the SHA of the commit that includes it without becoming self-referential (the commit that adds/updates the receipt necessarily postdates whatever SHA the receipt names). The receipt now uses `repair_logic_commit` (the commit containing this micro-repair's actual code/doc changes), `receipt_binding_parent_commit` (the parent commit the receipt-binding commit is built on), and an explicit `receipt_self_binding_note` stating this constraint, instead of a single misleading `branch_tip`.
+
+`UNDERLYING_MECHANISM: CONTINUE_WITH_CONDITIONS` and `ECONOMIC_GATE_PASS: false` are unchanged by this micro-repair.
+
 ## Failure-condition disposition (repaired)
 
 See `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md` for full per-condition evidence and classification. Summary:
@@ -59,7 +69,7 @@ See `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md` for 
 |---|---|---|---|
 | FC1 | Transferable token has no necessary function beyond rewarding donation | Conditional / policy question | Partially triggered — open pending target-ledger-function specification |
 | FC2 | Rational donors predictably destroy charity benefit via rebates | Conditional simulation result | Not triggered as an unconditional prediction; conditional arithmetic remains a real residual risk |
-| FC3 | One actor obtains practical governance control by donation alone | Conditional simulation result | Conditional on the integration rule adopted; not a default defect |
+| FC3 | One actor obtains practical governance control by donation alone | Conditional simulation result | Conditional on the integration rule adopted; not a default defect. The `cap_then_renormalize` rule reduced concentration below majority/blocking-third thresholds **in the tested many-holder scenario only** — it is not a hard per-holder cap and the whale's own final share still exceeds the nominal clip fraction after renormalization |
 | FC4 | Mechanism materially incentivizes stolen/tainted-fund laundering | Structural risk (pathway) + conditional (profitability) | Pathway proven and serious; profitability retracted as unconditional |
 | FC5 | Timing/cutoff games produce non-deterministic or privileged allocation | Structural risk / empirical unknown | Partially triggered; real but bounded |
 | FC6 | Mitigation depends on unverifiable identity while claiming permissionless | Mathematically proven | Triggered, no defensible mitigation for concave/capped schemes absent an identity layer |
@@ -79,7 +89,7 @@ Two conditions (FC4's pathway component, FC6) are proven residual risks requirin
 | Command | Result |
 |---|---|
 | `python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py` | 27 scenarios executed; `results/*.json` + `results/TABLES.md` regenerated |
-| `python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v` | 54 tests OK |
+| `python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v` | 72 tests OK (54 prior + 18 new: shared-validator and cap-then-renormalize tests) |
 | `python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py` | ran read-only; 28 scenarios OK; **zero diff** in Grok Breaker paths afterward |
 | `python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests -v` | 25 tests OK (frozen Grok suite, run read-only) |
 | `python3 -m unittest discover -s tests -v` | 185 tests OK (existing lab suite; unaffected) |

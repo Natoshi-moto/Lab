@@ -80,5 +80,99 @@ class TestAllocationInvariants(unittest.TestCase):
         self.assertEqual(r1, r2)
 
 
+class TestSharedParticipantValidator(unittest.TestCase):
+    """Direct tests against the public allocation functions themselves
+    (micro-repair item 1): validation must not be something only
+    model/scenario.py happens to provide. Every public allocation function
+    is exercised here with the same bad-input classes.
+    """
+
+    PUBLIC_FUNCTIONS = (
+        alloc.exact_pro_rata,
+        alloc.capped_pro_rata,
+        alloc.concave_sqrt,
+        alloc.concave_log,
+        alloc.time_weighted,
+    )
+
+    def test_duplicate_ids_rejected_by_every_public_function(self):
+        bad = [("dup", 10), ("dup", 20)]
+        for fn in self.PUBLIC_FUNCTIONS:
+            with self.subTest(fn=fn.__name__):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    fn(bad, POOL)
+        with self.assertRaises(alloc.ParticipantValidationError):
+            alloc.random_lottery_component(bad, POOL, random.Random(1))
+
+    def test_empty_id_rejected_by_every_public_function(self):
+        bad = [("", 10)]
+        for fn in self.PUBLIC_FUNCTIONS:
+            with self.subTest(fn=fn.__name__):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    fn(bad, POOL)
+        with self.assertRaises(alloc.ParticipantValidationError):
+            alloc.random_lottery_component(bad, POOL, random.Random(1))
+
+    def test_non_string_id_rejected_by_every_public_function(self):
+        bad = [(123, 10)]
+        for fn in self.PUBLIC_FUNCTIONS:
+            with self.subTest(fn=fn.__name__):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    fn(bad, POOL)
+
+    def test_boolean_weight_rejected_by_every_public_function(self):
+        # bool is a subclass of int in Python; must not be silently accepted.
+        bad = [("a", True)]
+        for fn in self.PUBLIC_FUNCTIONS:
+            with self.subTest(fn=fn.__name__):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    fn(bad, POOL)
+
+    def test_non_integer_weight_rejected_by_every_public_function(self):
+        for bad_weight in (10.5, "10", None):
+            bad = [("a", bad_weight)]
+            for fn in self.PUBLIC_FUNCTIONS:
+                with self.subTest(fn=fn.__name__, weight=bad_weight):
+                    with self.assertRaises(alloc.ParticipantValidationError):
+                        fn(bad, POOL)
+
+    def test_negative_weight_rejected_by_every_public_function(self):
+        bad = [("a", -1)]
+        for fn in self.PUBLIC_FUNCTIONS:
+            with self.subTest(fn=fn.__name__):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    fn(bad, POOL)
+
+    def test_invalid_pool_rejected(self):
+        for bad_pool in (-1, 1.5, "100", None, True):
+            with self.subTest(pool=bad_pool):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    alloc.exact_pro_rata(DONORS, bad_pool)
+
+    def test_zero_pool_is_allowed(self):
+        # Zero is a legitimate sub-pool (e.g. a fully-lottery split routes a
+        # zero-sized pro-rata remainder), not an error.
+        result = alloc.exact_pro_rata(DONORS, 0)
+        self.assertEqual(sum(result.values()), 0)
+
+    def test_invalid_cap_bps_rejected(self):
+        for bad_cap in (0, -100, 10_001, 1.5, "1000", True):
+            with self.subTest(cap_bps=bad_cap):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    alloc.capped_pro_rata(DONORS, POOL, cap_bps=bad_cap)
+
+    def test_invalid_winners_rejected(self):
+        for bad_winners in (0, -1, 1.5, "2", True):
+            with self.subTest(winners=bad_winners):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    alloc.random_lottery_component(DONORS, POOL, random.Random(1), winners=bad_winners)
+
+    def test_valid_input_still_succeeds(self):
+        # The validator must not be so strict that it rejects ordinary,
+        # well-formed input.
+        result = alloc.exact_pro_rata(DONORS, POOL)
+        self.assertEqual(sum(result.values()) <= POOL, True)
+
+
 if __name__ == "__main__":
     unittest.main()

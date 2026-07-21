@@ -39,20 +39,6 @@ class TestGovernanceRules(unittest.TestCase):
         control = gov.majority_threshold_control(result["weights"])
         self.assertTrue(control["crosses"][str(Fraction(1, 2))])
 
-    def test_continuously_capped_renormalizes_to_sum_one(self):
-        result = gov.governance_weights(ALLOCATION, "continuously_capped", cap_bps=1000)
-        total = sum(result["weights"].values())
-        self.assertEqual(total, Fraction(1))
-
-    def test_continuously_capped_holds_whale_under_majority(self):
-        result = gov.governance_weights(ALLOCATION, "continuously_capped", cap_bps=1000)
-        control = gov.majority_threshold_control(result["weights"])
-        self.assertFalse(control["crosses"][str(Fraction(1, 2))])
-
-    def test_continuously_capped_requires_cap_bps(self):
-        with self.assertRaises(ValueError):
-            gov.governance_weights(ALLOCATION, "continuously_capped")
-
     def test_unknown_rule_rejected(self):
         with self.assertRaises(ValueError):
             gov.governance_weights(ALLOCATION, "made_up_rule")
@@ -61,6 +47,71 @@ class TestGovernanceRules(unittest.TestCase):
         control = gov.majority_threshold_control({})
         self.assertFalse(control["crosses"][str(Fraction(1, 2))])
         self.assertIsNone(control["max_holder"])
+
+
+class TestCapThenRenormalize(unittest.TestCase):
+    """Micro-repair item 2: this rule must never be treated as a hard final
+    per-holder cap. These tests prove, at 1/2/3-holder scale, that the
+    *final* normalized weight can exceed the nominal clip fraction once
+    renormalization redistributes the clipped-off remainder.
+    """
+
+    def test_renormalizes_to_sum_one(self):
+        result = gov.governance_weights(ALLOCATION, "cap_then_renormalize", cap_bps=1000)
+        total = sum(result["weights"].values())
+        self.assertEqual(total, Fraction(1))
+
+    def test_holds_whale_under_majority_in_the_tested_many_holder_scenario(self):
+        result = gov.governance_weights(ALLOCATION, "cap_then_renormalize", cap_bps=1000)
+        control = gov.majority_threshold_control(result["weights"])
+        self.assertFalse(control["crosses"][str(Fraction(1, 2))])
+
+    def test_requires_cap_bps(self):
+        with self.assertRaises(ValueError):
+            gov.governance_weights(ALLOCATION, "cap_then_renormalize")
+
+    def test_reports_all_three_stages_distinctly(self):
+        result = gov.governance_weights(ALLOCATION, "cap_then_renormalize", cap_bps=1000)
+        self.assertIn("raw_proportional_weights", result)
+        self.assertIn("pre_normalization_clipped_weights", result)
+        self.assertIn("weights", result)
+        # the whale's raw share (0.6) differs from its clipped share (0.1,
+        # the cap) which differs again from its final renormalized share.
+        self.assertNotEqual(
+            result["raw_proportional_weights"]["whale"],
+            result["pre_normalization_clipped_weights"]["whale"],
+        )
+
+    def test_one_holder_final_share_exceeds_nominal_clip(self):
+        # A single holder clipped to 50% of pre-cap weight has nobody else
+        # to renormalize against, so its final share snaps back to 100% —
+        # far above the nominal 50% clip.
+        allocation = {"only": 1_000_000}
+        result = gov.governance_weights(allocation, "cap_then_renormalize", cap_bps=5_000)
+        nominal_clip = Fraction(5_000, 10_000)
+        self.assertEqual(result["pre_normalization_clipped_weights"]["only"], nominal_clip)
+        self.assertGreater(result["weights"]["only"], nominal_clip)
+        self.assertEqual(result["weights"]["only"], Fraction(1))
+
+    def test_two_holder_final_share_exceeds_nominal_clip(self):
+        allocation = {"a": 700_000, "b": 300_000}
+        result = gov.governance_weights(allocation, "cap_then_renormalize", cap_bps=5_000)
+        nominal_clip = Fraction(5_000, 10_000)
+        self.assertGreater(result["weights"]["a"], nominal_clip)
+        self.assertIn("a", result["holders_exceeding_nominal_cap_after_renormalization"])
+
+    def test_three_holder_final_share_exceeds_nominal_clip(self):
+        allocation = {"a": 500_000, "b": 300_000, "c": 200_000}
+        result = gov.governance_weights(allocation, "cap_then_renormalize", cap_bps=4_000)
+        nominal_clip = Fraction(4_000, 10_000)
+        self.assertGreater(result["weights"]["a"], nominal_clip)
+        self.assertIn("a", result["holders_exceeding_nominal_cap_after_renormalization"])
+
+    def test_notes_disclose_not_a_hard_cap_rather_than_asserting_one(self):
+        result = gov.governance_weights(ALLOCATION, "cap_then_renormalize", cap_bps=1000)
+        joined_notes = " ".join(result["notes"]).lower()
+        self.assertIn("not a hard final per-holder cap", joined_notes)
+        self.assertIn("cap-then-renormalize", joined_notes)
 
 
 if __name__ == "__main__":

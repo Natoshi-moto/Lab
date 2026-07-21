@@ -30,17 +30,19 @@ A sealed-commitment design (donors commit to an amount before seeing the running
 ## 3. Governance weighting alternatives
 
 > **Repair note (E-003, BGEN-ECON-REV-003):** governance analysis is now computed only for scenarios that explicitly opt in via `governance_rules`, under named, explicitly transferable-or-not rules (`model/governance.py`) — it is never assumed as a default property of the allocation mechanism.
+>
+> **Micro-repair note:** the fifth rule below is named `cap_then_renormalize`, not "continuously capped" or any wording implying a hard final per-holder ceiling. It clips each holder's raw proportional weight at the nominal fraction, then renormalizes the clipped weights to sum to 1 again — and that renormalization can push a holder's *final* share back above the nominal clip, which is exactly what the "Max single-owner governance share" column shows below (9.768% and 17.797% both exceed their respective 5%/10% nominal clips). This is disclosed, not a bug. See `tests/test_governance.py::TestCapThenRenormalize` for 1/2/3-holder proofs.
 
-| Rule | Max single-owner governance share | Crosses simple majority | Crosses blocking third |
-|---|---|---|---|
-| No governance rights (`none`, `13_governance_rules_comparison`) | 0% | False | False |
-| One equal vote per recipient (`nontransferable_equal`, `13_governance_rules_comparison`) | 0.2% | False | False |
-| Proportional, frozen at genesis (`nontransferable_proportional`, `13_governance_rules_comparison`) | 52.488% | **True** | True |
-| Proportional, transferable with the token (`token_weighted`, `13_governance_rules_comparison`) | 52.488% (numerically identical to the row above; differs only in durability once tokens transfer) | **True** | True |
-| Continuously capped at 5% of issued weight, renormalized (`continuously_capped`, `14_governance_continuously_capped`) | 9.768% | False | False |
-| Continuously capped at 10% of issued weight, renormalized (`continuously_capped`, `14_governance_continuously_capped`) | 17.797% | False | False |
+| Rule | Max single-owner governance share | Nominal clip fraction | Final share exceeds nominal clip? | Crosses simple majority | Crosses blocking third |
+|---|---|---|---|---|---|
+| No governance rights (`none`, `13_governance_rules_comparison`) | 0% | n/a | n/a | False | False |
+| One equal vote per recipient (`nontransferable_equal`, `13_governance_rules_comparison`) | 0.2% | n/a | n/a | False | False |
+| Proportional, frozen at genesis (`nontransferable_proportional`, `13_governance_rules_comparison`) | 52.488% | n/a | n/a | **True** | True |
+| Proportional, transferable with the token (`token_weighted`, `13_governance_rules_comparison`) | 52.488% (numerically identical to the row above; differs only in durability once tokens transfer) | n/a | n/a | **True** | True |
+| Cap-then-renormalize at 5% (`cap_then_renormalize`, `14_governance_cap_then_renormalize`) | 9.768% | 5% | **Yes** | False | False |
+| Cap-then-renormalize at 10% (`cap_then_renormalize`, `14_governance_cap_then_renormalize`) | 17.797% | 10% | **Yes** | False | False |
 
-Decoupling governance weight from economic allocation and capping it independently is the single most effective mitigation identified in this study for the governance-capture failure condition — **provided the cap is enforced on an ongoing basis by the ledger's own consensus rules (Track E), not only computed once at genesis.** This model does not simulate secondary-market vote-buying after genesis; it only shows that a cap, if it exists and holds, works at the point of allocation. Whether the current design defaults to any of these rules is unspecified by the design pack — see `FAILURE_CONDITIONS.md` FC3.
+Cap-then-renormalize reduced concentration below the majority/blocking-third thresholds **in this tested 501-donor population** — that is a scenario-specific result, not a per-holder guarantee, since the whale's own final share already exceeds the nominal clip fraction in both rows above. Decoupling governance weight from economic allocation and applying this rule is the most effective mitigation identified in this study for the governance-capture failure condition against majority/blocking-third capture specifically — **provided it is enforced on an ongoing basis by the ledger's own consensus rules (Track E), not only computed once at genesis; durable, hard-capped governance enforcement remains open Track E work.** This model does not simulate secondary-market vote-buying after genesis; it only shows that a cap-then-renormalize rule, if it exists and holds, reduces (but does not eliminate) concentration at the point of allocation. Whether the current design defaults to any of these rules is unspecified by the design pack — see `FAILURE_CONDITIONS.md` FC3.
 
 ## 4. Vesting / non-transferability window
 

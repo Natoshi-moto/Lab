@@ -15,6 +15,19 @@ outcome without saying which rule produced it. Weights are returned as
 exact ``Fraction`` shares summing to 1 among holders with positive weight
 (or 0 if none), since a capped-and-renormalized rule has no natural
 "pool units" analogue.
+
+Micro-repair note (BGEN-ECON-REPAIR-002 follow-up): the fifth rule was
+previously named ``continuously_capped`` and could be read as describing a
+hard, final per-holder ceiling. It is not one: it truncates each holder's
+*raw* proportional weight at the nominal cap fraction, then renormalizes
+the truncated weights so they sum to 1 again. When several holders are
+truncated simultaneously, that renormalization step can push an
+individual holder's *final* weight back above the nominal cap fraction
+(see ``cap_then_renormalize`` below and its tests). The rule is renamed
+``cap_then_renormalize`` to say this directly, and every report separates
+the three distinct quantities — raw proportional weight, pre-normalization
+clipped weight, and final normalized weight — rather than collapsing them
+into a single "capped" number.
 """
 
 from __future__ import annotations
@@ -27,7 +40,7 @@ GOVERNANCE_RULES = (
     "nontransferable_equal",
     "nontransferable_proportional",
     "token_weighted",
-    "continuously_capped",
+    "cap_then_renormalize",
 )
 
 
@@ -51,12 +64,19 @@ def governance_weights(
       is not durable across a secondary market the way the nontransferable
       rules are. The distinction is about durability, not the snapshot
       arithmetic (see ``NONCLAIMS_AND_OPEN_QUESTIONS.md``).
-    - ``continuously_capped``: each holder's raw proportional weight is
-      truncated at ``cap_bps`` (basis points of the pre-cap total), then
-      the capped weights are renormalized to sum to 1.
+    - ``cap_then_renormalize``: each holder's *raw* proportional weight is
+      clipped at ``cap_bps`` (basis points of the pre-cap total), then the
+      clipped weights are renormalized to sum to 1. This is **not** a hard
+      final per-holder ceiling: when several holders are clipped at once,
+      renormalizing can push an individual holder's *final* weight back
+      above the nominal cap fraction. All three quantities — raw
+      proportional weight, pre-normalization clipped weight, and final
+      normalized weight — are reported separately (``raw_proportional_weights``,
+      ``pre_normalization_clipped_weights``, ``weights``) so this is never
+      collapsed into a single "capped" figure.
 
-    Returns a dict with ``weights`` (Fraction shares), ``rule``,
-    ``transferable`` (bool), and ``notes``.
+    Returns a dict with ``weights`` (Fraction shares, the *final*
+    normalized values), ``rule``, ``transferable`` (bool), and ``notes``.
     """
     if rule not in GOVERNANCE_RULES:
         raise ValueError(f"unknown governance rule: {rule}")
@@ -99,38 +119,48 @@ def governance_weights(
             ],
         )
 
-    if rule == "continuously_capped":
+    if rule == "cap_then_renormalize":
         if cap_bps is None:
-            raise ValueError("continuously_capped requires cap_bps")
+            raise ValueError("cap_then_renormalize requires cap_bps")
         if not 0 < cap_bps <= 10_000:
             raise ValueError("cap_bps must be in (0, 10000]")
         cap_fraction = Fraction(cap_bps, 10_000)
         if issued == 0:
             return _pack(rule, {}, transferable=False, notes=["nothing issued"])
-        raw = {k: Fraction(v, issued) for k, v in recipients.items()}
-        capped = {k: min(v, cap_fraction) for k, v in raw.items()}
-        capped_sum = sum(capped.values())
-        if capped_sum == 0:
-            weights = {k: Fraction(0) for k in capped}
+        raw_proportional_weights = {k: Fraction(v, issued) for k, v in recipients.items()}
+        pre_normalization_clipped_weights = {
+            k: min(v, cap_fraction) for k, v in raw_proportional_weights.items()
+        }
+        clipped_sum = sum(pre_normalization_clipped_weights.values())
+        if clipped_sum == 0:
+            weights = {k: Fraction(0) for k in pre_normalization_clipped_weights}
         else:
-            weights = {k: v / capped_sum for k, v in capped.items()}
-        truncated_holders = [k for k, v in raw.items() if v > cap_fraction]
+            weights = {k: v / clipped_sum for k, v in pre_normalization_clipped_weights.items()}
+        clipped_holders = [
+            k for k, v in raw_proportional_weights.items() if v > cap_fraction
+        ]
+        exceeds_nominal_cap_after_renormalization = [
+            k for k, v in weights.items() if v > cap_fraction
+        ]
         notes = [
             f"cap_bps={cap_bps} ({cap_fraction} of pre-cap issued weight)",
-            "capped weights are renormalized so total governance weight sums to 1",
-            "known property: when the capped total is well under 1 (several holders "
-            "simultaneously truncated), renormalization can push an individual holder's "
-            "final weight above the nominal per-identity cap fraction; this is disclosed, "
-            "not hidden, and is a documented limitation of cap-then-renormalize schemes",
+            "this is a cap-THEN-renormalize rule, not a hard final per-holder cap: "
+            "raw proportional weight is clipped at the nominal fraction, then the "
+            "clipped weights are renormalized to sum to 1 again",
+            "known property: when several holders are clipped at once, renormalization "
+            "can push an individual holder's final weight back above the nominal "
+            "cap fraction; this is disclosed, not hidden, and is a documented limitation "
+            "of cap-then-renormalize schemes, not a bug",
         ]
         return _pack(
             rule,
             weights,
             transferable=False,
             notes=notes,
-            raw_proportional=raw,
-            pre_normalization_capped=capped,
-            truncated_holders=truncated_holders,
+            raw_proportional_weights=raw_proportional_weights,
+            pre_normalization_clipped_weights=pre_normalization_clipped_weights,
+            clipped_holders=clipped_holders,
+            holders_exceeding_nominal_cap_after_renormalization=exceeds_nominal_cap_after_renormalization,
         )
 
     raise ValueError(rule)

@@ -164,10 +164,44 @@ class TestGovernanceConditionality(unittest.TestCase):
         self.assertFalse(prop["transferable"])
         self.assertTrue(tok["transferable"])
 
-    def test_continuously_capped_holds_whale_under_majority(self):
-        result = run_scenario(load("14_governance_continuously_capped"))
-        self.assertFalse(result["governance"]["continuously_capped_500bps"]["crosses_simple_majority"])
-        self.assertFalse(result["governance"]["continuously_capped_1000bps"]["crosses_simple_majority"])
+    def test_cap_then_renormalize_holds_whale_under_majority_in_this_scenario(self):
+        # This holds in the tested many-holder (501-donor) population; it is
+        # not a durable guarantee of the rule itself — see
+        # TestCapThenRenormalizeIsNotAHardCap below and FAILURE_CONDITIONS.md.
+        result = run_scenario(load("14_governance_cap_then_renormalize"))
+        self.assertFalse(result["governance"]["cap_then_renormalize_500bps"]["crosses_simple_majority"])
+        self.assertFalse(result["governance"]["cap_then_renormalize_1000bps"]["crosses_simple_majority"])
+
+    def test_cap_then_renormalize_reports_all_three_stages_in_scenario_output(self):
+        result = run_scenario(load("14_governance_cap_then_renormalize"))
+        block = result["governance"]["cap_then_renormalize_500bps"]
+        for field in (
+            "raw_proportional_weights",
+            "pre_normalization_clipped_weights",
+            "final_normalized_weights",
+        ):
+            self.assertIn(field, block)
+
+
+class TestCapThenRenormalizeIsNotAHardCap(unittest.TestCase):
+    def test_small_population_final_share_can_exceed_nominal_clip(self):
+        # Direct scenario-level proof (mirrors tests/test_governance.py at
+        # the model layer) that a small, concentrated holder set can push a
+        # holder's final governance share above the nominal cap fraction.
+        manifest = {
+            "scenario_id": "cap_then_renormalize_small_population_probe",
+            "seed": 1,
+            "pool_units": 1_000_000,
+            "allocation_scheme": "EXACT_PRO_RATA",
+            "governance_rules": [{"rule": "cap_then_renormalize", "cap_bps": 5_000}],
+            "donors": [
+                {"id": "only", "sats": 1_000_000, "group": "only"},
+            ],
+        }
+        result = run_scenario(manifest)
+        block = result["governance"]["cap_then_renormalize_5000bps"]
+        nominal_clip = Fraction(1, 2)
+        self.assertGreater(Fraction(block["final_normalized_weights"]["only"]), nominal_clip)
 
 
 class TestLockupFinding(unittest.TestCase):

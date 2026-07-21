@@ -21,7 +21,10 @@
   "independent_breaker_evidence_merge_commit": "d8523b29ca7a1e0433ab5afdb494ed8452450dde",
   "independent_breaker_pr": 37,
   "repair_start_head": "d8523b29ca7a1e0433ab5afdb494ed8452450dde",
-  "branch_tip": "00402a1b417ea9ac328ab51666364ecbe6c07ae4",
+  "prior_repair_pass_head": "a0358909c158d3599104b3634447d1320b49881d",
+  "repair_logic_commit": "pending_commit_a",
+  "receipt_binding_parent_commit": "pending_commit_a",
+  "receipt_self_binding_note": "A committed receipt cannot contain the SHA of the commit that includes its own final state without becoming self-referential (the commit that writes this exact byte content necessarily postdates any SHA it could name for itself). This field set resolves that by splitting the work into two commits: repair_logic_commit is the commit hash containing the actual micro-repair code/doc changes (the validator, the governance rule rename, this receipt's non-binding fields), and receipt_binding_parent_commit is the parent commit that a small follow-up commit (binding only this receipt's exact hash reference) is built on top of -- which is the same commit in this two-commit pattern. The follow-up binding commit's own SHA is, by construction, never written into the receipt it produces.",
   "draft_pr": 35,
   "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/35",
   "authorized_paths": [
@@ -47,13 +50,18 @@
   "repair_items_implemented": {
     "E-001_stolen_asset_economics": "model/tainted_funds.py: decomposed legal_cost_basis/opportunity_value/gross_output/risk_adjusted_value/realizable_value/net_migration_profit + sensitivity grid",
     "E-002_rebate_incidence": "model/collusion.py: conditional (arrangement-exists) vs expected (access/enforcement/detection frictions) rebate incidence, side by side",
-    "E-003_governance_conditionality": "model/governance.py: 5 named rules (none/nontransferable_equal/nontransferable_proportional/token_weighted/continuously_capped), opt-in per scenario via governance_rules, no default assumption",
+    "E-003_governance_conditionality": "model/governance.py: 5 named rules (none/nontransferable_equal/nontransferable_proportional/token_weighted/cap_then_renormalize -- renamed from continuously_capped in the micro-repair below), opt-in per scenario via governance_rules, no default assumption",
     "E-004_mechanism_necessity_scope": "MECHANISM_NECESSITY.md narrowed to charity+migration-receipt functions; added target-ledger-function matrix (SS3a) for unspecified functions",
     "E-005_implementation_and_metric_repairs": "model/metrics.py: explicit share_of_pool vs share_of_issued, no mixed denominators; model/allocation.py: lottery draws without replacement; duplicate donor_id rejected fail-closed; assumption-asserting tests replaced",
     "E-006_language_boundary": "removed 'token sale'/'investment contract' wording; replaced with 'fixed-pool floating implied allocation ratio' throughout",
     "E-007_complete_failure_condition_map": "FAILURE_CONDITIONS.md maps all 7 issue #34 failure conditions (FC1-FC7, previously 6) each classified as mathematically_proven/conditional_simulation_result/structural_risk/empirical_unknown/policy_legal_question",
     "E-008_preserve_confirmed_findings": "FAILURE_CONDITIONS.md 'Preserved findings' section retains all 6 REV-007 findings unchanged",
     "E-009_cross_model_and_repository_checks": "CROSS_MODEL_COMPARISON.md added; all required commands run (see command_results)"
+  },
+  "micro_repair_items": {
+    "1_shared_participant_validator": "model/allocation.py: added validate_participants(), called directly by every public allocation function (exact_pro_rata, capped_pro_rata, concave_sqrt, concave_log, time_weighted, random_lottery_component); rejects duplicate/empty/non-string participant IDs, boolean/non-integer/negative weights, and invalid pool/cap/winner-count values; direct tests added in tests/test_allocation.py::TestSharedParticipantValidator (not relying only on scenario.py validation)",
+    "2_governance_rule_renamed_cap_then_renormalize": "model/governance.py: continuously_capped renamed cap_then_renormalize; reports raw_proportional_weights, pre_normalization_clipped_weights, and final weights separately; tests/test_governance.py::TestCapThenRenormalize proves final normalized share can exceed the nominal clip value at 1, 2, and 3 holders; README.md, FAILURE_CONDITIONS.md, ALTERNATIVES_COMPARISON.md, MECHANISM_NECESSITY.md, CROSS_MODEL_COMPARISON.md, and the audit report updated to say only that this rule reduced concentration in the tested many-holder scenario (14_governance_cap_then_renormalize, renamed from 14_governance_continuously_capped), never a hard final per-holder cap",
+    "3_receipt_branch_tip_replaced": "see repair_logic_commit, receipt_binding_parent_commit, receipt_self_binding_note fields above"
   },
   "command_results": {
     "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": {
@@ -62,7 +70,7 @@
     },
     "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v": {
       "exit_code": 0,
-      "summary": "54 tests OK"
+      "summary": "72 tests OK (54 prior + 18 new: shared-validator and cap-then-renormalize tests)"
     },
     "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py": {
       "exit_code": 0,
@@ -138,6 +146,6 @@
     "no claim of cross-family independent review of the repaired package specifically",
     "no modification of the Grok Breaker evidence paths"
   ],
-  "receipt_schema": "bgen.econ-redteam-001.receipt/v2-repair",
+  "receipt_schema": "bgen.econ-redteam-001.receipt/v3-microrepair",
   "label": "SANITIZED_TASK_RECEIPT"
 }
