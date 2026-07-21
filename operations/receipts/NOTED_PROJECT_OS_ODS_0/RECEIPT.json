@@ -1,0 +1,80 @@
+{
+  "schema": "nexus.receipt/v1",
+  "receipt_id": "RCT-NOTED-PROJECT-OS-ODS-0-001",
+  "operation": "noted-project-os-ods-0-skeleton",
+  "status_authority": "NONE",
+  "seat": "SEAT-CODEX-IMPLEMENT",
+  "baseline_commit": "f3bc868ccbdb1b54ac37c8ade803f0e8382ef073",
+  "verified_at_commit": "47f8dcd0cbb44498ff974e4932db9badfa31b38c",
+  "started_at": "2026-07-21T22:57:00+01:00",
+  "finished_at": "2026-07-21T23:08:10+01:00",
+  "exit_code": 0,
+  "inputs": [
+    { "path": "experiments/NOTED_PROJECT_OS_001/seats/CODEX_IMPLEMENTER.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/CANONICAL_DIRECTION.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/DIAGNOSTIC_SUITE.md", "sections": "§2, §3, §4.1-4.2, §5, §9 ODS-0" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/TECH_SPEC.md", "sections": "§8.0" },
+    { "path": "products/noted-host/src/bridges/nexusHostBridge.ts", "description": "Merged Phase 1 bridge API reused without weakening its source guard." }
+  ],
+  "outputs": [
+    {
+      "path": "products/noted-host/src/studios/diagnostics/DiagnosticsStudio.tsx",
+      "sha256": "6abbefed0fbf9598df4ca8fa7f0e5216511ac95d210a006cec15eba2cea20097",
+      "change": "Adds the ODS-0 UI, environment and mount/path probes, real trusted/foreign bridge runners, bounded timeline, always-visible non-claims banner, and redacted JSON/Markdown diagnosis-pack exports."
+    },
+    {
+      "path": "products/noted-host/src/studios/diagnostics/odsCases.ts",
+      "sha256": "e4660fa7e1f65e1c515058264ebe4a5bcbd018b20c04b708bac715ef500c8a0a",
+      "change": "Defines all nine DIAGNOSTIC_SUITE §4.2 P0 case IDs in one catalog; BR-003, BR-004, and BR-005 are honestly marked as ODS-1 SKIP runners."
+    },
+    {
+      "path": "products/noted-host/scripts/ods-0-smoke.mjs",
+      "sha256": "85f6b4f4215441193716e93fc610efc480a332b2f015cbc0154454e442e0f138",
+      "change": "Adds a reproducible Playwright smoke for dev and production preview covering route, navigation gate, catalog, six implemented cases, JSON download/schema, and browser errors."
+    },
+    {
+      "path": "products/noted-host/src/App.tsx",
+      "sha256": "8a3c33d05dfb0b708883293677952781508fd300906a9b60bae67388995b00f9",
+      "change": "Adds #/diagnostics and #/ods alias routes."
+    },
+    {
+      "path": "products/noted-host/src/components/Sidebar.tsx",
+      "sha256": "bebbced258111bcff876f2f9ca9510567d95aaf25a3efb96ea5f2cadbfa0a100",
+      "change": "Adds a Diagnostics navigation entry visible only in Vite DEV; the production direct route retains its research banner."
+    }
+  ],
+  "claims": [
+    "#/diagnostics loads the ODS-0 studio and #/ods redirects to it.",
+    "The Diagnostics sidebar entry is visible in DEV and hidden in production preview; the direct production route remains clearly labeled as a research tool with status_authority NONE and anti-real-world-value non-claims.",
+    "All nine P0 IDs from DIAGNOSTIC_SUITE §4.2 are defined in the shared TypeScript catalog.",
+    "ODS-ENV-001, ODS-HOST-001, ODS-PATH-001, ODS-PACK-001, ODS-BR-001, and ODS-BR-002 pass in both dev and production-preview browser smoke runs.",
+    "ODS-BR-001 invokes the real Nexus iframe adapter and observes the real host bridge accepted receipt. ODS-BR-002 sends from the parent and observes the real local UNTRUSTED_SOURCE receipt with no response posted back.",
+    "JSON export downloads a noted.ods-pack/v1 document with status_authority NONE, environment, cases, timeline, bridge, console, storage, security notes, and non-claims fields. Markdown summary export is also present.",
+    "Known sk-, xai-, Bearer, and nsec-shaped secrets are redacted from exported JSON and Markdown strings."
+  ],
+  "non_claims": [
+    "This is ODS-0, not full ODS-1 or full P0 coverage. ODS-BR-003, ODS-BR-004, and ODS-BR-005 are defined but only record SKIP; npm run ods:p0 was not added or claimed.",
+    "This receipt and exported diagnosis packs have status_authority NONE and are not security audits or production-readiness claims.",
+    "Phase 2 Agent scrub/import, simulator frame, creature, broker, and Nostr product work were not started.",
+    "No real-world value, funds, token, redeem, or economic authorization surface was added.",
+    "The diagnosis pack intentionally does not dump IndexedDB contents, localStorage values, Agent history, secrets, or private notes.",
+    "npm audit reported 5 dependency findings (1 low, 3 moderate, 1 high); dependency remediation was outside ODS-0 scope.",
+    "The receipt is committed after the immutable verified code commit named by verified_at_commit; the receipt-only commit does not alter verified product files."
+  ],
+  "checks": [
+    { "command": "python3 experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py", "exit_code": 0, "result": "PASS registry: 3 package(s) ok" },
+    { "command": "cd products/noted-host && npm ci", "exit_code": 0, "result": "PASS; added and audited 166 packages. npm audit reported 5 known findings." },
+    { "command": "cd products/noted-host && npm run typecheck", "exit_code": 0, "result": "PASS; tsc --noEmit returned no errors." },
+    { "command": "cd products/noted-host && npm run build", "exit_code": 0, "result": "PASS; Vite transformed 297 modules, produced dist, and pack.js emitted the two single-file HTML artifacts." },
+    { "command": "cd products/noted-host && npm run bridge:smoke", "exit_code": 0, "result": "PASS; Phase 1 trusted/untrusted bridge regression checks and browser error checks remained green." },
+    { "command": "cd products/noted-host && npm run ods:smoke", "exit_code": 0, "result": "PASS in DEV; route, DEV navigation, banner, catalog, six implemented runners, pack download/schema, and zero browser errors." },
+    { "command": "cd products/noted-host && npm run ods:smoke -- --preview", "exit_code": 0, "result": "PASS in production preview; hidden sidebar entry, direct-route banner, catalog, six implemented runners, pack download/schema, and zero browser errors." }
+  ],
+  "limitations": [
+    "ODS-0 records empty console arrays in the exported pack; the Playwright smoke separately captures and asserts browser console/page errors. Full in-product console capture belongs to ODS-1.",
+    "lab_git_head and noted_build_commit are null because no build-time commit injection exists in noted-host yet; the fields remain present and honest.",
+    "Storage reporting is schema-shaped metadata only; ODS-0 does not inspect or export workspace records.",
+    "The existing local Playwright Chromium cache is used when the package-expected browser revision is absent."
+  ],
+  "next": "NEXT: SEAT-GROK-DRIVE for ODS-0 acceptance. Do not begin Phase 2."
+}
