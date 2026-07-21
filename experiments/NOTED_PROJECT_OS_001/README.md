@@ -37,7 +37,8 @@ End of THIS phase = system the sim is designed IN / FOR / BUILT INTO.
 | 8 | `seats/CLAUDE_DEBUGGER.md` | Claude Code |
 | 9 | `seats/GROK_DRIVER.md` | Grok (drive + test) |
 | 10 | `AI_ROUTING.md` | Operator + all seats |
-| 11 | Sister: `../BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md` | All |
+| 11 | **`GROK_PICKUP.md`** | **Fresh Grok session — one-command handoff + history walk + 5 options** |
+| 12 | Sister: `../BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md` | All |
 
 ## Non-claims
 
