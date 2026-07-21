@@ -1,0 +1,22 @@
+{
+  "exchange_concentration": {
+    "gini": "0",
+    "hhi": "1",
+    "n": 1,
+    "sum": 1000000000,
+    "top10_share": "1",
+    "top1_share": "1"
+  },
+  "note": "Pro-rata is linear: aggregation does not change total allocation to the economic owner if total e equal; custody/governance aggregation still concentrates control.",
+  "one_exchange_alloc": 1000000000,
+  "same_total_eligible": true,
+  "small_concentration": {
+    "gini": "0",
+    "hhi": "1/10000",
+    "n": 10000,
+    "sum": 1000000000,
+    "top10_share": "1/1000",
+    "top1_share": "1/10000"
+  },
+  "ten_thousand_small_sum_alloc": 1000000000
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "alloc_value_assumed": 0,
+    "charity_net": 75000000,
+    "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+    "others_donation": 50000000,
+    "pool": 1000000000,
+    "profitable_under_assumptions": false,
+    "rebate": 25000000,
+    "token_value_per_unit": "0",
+    "whale_alloc": 500000000,
+    "whale_donation": 50000000,
+    "whale_net_assumed": -25000000
+  },
+  {
+    "alloc_value_assumed": 5000000,
+    "charity_net": 75000000,
+    "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+    "others_donation": 50000000,
+    "pool": 1000000000,
+    "profitable_under_assumptions": false,
+    "rebate": 25000000,
+    "token_value_per_unit": "1/100",
+    "whale_alloc": 500000000,
+    "whale_donation": 50000000,
+    "whale_net_assumed": -20000000
+  },
+  {
+    "alloc_value_assumed": 50000000,
+    "charity_net": 75000000,
+    "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+    "others_donation": 50000000,
+    "pool": 1000000000,
+    "profitable_under_assumptions": true,
+    "rebate": 25000000,
+    "token_value_per_unit": "1/10",
+    "whale_alloc": 500000000,
+    "whale_donation": 50000000,
+    "whale_net_assumed": 25000000
+  },
+  {
+    "alloc_value_assumed": 500000000,
+    "charity_net": 75000000,
+    "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+    "others_donation": 50000000,
+    "pool": 1000000000,
+    "profitable_under_assumptions": true,
+    "rebate": 25000000,
+    "token_value_per_unit": "1",
+    "whale_alloc": 500000000,
+    "whale_donation": 50000000,
+    "whale_net_assumed": 475000000
+  }
+]

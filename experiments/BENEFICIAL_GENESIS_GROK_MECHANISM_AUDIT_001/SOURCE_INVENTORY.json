@@ -1,0 +1,57 @@
+{
+  "schema": "nexus.bgen.grok-mechanism-audit.source-inventory/v1",
+  "audit_id": "BGEN-GROK-MECHANISM-AUDIT-001",
+  "frozen_subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "freeze_commit": "895f8b54d68349e470ebf853ab841de45c5a8269",
+  "inspected_before_freeze": [
+    "AGENTS.md",
+    "CLAUDE.md (safety; not used as task selector)",
+    "STATUS.json",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/TECHNICAL_DESIGN.md",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/THREAT_MODEL_AND_NONCLAIMS.md",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/allocation.py",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/constants.py",
+    "GitHub issue #33 (exact)",
+    "GitHub issue #34 (exact)",
+    "pasted controlling audit contract"
+  ],
+  "inspected_after_freeze": [
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/MECHANISM_NECESSITY.md (partial)",
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/SUMMARY.json",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/MECHANISM_NECESSITY.md",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/FAILURE_CONDITIONS.md",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/DECISION.json",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/SUMMARY.json",
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/results/DECISION.json",
+    "PR #35 metadata (title/state/merge commit)",
+    "PR #37 metadata",
+    "PR #39 metadata"
+  ],
+  "hashed_not_read_before_freeze": {
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001": "9236b150beabae6c2583c120e0886ae71f926468239597dde44a462390537174",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001": "f5e70ed12b24d0c11f78d34af9843ca43f6ef371d93a7bda4ee6716cea286909",
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003": "8cc215db03efec9f42385defa43f7098c4c4741bf0c2c5b585d7c551b0953427",
+    "experiments/BENEFICIAL_GENESIS_RETEST_002": "2dc7bfc72c98a5cc41a82f6651f5a814428c8b5f0bf72c53559cedc381068ed8"
+  },
+  "never_inspected_forbidden": [
+    "PR #40",
+    "PR #42",
+    "PR #43",
+    "fable/bgen-epistemic-audit-001",
+    "codex/bgen-technical-audit-001",
+    "grok/bgen-technical-audit-001",
+    "experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+    "experiments/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+    "experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+    "related operations audit/receipt paths for sibling 2x2 audits",
+    "recent issue/PR listings",
+    "prior Grok session transcripts"
+  ],
+  "not_imported": [
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/**",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/**",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/** (post-freeze: read only for design; independent model reimplemented)"
+  ],
+  "blinding_breach": false
+}

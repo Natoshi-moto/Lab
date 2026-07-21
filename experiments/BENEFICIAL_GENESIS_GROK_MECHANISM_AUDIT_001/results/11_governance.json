@@ -1,0 +1,119 @@
+{
+  "cap_renorm": {
+    "cap_share": "1/10",
+    "coalition_note": "Many sub-cap identities controlled by one coalition can re-aggregate to above cap if identity binding is weak or transferable units re-delegate.",
+    "identity_allocations": {
+      "id_0": 10,
+      "id_1": 10,
+      "id_2": 10,
+      "id_3": 10,
+      "id_4": 10
+    },
+    "rule": "gov_cap_then_renormalize",
+    "shares": [
+      "1/5",
+      "1/5",
+      "1/5",
+      "1/5",
+      "1/5"
+    ],
+    "total_weight": 50,
+    "weights": [
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
+  },
+  "coalition_only_population_control": {
+    "coalition_gov_share_if_separate_ids": "1",
+    "evidence_class": "structural_pathway_under_identity_model",
+    "members": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "single_identity_gov_share": "1",
+    "splitting_increases_gov_power": false
+  },
+  "coalition_vs_outsiders": {
+    "evidence_class": "structural_pathway_under_weak_identity",
+    "many": {
+      "shares": [
+        "9/100",
+        "9/100",
+        "9/100",
+        "9/100",
+        "9/100",
+        "9/100",
+        "9/100",
+        "9/100",
+        "9/100",
+        "9/100",
+        "1/10"
+      ],
+      "total_weight": 100,
+      "weights": [
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        10
+      ]
+    },
+    "one": {
+      "cap_share": "1/10",
+      "coalition_note": "Many sub-cap identities controlled by one coalition can re-aggregate to above cap if identity binding is weak or transferable units re-delegate.",
+      "identity_allocations": {
+        "rest": 10,
+        "whale": 10
+      },
+      "rule": "gov_cap_then_renormalize",
+      "shares": [
+        "1/2",
+        "1/2"
+      ],
+      "total_weight": 20,
+      "weights": [
+        10,
+        10
+      ]
+    },
+    "splitting_increases_gov_power": true,
+    "whale_share_as_10_sybil_ids": "9/10",
+    "whale_share_as_one_identity": "1/2"
+  },
+  "proportional": {
+    "note": "Transferable economic units imply transferable governance under this rule.",
+    "rule": "gov_proportional_to_economic_units",
+    "shares": [
+      "4/5",
+      "1/20",
+      "1/20",
+      "1/20",
+      "1/20"
+    ],
+    "total": 100,
+    "weights": [
+      80,
+      5,
+      5,
+      5,
+      5
+    ]
+  }
+}

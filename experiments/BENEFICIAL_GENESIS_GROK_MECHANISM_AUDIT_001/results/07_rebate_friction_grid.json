@@ -1,0 +1,184 @@
+{
+  "rows": [
+    {
+      "access_share": "0",
+      "accessible_volume": 0,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "0"
+    },
+    {
+      "access_share": "1/10",
+      "accessible_volume": 10000000,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "0"
+    },
+    {
+      "access_share": "1/2",
+      "accessible_volume": 50000000,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "0"
+    },
+    {
+      "access_share": "1",
+      "accessible_volume": 100000000,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "0"
+    },
+    {
+      "access_share": "0",
+      "accessible_volume": 0,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "1/4"
+    },
+    {
+      "access_share": "1/10",
+      "accessible_volume": 10000000,
+      "charity_net": 97500000,
+      "donated": 100000000,
+      "net_share_of_donated": "39/40",
+      "rebate_paid": 2500000,
+      "rebate_rate": "1/4"
+    },
+    {
+      "access_share": "1/2",
+      "accessible_volume": 50000000,
+      "charity_net": 87500000,
+      "donated": 100000000,
+      "net_share_of_donated": "7/8",
+      "rebate_paid": 12500000,
+      "rebate_rate": "1/4"
+    },
+    {
+      "access_share": "1",
+      "accessible_volume": 100000000,
+      "charity_net": 75000000,
+      "donated": 100000000,
+      "net_share_of_donated": "3/4",
+      "rebate_paid": 25000000,
+      "rebate_rate": "1/4"
+    },
+    {
+      "access_share": "0",
+      "accessible_volume": 0,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "1/2"
+    },
+    {
+      "access_share": "1/10",
+      "accessible_volume": 10000000,
+      "charity_net": 95000000,
+      "donated": 100000000,
+      "net_share_of_donated": "19/20",
+      "rebate_paid": 5000000,
+      "rebate_rate": "1/2"
+    },
+    {
+      "access_share": "1/2",
+      "accessible_volume": 50000000,
+      "charity_net": 75000000,
+      "donated": 100000000,
+      "net_share_of_donated": "3/4",
+      "rebate_paid": 25000000,
+      "rebate_rate": "1/2"
+    },
+    {
+      "access_share": "1",
+      "accessible_volume": 100000000,
+      "charity_net": 50000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1/2",
+      "rebate_paid": 50000000,
+      "rebate_rate": "1/2"
+    },
+    {
+      "access_share": "0",
+      "accessible_volume": 0,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "1"
+    },
+    {
+      "access_share": "1/10",
+      "accessible_volume": 10000000,
+      "charity_net": 90000000,
+      "donated": 100000000,
+      "net_share_of_donated": "9/10",
+      "rebate_paid": 10000000,
+      "rebate_rate": "1"
+    },
+    {
+      "access_share": "1/2",
+      "accessible_volume": 50000000,
+      "charity_net": 50000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1/2",
+      "rebate_paid": 50000000,
+      "rebate_rate": "1"
+    },
+    {
+      "access_share": "1",
+      "accessible_volume": 100000000,
+      "charity_net": 0,
+      "donated": 100000000,
+      "net_share_of_donated": "0",
+      "rebate_paid": 100000000,
+      "rebate_rate": "1"
+    },
+    {
+      "access_share": "0",
+      "accessible_volume": 0,
+      "charity_net": 100000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1",
+      "rebate_paid": 0,
+      "rebate_rate": "1"
+    },
+    {
+      "access_share": "1/10",
+      "accessible_volume": 10000000,
+      "charity_net": 90000000,
+      "donated": 100000000,
+      "net_share_of_donated": "9/10",
+      "rebate_paid": 10000000,
+      "rebate_rate": "1"
+    },
+    {
+      "access_share": "1/2",
+      "accessible_volume": 50000000,
+      "charity_net": 50000000,
+      "donated": 100000000,
+      "net_share_of_donated": "1/2",
+      "rebate_paid": 50000000,
+      "rebate_rate": "1"
+    },
+    {
+      "access_share": "1",
+      "accessible_volume": 100000000,
+      "charity_net": 0,
+      "donated": 100000000,
+      "net_share_of_donated": "0",
+      "rebate_paid": 100000000,
+      "rebate_rate": "1"
+    }
+  ]
+}

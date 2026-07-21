@@ -1,0 +1,98 @@
+{
+  "dominance_caution": "Do not call no-token dominant unless F2\u2013F4 are dropped from required functions. Do not call transferable dominant unless additional functions (liquidity, collateral, tradable gov) are explicitly required and held constant.",
+  "evidence_class": "mechanism_structure_comparison",
+  "product_functions_held_constant": [
+    "F1",
+    "F2",
+    "F3",
+    "F4"
+  ],
+  "reasoning": "Non-transferable receipt and delayed-transfer achieve F1\u2013F4 without immediate alienable units. Transferability is a product choice that enables secondary markets, not a requirement of charity-bound migration receipts.",
+  "regimes": {
+    "charity_directed_fees": {
+      "governance_via_allocation": "n/a",
+      "necessary_for_charity_payment": false,
+      "notes": "Different mechanism: continuous fees, not donation-bound genesis.",
+      "secondary_market_attack_surface": "native_token",
+      "serves_F1": "ongoing_not_genesis",
+      "serves_F2": false,
+      "serves_F3": false,
+      "serves_F4_claim": false,
+      "speculative_demand_channel": true,
+      "transferable_economic_unit": "ledger_native"
+    },
+    "delayed_transfer": {
+      "governance_via_allocation": "depends",
+      "necessary_for_charity_payment": false,
+      "notes": "Moves risk in time; may reintroduce markets via expectations.",
+      "secondary_market_attack_surface": "deferred",
+      "serves_F1": true,
+      "serves_F2": true,
+      "serves_F3": true,
+      "serves_F4_claim": true,
+      "speculative_demand_channel": "forward_markets_possible",
+      "transferable_economic_unit": "after_delay"
+    },
+    "no_token": {
+      "governance_via_allocation": false,
+      "necessary_for_charity_payment": false,
+      "notes": "Direct donation alone achieves F1; no migration receipt.",
+      "secondary_market_attack_surface": "none_from_allocation_unit",
+      "serves_F1": true,
+      "serves_F2": false,
+      "serves_F3": false,
+      "serves_F4_claim": false,
+      "speculative_demand_channel": false,
+      "transferable_economic_unit": false
+    },
+    "non_transferable_receipt": {
+      "governance_via_allocation": "only_if_receipt_grants_gov",
+      "necessary_for_charity_payment": false,
+      "notes": "Holds F1\u2013F4 without alienable token; recognition/migration proof.",
+      "secondary_market_attack_surface": "low_direct",
+      "serves_F1": true,
+      "serves_F2": true,
+      "serves_F3": true,
+      "serves_F4_claim": true,
+      "speculative_demand_channel": "weak_unless_gov_or_status",
+      "transferable_economic_unit": false
+    },
+    "proof_of_burn_migration": {
+      "governance_via_allocation": "depends",
+      "necessary_for_charity_payment": false,
+      "notes": "Destroys source value; does not fund charity (fails F1).",
+      "secondary_market_attack_surface": "depends_on_unit",
+      "serves_F1": false,
+      "serves_F2": true,
+      "serves_F3": true,
+      "serves_F4_claim": true,
+      "speculative_demand_channel": "depends",
+      "transferable_economic_unit": "optional"
+    },
+    "snapshot_airdrop_no_donation": {
+      "governance_via_allocation": "typical",
+      "necessary_for_charity_payment": false,
+      "notes": "No charity payment; different public benefit theory.",
+      "secondary_market_attack_surface": "high",
+      "serves_F1": false,
+      "serves_F2": "partial_ownership_proof",
+      "serves_F3": true,
+      "serves_F4_claim": true,
+      "speculative_demand_channel": true,
+      "transferable_economic_unit": "typical"
+    },
+    "transferable_allocation": {
+      "governance_via_allocation": "if_linked",
+      "necessary_for_charity_payment": false,
+      "notes": "Adds liquidity/speculation/gov capture channels not required for F1\u2013F4.",
+      "secondary_market_attack_surface": "high",
+      "serves_F1": true,
+      "serves_F2": true,
+      "serves_F3": true,
+      "serves_F4_claim": true,
+      "speculative_demand_channel": true,
+      "transferable_economic_unit": true
+    }
+  },
+  "structural_necessity_of_transferability_for_F1_to_F4": false
+}

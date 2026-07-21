@@ -1,0 +1,13 @@
+{
+  "over_remainder": 5,
+  "oversubscription_tiny_per_sat": 0,
+  "undersubscription": {
+    "T_large": 1000000000,
+    "T_small": 1000,
+    "alloc_per_first_sat_at_T_large": 1,
+    "alloc_per_first_sat_at_T_small": 1000000,
+    "note": "Extreme undersubscription makes each sat extremely valuable in allocation units \u2014 speculative coordination pathway.",
+    "pool": 1000000000,
+    "ratio_exact": "1000000"
+  }
+}

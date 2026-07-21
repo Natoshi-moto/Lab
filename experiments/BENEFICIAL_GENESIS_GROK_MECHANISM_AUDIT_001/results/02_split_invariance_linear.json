@@ -1,0 +1,28 @@
+{
+  "eligible_atom": 10000003,
+  "multi_alloc_sum": 999999999,
+  "multi_allocs": [
+    142857057,
+    142857057,
+    142857057,
+    142857057,
+    142857057,
+    142857057,
+    142857657
+  ],
+  "multi_remainder": 1,
+  "note": "Under pure pro-rata with fixed T=e, split cannot increase total floor allocation to the splitter; may decrease due to extra floors.",
+  "parts": 7,
+  "single_alloc": 1000000000,
+  "single_remainder": 0,
+  "split_eligible": [
+    1428571,
+    1428571,
+    1428571,
+    1428571,
+    1428571,
+    1428571,
+    1428577
+  ],
+  "split_never_increases_issued_to_splitter": true
+}
