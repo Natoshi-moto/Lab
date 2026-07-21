@@ -11,9 +11,9 @@
   "subject_repository": "Natoshi-moto/Lab",
   "subject_commit": "22ce8c11297ad4c08606277ee83dc845797ba220",
   "subject_commit_description": "Merged Beneficial Genesis research base (main merge of PR #27)",
-  "branch_tip": "pending_commit",
-  "draft_pr": null,
-  "draft_pr_url": null,
+  "branch_tip": "f45e946325483a6441cb510c46f55aafbac20956",
+  "draft_pr": 35,
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/35",
   "authorized_paths": [
     "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
     "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
