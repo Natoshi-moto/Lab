@@ -1,5 +1,17 @@
 # The Bitcoin Paper
 
+---
+A note on what this is: everything below is written in the voice of
+conviction, because that's the only honest way to state a stance worth
+testing. But the underlying claim is narrower than the voice: I am
+claiming that I am attempting this, in good faith, with real
+infrastructure behind the attempt — not that I have achieved it, not
+that it is proven, not that it is ready for anyone else's participation
+yet. Read every "we will" as "we intend to attempt," and every strong
+claim as a stated target for someone to try to break, not a report of
+success. That's the actual epistemic status of this paper.
+---
+
 ## A stabilizer for multi-asset public contribution — and a research program for cryptographic financial security under AI
 
 **Status:** `DRAFT FOR OPERATOR REVIEW / NOT A PROTOCOL SPEC / STATUS_AUTHORITY: NONE`  
