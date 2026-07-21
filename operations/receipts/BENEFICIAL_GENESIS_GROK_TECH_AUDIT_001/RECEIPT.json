@@ -36,7 +36,7 @@
   "highest_value_next_repair": "Update BENEFICIAL_GENESIS_DESIGN_001/README.md fixture catalog counts to match EXPECTED.json/evidence gate (34/1/8).",
   "timestamp_utc": "2026-07-21T14:23:05Z",
   "receipt_self_binding_note": "Logic commit hash fields are filled in a follow-up binding commit so this receipt does not contain the SHA of the commit that finalizes its own bytes.",
-  "audit_logic_commit": null,
-  "receipt_binding_parent_commit": null,
+  "audit_logic_commit": "7e59f822682f727c882f824cae89da4879b81ffa",
+  "receipt_binding_parent_commit": "7e59f822682f727c882f824cae89da4879b81ffa",
   "draft_pr": null
 }
