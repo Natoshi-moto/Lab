@@ -1,0 +1,52 @@
+{
+  "schema": "nexus.receipt/v1",
+  "task_id": "TSK-BGEN-R1-SUPPLY-INVARIANT-REPAIR",
+  "repair_id": "R1",
+  "parent_tribunal": "BGEN-INTEGRATION-TRIBUNAL-001",
+  "parent_pr": 46,
+  "findings_addressed": ["TRIB-F-001", "TRIB-F-002", "TRIB-F-008"],
+  "seat": "Grok interactive CLI (grok-4.5 class)",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / BOUNDED_REPAIR",
+  "subject_base_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "branch": "grok/bgen-r1-synthesis-001",
+  "synthetic_only": true,
+  "live_funds": false,
+  "status_json_modified": false,
+  "historical_audit_packages_rewritten": false,
+  "token_launch": false,
+  "changes": {
+    "allocation_py": "scheme-parameter gates (lottery_share_bps, early_bonus_bps, epoch bounds, scale); enforce_supply_invariant on public allocators; negative lottery_share_bps fail-closed",
+    "scenario_py": "pool type gate; supply invariant before result emission; unknown scheme fail",
+    "tests": "R1 boundary matrix + controlling counterexample regression",
+    "thesis_package": "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/** operating map + protocol/Haven thesis + S1 brief"
+  },
+  "controlling_counterexample": {
+    "input": {"pool": 100, "lottery_share_bps": -1000, "donors": [["a", 100]]},
+    "pre_repair": {"total_issued": 110, "unissued_remainder": -10},
+    "post_repair": "ParticipantValidationError fail-closed before arithmetic"
+  },
+  "commands": {
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v": {
+      "exit_code": 0,
+      "summary": "78 tests OK (was 72; +R1 cases)"
+    },
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": {
+      "exit_code": 0,
+      "summary": "27 scenarios OK; committed results byte-identical"
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS (WORKTREE_DIRTY expected pre-commit)"
+    }
+  },
+  "claims_scope": "Pass language applies only to tested input domains after R1 gates. Does not promote mechanism to ECONOMIC_GATE_PASS. Does not authorize transferability or live activity.",
+  "follow_on_required": "Fresh different-family retest of exact repaired commit (PR #39 pattern), then R2/R3/R4 and S1",
+  "non_claims": [
+    "No merge authorization for this PR or audits #40-#49",
+    "No STATUS.json change",
+    "No live funds, peg, or Haven-equivalent privacy money",
+    "No claim multi-AI independence",
+    "Thesis is research orientation only"
+  ]
+}

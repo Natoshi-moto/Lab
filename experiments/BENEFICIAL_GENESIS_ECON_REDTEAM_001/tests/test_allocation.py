@@ -174,5 +174,99 @@ class TestSharedParticipantValidator(unittest.TestCase):
         self.assertEqual(sum(result.values()) <= POOL, True)
 
 
+class TestR1SchemeParameterGates(unittest.TestCase):
+    """Tribunal R1 / TRIB-F-001: scheme-parameter validation + supply gate."""
+
+    def test_negative_lottery_share_bps_rejected_not_over_issue(self):
+        # Controlling counterexample: pool=100, lottery_share_bps=-1000 used to
+        # issue 110 units. Must now fail closed before arithmetic.
+        with self.assertRaises(alloc.ParticipantValidationError):
+            alloc.random_lottery_component(
+                [("a", 100)], 100, random.Random(1), lottery_share_bps=-1000, winners=1
+            )
+
+    def test_lottery_share_bps_boundary_matrix(self):
+        donors = [("a", 10), ("b", 10)]
+        # 0 and 10000 are valid endpoints; 10001 and non-ints are not.
+        for ok in (0, 1, 10_000):
+            result = alloc.random_lottery_component(
+                donors, 1_000, random.Random(1), lottery_share_bps=ok, winners=1
+            )
+            self.assertLessEqual(sum(result.values()), 1_000)
+        for bad in (-1, 10_001, True, False, 1.5, "1000", None):
+            with self.subTest(lottery_share_bps=bad):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    alloc.random_lottery_component(
+                        donors, 1_000, random.Random(1), lottery_share_bps=bad, winners=1
+                    )
+
+    def test_early_bonus_bps_and_epoch_bounds(self):
+        donors = [("early", 100), ("late", 100)]
+        blocks = {"early": 0, "late": 10}
+        ok = alloc.time_weighted(
+            donors,
+            1_000,
+            donor_blocks=blocks,
+            epoch_open_block=0,
+            epoch_close_block=10,
+            early_bonus_bps=5_000,
+        )
+        self.assertGreater(ok["early"], ok["late"])
+        self.assertLessEqual(sum(ok.values()), 1_000)
+
+        for bad in (-1, 10_001, True, 1.5, "5000"):
+            with self.subTest(early_bonus_bps=bad):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    alloc.time_weighted(
+                        donors,
+                        1_000,
+                        donor_blocks=blocks,
+                        epoch_open_block=0,
+                        epoch_close_block=10,
+                        early_bonus_bps=bad,
+                    )
+
+        with self.assertRaises(alloc.ParticipantValidationError):
+            alloc.time_weighted(
+                donors,
+                1_000,
+                donor_blocks=blocks,
+                epoch_open_block=10,
+                epoch_close_block=0,
+                early_bonus_bps=1_000,
+            )
+        for bad_block in (True, 1.5, "0"):
+            with self.subTest(epoch_open_block=bad_block):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    alloc.time_weighted(
+                        donors,
+                        1_000,
+                        donor_blocks=blocks,
+                        epoch_open_block=bad_block,
+                        epoch_close_block=10,
+                        early_bonus_bps=1_000,
+                    )
+
+    def test_concave_log_scale_must_be_positive_int(self):
+        for bad in (0, -1, True, 1.5, "1000"):
+            with self.subTest(scale=bad):
+                with self.assertRaises(alloc.ParticipantValidationError):
+                    alloc.concave_log(DONORS, POOL, scale=bad)
+
+    def test_empty_and_zero_weight_populations(self):
+        self.assertEqual(sum(alloc.exact_pro_rata([], 100).values()), 0)
+        zeroed = alloc.exact_pro_rata([("a", 0), ("b", 0)], 100)
+        self.assertEqual(sum(zeroed.values()), 0)
+        lottery = alloc.random_lottery_component(
+            [("a", 0), ("b", 0)], 100, random.Random(1), lottery_share_bps=1_000, winners=2
+        )
+        self.assertLessEqual(sum(lottery.values()), 100)
+
+    def test_enforce_supply_invariant_public_gate(self):
+        with self.assertRaises(alloc.ParticipantValidationError):
+            alloc.enforce_supply_invariant({"a": 101}, 100)
+        alloc.enforce_supply_invariant({"a": 100}, 100)  # boundary OK
+
+
 if __name__ == "__main__":
     unittest.main()

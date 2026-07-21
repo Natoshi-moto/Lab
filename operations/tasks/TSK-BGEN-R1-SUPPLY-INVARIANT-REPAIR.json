@@ -1,0 +1,45 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-BGEN-R1-SUPPLY-INVARIANT-REPAIR",
+  "seat": "grok-repair-engineer",
+  "authority": "PROPOSE_ONLY",
+  "status_authority": "NONE",
+  "baseline_ref": "main",
+  "baseline_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "parent_adjudication": {
+    "pr": 46,
+    "task": "BGEN-INTEGRATION-TRIBUNAL-001",
+    "repair_id": "R1",
+    "findings": ["TRIB-F-001", "TRIB-F-002", "TRIB-F-008"]
+  },
+  "objective": "Implement tribunal R1: scheme-parameter validation and supply-invariant gate on the economics redteam package so no supported input can yield sum(allocation) > pool or unissued_remainder < 0. File unified operating thesis tying protocol adoption and delayed unit ambition without authorizing live activity.",
+  "allowed_write": [
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/allocation.py",
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/scenario.py",
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/**",
+    "experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/**",
+    "operations/tasks/TSK-BGEN-R1-SUPPLY-INVARIANT-REPAIR.json",
+    "operations/receipts/BENEFICIAL_GENESIS_R1_SUPPLY_INVARIANT_REPAIR/**",
+    "operations/audits/BENEFICIAL_GENESIS_R1_SUPPLY_INVARIANT_REPAIR/**"
+  ],
+  "prohibited": [
+    "STATUS.json mutation",
+    "rewrite of historical audit/tribunal packages",
+    "design pack / Breaker / RETEST package mutation except via superseding claims language",
+    "live funds",
+    "token launch",
+    "merge of PRs #40-#49"
+  ],
+  "acceptance": [
+    "negative lottery_share_bps fails closed with ParticipantValidationError",
+    "bps/bool/float/string adversarial matrix for scheme params",
+    "enforce_supply_invariant on public allocators and scenario runner",
+    "existing valid scenarios still run; no silent arithmetic change intent on valid inputs",
+    "unified thesis package present with non-claims and S1 brief",
+    "status_authority remains NONE"
+  ],
+  "follow_on": {
+    "required": "Fresh different-family retest of the exact repaired commit (PR #39 pattern)",
+    "then": ["R2", "R3", "R4 optional", "S1"]
+  }
+}
