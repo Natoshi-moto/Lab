@@ -283,6 +283,11 @@ function getCaretCoords(ta: HTMLTextAreaElement): { left: number; top: number } 
 // ════════════════════════════════════════════════════════════════════════════
 
 export function PromptStudio() {
+  const ws = useWorkspace()
+  const promptRecords = [...ws.prompts]
+    .filter((prompt) => prompt.deletedAt === undefined)
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+
   return (
     <div
       className="flex-1 flex flex-col min-h-0 bg-surface"
@@ -297,6 +302,19 @@ export function PromptStudio() {
 Prompts · blocks and pipelines for your private knowledge foundry
         </span>
       </header>
+
+      {promptRecords.length > 0 && (
+        <section className="shrink-0 border-b border-line bg-surface-2/50 px-6 py-2" data-test="prompt-records">
+          <div className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Saved prompt records</div>
+          <div className="flex flex-wrap gap-2">
+            {promptRecords.slice(0, 5).map((prompt) => (
+              <span key={prompt.id} className="rounded border border-line bg-surface px-2 py-1 text-xs text-ink" data-test="prompt-record-title" title={prompt.body}>
+                {prompt.title}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
 
       <PipelinesView />
     </div>

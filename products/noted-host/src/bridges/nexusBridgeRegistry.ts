@@ -26,7 +26,7 @@ export type NexusCapabilityDefinition = {
 export const NEXUS_BRIDGE_PROTOCOL = Object.freeze({
   inboundMessageType: 'NEXUS_HOST_BRIDGE',
   receiptMessageType: 'NEXUS_HOST_BRIDGE_RECEIPT',
-  protocolVersion: '0.05-stub',
+  protocolVersion: '0.06-phase-2',
 })
 
 export const NEXUS_CHANNELS: readonly NexusChannelDefinition[] = Object.freeze([
@@ -49,7 +49,7 @@ export const NEXUS_CHANNELS: readonly NexusChannelDefinition[] = Object.freeze([
     owner: 'noted-host',
     direction: 'nexus-to-noted',
     implementedIn: 'BB-04',
-    mutation: 'stub-only',
+    mutation: 'effectful',
   },
   {
     channel: 'agent.action.proposed',

@@ -43,6 +43,19 @@ npm run build
 
 `npm run preview` is also available for previewing the Vite build output.
 
+## Nexus Agent and prompt import
+
+`#/nexus-agent` loads the scrubbed v0.14 Agent block. Its default embedded data
+is factory-empty; no personal sessions, agents, provider selection, or keys ship
+with the block. The Agent HTML currently uses public CDNs for Tailwind, Marked,
+Highlight.js, and KaTeX, so this is not yet a fully offline Agent bundle.
+
+The Agent's **Import prompt to Noted** control proposes the current prompt to the
+host. Noted shows a preview and requires an explicit operator click before it
+writes a prompt to the local IndexedDB `prompts` store. Success includes a local
+receipt and an **Open Prompts** link. Provider and research-tool output is not
+treated as verified evidence.
+
 
 ## AI Brief Export
 
