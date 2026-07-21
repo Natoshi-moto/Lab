@@ -1,0 +1,24 @@
+{
+  "schema": "bgen.codex-mechanism-receipt/v1",
+  "label": "SANITIZED_AUDIT_RECEIPT",
+  "audit_id": "BGEN-CODEX-MECHANISM-AUDIT-001",
+  "subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "branch": "codex/bgen-mechanism-audit-001",
+  "status_authority": "NONE",
+  "freeze_commit": "3d05fee09931d61329da423cf1a43a436db41a07",
+  "runtime": {"python":"3.14.6","git":"2.54.0","os":"Linux 7.0.12-201.fc44.x86_64","repository_visibility_observed":"PUBLIC"},
+  "verdicts": {"UNDERLYING_MECHANISM":"CONTINUE_WITH_CONDITIONS","TRANSFERABILITY_NECESSITY":"NOT_DEMONSTRATED","EVIDENCE_STATE":"UNDERDETERMINED","REAL_WORLD_READINESS":"RESEARCH_ONLY"},
+  "commands": {
+    "independent_tests_initial": "6 run, 1 failed because the test expected only {-1,+1} while the exact grid correctly included a zero boundary; assertion repaired to require both signs without excluding zero",
+    "subject_economics_tests": "72 tests OK",
+    "subject_design_tests": "37 tests OK",
+    "subject_evidence_gate": "PASS; 34 executable invalid, 1 documentary, 8 residual",
+    "independent_tests_final": "6 tests OK",
+    "nexus_doctor": "PASS with expected WORKTREE_DIRTY warning",
+    "repository_tests": "185 run; FAILED with 9 failures and 2 errors, all observed at missing @noble/ed25519 imports in unrelated R013/R015/R016 Node verifiers; dependency installation not authorized",
+    "nexus_verify": "FAILED at independent R013 verifier because @noble/ed25519 is not installed",
+    "git_diff_check": "PASS before final commit"
+  },
+  "scope": "Only three authorized Codex Mechanism audit roots changed.",
+  "nonclaims": ["No status promotion", "No R-round", "No live funds", "No real charities", "No issuance or deployment", "No legal conclusion"]
+}

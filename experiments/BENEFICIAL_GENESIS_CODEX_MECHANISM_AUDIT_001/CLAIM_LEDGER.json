@@ -1,0 +1,17 @@
+{
+  "schema": "bgen.claim-ledger/v1",
+  "subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "claims": [
+    {"id":"C1","type":"MATHEMATICAL_DEDUCTION_AND_TEST","claim":"fixed-pool floors conserve supply","confidence":"HIGH","state":"CONFIRMED"},
+    {"id":"C2","type":"MATHEMATICAL_DEDUCTION_AND_TEST","claim":"linear entitlement is split-invariant before floors; floors weakly penalize splitting","confidence":"HIGH","state":"CONFIRMED"},
+    {"id":"C3","type":"COUNTERMODEL","claim":"concavity and per-identity caps are Sybil-exploitable without an actor boundary","confidence":"HIGH","state":"CONFIRMED"},
+    {"id":"C4","type":"COUNTERMODEL","claim":"cap-then-renormalize is not a hard cap","confidence":"HIGH","state":"CONFIRMED"},
+    {"id":"C5","type":"REPOSITORY_OBSERVATION","claim":"specified receipt and recognition functions do not require transferability","confidence":"HIGH","state":"CONFIRMED_WITHIN_SCOPE"},
+    {"id":"C6","type":"UNRESOLVED_CLAIM","claim":"future ledger functions require transferable allocation","confidence":"LOW","state":"UNABLE_TO_VERIFY"},
+    {"id":"C7","type":"CONDITIONAL_MODEL","claim":"rebates and tainted flows can be privately profitable","confidence":"MEDIUM_CONDITIONAL","state":"SIGN_REVERSAL"},
+    {"id":"C8","type":"EMPIRICAL_HYPOTHESIS","claim":"mechanism increases real social welfare","confidence":"LOW","state":"UNABLE_TO_VERIFY"},
+    {"id":"C9","type":"POLICY_CHOICE","claim":"allocation should confer governance","confidence":"NOT_APPLICABLE","state":"NOT_REQUIRED"},
+    {"id":"C10","type":"LEGAL_QUESTION","claim":"regulatory or tax characterization","confidence":"NOT_APPLICABLE","state":"QUALIFIED_REVIEW_REQUIRED"},
+    {"id":"C11","type":"REPRODUCED_EXECUTABLE_RESULT","claim":"synthetic verifier accepts/rejects the exercised vectors","confidence":"HIGH_FOR_EXERCISED_PREDICATE","state":"CONFIRMED_BOUNDED"}
+  ]
+}

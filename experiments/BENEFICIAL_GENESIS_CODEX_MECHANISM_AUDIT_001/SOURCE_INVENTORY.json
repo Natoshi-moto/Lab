@@ -1,0 +1,13 @@
+{
+  "schema": "bgen.codex-mechanism-source-inventory/v1",
+  "subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "inspected_classes": {
+    "safety_and_constitution": ["AGENTS.md", "README_START_HERE.md", "STATUS.json", "STATUS.md", "NEXT_ACTION.md", "AUDIT_START_HERE.md", "constitution/*.md"],
+    "pre_freeze_subject": ["experiments/BENEFICIAL_GENESIS_DESIGN_001 documentation and genesis/EXPECTED fixtures", "exact GitHub issues #33 and #34"],
+    "post_freeze_subject": ["experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001 documentation, model code, tests, results, audit and receipt", "Beneficial Genesis design tests/verifier", "exact PRs #35, #37 and #39"]
+  },
+  "temporarily_unread_at_freeze": ["subject protocol implementation", "subject economics implementation", "Breaker/retest packages", "PRs #35/#37/#39"],
+  "permanently_excluded": "All materials listed by the controlling task's PERMANENT BLINDNESS RULE",
+  "forbidden_material_exposed": false,
+  "notes": ["Existence and mechanical hashing were not counted as inspection.", "No recent issue/PR listing, global search, broad branch search, memory search, or sibling audit branch was used."]
+}
