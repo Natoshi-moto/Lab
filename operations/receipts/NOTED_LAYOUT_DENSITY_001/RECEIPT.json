@@ -1,0 +1,66 @@
+{
+  "schema": "nexus.receipt/v1",
+  "receipt_id": "RCT-NOTED-LAYOUT-DENSITY-001",
+  "operation": "noted-layout-density-001",
+  "status_authority": "NONE",
+  "seat": "SEAT-CODEX-IMPLEMENT",
+  "baseline_commit": "fdc01a2eff9abaad8c139c06814bd8a476728880",
+  "verified_at_commit": "1d1995f6a4e331634af678ed244bf89f983da39c",
+  "finished_at": "2026-07-22T00:14:11+01:00",
+  "exit_code": 0,
+  "scope": "Layout and density UX only.",
+  "layout": {
+    "scratch_drawer": {
+      "before": "First boot opened the drawer; later boots restored the persisted open state.",
+      "after": "Always closed on app mount/first paint at 28px; the user can open and close it during the session.",
+      "persistence_choice": "Earlier persisted open state is intentionally ignored at the next app mount. User changes still persist and broadcast for current-session consumers."
+    },
+    "left_sidebar_expanded_px": { "before": 240, "after": 148 },
+    "studio_list_rail_px": { "before": 256, "after": 170 },
+    "nexus_panel_expanded_px": { "before": 320, "after": 212 },
+    "collapsed_sidebar_px": { "before": 48, "after": 48 },
+    "collapsed_nexus_strip_px": { "before": 28, "after": 28 },
+    "agent": {
+      "scale_factor": 0.8,
+      "method": "CSS transform scale on the Agent iframe with top-left origin, a 125% inverse-sized iframe viewport, and an overflow-hidden wrapper.",
+      "reason": "A 1440x900 visual check showed materially more Agent workspace and controls while keeping first-run text readable; the Agent HTML and individual fonts were not edited."
+    }
+  },
+  "outputs": [
+    { "path": "products/noted-host/src/components/ScratchDrawer.tsx", "sha256": "16a30581032e8763f9506ac2c9c37e524b4ae1516bdca9fb9b17344fec5aad5d" },
+    { "path": "products/noted-host/src/components/Sidebar.tsx", "sha256": "331f4af6d2e8974e1ebd60d4140d43891af5e1245262711c4c2ceb65127f0810" },
+    { "path": "products/noted-host/src/components/NexusPanel.tsx", "sha256": "ba8822959605c1ab695edd6894f23c32ac075249fdd66c975f8e271cf0106059" },
+    { "path": "products/noted-host/src/util/rail.ts", "sha256": "cf04f5fa4a8f395926e5985c63d25d55db458d0550d66cb3c386d616356f86ba" },
+    { "path": "products/noted-host/src/studios/nexusAgent/NexusAgentStudio.tsx", "sha256": "8bbfcf81ba09533fdf4ce1065eb7621d9b85dfb552b80703c70e96c2eaffb6ca" },
+    { "path": "products/noted-host/noted-v0.01.html", "sha256": "b384d51dc45ca99cf748198e7c45e07156368b1bb9f2b7cbdd2dee6dce78494d" },
+    { "path": "products/noted-host/verse-studio.html", "sha256": "b384d51dc45ca99cf748198e7c45e07156368b1bb9f2b7cbdd2dee6dce78494d" }
+  ],
+  "checks": [
+    { "command": "cd products/noted-host && npm ci", "exit_code": 0, "result": "PASS; 166 packages installed. npm audit reported 5 dependency findings (1 low, 3 moderate, 1 high)." },
+    { "command": "cd products/noted-host && npm run typecheck", "exit_code": 0, "result": "PASS; tsc --noEmit returned no errors." },
+    { "command": "cd products/noted-host && npm run build", "exit_code": 0, "result": "PASS; 304 modules transformed and both packed HTML artifacts emitted." },
+    { "command": "cd products/noted-host && npm run bridge:smoke", "exit_code": 0, "result": "PASS; trusted/untrusted bridge assertions and zero console/page errors." },
+    { "command": "cd products/noted-host && npm run ods:p0", "exit_code": 0, "result": "PASS; all nine non-human P0 cases." },
+    { "command": "cd products/noted-host && npm run agent:prompt-smoke", "exit_code": 0, "result": "PASS; Agent factory scrub, approval preview, approved prompt visibility, and zero unexpected errors." },
+    { "command": "python3 experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py", "exit_code": 0, "result": "PASS registry: 3 package(s) ok." },
+    { "command": "headless Chromium visual/metric check at 1440x900", "exit_code": 0, "result": "PASS; sidebar 148px, Nexus panel 212px, scratch false/28px, Agent scale 0.8; visual inspection retained readable first-run controls." },
+    { "command": "./nexus doctor", "exit_code": 0, "result": "PASS after removing generated node_modules from the worktree." },
+    { "command": "python3 -m unittest discover -s tests -v", "exit_code": 0, "result": "PASS; 190 tests." },
+    { "command": "./nexus verify", "exit_code": 0, "result": "PASS." },
+    { "command": "git diff --check", "exit_code": 0, "result": "PASS; no whitespace errors before implementation commit." }
+  ],
+  "evidence": ["SOURCE-VERIFIED", "BUILD-VERIFIED", "RUNTIME-ATTESTED"],
+  "non_claims": [
+    "This is not security work or a security audit.",
+    "This does not implement Phase 3 or any broker, creature, sim-frame, sovereignty assault, or Power Snooper work.",
+    "This is not a production polish certification or production-readiness claim.",
+    "This does not authorize or endorse tokens, funds, redemption, custody, or real-world value.",
+    "The receipt is committed after the immutable verified product commit named by verified_at_commit; the receipt-only commit does not alter verified product files."
+  ],
+  "limitations": [
+    "npm audit reported five dependency findings; dependency or security remediation was outside this layout-only task.",
+    "The first repository doctor run inspected generated node_modules and failed on dependency symlinks/permissive third-party JSON; node_modules was removed and doctor, unit tests, and verify then passed against repository content.",
+    "Runtime evidence is a bounded local Chromium observation, not operator acceptance or broad device certification."
+  ],
+  "next": "NEXT: SEAT-GROK-DRIVE"
+}
