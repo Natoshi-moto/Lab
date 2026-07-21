@@ -4,10 +4,11 @@
 
 This **single public Git repository is the authoritative corpus boundary** for a multi-model research laboratory. GitHub supplies history, collaboration, issues, pull requests, checks, tags, and releases. Nexus adds typed research objects, route compilation, bounded mutation, evidence handling, deterministic snapshots, and read-only audit overlays.
 
-**Observed repository visibility: `PUBLIC`.** `NEXUS.json` and
-`constitution/PRIVACY.md` retain a private-repository design requirement. The
-constitutional resolution is `HUMAN_DECISION_REQUIRED`; until a human resolves it,
-do not weaken the stricter data-handling and secret rules.
+**Observed repository visibility: `PUBLIC`.** The visibility question was resolved
+in favor of public operation by
+[`DEC-2026-000002`](corpus/records/decisions/DEC-2026-000002.md), and `NEXUS.json`
+and `constitution/PRIVACY.md` were reconciled accordingly. Public visibility does
+not weaken the stricter data-handling and secret rules.
 
 The repository is not a conventional software package with research notes attached. The software, governance, source material, decisions, experiments, failures, audit records, and handoffs are one governed body of work.
 
@@ -51,12 +52,11 @@ AUDIT_START_HERE.md
 
 ## Where non-public data belongs
 
-The existing constitution classified committed material for a private repository,
-but the repository is now publicly visible. Do not add material that relies on
+Repository visibility is resolved as public. Do not add material that relies on
 private visibility. `LOCAL_ONLY` payloads belong under the ignored
 `corpus/local-only/` area; only manifests and hashes are committed. Secrets are
-never committed. Revising the deeper classification model is
-`HUMAN_DECISION_REQUIRED`.
+never committed. The separate question of fully redesigning the legacy data
+classifications remains open under `DEC-2026-000002`.
 
 ## Where the next action is
 

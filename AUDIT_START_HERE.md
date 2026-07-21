@@ -1,5 +1,7 @@
 # Audit entrypoint — foundation cycle closed
 
+**Before any trust-shaped conclusion:** read root [`WHY_NOT_TO_TRUST_THIS_PROJECT.md`](WHY_NOT_TO_TRUST_THIS_PROJECT.md). Multi-AI agreement, green CI, and receipts do not create a liable author or certified product.
+
 There is no active broad audit task.
 
 The R001 foundation was frozen at `baseline-001`. R002 produced preserved, non-authoritative observations against that immutable target. Follow-up rounds implemented and boundedly retested the material remediations:
