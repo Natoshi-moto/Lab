@@ -14,7 +14,7 @@
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
   "last_completed_action": "R016_EXACT_AUDITED_HEAD_USER_AUTHORIZED_AND_MERGED",
-  "next_action_id": "ACT-R017_DESIGN_MULTI_HOST_REPLICATION_AND_EXPLICIT_FORK_EVIDENCE",
+  "next_action_id": "ACT-R017_REVIEW_AND_ADJUDICATE_PR_22",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"

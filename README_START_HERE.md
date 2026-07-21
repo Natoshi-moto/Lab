@@ -1,8 +1,13 @@
-# Start here — Nexus Private Research Lab
+# Start here — Nexus Public Research Lab
 
 ## What this repository is
 
-This **single private Git repository is the authoritative corpus boundary** for a multi-model research laboratory. GitHub supplies history, collaboration, issues, pull requests, checks, tags, and releases. Nexus adds typed research objects, route compilation, bounded mutation, evidence handling, deterministic snapshots, and read-only audit overlays.
+This **single public Git repository is the authoritative corpus boundary** for a multi-model research laboratory. GitHub supplies history, collaboration, issues, pull requests, checks, tags, and releases. Nexus adds typed research objects, route compilation, bounded mutation, evidence handling, deterministic snapshots, and read-only audit overlays.
+
+**Observed repository visibility: `PUBLIC`.** `NEXUS.json` and
+`constitution/PRIVACY.md` retain a private-repository design requirement. The
+constitutional resolution is `HUMAN_DECISION_REQUIRED`; until a human resolves it,
+do not weaken the stricter data-handling and secret rules.
 
 The repository is not a conventional software package with research notes attached. The software, governance, source material, decisions, experiments, failures, audit records, and handoffs are one governed body of work.
 
@@ -44,9 +49,14 @@ AUDIT_START_HERE.md
 ./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND
 ```
 
-## Where private data lives
+## Where non-public data belongs
 
-All committed material is classified for a **private repository**. `LOCAL_ONLY` payloads belong under the ignored `corpus/local-only/` area; only manifests and hashes are committed. Secrets are never committed.
+The existing constitution classified committed material for a private repository,
+but the repository is now publicly visible. Do not add material that relies on
+private visibility. `LOCAL_ONLY` payloads belong under the ignored
+`corpus/local-only/` area; only manifests and hashes are committed. Secrets are
+never committed. Revising the deeper classification model is
+`HUMAN_DECISION_REQUIRED`.
 
 ## Where the next action is
 

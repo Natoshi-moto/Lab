@@ -1,0 +1,86 @@
+{
+  "baseline_sha": "52bfb27cef4212a82226f9f9281e540e8abb7173",
+  "baseline_status": "MATCHED_EXPECTED_BASELINE",
+  "changed_paths": [
+    "CLAUDE.md",
+    "NEXT_ACTION.md",
+    "NEXUS.json",
+    "PROJECT_INDEX.json",
+    "README.md",
+    "README_START_HERE.md",
+    "STATUS.json",
+    "STATUS.md",
+    "operations/receipts/TSK-LABOPS-CTRL-001/OPEN_PULL_REQUESTS.json",
+    "operations/receipts/TSK-LABOPS-CTRL-001/RECEIPT.json",
+    "operations/receipts/TSK-LABOPS-CTRL-001/RECONCILIATION.md",
+    "programmes/research-lab-bootstrap/AGENTS.md",
+    "programmes/research-lab-bootstrap/STATE.json",
+    "system/nexus_lab/control_plane.py",
+    "tests/test_control_plane.py"
+  ],
+  "commands_executed": [
+    {
+      "command": "git fetch origin",
+      "exit_code": 0,
+      "outcome": "origin/main fetched; actual SHA matched expected baseline"
+    },
+    {
+      "command": "git fetch origin pull/14/head:refs/remotes/origin/pr/14 pull/22/head:refs/remotes/origin/pr/22 pull/23/head:refs/remotes/origin/pr/23 pull/24/head:refs/remotes/origin/pr/24",
+      "exit_code": 0,
+      "outcome": "proposal heads fetched into read-only local remote-tracking refs"
+    },
+    {
+      "command": "./nexus doctor",
+      "exit_code": 0,
+      "outcome": "PASS; required_paths, symlink_policy, json_parse, secret_patterns, privacy_ignore_rules, seed_handoff_binding, and git_repository passed; expected WORKTREE_DIRTY warning"
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "outcome": "PASS; 190 tests ran in 29.468s"
+    },
+    {
+      "command": "./nexus verify",
+      "exit_code": 0,
+      "outcome": "PASS; verification report status PASS, both audit overlays PASS, five indexed packs PASS, frozen snapshot verified"
+    },
+    {
+      "command": "python3 -m unittest tests.test_control_plane -v",
+      "exit_code": 0,
+      "outcome": "PASS; 5 tests ran in 0.016s"
+    },
+    {
+      "command": "python3 -m system.nexus_lab.control_plane",
+      "exit_code": 0,
+      "outcome": "CONTROL_PLANE_OK"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "outcome": "PASS; no whitespace errors"
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "outcome": "clean immediately after implementation commit; receipt then added for binding commit"
+    }
+  ],
+  "resulting_head_sha": "2f37ae075c3a05a3b20ad392e42229042ddeeb5f",
+  "resulting_head_scope": "Implementation and reconciliation head immediately before adding this self-referential receipt; the subsequent receipt-only commit records this immutable SHA.",
+  "schema": "nexus.task-receipt/v1",
+  "status_authority": "NONE",
+  "task_id": "TSK-LABOPS-CTRL-001",
+  "test_outcomes": {
+    "control_plane_direct": "PASS: CONTROL_PLANE_OK",
+    "control_plane_unit": "PASS: 5/5",
+    "diff_check": "PASS",
+    "doctor": "PASS_WITH_WORKTREE_DIRTY_WARNING",
+    "full_unittest": "PASS: 190/190",
+    "verify": "PASS"
+  },
+  "unresolved_decisions": [
+    "HUMAN_DECISION_REQUIRED: adjudicate draft PR #22 as accept, revise, replace, or close; R017 remains unaccepted.",
+    "HUMAN_DECISION_REQUIRED: either restore private repository visibility through authorized administration or revise the private-repository constitution, classifications, and bootstrap assumptions for public operation.",
+    "HUMAN_DECISION_REQUIRED: PRs #14, #23, and #24 remain separate unaccepted proposals requiring their own review."
+  ]
+}

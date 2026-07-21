@@ -11,7 +11,7 @@
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
 | Last completed action | `R016_EXACT_AUDITED_HEAD_USER_AUTHORIZED_AND_MERGED` |
-| Next action | `ACT-R017_DESIGN_MULTI_HOST_REPLICATION_AND_EXPLICIT_FORK_EVIDENCE` |
+| Next action | `ACT-R017_REVIEW_AND_ADJUDICATE_PR_22` |
 
 ## Active tasks
 

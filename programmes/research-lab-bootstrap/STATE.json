@@ -1,16 +1,11 @@
 {
-  "active_task": "TSK-R007-REMAINING-AUDIT-ADJUDICATION",
+  "active_task": null,
   "audit_evidence_commit": "4ef36f19364b6df8fe5e363bcd3b2508680eb1a6",
   "audit_observation_count": 18,
   "audit_pack_sha256": "e7da2562015885ddb0163a3147b621c7fa4f7fe32014c53075cd92298b6b4b5e",
   "baseline_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
   "baseline_ref": "baseline-001",
-  "open_assurance": [
-    "R002_OBSERVATIONS_PRESERVED_NOT_LEDGER_APPENDED",
-    "AUDOBS_0010_CROSS_TOOLCHAIN_DETERMINISM_PENDING",
-    "AUDOBS_0014_0015_GITHUB_BOOTSTRAP_PENDING",
-    "AUDOBS_0016_PROCESS_CONTRADICTION_PENDING"
-  ],
+  "open_assurance": [],
   "programme": "research-lab-bootstrap",
   "remediated_observations": [
     "AUDOBS-0003",
@@ -19,12 +14,13 @@
   ],
   "remediation_receipts": [
     "operations/receipts/R003_R004_AUDIT_REMEDIATION/RECEIPT.json",
-    "operations/receipts/R006_AUDOBS_0003_REMEDIATION/RECEIPT.json"
+    "operations/receipts/R006_AUDOBS_0003_REMEDIATION/RECEIPT.json",
+    "operations/receipts/R008_R010_FOUNDATION_CLOSEOUT/RECEIPT.json"
   ],
-  "round": "R007",
+  "round": "R016",
   "route_sha256": "816169d3e4bb930a52792af1113ac58cb9e234a3ea074bac6ea381756f446c2f",
   "route_task_sha256": "e114a9c3a03fcd1349b87d3c10ecbc845b2931ec82a307c983fd2c197de0f5ed",
   "schema": "nexus.programme-state/v1",
   "snapshot_sha256": "33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603",
-  "status": "R007_REMAINING_ADJUDICATION_READY"
+  "status": "FOUNDATION_CYCLE_CLOSED"
 }

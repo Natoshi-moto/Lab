@@ -1,0 +1,89 @@
+{
+  "as_of": "2026-07-20",
+  "baseline_sha": "52bfb27cef4212a82226f9f9281e540e8abb7173",
+  "pull_requests": [
+    {
+      "number": 14,
+      "state": "DRAFT",
+      "round": "R014",
+      "title": "R014: demonstrate crash-recoverable synthetic settlement",
+      "base": "agent/r013-pcx-conserved-claim",
+      "head": "agent/r014-pcx-durable-settlement",
+      "head_sha": "b62fef7f267e6d3822b730d3a785fbd75d3c7c44",
+      "changed_file_count": 32,
+      "summary": "Adds a stacked R014 durable-settlement implementation, schemas, proposal/task/evidence, CLI integration, workflow coverage, and tests; it is not based on main and remains unpromoted.",
+      "source_url": "https://github.com/Natoshi-moto/Lab/pull/14"
+    },
+    {
+      "number": 22,
+      "state": "DRAFT",
+      "round": "R017",
+      "title": "R017: replica-independent history attestations and fork evidence",
+      "base": "main",
+      "head": "agent/r017-replication-fork-evidence",
+      "head_sha": "b8dca0e9be40dedd4f1ba6930ad34caec0167076",
+      "changed_file_count": 10,
+      "summary": "Adds R017 replication authentication/evidence modules, a partition demo, proposal and task documents, a technical white-paper draft, and focused tests.",
+      "source_paths": [
+        "system/nexus_lab/replication_auth.py",
+        "system/nexus_lab/replication_evidence.py",
+        "experiments/R017_REPLICATION_FORK_EVIDENCE/README.md",
+        "experiments/R017_REPLICATION_FORK_EVIDENCE/run_partition_demo.py",
+        "operations/proposals/R017_REPLICATION_FORK_EVIDENCE/PROTOCOL.md",
+        "operations/proposals/R017_REPLICATION_FORK_EVIDENCE/NEXUS_TECHNICAL_WHITEPAPER_DRAFT.md",
+        "operations/tasks/TSK-R017-REPLICATION-FORK-EVIDENCE.json",
+        "tests/test_r017_partition_demo.py",
+        "tests/test_r017_replication_auth.py",
+        "tests/test_r017_replication_evidence.py"
+      ],
+      "source_url": "https://github.com/Natoshi-moto/Lab/pull/22"
+    },
+    {
+      "number": 23,
+      "state": "DRAFT",
+      "round": "R018",
+      "title": "R018: fixed hybrid post-quantum admission evidence",
+      "base": "agent/r017-replication-fork-evidence",
+      "head": "agent/r018-pq-hybrid-admission",
+      "head_sha": "78dde8674c3e65c709f9075c3bb647d2a0b2e2d1",
+      "changed_file_count": 22,
+      "summary": "Adds a stacked R018 ML-DSA-65 hybrid-admission experiment, isolated JavaScript dependencies and verifier, proposal/task/evidence files, workflow coverage, and tests.",
+      "source_paths": [
+        ".github/workflows/nexus-audit.yml",
+        "experiments/R018_PQ_HYBRID_ADMISSION/README.md",
+        "operations/proposals/R018_PQ_HYBRID_ADMISSION/PROTOCOL.md",
+        "operations/proposals/R018_PQ_HYBRID_ADMISSION/THREAT_MODEL.md",
+        "operations/tasks/TSK-R018-PQ-HYBRID-ADMISSION.json",
+        "system/nexus_lab/pq_admission.mjs",
+        "tests/test_r018_pq_hybrid_admission.py"
+      ],
+      "source_url": "https://github.com/Natoshi-moto/Lab/pull/23"
+    },
+    {
+      "number": 24,
+      "state": "OPEN",
+      "round": "R017",
+      "title": "Declare OPEN-GATE v0 public protocol bet",
+      "base": "main",
+      "head": "docs/open-gate-v0-claim",
+      "head_sha": "f720c0e6795f630943acb5347e675824cf323b1d",
+      "changed_file_count": 23,
+      "summary": "Proposes public-protocol documentation and entry links while also carrying unmerged R017 experiment, proposal, research, task, receipt, implementation, and test paths relative to current main.",
+      "source_paths": [
+        "README.md",
+        "README_START_HERE.md",
+        "docs/PROTOCOL_V0.md",
+        "docs/PROTOCOL_V0.json",
+        "experiments/R017_REPLICATION_FORK_EVIDENCE/README.md",
+        "operations/proposals/R017_REPLICATION_FORK_EVIDENCE/PROTOCOL.md",
+        "operations/research/R017_MULTI_HOST_REPLICATION/FIVE_TARGET_COMPOUND_ATTACK.md",
+        "operations/tasks/TSK-R017-REPLICATION-FORK-EVIDENCE.json",
+        "system/nexus_lab/replication.py",
+        "tests/test_r017_replication.py"
+      ],
+      "source_url": "https://github.com/Natoshi-moto/Lab/pull/24"
+    }
+  ],
+  "schema": "nexus.open-pull-request-inventory/v1",
+  "status_authority": "NONE"
+}
