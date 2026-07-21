@@ -4,20 +4,60 @@
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
-  "token_value_multipliers": [1.0],
-  "governance_cap_bps": "PROPORTIONAL",
+  "token_value_multipliers": [
+    1.0
+  ],
   "donors": [
-    {"id": "early_donor_reference", "sats": 1000000, "role": "early_donor", "group": "early_donor_reference", "block": 0},
-    {"id": "compromise_race_attacker", "sats": 5000000, "stolen": true, "role": "attacker_stolen", "group": "compromise_race_attacker", "block": 49,
-     "note": "races to donate stolen/compromised-key funds in the window between a declared classical-key compromise and epoch close, since cryptographic admission does not distinguish stolen from owned source keys"},
-    {"id": "locked_out_donor_01", "sats": 15000000, "role": "would_be_late_donor", "group": "locked_out_donor_01", "block": 99},
-    {"id": "locked_out_donor_02", "sats": 15000000, "role": "would_be_late_donor", "group": "locked_out_donor_02", "block": 99}
+    {
+      "id": "early_donor_reference",
+      "sats": 1000000,
+      "role": "early_donor",
+      "group": "early_donor_reference",
+      "block": 0
+    },
+    {
+      "id": "compromise_race_attacker",
+      "sats": 5000000,
+      "stolen": true,
+      "role": "attacker_stolen",
+      "group": "compromise_race_attacker",
+      "block": 49,
+      "note": "races to donate stolen/compromised-key funds in the window between a declared classical-key compromise and epoch close, since cryptographic admission does not distinguish stolen from owned source keys"
+    },
+    {
+      "id": "locked_out_donor_01",
+      "sats": 15000000,
+      "role": "would_be_late_donor",
+      "group": "locked_out_donor_01",
+      "block": 99
+    },
+    {
+      "id": "locked_out_donor_02",
+      "sats": 15000000,
+      "role": "would_be_late_donor",
+      "group": "locked_out_donor_02",
+      "block": 99
+    }
   ],
   "generators": [
-    {"kind": "small_donors", "count": 200, "sats_min": 10000, "sats_max": 200000, "id_prefix": "honest", "block": 0}
+    {
+      "kind": "small_donors",
+      "count": 200,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "honest",
+      "block": 0
+    }
   ],
   "denominator_shock": {
     "reference_donor_id": "early_donor_reference",
-    "add_donor_ids": ["locked_out_donor_01", "locked_out_donor_02"]
+    "add_donor_ids": [
+      "locked_out_donor_01",
+      "locked_out_donor_02"
+    ]
+  },
+  "tainted_fund_assumptions": {
+    "alternative_realization_fraction": "1/2",
+    "seizure_probability_migration_path": "3/10"
   }
 }

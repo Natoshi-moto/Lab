@@ -4,19 +4,26 @@
   "baseline_breakeven_price": "62382650031/12500000",
   "concentration": {
     "by_account": {
-      "gini": "22430395843/66665990000",
-      "hhi": "6698556276917/9999797001030225",
+      "gini_of_issued": "22430395843/66665990000",
+      "hhi_of_issued": "6698556276917/9999797001030225",
       "holder_count": 2000,
-      "top10_share": "40009/4000000",
-      "top1_share": "20021/20000000"
+      "top10_share_of_issued": "200045/19999797",
+      "top10_share_of_pool": "40009/4000000",
+      "top1_share_of_issued": "20021/19999797",
+      "top1_share_of_pool": "20021/20000000",
+      "total_issued": 99998985
     },
     "by_beneficial_owner": {
-      "gini": "22430395843/66665990000",
-      "hhi": "6698556276917/9999797001030225",
+      "gini_of_issued": "22430395843/66665990000",
+      "hhi_of_issued": "6698556276917/9999797001030225",
       "owner_count": 2000,
-      "top10_share": "40009/4000000",
-      "top1_share": "20021/20000000"
-    }
+      "top10_share_of_issued": "200045/19999797",
+      "top10_share_of_pool": "40009/4000000",
+      "top1_share_of_issued": "20021/19999797",
+      "top1_share_of_pool": "20021/20000000",
+      "total_issued": 99998985
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 2000,
   "donor_economics": {
@@ -28,25 +35,7 @@
       "unprofitable_donor_count": 2000
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "22430395843/66665990000",
-      "hhi": "6698556276917/9999797001030225",
-      "holder_count": 2000,
-      "top10_share": "40009/4000000",
-      "top1_share": "20021/20000000"
-    },
-    "by_beneficial_owner": {
-      "gini": "22430395843/66665990000",
-      "hhi": "6698556276917/9999797001030225",
-      "owner_count": 2000,
-      "top10_share": "40009/4000000",
-      "top1_share": "20021/20000000"
-    },
-    "crosses_blocking_third": false,
-    "crosses_simple_majority": false,
-    "max_owner_governance_share": "20021/19999797"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "20_oversubscribed_pool",
   "scheme_params": {},

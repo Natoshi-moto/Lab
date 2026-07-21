@@ -108,33 +108,43 @@ def random_lottery_component(
     """Splits the pool into a pro-rata sub-pool and a weighted-lottery
     sub-pool. ``rng`` must be a ``random.Random`` instance seeded by the
     caller so results are reproducible.
+
+    Repair note (E-005 / BGEN-ECON-REV-005): the original implementation
+    drew winners with ``random.choices`` (sampling *with* replacement),
+    so a single donor could occupy more than one of the ``winners`` slots
+    despite the "winners" terminology implying distinct recipients. This
+    version draws winners **without replacement**: each weighted draw
+    removes the chosen donor from the remaining pool before the next
+    draw, so at most one prize per donor and the slot count matches the
+    number of distinct winners.
     """
     lottery_pool = _safe_ratio_floor(pool, lottery_share_bps, 10_000)
     pro_rata_pool = pool - lottery_pool
     allocation = exact_pro_rata(donors, pro_rata_pool)
 
-    ids = [donor_id for donor_id, w in donors if w > 0]
-    weights = [w for _, w in donors if w > 0]
-    if ids and lottery_pool > 0:
-        prize = lottery_pool // max(winners, 1)
-        chosen = rng.choices(ids, weights=weights, k=min(winners, len(ids)))
+    remaining_ids = [donor_id for donor_id, w in donors if w > 0]
+    remaining_weights = [w for _, w in donors if w > 0]
+    chosen: list[str] = []
+    if remaining_ids and lottery_pool > 0:
+        slots = min(winners, len(remaining_ids))
+        for _ in range(slots):
+            total_w = sum(remaining_weights)
+            if total_w <= 0:
+                break
+            draw = rng.randrange(total_w)
+            acc = 0
+            pick = 0
+            for idx, w in enumerate(remaining_weights):
+                acc += w
+                if draw < acc:
+                    pick = idx
+                    break
+            chosen.append(remaining_ids.pop(pick))
+            remaining_weights.pop(pick)
+        prize = lottery_pool // max(len(chosen), 1) if chosen else 0
         for donor_id in chosen:
             allocation[donor_id] = allocation.get(donor_id, 0) + prize
     return allocation
-
-
-def governance_weight(
-    economic_allocation: Mapping[str, int], cap_bps: int | None, pool: int
-) -> dict[str, int]:
-    """Derives governance weight from economic allocation, optionally capped
-    per-identity at ``cap_bps`` of pool and renormalized so weights still
-    sum to (at most) ``pool`` units of governance power. ``cap_bps=None``
-    means governance is exactly proportional to economic allocation.
-    """
-    if cap_bps is None:
-        return dict(economic_allocation)
-    cap_units = _safe_ratio_floor(pool, cap_bps, 10_000)
-    return {donor_id: min(units, cap_units) for donor_id, units in economic_allocation.items()}
 
 
 SCHEMES: dict[str, Callable[..., dict[str, int]]] = {

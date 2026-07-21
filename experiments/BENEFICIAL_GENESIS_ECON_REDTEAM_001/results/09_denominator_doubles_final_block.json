@@ -3,9 +3,9 @@
   "attack_analysis": {
     "denominator_shock": {
       "dilution": "248423/6250000",
-      "post_shock_share": "413829/50000000",
+      "post_shock_share_of_pool": "413829/50000000",
       "post_shock_total_eligible": 120822806,
-      "pre_shock_share": "2401213/50000000",
+      "pre_shock_share_of_pool": "2401213/50000000",
       "pre_shock_total_eligible": 20822806,
       "reference_donor_id": "early_donor_reference"
     }
@@ -13,19 +13,26 @@
   "baseline_breakeven_price": "60411403/50000000",
   "concentration": {
     "by_account": {
-      "gini": "17774542804/20499978065",
-      "hhi": "1714997719457697/9999978600011449",
+      "gini_of_issued": "17774542804/20499978065",
+      "hhi_of_issued": "1714997719457697/9999978600011449",
       "holder_count": 205,
-      "top10_share": "3376189/4000000",
-      "top1_share": "20691457/100000000"
+      "top10_share_of_issued": "84404725/99999893",
+      "top10_share_of_pool": "3376189/4000000",
+      "top1_share_of_issued": "20691457/99999893",
+      "top1_share_of_pool": "20691457/100000000",
+      "total_issued": 99999893
     },
     "by_beneficial_owner": {
-      "gini": "17774542804/20499978065",
-      "hhi": "1714997719457697/9999978600011449",
+      "gini_of_issued": "17774542804/20499978065",
+      "hhi_of_issued": "1714997719457697/9999978600011449",
       "owner_count": 205,
-      "top10_share": "3376189/4000000",
-      "top1_share": "20691457/100000000"
-    }
+      "top10_share_of_issued": "84404725/99999893",
+      "top10_share_of_pool": "3376189/4000000",
+      "top1_share_of_issued": "20691457/99999893",
+      "top1_share_of_pool": "20691457/100000000",
+      "total_issued": 99999893
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 205,
   "donor_economics": {
@@ -68,25 +75,7 @@
       "unprofitable_donor_count": 205
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "17774542804/20499978065",
-      "hhi": "1714997719457697/9999978600011449",
-      "holder_count": 205,
-      "top10_share": "3376189/4000000",
-      "top1_share": "20691457/100000000"
-    },
-    "by_beneficial_owner": {
-      "gini": "17774542804/20499978065",
-      "hhi": "1714997719457697/9999978600011449",
-      "owner_count": 205,
-      "top10_share": "3376189/4000000",
-      "top1_share": "20691457/100000000"
-    },
-    "crosses_blocking_third": false,
-    "crosses_simple_majority": false,
-    "max_owner_governance_share": "20691457/99999893"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "09_denominator_doubles_final_block",
   "scheme_params": {},

@@ -4,8 +4,9 @@
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
-  "token_value_multipliers": [1.0],
-  "governance_cap_bps": "PROPORTIONAL",
+  "token_value_multipliers": [
+    1.0
+  ],
   "donors": [
     {
       "id": "exchange_omnibus",
@@ -16,6 +17,13 @@
     }
   ],
   "generators": [
-    {"kind": "small_donors", "count": 10000, "sats_min": 1000, "sats_max": 2000000, "id_prefix": "small", "block": 0}
+    {
+      "kind": "small_donors",
+      "count": 10000,
+      "sats_min": 1000,
+      "sats_max": 2000000,
+      "id_prefix": "small",
+      "block": 0
+    }
   ]
 }

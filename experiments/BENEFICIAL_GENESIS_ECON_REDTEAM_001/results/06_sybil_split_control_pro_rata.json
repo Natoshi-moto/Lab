@@ -3,10 +3,10 @@
   "attack_analysis": {
     "sybil_split": {
       "attacker": {
-        "single_identity_share": "10791953/25000000",
+        "single_identity_share_of_pool": "10791953/25000000",
         "split_gain": "-53/25000000",
         "split_into": 400,
-        "split_total_share": "107919/250000",
+        "split_total_share_of_pool": "107919/250000",
         "sybil_split_is_profitable": false
       }
     }
@@ -14,19 +14,26 @@
   "baseline_breakeven_price": "92661633/100000000",
   "concentration": {
     "by_account": {
-      "gini": "9586153643/44999792100",
-      "hhi": "3232473061574/2499976900053361",
+      "gini_of_issued": "9586153643/44999792100",
+      "hhi_of_issued": "3232473061574/2499976900053361",
       "holder_count": 900,
-      "top10_share": "1067019/50000000",
-      "top1_share": "42867/20000000"
+      "top10_share_of_issued": "1067019/49999769",
+      "top10_share_of_pool": "1067019/50000000",
+      "top1_share_of_issued": "214335/99999538",
+      "top1_share_of_pool": "42867/20000000",
+      "total_issued": 99999538
     },
     "by_beneficial_owner": {
-      "gini": "15103467674/25049884269",
-      "hhi": "20344706280238/108694647828407",
+      "gini_of_issued": "15103467674/25049884269",
+      "hhi_of_issued": "20344706280238/108694647828407",
       "owner_count": 501,
-      "top10_share": "5636213/12500000",
-      "top1_share": "107919/250000"
-    }
+      "top10_share_of_issued": "22544852/49999769",
+      "top10_share_of_pool": "5636213/12500000",
+      "top1_share_of_issued": "21583800/49999769",
+      "top1_share_of_pool": "107919/250000",
+      "total_issued": 99999538
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 900,
   "donor_economics": {
@@ -2439,25 +2446,7 @@
       "unprofitable_donor_count": 900
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "9586153643/44999792100",
-      "hhi": "3232473061574/2499976900053361",
-      "holder_count": 900,
-      "top10_share": "1067019/50000000",
-      "top1_share": "42867/20000000"
-    },
-    "by_beneficial_owner": {
-      "gini": "15103467674/25049884269",
-      "hhi": "20344706280238/108694647828407",
-      "owner_count": 501,
-      "top10_share": "5636213/12500000",
-      "top1_share": "107919/250000"
-    },
-    "crosses_blocking_third": true,
-    "crosses_simple_majority": false,
-    "max_owner_governance_share": "21583800/49999769"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "06_sybil_split_control_pro_rata",
   "scheme_params": {},

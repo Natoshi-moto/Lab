@@ -4,12 +4,25 @@
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
-  "token_value_multipliers": [1.0],
-  "governance_cap_bps": "PROPORTIONAL",
+  "token_value_multipliers": [
+    1.0
+  ],
   "donors": [
-    {"id": "whale_01", "sats": 5197500000, "role": "whale", "group": "whale_01"}
+    {
+      "id": "whale_01",
+      "sats": 5197500000,
+      "role": "whale",
+      "group": "whale_01"
+    }
   ],
   "generators": [
-    {"kind": "small_donors", "count": 500, "sats_min": 10000, "sats_max": 200000, "id_prefix": "small", "block": 0}
+    {
+      "kind": "small_donors",
+      "count": 500,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "small",
+      "block": 0
+    }
   ]
 }

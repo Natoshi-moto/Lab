@@ -29,12 +29,18 @@ A sealed-commitment design (donors commit to an amount before seeing the running
 
 ## 3. Governance weighting alternatives
 
+> **Repair note (E-003, BGEN-ECON-REV-003):** governance analysis is now computed only for scenarios that explicitly opt in via `governance_rules`, under named, explicitly transferable-or-not rules (`model/governance.py`) — it is never assumed as a default property of the allocation mechanism.
+
 | Rule | Max single-owner governance share | Crosses simple majority | Crosses blocking third |
 |---|---|---|---|
-| Proportional to economic allocation (`13_governance_proportional`) | 52.488% | **True** | True |
-| Capped at 5% of pool per identity (`14_governance_capped`) | 9.768% | False | False |
+| No governance rights (`none`, `13_governance_rules_comparison`) | 0% | False | False |
+| One equal vote per recipient (`nontransferable_equal`, `13_governance_rules_comparison`) | 0.2% | False | False |
+| Proportional, frozen at genesis (`nontransferable_proportional`, `13_governance_rules_comparison`) | 52.488% | **True** | True |
+| Proportional, transferable with the token (`token_weighted`, `13_governance_rules_comparison`) | 52.488% (numerically identical to the row above; differs only in durability once tokens transfer) | **True** | True |
+| Continuously capped at 5% of issued weight, renormalized (`continuously_capped`, `14_governance_continuously_capped`) | 9.768% | False | False |
+| Continuously capped at 10% of issued weight, renormalized (`continuously_capped`, `14_governance_continuously_capped`) | 17.797% | False | False |
 
-Decoupling governance weight from economic allocation and capping it independently is the single most effective mitigation identified in this study for the governance-capture failure condition — **provided the cap is enforced on an ongoing basis by the ledger's own consensus rules (Track E), not only computed once at genesis.** This model does not simulate secondary-market vote-buying after genesis; it only shows that a cap, if it exists and holds, works at the point of allocation.
+Decoupling governance weight from economic allocation and capping it independently is the single most effective mitigation identified in this study for the governance-capture failure condition — **provided the cap is enforced on an ongoing basis by the ledger's own consensus rules (Track E), not only computed once at genesis.** This model does not simulate secondary-market vote-buying after genesis; it only shows that a cap, if it exists and holds, works at the point of allocation. Whether the current design defaults to any of these rules is unspecified by the design pack — see `FAILURE_CONDITIONS.md` FC3.
 
 ## 4. Vesting / non-transferability window
 

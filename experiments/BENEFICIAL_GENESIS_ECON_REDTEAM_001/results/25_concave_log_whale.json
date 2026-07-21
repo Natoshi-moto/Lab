@@ -4,19 +4,26 @@
   "baseline_breakeven_price": "14289077/12500000",
   "concentration": {
     "by_account": {
-      "gini": "850543547/25049937876",
-      "hhi": "10023334079933/4999975200030752",
+      "gini_of_issued": "850543547/25049937876",
+      "hhi_of_issued": "10023334079933/4999975200030752",
       "holder_count": 501,
-      "top10_share": "139433/6250000",
-      "top1_share": "313037/100000000"
+      "top10_share_of_issued": "278866/12499969",
+      "top10_share_of_pool": "139433/6250000",
+      "top1_share_of_issued": "313037/99999752",
+      "top1_share_of_pool": "313037/100000000",
+      "total_issued": 99999752
     },
     "by_beneficial_owner": {
-      "gini": "850543547/25049937876",
-      "hhi": "10023334079933/4999975200030752",
+      "gini_of_issued": "850543547/25049937876",
+      "hhi_of_issued": "10023334079933/4999975200030752",
       "owner_count": 501,
-      "top10_share": "139433/6250000",
-      "top1_share": "313037/100000000"
-    }
+      "top10_share_of_issued": "278866/12499969",
+      "top10_share_of_pool": "139433/6250000",
+      "top1_share_of_issued": "313037/99999752",
+      "top1_share_of_pool": "313037/100000000",
+      "total_issued": 99999752
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 501,
   "donor_economics": {
@@ -35,25 +42,7 @@
       "unprofitable_donor_count": 1
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "850543547/25049937876",
-      "hhi": "10023334079933/4999975200030752",
-      "holder_count": 501,
-      "top10_share": "139433/6250000",
-      "top1_share": "313037/100000000"
-    },
-    "by_beneficial_owner": {
-      "gini": "850543547/25049937876",
-      "hhi": "10023334079933/4999975200030752",
-      "owner_count": 501,
-      "top10_share": "139433/6250000",
-      "top1_share": "313037/100000000"
-    },
-    "crosses_blocking_third": false,
-    "crosses_simple_majority": false,
-    "max_owner_governance_share": "313037/99999752"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "25_concave_log_whale",
   "scheme_params": {},

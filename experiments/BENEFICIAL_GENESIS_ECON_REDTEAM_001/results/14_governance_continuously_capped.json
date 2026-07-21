@@ -1,0 +1,83 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {},
+  "baseline_breakeven_price": "5575043/5000000",
+  "concentration": {
+    "by_account": {
+      "gini_of_issued": "33885784034/50099874249",
+      "hhi_of_issued": "2901102514002627/9999949800063001",
+      "holder_count": 501,
+      "top10_share_of_issued": "55413335/99999749",
+      "top10_share_of_pool": "11082667/20000000",
+      "top1_share_of_issued": "53811244/99999749",
+      "top1_share_of_pool": "13452811/25000000",
+      "total_issued": 99999749
+    },
+    "by_beneficial_owner": {
+      "gini_of_issued": "33885784034/50099874249",
+      "hhi_of_issued": "2901102514002627/9999949800063001",
+      "owner_count": 501,
+      "top10_share_of_issued": "55413335/99999749",
+      "top10_share_of_pool": "11082667/20000000",
+      "top1_share_of_issued": "53811244/99999749",
+      "top1_share_of_pool": "13452811/25000000",
+      "total_issued": 99999749
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
+  },
+  "donor_count": 501,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-1399335793/2505000000",
+      "per_donor": {
+        "whale_01": {
+          "gross_token_value": "74999999795873/1250000",
+          "liquid_token_value": "74999999795873/1250000",
+          "net_cost": "60000000",
+          "utility": "-204127/1250000"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "5575043/5000000",
+      "unprofitable_donor_count": 501
+    }
+  },
+  "governance": {
+    "continuously_capped_1000bps": {
+      "crosses_blocking_third": false,
+      "crosses_simple_majority": false,
+      "gini_of_weights": "119801494840/281504284299",
+      "hhi_of_weights": "1171689235285789/35079391927474489",
+      "max_holder": "whale_01",
+      "max_holder_share": "99999749/561884799",
+      "notes": [
+        "cap_bps=1000 (1/10 of pre-cap issued weight)",
+        "capped weights are renormalized so total governance weight sums to 1",
+        "known property: when the capped total is well under 1 (several holders simultaneously truncated), renormalization can push an individual holder's final weight above the nominal per-identity cap fraction; this is disclosed, not hidden, and is a documented limitation of cap-then-renormalize schemes"
+      ],
+      "rule": "continuously_capped",
+      "transferable": false
+    },
+    "continuously_capped_500bps": {
+      "crosses_blocking_third": false,
+      "crosses_simple_majority": false,
+      "gini_of_weights": "189603115180/512908694349",
+      "hhi_of_weights": "12180963070099401/1048104703721482801",
+      "max_holder": "whale_01",
+      "max_holder_share": "99999749/1023769849",
+      "notes": [
+        "cap_bps=500 (1/20 of pre-cap issued weight)",
+        "capped weights are renormalized so total governance weight sums to 1",
+        "known property: when the capped total is well under 1 (several holders simultaneously truncated), renormalization can push an individual holder's final weight above the nominal per-identity cap fraction; this is disclosed, not hidden, and is a documented limitation of cap-then-renormalize schemes"
+      ],
+      "rule": "continuously_capped",
+      "transferable": false
+    }
+  },
+  "pool_units": 100000000,
+  "scenario_id": "14_governance_continuously_capped",
+  "scheme_params": {},
+  "seed": 1014,
+  "total_eligible_units": 111500860,
+  "unissued_remainder": 251
+}

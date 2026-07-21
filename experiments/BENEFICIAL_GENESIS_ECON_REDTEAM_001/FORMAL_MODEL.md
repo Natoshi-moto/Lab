@@ -37,7 +37,7 @@ with the remainder left unissued. This model implements that rule as `EXACT_PRO_
 | `RANDOM_LOTTERY_COMPONENT` | a `lottery_share_bps` slice of `P` is drawn via seeded weighted lottery; remainder is pro rata | `allocation.random_lottery_component` |
 | `NO_TOKEN` | `a_i = 0` for all `i`; `P` is entirely unissued | scenario runner special case |
 
-Governance weight is modelled as a function *of* economic allocation, either exactly proportional (`governance_cap_bps = "PROPORTIONAL"`) or capped per identity (`governance_cap_bps = <bps>`), per `allocation.governance_weight`. This lets Track 1's "governance rights proportional to allocation versus independently capped" be tested as an orthogonal axis rather than a seventh allocation scheme.
+Governance weight (`model/governance.py`, repaired under E-003) is modelled as a function *of* economic allocation under one of five explicitly named rules — `none`, `nontransferable_equal`, `nontransferable_proportional`, `token_weighted`, `continuously_capped` — computed **only** for scenarios that opt in via a `governance_rules` manifest field, never assumed by default. `nontransferable_proportional` and `token_weighted` are numerically identical at computation time; they differ only in the *durability* label (frozen at genesis vs. moves with the token on a secondary market). `continuously_capped` truncates each holder's raw proportional weight at `cap_bps` of the pre-cap total, then **renormalizes** so weights sum to exactly 1 — with the disclosed caveat that renormalization can push an individual holder's post-cap weight above the nominal cap fraction when several holders are simultaneously truncated. This lets Track 1's "governance rights proportional to allocation versus independently capped" be tested as an orthogonal axis rather than a seventh allocation scheme.
 
 Non-transferability / vesting is modelled as a **liquidity discount** on gross token value, not a new allocation rule (allocation math is unaffected by lock-up):
 
@@ -69,10 +69,13 @@ utility_i    = liquid_value_i - net_cost_i
 
 ## 5. Concentration and welfare metrics (`model/metrics.py`)
 
-- **Gini coefficient** over allocated units, computed with exact `fractions.Fraction` arithmetic (bit-reproducible, no floating-point rounding).
-- **HHI**: `sum((a_i/total)^2)`, scale 0..1.
-- **top-1 / top-10 share**: largest 1 or 10 holders' combined share of `P`.
-- All four are computed twice per scenario: **by_account** (raw donor identity) and **by_beneficial_owner** (identities grouped by `g(i)`), so identity-splitting and custodial-aggregation effects are visible as a divergence between the two views.
+> **Repair note (E-005, BGEN-ECON-REV-005):** the original version of this module divided `top_n_share` by the fixed pool while `hhi` implicitly divided by the issued total, silently mixing two denominators in one "concentration" report. Every metric below now states its denominator explicitly and the two are never merged into a single unlabeled field.
+
+- **Gini coefficient** over the *issued* distribution, computed with exact `fractions.Fraction` arithmetic (bit-reproducible, no floating-point rounding). Also accepts `Fraction`-valued governance-weight shares directly.
+- **HHI**: `sum((a_i/total_issued)^2)`, scale 0..1 — always defined over the issued distribution (a "share of pool" HHI has no clean interpretation when much of the pool is unissued; that information is already captured by `unissued_remainder`).
+- **top-n share of issued**: largest `n` holders' combined share of the actually issued total.
+- **top-n share of pool**: largest `n` holders' combined share of the fixed pool (reflects unissued remainder).
+- All are computed twice per scenario: **by_account** (raw donor identity) and **by_beneficial_owner** (identities grouped by `g(i)`), so identity-splitting and custodial-aggregation effects are visible as a divergence between the two views, with both `_of_pool` and `_of_issued` variants reported explicitly and a `denominator_note` field spelling out which is which.
 
 ## 6. Denominator behaviour (a structural property, not an attack)
 
@@ -82,14 +85,14 @@ Because `EXACT_PRO_RATA` (and every alternative above) allocates the *entire* fi
 
 | Probe | What it computes | Manifest field |
 |---|---|---|
-| Sybil identity split | share under one identity vs. `k` split identities holding the same total, same background population | `split_identity_probes` |
-| Rebate / circularity | utility delta from a declared `rebate_rate`, and resulting charity loss | any donor with `rebate_rate > 0` |
-| Stolen-key laundering | gross token value received with **zero** legitimate cost basis | any donor with `stolen: true` |
-| Denominator shock | an early donor's share before vs. after a late-arriving donor group | `denominator_shock` |
-| Governance capture | whether any beneficial owner's governance weight crosses 1/2 or 1/3 of total | `governance_cap_bps` |
-| Charity selection / circularity | per-charity totals donated, rebated, and net retained | `track_charity_breakdown` + `charity_id` |
+| Sybil identity split | share of pool under one identity vs. `k` split identities holding the same total, same background population | `split_identity_probes` |
+| Rebate / circularity | conditional (arrangement-exists, zero-friction) rebate incidence **and** an expected, access/enforcement/detection-friction-adjusted incidence, side by side (`model/collusion.py`) | any donor with `rebate_rate > 0`; friction parameters via `rebate_friction_assumptions` and per-donor `colluding_arrangement_exists` |
+| Stolen/tainted-fund migration | decomposed legal cost basis, source-asset opportunity value, gross/risk-adjusted/realizable token value, and net migration profit, plus an optional sensitivity grid over token-value and realization-fraction assumptions (`model/tainted_funds.py`) | any donor with `stolen: true`; assumption overrides via `tainted_fund_assumptions`; grid via `tainted_fund_sensitivity_grid` |
+| Denominator shock | an early donor's share of pool before vs. after a late-arriving donor group | `denominator_shock` |
+| Governance capture | whether any beneficial owner's governance weight crosses 1/2 or 1/3 of total, under one or more explicitly named rules (`model/governance.py`) | `governance_rules` (opt-in only; no scenario defaults to any governance assumption) |
+| Charity selection / circularity | per-charity totals donated, rebated (conditional), and net retained | `track_charity_breakdown` + `charity_id` |
 
-Every probe is a pure function of the manifest and the published integer `seed`; re-running `simulate.py` reproduces `results/*.json` byte-for-byte (enforced by `tests/test_scenarios.py::TestScenarioDeterminism`).
+Every probe is a pure function of the manifest and the published integer `seed`; re-running `simulate.py` reproduces `results/*.json` byte-for-byte (enforced by `tests/test_scenarios.py::TestScenarioDeterminism`). Duplicate donor identifiers are rejected with a `ValueError` rather than silently colliding (E-005).
 
 ## 8. What this model does not do
 

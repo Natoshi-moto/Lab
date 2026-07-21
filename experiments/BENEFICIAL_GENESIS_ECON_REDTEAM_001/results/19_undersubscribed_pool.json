@@ -4,19 +4,26 @@
   "baseline_breakeven_price": "1/100000",
   "concentration": {
     "by_account": {
-      "gini": "0",
-      "hhi": "1",
+      "gini_of_issued": "0",
+      "hhi_of_issued": "1",
       "holder_count": 1,
-      "top10_share": "1",
-      "top1_share": "1"
+      "top10_share_of_issued": "1",
+      "top10_share_of_pool": "1",
+      "top1_share_of_issued": "1",
+      "top1_share_of_pool": "1",
+      "total_issued": 100000000
     },
     "by_beneficial_owner": {
-      "gini": "0",
-      "hhi": "1",
+      "gini_of_issued": "0",
+      "hhi_of_issued": "1",
       "owner_count": 1,
-      "top10_share": "1",
-      "top1_share": "1"
-    }
+      "top10_share_of_issued": "1",
+      "top10_share_of_pool": "1",
+      "top1_share_of_issued": "1",
+      "top1_share_of_pool": "1",
+      "total_issued": 100000000
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 1,
   "donor_economics": {
@@ -35,25 +42,7 @@
       "unprofitable_donor_count": 0
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "0",
-      "hhi": "1",
-      "holder_count": 1,
-      "top10_share": "1",
-      "top1_share": "1"
-    },
-    "by_beneficial_owner": {
-      "gini": "0",
-      "hhi": "1",
-      "owner_count": 1,
-      "top10_share": "1",
-      "top1_share": "1"
-    },
-    "crosses_blocking_third": true,
-    "crosses_simple_majority": true,
-    "max_owner_governance_share": "1"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "19_undersubscribed_pool",
   "scheme_params": {},

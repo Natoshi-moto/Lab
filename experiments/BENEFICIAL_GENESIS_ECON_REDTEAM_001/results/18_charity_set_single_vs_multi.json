@@ -3,56 +3,95 @@
   "attack_analysis": {
     "charity_breakdown": {
       "donor_controlled_charity": {
-        "net_retained": "3000000",
+        "net_retained_conditional": "3000000",
         "total_donated": "15000000",
-        "total_rebated": "12000000"
+        "total_rebated_conditional": "12000000"
       },
       "honest_charity": {
-        "net_retained": "20000000",
+        "net_retained_conditional": "20000000",
         "total_donated": "20000000",
-        "total_rebated": "0"
+        "total_rebated_conditional": "0"
       },
       "unspecified": {
-        "net_retained": "20556532",
+        "net_retained_conditional": "20556532",
         "total_donated": "20556532",
-        "total_rebated": "0"
+        "total_rebated_conditional": "0"
       }
     },
-    "rebate_attack": {
+    "rebate_and_collusion": {
       "donor_to_donor_controlled_charity_01": {
-        "charity_loss": "8000000",
-        "honest_utility": "-8855161/25000000",
-        "rebate_attack_gain": "8000000",
-        "rebate_rate": "4/5",
-        "rebated_utility": "199999991144839/25000000",
-        "secret": true
+        "claims": {
+          "conditional_one_for_one_reduction_holds": true,
+          "predictable_aggregate_destruction_of_charity_benefit": false,
+          "predictable_note": "cannot claim rational donors predictably destroy aggregate charity benefit without access, enforcement, and detection assumptions; the immutable genesis charity set makes acquiring a colluding destination a nontrivial capability, not a free donor action"
+        },
+        "conditional": {
+          "charity_retained": "2000000",
+          "note": "conditional arithmetic only: assumes a rebate arrangement already exists at this rate, at zero additional arrangement/detection cost",
+          "rebate_sats": "8000000"
+        },
+        "donated_sats": 10000000,
+        "expected_with_frictions": {
+          "access_probability_used": "1",
+          "arrangement_cost_sats": "0",
+          "detection_loss_fraction": "1/2",
+          "detection_probability": "0",
+          "enforcement_probability": "1",
+          "expected_charity_retained": "2000000",
+          "expected_donor_net_from_rebate": "8000000",
+          "expected_rebate_sats": "8000000"
+        },
+        "rebate_rate": "4/5"
       },
       "donor_to_donor_controlled_charity_02": {
-        "charity_loss": "4000000",
-        "honest_utility": "-11372147/25000000",
-        "rebate_attack_gain": "4000000",
-        "rebate_rate": "4/5",
-        "rebated_utility": "99999988627853/25000000",
-        "secret": true
+        "claims": {
+          "conditional_one_for_one_reduction_holds": true,
+          "predictable_aggregate_destruction_of_charity_benefit": false,
+          "predictable_note": "cannot claim rational donors predictably destroy aggregate charity benefit without access, enforcement, and detection assumptions; the immutable genesis charity set makes acquiring a colluding destination a nontrivial capability, not a free donor action"
+        },
+        "conditional": {
+          "charity_retained": "1000000",
+          "note": "conditional arithmetic only: assumes a rebate arrangement already exists at this rate, at zero additional arrangement/detection cost",
+          "rebate_sats": "4000000"
+        },
+        "donated_sats": 5000000,
+        "expected_with_frictions": {
+          "access_probability_used": "1",
+          "arrangement_cost_sats": "0",
+          "detection_loss_fraction": "1/2",
+          "detection_probability": "0",
+          "enforcement_probability": "1",
+          "expected_charity_retained": "1000000",
+          "expected_donor_net_from_rebate": "4000000",
+          "expected_rebate_sats": "4000000"
+        },
+        "rebate_rate": "4/5"
       }
     }
   },
   "baseline_breakeven_price": "13889133/25000000",
   "concentration": {
     "by_account": {
-      "gini": "4939636917/6799992860",
-      "hhi": "1061870033565659/9999979000011025",
+      "gini_of_issued": "4939636917/6799992860",
+      "hhi_of_issued": "1061870033565659/9999979000011025",
       "holder_count": 204,
-      "top10_share": "65147167/100000000",
-      "top1_share": "17999683/100000000"
+      "top10_share_of_issued": "65147167/99999895",
+      "top10_share_of_pool": "65147167/100000000",
+      "top1_share_of_issued": "17999683/99999895",
+      "top1_share_of_pool": "17999683/100000000",
+      "total_issued": 99999895
     },
     "by_beneficial_owner": {
-      "gini": "4939636917/6799992860",
-      "hhi": "1061870033565659/9999979000011025",
+      "gini_of_issued": "4939636917/6799992860",
+      "hhi_of_issued": "1061870033565659/9999979000011025",
       "owner_count": 204,
-      "top10_share": "65147167/100000000",
-      "top1_share": "17999683/100000000"
-    }
+      "top10_share_of_issued": "65147167/99999895",
+      "top10_share_of_pool": "65147167/100000000",
+      "top1_share_of_issued": "17999683/99999895",
+      "top1_share_of_pool": "17999683/100000000",
+      "total_issued": 99999895
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 204,
   "donor_economics": {
@@ -89,25 +128,7 @@
       "unprofitable_donor_count": 202
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "4939636917/6799992860",
-      "hhi": "1061870033565659/9999979000011025",
-      "holder_count": 204,
-      "top10_share": "65147167/100000000",
-      "top1_share": "17999683/100000000"
-    },
-    "by_beneficial_owner": {
-      "gini": "4939636917/6799992860",
-      "hhi": "1061870033565659/9999979000011025",
-      "owner_count": 204,
-      "top10_share": "65147167/100000000",
-      "top1_share": "17999683/100000000"
-    },
-    "crosses_blocking_third": false,
-    "crosses_simple_majority": false,
-    "max_owner_governance_share": "17999683/99999895"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "18_charity_set_single_vs_multi",
   "scheme_params": {},

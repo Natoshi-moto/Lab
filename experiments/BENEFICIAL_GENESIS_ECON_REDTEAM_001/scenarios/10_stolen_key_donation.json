@@ -4,12 +4,30 @@
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
-  "token_value_multipliers": [1.0],
-  "governance_cap_bps": "PROPORTIONAL",
+  "token_value_multipliers": [
+    1.0
+  ],
   "donors": [
-    {"id": "stolen_key_attacker", "sats": 10000000, "stolen": true, "role": "attacker_stolen", "group": "stolen_key_attacker"}
+    {
+      "id": "stolen_key_attacker",
+      "sats": 10000000,
+      "stolen": true,
+      "role": "attacker_stolen",
+      "group": "stolen_key_attacker"
+    }
   ],
   "generators": [
-    {"kind": "small_donors", "count": 500, "sats_min": 10000, "sats_max": 200000, "id_prefix": "honest", "block": 0}
-  ]
+    {
+      "kind": "small_donors",
+      "count": 500,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "honest",
+      "block": 0
+    }
+  ],
+  "tainted_fund_sensitivity_grid": {
+    "token_value_multipliers": ["1/2", "1", "3/2"],
+    "alternative_realization_fractions": ["0", "3/10", "7/10", "1"]
+  }
 }

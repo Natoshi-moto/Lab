@@ -58,12 +58,21 @@ class TestAllocationInvariants(unittest.TestCase):
         self.assertEqual(r1, r2)
         self.assertLessEqual(sum(r1.values()), POOL)
 
-    def test_governance_cap_reduces_max_weight(self):
-        allocation = {"whale": 800_000, "small": 200_000}
-        proportional = alloc.governance_weight(allocation, None, POOL)
-        capped = alloc.governance_weight(allocation, 1000, POOL)
-        self.assertEqual(proportional["whale"], 800_000)
-        self.assertLessEqual(capped["whale"], (POOL * 1000) // 10_000)
+    def test_random_lottery_component_draws_without_replacement(self):
+        # E-005 / BGEN-ECON-REV-005 repair: the original implementation used
+        # random.choices (with replacement), so "winners" could double-count
+        # one donor. With a small population and many requested winner slots,
+        # a with-replacement bug would show fewer distinct winners receiving
+        # the prize than slots requested; without replacement, every donor
+        # with positive weight wins at most once and all of them win when
+        # slots >= population size.
+        donors = [("a", 10), ("b", 10), ("c", 10)]
+        result = alloc.random_lottery_component(
+            donors, 3_000, random.Random(42), lottery_share_bps=10_000, winners=3
+        )
+        winners = [donor_id for donor_id, units in result.items() if units > 0]
+        self.assertEqual(len(winners), 3, "all three donors must win exactly one slot each")
+        self.assertEqual(len(set(winners)), 3, "no donor may occupy more than one winner slot")
 
     def test_concave_log_is_deterministic_given_same_inputs(self):
         r1 = alloc.concave_log(DONORS, POOL)

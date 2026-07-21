@@ -4,19 +4,26 @@
   "baseline_breakeven_price": "35941661/50000000",
   "concentration": {
     "by_account": {
-      "gini": "25013184098/50099874249",
-      "hhi": "787531825313867/9999949800063001",
+      "gini_of_issued": "25013184098/50099874249",
+      "hhi_of_issued": "787531825313867/9999949800063001",
       "holder_count": 501,
-      "top10_share": "6061377/20000000",
-      "top1_share": "5564573/20000000"
+      "top10_share_of_issued": "30306885/99999749",
+      "top10_share_of_pool": "6061377/20000000",
+      "top1_share_of_issued": "27822865/99999749",
+      "top1_share_of_pool": "5564573/20000000",
+      "total_issued": 99999749
     },
     "by_beneficial_owner": {
-      "gini": "25013184098/50099874249",
-      "hhi": "787531825313867/9999949800063001",
+      "gini_of_issued": "25013184098/50099874249",
+      "hhi_of_issued": "787531825313867/9999949800063001",
       "owner_count": 501,
-      "top10_share": "6061377/20000000",
-      "top1_share": "5564573/20000000"
-    }
+      "top10_share_of_issued": "30306885/99999749",
+      "top10_share_of_pool": "6061377/20000000",
+      "top1_share_of_issued": "27822865/99999749",
+      "top1_share_of_pool": "5564573/20000000",
+      "total_issued": 99999749
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 501,
   "donor_economics": {
@@ -63,25 +70,7 @@
       "unprofitable_donor_count": 0
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "25013184098/50099874249",
-      "hhi": "787531825313867/9999949800063001",
-      "holder_count": 501,
-      "top10_share": "6061377/20000000",
-      "top1_share": "5564573/20000000"
-    },
-    "by_beneficial_owner": {
-      "gini": "25013184098/50099874249",
-      "hhi": "787531825313867/9999949800063001",
-      "owner_count": 501,
-      "top10_share": "6061377/20000000",
-      "top1_share": "5564573/20000000"
-    },
-    "crosses_blocking_third": false,
-    "crosses_simple_majority": false,
-    "max_owner_governance_share": "27822865/99999749"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "12_token_value_below_equal_above",
   "scheme_params": {},

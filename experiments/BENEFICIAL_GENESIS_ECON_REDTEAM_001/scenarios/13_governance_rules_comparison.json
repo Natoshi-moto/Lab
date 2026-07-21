@@ -1,11 +1,16 @@
 {
-  "scenario_id": "13_governance_proportional",
+  "scenario_id": "13_governance_rules_comparison",
   "seed": 1013,
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
   "token_value_multipliers": [1.0],
-  "governance_cap_bps": "PROPORTIONAL",
+  "governance_rules": [
+    {"rule": "none"},
+    {"rule": "nontransferable_equal"},
+    {"rule": "nontransferable_proportional"},
+    {"rule": "token_weighted"}
+  ],
   "donors": [
     {"id": "whale_01", "sats": 60000000, "role": "whale", "group": "whale_01"}
   ],

@@ -4,22 +4,85 @@
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
-  "token_value_multipliers": [1.0],
-  "governance_cap_bps": "PROPORTIONAL",
+  "token_value_multipliers": [
+    1.0
+  ],
   "donors": [
-    {"id": "rebate_0pct", "sats": 5000000, "rebate_rate": "0", "group": "rebate_0pct"},
-    {"id": "rebate_10pct", "sats": 5000000, "rebate_rate": "1/10", "group": "rebate_10pct"},
-    {"id": "rebate_20pct", "sats": 5000000, "rebate_rate": "1/5", "group": "rebate_20pct"},
-    {"id": "rebate_30pct", "sats": 5000000, "rebate_rate": "3/10", "group": "rebate_30pct"},
-    {"id": "rebate_40pct", "sats": 5000000, "rebate_rate": "2/5", "group": "rebate_40pct"},
-    {"id": "rebate_50pct", "sats": 5000000, "rebate_rate": "1/2", "group": "rebate_50pct"},
-    {"id": "rebate_60pct", "sats": 5000000, "rebate_rate": "3/5", "group": "rebate_60pct"},
-    {"id": "rebate_70pct", "sats": 5000000, "rebate_rate": "7/10", "group": "rebate_70pct"},
-    {"id": "rebate_80pct", "sats": 5000000, "rebate_rate": "4/5", "group": "rebate_80pct"},
-    {"id": "rebate_90pct", "sats": 5000000, "rebate_rate": "9/10", "group": "rebate_90pct"},
-    {"id": "rebate_100pct", "sats": 5000000, "rebate_rate": "1", "group": "rebate_100pct"}
+    {
+      "id": "rebate_0pct",
+      "sats": 5000000,
+      "rebate_rate": "0",
+      "group": "rebate_0pct"
+    },
+    {
+      "id": "rebate_10pct",
+      "sats": 5000000,
+      "rebate_rate": "1/10",
+      "group": "rebate_10pct"
+    },
+    {
+      "id": "rebate_20pct",
+      "sats": 5000000,
+      "rebate_rate": "1/5",
+      "group": "rebate_20pct"
+    },
+    {
+      "id": "rebate_30pct",
+      "sats": 5000000,
+      "rebate_rate": "3/10",
+      "group": "rebate_30pct"
+    },
+    {
+      "id": "rebate_40pct",
+      "sats": 5000000,
+      "rebate_rate": "2/5",
+      "group": "rebate_40pct"
+    },
+    {
+      "id": "rebate_50pct",
+      "sats": 5000000,
+      "rebate_rate": "1/2",
+      "group": "rebate_50pct"
+    },
+    {
+      "id": "rebate_60pct",
+      "sats": 5000000,
+      "rebate_rate": "3/5",
+      "group": "rebate_60pct"
+    },
+    {
+      "id": "rebate_70pct",
+      "sats": 5000000,
+      "rebate_rate": "7/10",
+      "group": "rebate_70pct"
+    },
+    {
+      "id": "rebate_80pct",
+      "sats": 5000000,
+      "rebate_rate": "4/5",
+      "group": "rebate_80pct"
+    },
+    {
+      "id": "rebate_90pct",
+      "sats": 5000000,
+      "rebate_rate": "9/10",
+      "group": "rebate_90pct"
+    },
+    {
+      "id": "rebate_100pct",
+      "sats": 5000000,
+      "rebate_rate": "1",
+      "group": "rebate_100pct"
+    }
   ],
   "generators": [
-    {"kind": "small_donors", "count": 500, "sats_min": 10000, "sats_max": 200000, "id_prefix": "honest", "block": 0}
+    {
+      "kind": "small_donors",
+      "count": 500,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "honest",
+      "block": 0
+    }
   ]
 }

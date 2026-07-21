@@ -4,10 +4,16 @@
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
-  "token_value_multipliers": [1.0],
-  "governance_cap_bps": "PROPORTIONAL",
+  "token_value_multipliers": [
+    1.0
+  ],
   "donors": [
-    {"id": "only_donor", "sats": 1000, "role": "sole_donor", "group": "only_donor"}
+    {
+      "id": "only_donor",
+      "sats": 1000,
+      "role": "sole_donor",
+      "group": "only_donor"
+    }
   ],
   "generators": []
 }

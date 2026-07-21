@@ -1,86 +1,107 @@
-# Audit report — TSK-BGEN-ECON-REDTEAM-001
+# Audit report — TSK-BGEN-ECON-REDTEAM-001 (repaired under BGEN-ECON-REPAIR-002)
 
 ## Authority
 
 `status_authority: NONE`
 Does not promote, merge, assign R-rounds, alter `STATUS.json`, authorize live funds, select real charities, or make legal conclusions.
 
-## Subject binding
+## Subject and repair binding
 
 | Item | Value |
 |---|---|
 | Repository | Natoshi-moto/Lab |
 | Parent program issue | #33 (`BENEFICIAL-GENESIS-PROGRAM-001`) |
-| This task's issue | #34 (`BGEN-ECON-REDTEAM-001`) |
+| Original task issue | #34 (`BGEN-ECON-REDTEAM-001`) |
+| Repair task issue | #38 (`BGEN-ECON-REPAIR-002`) |
 | Merged Beneficial Genesis research base (exact subject) | `22ce8c11297ad4c08606277ee83dc845797ba220` |
 | Branch | `claude/bgen-econ-redteam-001` |
-| Staleness check | branch tip equals `origin/main` tip at time of this report; `git merge-base main HEAD` confirms the branch sits exactly on the merged base cited in issue #34 |
+| Original submission commit (subject of the controlling review) | `b5887791338b146daad8f5233ce0e25bf24fe357` |
+| Original submission receipt binding | `b588779...` (see prior receipt state) |
+| Independent Grok Breaker review evidence merge (PR #37) | `d8523b29ca7a1e0433ab5afdb494ed8452450dde` |
+| Repair task exact head at start of this work | `d8523b29ca7a1e0433ab5afdb494ed8452450dde` |
+| Controlling documents | PR #35 review `#pullrequestreview-4743521321` ("CONTROLLING ADJUDICATION — HOLD FOR INDEPENDENT ECONOMICS BREAKER") and `#pullrequestreview-4743694588` ("Controlling repair contract — BGEN-ECON-REPAIR-002") |
 
 ## Seat identity
 
 | Field | Value |
 |---|---|
-| Seat | Economics Designer / Red-Team |
-| Role scope | issue #34 only — locked scope per issue: Bitcoin-only Beneficial Genesis v1, synthetic agents and scenarios only, no market-price prediction, no live charity addresses/donors/funds/solicitation, no legal advice, no cryptographic verifier changes |
+| Seat | Economics Designer / Red-Team (repair pass) |
+| Role scope | issue #38 only — repair the Claude economics package (`experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**`, its audit, receipt, README, and PR body) to implement E-001 through E-009 exactly. Do not touch the Grok Breaker paths (`experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/**`, `operations/{audits,receipts}/BENEFICIAL_GENESIS_ECON_BREAKER_001/**`). Keep PR #35 draft. No merge, no `STATUS.json` change, no R-round, no live activity, no legal conclusions. |
 
 ## Method
 
-1. Read issue #33 (program roadmap) and issue #34 (this task's exact requirements) in full before writing any code.
-2. Read the existing Beneficial Genesis design pack (`experiments/BENEFICIAL_GENESIS_DESIGN_001`) and its threat model to ground the economic model in the subject's *own* stated allocation rule (`floor(pool * eligible_i / total_eligible)`) rather than inventing a different mechanism to critique.
-3. Built a deterministic, stdlib-only Python simulator (`experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/`) implementing: the required allocation alternatives, concentration/welfare metrics, and adversarial probes (Sybil identity-split, rebate/circularity, stolen-key laundering, denominator shock, governance capture, charity-selection breakdown).
-4. Authored 26 scenario manifests covering every required adversarial scenario from issue #34 (whale shares 50/80/99%, exchange-omnibus vs. 10,000 small donors, identity splitting under three allocation rules, rebate sweep 0-100%, secret rebate, denominator surge, stolen-key donation, compromise-cutoff race, token value below/equal/above breakeven, governance proportional vs. capped, non-transferability at 0/3/12 months, single vs. multiple charity destinations, undersubscribed and oversubscribed pools).
-5. Ran the simulator, wrote a 26-test `unittest` suite asserting both general invariants (allocation never exceeds pool, every scenario is bit-reproducible from its seed) and the specific direction of each adversarial finding, then re-ran the full existing lab test suite to confirm no interference.
-6. Wrote `MECHANISM_NECESSITY.md`, `FORMAL_MODEL.md`, `ALTERNATIVES_COMPARISON.md`, `FAILURE_CONDITIONS.md`, and `NONCLAIMS_AND_OPEN_QUESTIONS.md` under the experiment directory, each citing concrete figures pulled from `results/*.json` rather than asserted from memory.
+1. Read issue #38 and the two controlling reviews on PR #35 in full before editing any file.
+2. Read the frozen Grok Breaker package (`experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/**`) read-only, to understand what a second-family reconstruction independently found and required, without modifying it.
+3. Implemented E-001 (`model/tainted_funds.py`: decomposed legal cost basis / opportunity value / risk-adjusted realizable value / net migration profit, plus a sensitivity grid), E-002 (`model/collusion.py`: conditional-vs-expected rebate incidence with access/enforcement/detection frictions), E-003 (`model/governance.py`: five named, explicitly transferable-or-not governance rules, opt-in per scenario), E-004 (narrowed `MECHANISM_NECESSITY.md` conclusion plus an explicit target-ledger-function matrix), E-005 (fixed `model/metrics.py` denominator mixing, fixed the with-replacement lottery bug in `model/allocation.py`, added duplicate-donor-ID rejection, replaced assumption-asserting tests), E-006 (removed "token sale"/"investment contract" wording in favor of "fixed-pool floating implied allocation ratio"), E-007 (mapped and classified all seven of issue #34's failure conditions in `FAILURE_CONDITIONS.md`, previously only six were mapped), E-008 (explicit "Preserved findings" section cross-linked to the independent model), E-009 (`CROSS_MODEL_COMPARISON.md` plus running every required command).
+4. Regenerated `results/*.json` and `results/TABLES.md`; rewrote and extended the `unittest` suite (added `test_governance.py`, `test_tainted_funds.py`, `test_collusion.py`; updated `test_allocation.py`, `test_metrics.py`, `test_scenarios.py`) to assert decomposition/boundary/sensitivity behavior instead of the disputed assumptions themselves.
+5. Ran every command listed in the controlling repair contract (§ below) and confirmed the Grok Breaker paths show zero diff after being re-run read-only.
+6. Updated this audit report, the sanitized receipt, the package README, and the PR #35 body to record the repair.
 
-## What was tested (evidence, not narrative)
+## What changed and why (E-001 through E-009 summary)
 
-See `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/README.md` "Headline findings" for the summary and the linked documents for full detail. In brief, executable evidence supports:
+See `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/README.md` "What changed in the repair" and `FAILURE_CONDITIONS.md` for full detail. In brief:
 
-- the fixed pool issues in full regardless of subscription level (sale-like behaviour, independent of transferability);
-- every allocation rule that meaningfully reduces whale concentration for honest single identities is severely Sybil-split-exploitable in a permissionless, identity-free design; linear pro-rata is split-invariant but does not reduce whale concentration;
-- rebate/circularity attacks are unconditionally profitable, exactly equal to the rebate amount, and cryptographically undetectable;
-- stolen-key donations fully launder at zero attacker cost;
-- proportional governance lets a single honest whale cross simple majority by size alone; an independent cap prevents this at allocation time only (continuous post-genesis enforcement is unverified and out of this seat's scope).
+- Stolen/tainted-fund "laundering_gain at zero cost" → decomposed `net_migration_profit`, assumption-conditional, with both profitable and unprofitable cells in the sensitivity grid (E-001).
+- Rebate "predictably destroys charity benefit" → retracted; exact one-for-one conditional arithmetic preserved, expected-with-frictions view added showing the magnitude collapses under low access (E-002).
+- Governance analysis is now opt-in per scenario under five named rules instead of defaulting every scenario to proportional governance (E-003).
+- Mechanism-necessity conclusion narrowed to what the design pack specifies, with an explicit open-question matrix for unspecified ledger functions (E-004).
+- Concentration-metric denominator mixing and the with-replacement lottery bug fixed; duplicate donor IDs now rejected; assumption-asserting tests replaced (E-005).
+- "Token sale"/"investment contract" wording replaced with "fixed-pool floating implied allocation ratio" throughout (E-006).
+- All seven of issue #34's failure conditions mapped and classified by evidence type (E-007).
+- Six independently-confirmed findings preserved and explicitly labelled (E-008).
+- Cross-model comparison against the frozen Grok package added; every required command run (E-009).
 
-## Failure-condition disposition
+## Failure-condition disposition (repaired)
 
-See `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md` for the full per-condition evidence. Summary:
+See `experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md` for full per-condition evidence and classification. Summary:
 
-| Failure condition | Status |
-|---|---|
-| FC-1 transferable token has no necessary function beyond rewarding donation | **TRIGGERED** |
-| FC-2 rational donor behavior predictably destroys charity net benefit through rebates | **TRIGGERED** |
-| FC-3 one actor can obtain practical governance control by donation alone | **TRIGGERED** (mitigable only with an out-of-scope continuous-enforcement guarantee) |
-| FC-4 mechanism materially incentivizes stolen/tainted-fund laundering | **TRIGGERED** |
-| FC-5 timing/cutoff games produce non-deterministic or privileged allocation | Partially triggered; real but bounded, separately addressable |
-| FC-6 social benefit dominated by a simpler non-token mechanism | **TRIGGERED** |
+| FC | Condition (issue #34) | Evidence class | Disposition |
+|---|---|---|---|
+| FC1 | Transferable token has no necessary function beyond rewarding donation | Conditional / policy question | Partially triggered — open pending target-ledger-function specification |
+| FC2 | Rational donors predictably destroy charity benefit via rebates | Conditional simulation result | Not triggered as an unconditional prediction; conditional arithmetic remains a real residual risk |
+| FC3 | One actor obtains practical governance control by donation alone | Conditional simulation result | Conditional on the integration rule adopted; not a default defect |
+| FC4 | Mechanism materially incentivizes stolen/tainted-fund laundering | Structural risk (pathway) + conditional (profitability) | Pathway proven and serious; profitability retracted as unconditional |
+| FC5 | Timing/cutoff games produce non-deterministic or privileged allocation | Structural risk / empirical unknown | Partially triggered; real but bounded |
+| FC6 | Mitigation depends on unverifiable identity while claiming permissionless | Mathematically proven | Triggered, no defensible mitigation for concave/capped schemes absent an identity layer |
+| FC7 | Social benefit dominated by a simpler non-token mechanism | Conditional, scoped | Partially triggered for specified functions; open for unspecified ones |
 
-Four of six conditions trigger without a defensible mitigation identified in this analysis; a fifth is mitigable only conditionally.
+## Aggregate disposition
+
+```text
+UNDERLYING_MECHANISM: CONTINUE_WITH_CONDITIONS
+ECONOMIC_GATE_PASS: false
+```
+
+Two conditions (FC4's pathway component, FC6) are proven residual risks requiring redesign or policy gates regardless of further modelling; the remaining five are conditional on integration choices, product-scope decisions, or assumptions this seat cannot close alone. See `FAILURE_CONDITIONS.md` "Conditions for continuation" for the seven concrete conditions attached to this disposition.
 
 ## Commands and results
 
 | Command | Result |
 |---|---|
-| `python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py` | 26 scenarios executed; `results/*.json` + `results/TABLES.md` written |
-| `python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v` | 26 tests OK |
+| `python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py` | 27 scenarios executed; `results/*.json` + `results/TABLES.md` regenerated |
+| `python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v` | 54 tests OK |
+| `python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py` | ran read-only; 28 scenarios OK; **zero diff** in Grok Breaker paths afterward |
+| `python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests -v` | 25 tests OK (frozen Grok suite, run read-only) |
 | `python3 -m unittest discover -s tests -v` | 185 tests OK (existing lab suite; unaffected) |
 | `./nexus doctor` | PASS (`WORKTREE_DIRTY` warning while uncommitted, expected) |
-| `git status --short` (pre-commit) | only paths under the three authorized directories |
+| `git diff --check` | clean |
+| `git status --short` (pre-commit) | only paths under the three Claude-authorized directories; zero diff under Grok Breaker paths |
 
-`./nexus verify` and `./nexus audit-check` were not run as part of this task: `./nexus verify` is scoped to the R-round custody/exchange kernels and this task explicitly does not assign an R-round; `audit-check --audit-id` targets the R001/R002 blind-audit ledgers, which this task does not touch and must not reopen. Re-running them was judged out of scope rather than silently skipped.
+`./nexus verify` and `./nexus audit-check` were not run: `./nexus verify` is scoped to the R-round custody/exchange kernels and this task assigns no R-round; `audit-check --audit-id` targets the R001/R002 blind-audit ledgers, out of scope and must not be reopened. Same disposition as the original submission.
 
 ## Independence qualification
 
-This is a single-seat (Economics Designer/Red-Team) result. No second-family Breaker review has occurred for this package, and issue #34 requires one "before any gate pass." Because the recommendation below is `REJECT_OR_REDESIGN`, not a gate pass, this condition is disclosed rather than blocking, but the recommendation should be treated as provisional pending independent review.
+This repair is a single-seat (Economics Designer/Red-Team) correction responding to an independent second-family (Grok) review that has already occurred (`BENEFICIAL_GENESIS_ECON_BREAKER_001`, merged PR #37). The repair itself has not been re-reviewed by a second family. Because the recommendation is `CONTINUE_WITH_CONDITIONS` with `ECONOMIC_GATE_PASS: false`, not a gate pass, issue #34's "second-family review before any gate pass" condition is not itself triggered by this submission, but a fresh independent look at the repaired package should precede any future gate-pass decision.
 
 ## Gate recommendation
 
 ```text
-REJECT_OR_REDESIGN
+CONTINUE_WITH_CONDITIONS
+ECONOMIC_GATE_PASS: false
 ```
 
-The transferable, fixed-pool allocation token as specified in the merged Beneficial Genesis research base should not proceed past the economic-necessity gate as currently designed. This is not a claim that Beneficial Genesis as a charitable migration *concept* is unsound — `MECHANISM_NECESSITY.md` §5 and `ALTERNATIVES_COMPARISON.md` §5 identify specific, less complex redesign directions (a non-transferable or delayed-transfer claim right, governance decoupled from and independently/continuously capped relative to economic allocation, sealed/precommitted donation amounts) that address most of the triggered conditions without abandoning the migration-coordination function. Evaluating any such redesign is future work for a subsequent, separately authorized task, not something this seat is authorized to bless.
+The charity-bound migration-receipt concept is not shown to be economically incoherent. The transferable fixed-pool token as currently underspecified should not be defended by default and is not economically gate-passed. See `FAILURE_CONDITIONS.md` "Conditions for continuation" for the redesign/policy conditions attached, and `MECHANISM_NECESSITY.md` §3a for the open target-ledger-function question that FC1/FC7 depend on. PR #35 remains draft; no merge, no status change, no R-round.
 
 ## Non-claims
 
-No merge authority, no R-round assignment, no status promotion, no market-price prediction, no live funds or real charity claims, no legal conclusions, no claim of cross-family independent review, no claim that this analysis exhaustively enumerates every possible strategic behavior against the mechanism.
+No merge authority, no R-round assignment, no status promotion, no market-price prediction, no live funds or real charity claims, no legal conclusions, no claim of cross-family independent review of the *repaired* package specifically, no claim that this analysis exhaustively enumerates every possible strategic behavior against the mechanism.

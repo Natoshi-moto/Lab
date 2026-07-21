@@ -4,13 +4,26 @@
   "pool_units": 100000000,
   "allocation_scheme": "EXACT_PRO_RATA",
   "scheme_params": {},
-  "token_value_multipliers": [1.5],
+  "token_value_multipliers": [
+    1.5
+  ],
   "lockup_months": 0,
-  "governance_cap_bps": "PROPORTIONAL",
   "donors": [
-    {"id": "speculator", "sats": 20000000, "role": "speculator", "group": "speculator"}
+    {
+      "id": "speculator",
+      "sats": 20000000,
+      "role": "speculator",
+      "group": "speculator"
+    }
   ],
   "generators": [
-    {"kind": "small_donors", "count": 500, "sats_min": 10000, "sats_max": 200000, "id_prefix": "small", "block": 0}
+    {
+      "kind": "small_donors",
+      "count": 500,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "small",
+      "block": 0
+    }
   ]
 }

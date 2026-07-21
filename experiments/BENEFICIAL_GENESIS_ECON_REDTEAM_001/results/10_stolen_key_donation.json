@@ -1,30 +1,132 @@
 {
   "allocation_scheme": "EXACT_PRO_RATA",
   "attack_analysis": {
-    "stolen_key_laundering": {
+    "tainted_fund_migration": {
       "stolen_key_attacker": {
-        "laundering_gain": "999999939381597/100000000",
-        "note": "attacker's cost basis is the theft victim's loss, not the attacker's; the protocol allocates identically to an honest donor of equal sats",
-        "true_economic_cost_borne_by_attacker": "0"
+        "allocation_units": 15911637,
+        "assumptions": {
+          "alternative_realization_fraction": "7/10",
+          "liquidation_haircut": "3/20",
+          "lockup_discount": "1",
+          "lockup_months": 0,
+          "seizure_probability_alternative_path": "3/10",
+          "seizure_probability_migration_path": "1/5",
+          "token_value_per_unit": "62847081/100000000",
+          "transaction_cost_sats": "0"
+        },
+        "donated_sats": 10000000,
+        "gross_token_output": "999999939381597/100000000",
+        "interpretation": {
+          "pathway_exists": true,
+          "pathway_note": "cryptographic control admits a claim; legal ownership is not checked by the verifier (a design residual risk documented independently of this package)",
+          "profitable_under_these_assumptions": true,
+          "zero_cost_unconditionally_profitable_laundering_proven": false
+        },
+        "legal_cost_basis": "0",
+        "net_migration_profit": "4749998969487149/2500000000",
+        "realizable_token_value": "16999998969487149/2500000000",
+        "risk_adjusted_token_value": "16999998969487149/2500000000",
+        "source_asset_opportunity_value": "4900000"
       }
-    }
+    },
+    "tainted_fund_sensitivity_grid": [
+      {
+        "alternative_realization_fraction": "0",
+        "net_migration_profit": "270497829/50",
+        "profitable": true,
+        "token_value_per_unit": "1/2"
+      },
+      {
+        "alternative_realization_fraction": "3/10",
+        "net_migration_profit": "165497829/50",
+        "profitable": true,
+        "token_value_per_unit": "1/2"
+      },
+      {
+        "alternative_realization_fraction": "7/10",
+        "net_migration_profit": "25497829/50",
+        "profitable": true,
+        "token_value_per_unit": "1/2"
+      },
+      {
+        "alternative_realization_fraction": "1",
+        "net_migration_profit": "-79502171/50",
+        "profitable": false,
+        "token_value_per_unit": "1/2"
+      },
+      {
+        "alternative_realization_fraction": "0",
+        "net_migration_profit": "270497829/25",
+        "profitable": true,
+        "token_value_per_unit": "1"
+      },
+      {
+        "alternative_realization_fraction": "3/10",
+        "net_migration_profit": "217997829/25",
+        "profitable": true,
+        "token_value_per_unit": "1"
+      },
+      {
+        "alternative_realization_fraction": "7/10",
+        "net_migration_profit": "147997829/25",
+        "profitable": true,
+        "token_value_per_unit": "1"
+      },
+      {
+        "alternative_realization_fraction": "1",
+        "net_migration_profit": "95497829/25",
+        "profitable": true,
+        "token_value_per_unit": "1"
+      },
+      {
+        "alternative_realization_fraction": "0",
+        "net_migration_profit": "811493487/50",
+        "profitable": true,
+        "token_value_per_unit": "3/2"
+      },
+      {
+        "alternative_realization_fraction": "3/10",
+        "net_migration_profit": "706493487/50",
+        "profitable": true,
+        "token_value_per_unit": "3/2"
+      },
+      {
+        "alternative_realization_fraction": "7/10",
+        "net_migration_profit": "566493487/50",
+        "profitable": true,
+        "token_value_per_unit": "3/2"
+      },
+      {
+        "alternative_realization_fraction": "1",
+        "net_migration_profit": "461493487/50",
+        "profitable": true,
+        "token_value_per_unit": "3/2"
+      }
+    ]
   },
   "baseline_breakeven_price": "62847081/100000000",
   "concentration": {
     "by_account": {
-      "gini": "3402368178/8349979793",
-      "hhi": "135552755100923/4999975800029282",
+      "gini_of_issued": "3402368178/8349979793",
+      "hhi_of_issued": "135552755100923/4999975800029282",
       "holder_count": 501,
-      "top10_share": "935949/5000000",
-      "top1_share": "15911637/100000000"
+      "top10_share_of_issued": "9359490/49999879",
+      "top10_share_of_pool": "935949/5000000",
+      "top1_share_of_issued": "15911637/99999758",
+      "top1_share_of_pool": "15911637/100000000",
+      "total_issued": 99999758
     },
     "by_beneficial_owner": {
-      "gini": "3402368178/8349979793",
-      "hhi": "135552755100923/4999975800029282",
+      "gini_of_issued": "3402368178/8349979793",
+      "hhi_of_issued": "135552755100923/4999975800029282",
       "owner_count": 501,
-      "top10_share": "935949/5000000",
-      "top1_share": "15911637/100000000"
-    }
+      "top10_share_of_issued": "9359490/49999879",
+      "top10_share_of_pool": "935949/5000000",
+      "top1_share_of_issued": "15911637/99999758",
+      "top1_share_of_pool": "15911637/100000000",
+      "total_issued": 99999758
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 501,
   "donor_economics": {
@@ -43,25 +145,7 @@
       "unprofitable_donor_count": 501
     }
   },
-  "governance": {
-    "by_account": {
-      "gini": "3402368178/8349979793",
-      "hhi": "135552755100923/4999975800029282",
-      "holder_count": 501,
-      "top10_share": "935949/5000000",
-      "top1_share": "15911637/100000000"
-    },
-    "by_beneficial_owner": {
-      "gini": "3402368178/8349979793",
-      "hhi": "135552755100923/4999975800029282",
-      "owner_count": 501,
-      "top10_share": "935949/5000000",
-      "top1_share": "15911637/100000000"
-    },
-    "crosses_blocking_third": false,
-    "crosses_simple_majority": false,
-    "max_owner_governance_share": "15911637/99999758"
-  },
+  "governance": null,
   "pool_units": 100000000,
   "scenario_id": "10_stolen_key_donation",
   "scheme_params": {},

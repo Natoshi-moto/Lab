@@ -3,6 +3,27 @@
 A manifest describes a donor population (explicit or generated), an
 allocation scheme, and zero or more adversarial "probes". The runner never
 consults external data, wall-clock time, or unseeded randomness.
+
+Repair history (BGEN-ECON-REPAIR-002, issue #38, E-001..E-009): see
+FAILURE_CONDITIONS.md and CROSS_MODEL_COMPARISON.md for the full record.
+Summary of behavioral changes from the original BGEN-ECON-REDTEAM-001
+submission (PR #35 @ b588779):
+
+- stolen-key donations now report a decomposed net-migration-profit
+  estimate (model/tainted_funds.py) instead of an unconditional
+  zero-cost "laundering_gain" (E-001);
+- rebates report both the conditional (arrangement-exists) arithmetic and
+  an access/enforcement/detection-frictions expected view
+  (model/collusion.py), and no longer claim a predictable aggregate
+  behavioral outcome (E-002);
+- governance analysis is computed only when a scenario explicitly opts in
+  via ``governance_rules``, under named rules with explicit transferability
+  and renormalization semantics (model/governance.py), instead of
+  defaulting every scenario to proportional governance (E-003);
+- concentration reporting distinguishes share-of-pool from
+  share-of-issued throughout (model/metrics.py) (E-005);
+- duplicate donor identifiers are rejected rather than silently
+  colliding (E-005).
 """
 
 from __future__ import annotations
@@ -12,8 +33,11 @@ from fractions import Fraction
 from typing import Any
 
 from . import allocation as alloc
+from . import collusion
+from . import governance as gov
 from . import metrics
 from . import population as pop
+from . import tainted_funds
 
 
 def _fr(x: str | float | int) -> Fraction:
@@ -49,10 +73,19 @@ def _build_donors(manifest: dict[str, Any], rng: random.Random) -> list[dict[str
         donors.extend(pop.split_identity(target, probe["into"]))
     for donor in donors:
         donor.setdefault("rebate_rate", 0)
-        donor.setdefault("secret_rebate", False)
+        donor.setdefault("colluding_arrangement_exists", _fr(donor.get("rebate_rate", 0)) > 0)
         donor.setdefault("stolen", False)
         donor.setdefault("block", 0)
         donor.setdefault("group", donor["id"])
+
+    # E-005: fail closed on duplicate donor identifiers instead of letting
+    # later dict/lookup construction silently drop or misattribute one.
+    seen: set[str] = set()
+    for donor in donors:
+        if donor["id"] in seen:
+            raise ValueError(f"duplicate donor_id in scenario population: {donor['id']!r}")
+        seen.add(donor["id"])
+
     return donors
 
 
@@ -77,22 +110,57 @@ def _group_totals(per_donor: dict[str, int], donors: list[dict[str, Any]]) -> di
 
 def _concentration_block(allocation: dict[str, int], pool: int, donors: list[dict[str, Any]]) -> dict[str, Any]:
     grouped = _group_totals(allocation, donors)
+    total_issued = sum(allocation.values())
+    grouped_issued = sum(grouped.values())
     return {
         "by_account": {
-            "gini": str(metrics.gini(allocation)),
-            "hhi": str(metrics.hhi(allocation, pool)),
-            "top1_share": str(metrics.top_n_share(allocation, pool, 1)),
-            "top10_share": str(metrics.top_n_share(allocation, pool, 10)),
             "holder_count": len(allocation),
+            "total_issued": total_issued,
+            "gini_of_issued": str(metrics.gini(allocation)),
+            "hhi_of_issued": str(metrics.hhi(allocation)),
+            "top1_share_of_issued": str(metrics.top_n_share_of_issued(allocation, 1)),
+            "top1_share_of_pool": str(metrics.top_n_share_of_pool(allocation, pool, 1)),
+            "top10_share_of_issued": str(metrics.top_n_share_of_issued(allocation, 10)),
+            "top10_share_of_pool": str(metrics.top_n_share_of_pool(allocation, pool, 10)),
         },
         "by_beneficial_owner": {
-            "gini": str(metrics.gini(grouped)),
-            "hhi": str(metrics.hhi(grouped, pool)),
-            "top1_share": str(metrics.top_n_share(grouped, pool, 1)),
-            "top10_share": str(metrics.top_n_share(grouped, pool, 10)),
             "owner_count": len(grouped),
+            "total_issued": grouped_issued,
+            "gini_of_issued": str(metrics.gini(grouped)),
+            "hhi_of_issued": str(metrics.hhi(grouped)),
+            "top1_share_of_issued": str(metrics.top_n_share_of_issued(grouped, 1)),
+            "top1_share_of_pool": str(metrics.top_n_share_of_pool(grouped, pool, 1)),
+            "top10_share_of_issued": str(metrics.top_n_share_of_issued(grouped, 10)),
+            "top10_share_of_pool": str(metrics.top_n_share_of_pool(grouped, pool, 10)),
         },
+        "denominator_note": (
+            "*_of_issued divides by the actually issued total; *_of_pool divides by the "
+            "fixed pool and also reflects any unissued remainder. Gini/HHI are defined "
+            "over the issued distribution only. Do not mix the two denominators."
+        ),
     }
+
+
+def _governance_block(allocation: dict[str, int], donors: list[dict[str, Any]], rule_requests: list[dict[str, Any]]) -> dict[str, Any]:
+    grouped = _group_totals(allocation, donors)
+    out: dict[str, Any] = {}
+    for req in rule_requests:
+        rule = req["rule"]
+        cap_bps = req.get("cap_bps")
+        weights = gov.governance_weights(grouped, rule, cap_bps=cap_bps)
+        control = gov.majority_threshold_control(weights["weights"])
+        out[rule if cap_bps is None else f"{rule}_{cap_bps}bps"] = {
+            "rule": weights["rule"],
+            "transferable": weights["transferable"],
+            "notes": weights["notes"],
+            "gini_of_weights": str(metrics.gini(weights["weights"])) if weights["weights"] else "0",
+            "hhi_of_weights": str(metrics.hhi(weights["weights"])) if weights["weights"] else "0",
+            "max_holder_share": control["max_holder_share"],
+            "max_holder": control["max_holder"],
+            "crosses_simple_majority": control["crosses"].get(str(Fraction(1, 2)), False),
+            "crosses_blocking_third": control["crosses"].get(str(Fraction(1, 3)), False),
+        }
+    return out
 
 
 def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
@@ -118,19 +186,10 @@ def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
     unissued = metrics.unissued_remainder(allocation, pool)
     concentration = _concentration_block(allocation, pool, donors)
 
-    governance_cap_bps = manifest.get("governance_cap_bps", "PROPORTIONAL")
     governance_block = None
-    if governance_cap_bps != "DISABLED":
-        cap = None if governance_cap_bps == "PROPORTIONAL" else governance_cap_bps
-        gov_weights = alloc.governance_weight(allocation, cap, pool)
-        governance_block = _concentration_block(gov_weights, pool, donors)
-        majority_owner_share = max(
-            (Fraction(v, sum(gov_weights.values()) or 1) for v in _group_totals(gov_weights, donors).values()),
-            default=Fraction(0),
-        )
-        governance_block["max_owner_governance_share"] = str(majority_owner_share)
-        governance_block["crosses_simple_majority"] = majority_owner_share > Fraction(1, 2)
-        governance_block["crosses_blocking_third"] = majority_owner_share > Fraction(1, 3)
+    governance_rules = manifest.get("governance_rules")
+    if governance_rules:
+        governance_block = _governance_block(allocation, donors, governance_rules)
 
     named_donor_ids = {d["id"] for d in manifest.get("donors", [])}
     for probe in manifest.get("split_identity_probes", []):
@@ -175,40 +234,59 @@ def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
 
     rebate_probe_donors = [d for d in donors if _fr(d.get("rebate_rate", 0)) > 0]
     if rebate_probe_donors:
-        m = _fr(manifest.get("token_value_multipliers", [1.0])[0])
-        token_value_per_unit = m * baseline_price
+        friction_defaults = manifest.get("rebate_friction_assumptions", {})
         rows = {}
         for d in rebate_probe_donors:
-            honest_utility = token_value_per_unit * allocation.get(d["id"], 0) - Fraction(d["sats"])
-            rebate_rate = _fr(d["rebate_rate"])
-            rebated_utility = (
-                token_value_per_unit * allocation.get(d["id"], 0)
-                - (Fraction(d["sats"]) - rebate_rate * d["sats"])
-            )
-            rows[d["id"]] = {
-                "rebate_rate": str(rebate_rate),
-                "secret": d.get("secret_rebate", False),
-                "honest_utility": str(honest_utility),
-                "rebated_utility": str(rebated_utility),
-                "rebate_attack_gain": str(rebated_utility - honest_utility),
-                "charity_loss": str(rebate_rate * d["sats"]),
+            params = {
+                "access_probability": _fr(d.get("access_probability", friction_defaults.get("access_probability", 1))),
+                "arrangement_cost_sats": _fr(d.get("arrangement_cost_sats", friction_defaults.get("arrangement_cost_sats", 0))),
+                "enforcement_probability": _fr(d.get("enforcement_probability", friction_defaults.get("enforcement_probability", 1))),
+                "detection_probability": _fr(d.get("detection_probability", friction_defaults.get("detection_probability", 0))),
+                "detection_loss_fraction": _fr(d.get("detection_loss_fraction", friction_defaults.get("detection_loss_fraction", "1/2"))),
             }
-        attack_analysis["rebate_attack"] = rows
+            rows[d["id"]] = collusion.conditional_and_expected_rebate(
+                donated_sats=d["sats"],
+                rebate_rate=_fr(d["rebate_rate"]),
+                colluding_arrangement_exists=bool(d.get("colluding_arrangement_exists", True)),
+                **params,
+            )
+        attack_analysis["rebate_and_collusion"] = rows
 
     stolen_donors = [d for d in donors if d.get("stolen")]
     if stolen_donors:
         m = _fr(manifest.get("token_value_multipliers", [1.0])[0])
         token_value_per_unit = m * baseline_price
+        tf_defaults = manifest.get("tainted_fund_assumptions", {})
         rows = {}
         for d in stolen_donors:
-            gross_value = token_value_per_unit * allocation.get(d["id"], 0)
-            rows[d["id"]] = {
-                "laundering_gain": str(gross_value),
-                "true_economic_cost_borne_by_attacker": "0",
-                "note": "attacker's cost basis is the theft victim's loss, not the attacker's; "
-                "the protocol allocates identically to an honest donor of equal sats",
+            kwargs: dict[str, Any] = {
+                "donated_sats": d["sats"],
+                "allocation_units": allocation.get(d["id"], 0),
+                "token_value_per_unit": token_value_per_unit,
+                "lockup_months": manifest.get("lockup_months", 0),
             }
-        attack_analysis["stolen_key_laundering"] = rows
+            for key in (
+                "legal_cost_basis",
+                "alternative_realization_fraction",
+                "seizure_probability_alternative_path",
+                "seizure_probability_migration_path",
+                "liquidation_haircut",
+                "transaction_cost_sats",
+            ):
+                if key in tf_defaults or key in d:
+                    kwargs[key] = _fr(d.get(key, tf_defaults.get(key)))
+            rows[d["id"]] = tainted_funds.decompose_tainted_fund_economics(**kwargs)
+        attack_analysis["tainted_fund_migration"] = rows
+
+        grid_spec = manifest.get("tainted_fund_sensitivity_grid")
+        if grid_spec:
+            target = stolen_donors[0]
+            attack_analysis["tainted_fund_sensitivity_grid"] = tainted_funds.tainted_fund_sensitivity_grid(
+                donated_sats=target["sats"],
+                allocation_units=allocation.get(target["id"], 0),
+                token_value_multipliers=[_fr(v) for v in grid_spec["token_value_multipliers"]],
+                alternative_realization_fractions=[_fr(v) for v in grid_spec["alternative_realization_fractions"]],
+            )
 
     probe = manifest.get("split_identity_probes")
     if probe:
@@ -227,9 +305,9 @@ def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
             split_ids = [d["id"] for d in donors if d.get("group") == target_id and d["id"].startswith(f"{target_id}_split")]
             split_share = Fraction(sum(allocation.get(i, 0) for i in split_ids), pool) if pool else Fraction(0)
             rows[target_id] = {
-                "single_identity_share": str(single_share),
+                "single_identity_share_of_pool": str(single_share),
                 "split_into": p["into"],
-                "split_total_share": str(split_share),
+                "split_total_share_of_pool": str(split_share),
                 "split_gain": str(split_share - single_share),
                 "sybil_split_is_profitable": split_share > single_share,
             }
@@ -254,8 +332,8 @@ def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
             "reference_donor_id": ref_id,
             "pre_shock_total_eligible": pre_total,
             "post_shock_total_eligible": total_eligible,
-            "pre_shock_share": str(pre_share),
-            "post_shock_share": str(post_share),
+            "pre_shock_share_of_pool": str(pre_share),
+            "post_shock_share_of_pool": str(post_share),
             "dilution": str(pre_share - post_share),
         }
 
@@ -272,8 +350,8 @@ def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
         attack_analysis["charity_breakdown"] = {
             charity_id: {
                 "total_donated": str(v["donated"]),
-                "total_rebated": str(v["rebate"]),
-                "net_retained": str(v["donated"] - v["rebate"]),
+                "total_rebated_conditional": str(v["rebate"]),
+                "net_retained_conditional": str(v["donated"] - v["rebate"]),
             }
             for charity_id, v in charity_totals.items()
         }

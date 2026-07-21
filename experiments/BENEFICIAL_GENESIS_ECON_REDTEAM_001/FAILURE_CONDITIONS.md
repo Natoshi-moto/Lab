@@ -1,63 +1,131 @@
 # Failure conditions disposition — BGEN-ECON-REDTEAM-001
 
-Per issue #34, the task must recommend `REJECT_OR_REDESIGN` if **any** of the six listed failure conditions remains without a defensible mitigation. Each is evaluated below against the executable evidence in `results/*.json`. Negative findings are stated plainly, per the task's explicit instruction not to soften them.
+**Repaired under BGEN-ECON-REPAIR-002 (issue #38, E-001 through E-009).** Per issue #34, the task must recommend `REJECT_OR_REDESIGN` if any of the seven listed failure conditions remains without a defensible mitigation. This version maps all **seven** conditions (the original submission mapped only six and folded the identity-dependent condition into narrative — a repaired gap, E-007) and classifies each with an explicit evidence class rather than a bare trigger/no-trigger call:
+
+- **mathematically proven** — follows deductively from the allocation rule itself; no assumption sweep changes the conclusion;
+- **conditional simulation result** — true given a stated set of modelling assumptions; a different assumption set can change the sign or magnitude;
+- **structural risk** — a real, verified pathway (e.g. the verifier not checking legal ownership) whose *magnitude* is not, and cannot be, established by this simulator;
+- **empirical unknown** — depends on real-world facts (donor behavior, market prices, adoption) this package does not and cannot observe;
+- **policy/legal question** — requires qualified counsel or an operator decision outside this seat's authority.
 
 ---
 
-### FC-1. "The transferable token has no necessary function beyond rewarding donation."
+### FC1. "The transferable token has no necessary function beyond rewarding donation."
 
-**Status: TRIGGERED — no defensible mitigation identified.**
+**Evidence class: conditional simulation result / policy question (narrowed from the original absolute claim, E-004).**
 
-`MECHANISM_NECESSITY.md` finds no modelled or documented function that requires *transferability* specifically, as opposed to a non-transferable or delayed-transfer claim right. The migration/coordination function needs only a cryptographically bound claim; the charitable function needs only the donation step. Transferability's only identified unique effect is donor liquidity / secondary-market price discovery, which is an investor convenience rather than a public benefit, coordination function, or security property in the program's own terms (issue #33). Its measured costs (laundering, post-genesis re-concentration, speculative flipping) are larger and better evidenced than its measured benefit.
+Not necessary for the charity-receipt and migration-claim-binding functions the design pack specifies (`MECHANISM_NECESSITY.md` §1–§3: a non-transferable claim satisfies both). Necessity for unspecified future ledger functions (payment, staking, fees, capital allocation, bootstrap distribution) is an **open question** the design pack does not resolve (§3a) — this seat cannot prove transferability is unnecessary for functions that have not been specified, and does not claim to.
 
----
-
-### FC-2. "Rational donor behavior predictably destroys charity net benefit through rebates."
-
-**Status: TRIGGERED — no defensible mitigation identified.**
-
-`07_rebate_sweep` and `08_secret_rebate_whale` show the rebate-attack gain equals the rebate amount **exactly**, for every rebate rate tested (0% to 100%), and is strictly positive for any nonzero rate. `18_charity_set_single_vs_multi` shows a donor routing through a donor-controlled charity retains only 20% of nominal donated value for the charity (net retained 3,000,000 of 15,000,000 donated) while the cryptographic claim verifies identically to an honest donation (`claim_charity_rebate_collusion_crypto_ok` in the existing design pack's own fixture set already documents this as crypto-valid). Track D's genesis ceremony authenticates charity **identity**, not charity **behavior after receipt**, and no protocol-level, cryptographic, or statistical detection mechanism is specified. Since the attack is unconditionally profitable and requires no special capability beyond finding or creating one colluding charity destination among however many are in the genesis charity set, rational profit-seeking donor behavior is predicted — not merely possible — to erode aggregate charity benefit in proportion to how much of the donor base can access such a destination.
+**Disposition:** partially triggered — requires the program to specify target ledger functions before transferability can be defended or ruled out; not a closed mathematical disproof.
 
 ---
 
-### FC-3. "One actor can obtain practical governance control by donation alone."
+### FC2. "Rational donor behavior predictably destroys charity net benefit through rebates."
 
-**Status: TRIGGERED for the design as currently specified; PARTIALLY MITIGABLE.**
+**Evidence class: conditional simulation result (narrowed from an over-generalized behavioral prediction, E-002).**
 
-`13_governance_proportional` shows a single **honest** whale (no attack) reaching 52.488% of governance weight — a simple majority — purely through the size of an honest donation, when governance weight is proportional to economic allocation (the default assumption absent an explicit design decision otherwise). `14_governance_capped` shows an independent 5%-of-pool governance cap holds that same whale to 9.768%, well under both the 1/2 and 1/3 thresholds. A mitigation therefore exists (decoupled, capped governance weight), but it is not present in the subject design pack as merged, and even if adopted, this study did not model whether a genesis-time cap remains enforced once tokens are transferable and lock-ups expire — a cap computed only once at genesis is a snapshot, not a durable guarantee, unless enforced continuously by the new ledger's own consensus rules (Track E, out of scope here). Absent that continuous-enforcement guarantee, we do not treat this as a defensible mitigation of the underlying risk, only of the risk *at the moment of allocation*.
+`27_rebate_access_frictions` and the `07_rebate_sweep`/`08_secret_rebate_whale`/`18_charity_set_single_vs_multi` scenarios together show two distinct results that must not be merged:
 
----
+1. **Conditional arithmetic (mathematically proven given an arrangement exists):** rebate reduces charity retention by exactly the rebate amount, for any rate tested 0–100%, with **zero** additional cost — this holds regardless of assumptions and is preserved from the original finding (E-008).
+2. **Expected, friction-adjusted outcome (conditional simulation result):** for a donor who does **not** already have a colluding arrangement, expected rebate collapses to a small fraction of the conditional figure once access is rare and costly (`27_rebate_access_frictions`: expected rebate 100,000 vs. conditional 2,500,000 — under 1/20th — at a modelled 5% access probability, 80% enforcement, 30% detection risk).
 
-### FC-4. "The mechanism materially incentivizes stolen/tainted-fund laundering into a new asset."
+Beneficial Genesis's charity set is fixed at genesis (an immutable registry); "find or create a colluding charity" is not a free donor action, so the *predictable aggregate destruction* claim from the original submission is **not supported** without supplying access/enforcement/detection assumptions this package does not observe empirically.
 
-**Status: TRIGGERED — no defensible mitigation identified.**
-
-`10_stolen_key_donation` and `11_quantum_cutoff_freeze` show an attacker donating stolen source-chain funds receives the **full gross token value** of their allocation (~10,000,000 and ~5,000,000 abstract units respectively in the modelled scenarios) at **zero** legitimate cost basis, because the verifier (by explicit, pre-existing design, documented in the subject's own `THREAT_MODEL_AND_NONCLAIMS.md` residual risk #2) validates cryptographic control of source funds, not legal ownership. Transferability is what converts this into a completed laundering event: the thief receives a liquid, saleable asset in exchange for stolen value, rather than (as under a non-transferable receipt or no-token design) nothing of resale value. `11_quantum_cutoff_freeze` additionally shows this risk concentrates in the specific, foreseeable window between a declared classical-key compromise and epoch close, where a rational attacker holding compromised keys has maximal urgency to donate before the window closes. Non-transferability windows (`ALTERNATIVES_COMPARISON.md` §4) reduce but do not eliminate this, since a thief has no legitimate opportunity cost for locked capital and can simply wait out a lock-up.
-
----
-
-### FC-5. "Timing/cutoff games produce non-deterministic or privileged allocation."
-
-**Status: PARTIALLY TRIGGERED — real but bounded; not on its own dispositive.**
-
-`09_denominator_doubles_final_block` shows a concrete, non-trivial dilution effect (4.802% → 0.828% share, a 3.975-percentage-point swing) from a late-arriving donor surge in the final block. This is **not** a "privileged" allocation in the sense of an unfair marginal rate — exact pro-rata gives every marginal sat the same rate regardless of when it arrives — but it **is** a source of ex-ante non-determinism that specifically disadvantages early, uninformed donors relative to anyone with better visibility into the final denominator (a miner, an exchange, or anyone monitoring the mempool near close). We do not treat this alone as requiring `REJECT_OR_REDESIGN`, since a low-cost mitigation exists (sealed/precommitted donation amounts, `ALTERNATIVES_COMPARISON.md` §2) that does not require abandoning the transferable-pool structure. It is folded into the overall recommendation as a required condition rather than an independent rejection trigger.
+**Disposition:** not triggered as an unconditional prediction; the conditional arithmetic remains a real, always-available residual risk that no protocol-level or cryptographic mechanism prevents.
 
 ---
 
-### FC-6. "The social benefit is dominated by a simpler non-token mechanism."
+### FC3. "One actor can obtain practical governance control by donation alone."
 
-**Status: TRIGGERED — supported, not merely plausible.**
+**Evidence class: conditional simulation result (narrowed from treating proportional governance as a default, E-003).**
 
-`MECHANISM_NECESSITY.md` §5 shows a non-transferable recognition/reputation receipt (or, more simply, direct donation with no token at all) preserves the charitable and migration-coordination functions while **eliminating** the laundering incentive (FC-4, since a non-transferable receipt has no resale value) and **eliminating** post-genesis governance re-concentration via secondary markets (FC-3's durability problem), at the cost only of investor liquidity — which issue #33's own definition of success does not list as a required property. Where a simpler mechanism dominates on the majority of the enumerated attack surfaces and concedes only an investor convenience, the social benefit of the more complex, transferable design is dominated within the terms of this analysis.
+Beneficial Genesis, as specified, is an *allocation* mechanism; it does not itself specify how (or whether) economic allocation becomes governance weight on a new ledger. `13_governance_rules_comparison` evaluates five explicit rules on the same whale-heavy population:
+
+| Rule | Max single-holder governance share | Crosses majority |
+|---|---|---|
+| `none` | 0% | No |
+| `nontransferable_equal` (one vote per recipient) | 0.2% | No |
+| `nontransferable_proportional` / `token_weighted` | 52.488% | **Yes** |
+| `continuously_capped` (5% cap, `14_governance_continuously_capped`) | ~9.8% | No |
+
+Governance capture by donation size alone is **true if and only if** a proportional or token-weighted rule is the adopted integration choice — it is not a property of the allocation mechanism by itself. A continuously-enforced cap prevents it at allocation time; whether such a cap survives once tokens are transferable and lock-ups expire is a Track E question this seat cannot verify (see `NONCLAIMS_AND_OPEN_QUESTIONS.md`).
+
+**Disposition:** conditional on the integration rule adopted; not a default defect of the current allocation subject.
 
 ---
 
-## Aggregate disposition
+### FC4. "The mechanism materially incentivizes stolen/tainted-fund laundering into a new asset."
 
-Four of six failure conditions (FC-1, FC-2, FC-4, FC-6) are triggered without a defensible mitigation; a fifth (FC-3) is mitigable only with an out-of-scope continuous-enforcement guarantee this study cannot verify; the sixth (FC-5) is real but bounded and separately addressable. Per the task's own rule, this requires a recommendation of:
+**Evidence class: structural risk (pathway) + conditional simulation result (profitability), narrowed from an unconditional zero-cost-profit claim, E-001.**
+
+`10_stolen_key_donation` and `11_quantum_cutoff_freeze` confirm the **pathway** is real: the verifier validates cryptographic control of source funds, not legal ownership (a pre-existing, explicit residual risk in the design pack's own `THREAT_MODEL_AND_NONCLAIMS.md`). This is **mathematically/structurally proven** and unaffected by any assumption.
+
+Whether migrating stolen funds is **net profitable** is a separate, assumption-conditional question. `model/tainted_funds.py` decomposes legal cost basis, forgone alternative-disposition value, migration-path seizure/detection risk, liquidation haircut, and lock-up, and the sensitivity grid attached to `10_stolen_key_donation` shows both profitable and unprofitable outcomes depending on the assumed token value and alternative-realization fraction. The original submission's claim of unconditional "zero-cost, fully profitable laundering" is **not supported**; "legal cost basis = 0" does not imply "opportunity cost = 0."
+
+**Disposition:** the pathway is a proven, serious residual risk requiring a redesign or policy gate regardless of profitability assumptions; the specific "automatically profitable at zero cost" framing is retracted.
+
+---
+
+### FC5. "Timing/cutoff games produce non-deterministic or privileged allocation."
+
+**Evidence class: structural risk / empirical unknown — real but bounded, unchanged in substance by this repair.**
+
+`09_denominator_doubles_final_block` shows a concrete dilution effect (4.802% → 0.828% share) from a late donor surge. This is **not** a privileged allocation in the sense of an unfair marginal rate — exact pro-rata gives every marginal sat the same rate regardless of timing — but it is a real source of ex-ante non-determinism disadvantaging early, uninformed donors relative to anyone with better visibility into the final denominator (a miner, an exchange, or a mempool-watcher). A low-cost mitigation exists (sealed/precommitted donation amounts) that does not require abandoning the transferable-pool structure; its compatibility with real Bitcoin transaction semantics is a Track B question outside this seat's scope.
+
+**Disposition:** partially triggered; real but bounded, and separately addressable without a full mechanism redesign.
+
+---
+
+### FC6. "Mitigation depends on unverifiable identity while claiming permissionless operation."
+
+**Evidence class: mathematically proven.**
+
+`05_sybil_split_concave` and `26_sybil_split_capped_pro_rata` demonstrate that concave weighting and per-identity caps — the only two allocation rules tested that meaningfully reduce whale concentration for honest single identities — are severely exploitable by free, unlinkable identity splitting (share gains of +40.6 and +70.5 percentage points respectively). Bitcoin-only Beneficial Genesis v1 has no identity or Sybil-resistance layer, by explicit design (`THREAT_MODEL_AND_NONCLAIMS.md` residual risk item 7). Linear pro-rata (`06_sybil_split_control_pro_rata`) is the only scheme tested that is *not* exploitable this way, and it does nothing to prevent whale concentration by size alone (`03_whale_99`). This condition is not merely a residual risk sensitive to assumptions — it follows deductively from the mathematical properties of concave and capped weighting under free identity creation, which the design pack itself concedes it does not have.
+
+**Disposition:** triggered, with no defensible mitigation for concave/capped schemes absent an identity layer that would contradict the stated permissionless design. Linear pro-rata avoids this specific trap at the cost of not addressing whale concentration at all.
+
+---
+
+### FC7. "The social benefit is dominated by a simpler non-token mechanism."
+
+**Evidence class: conditional simulation result, scoped to the specified functions (narrowed, E-004/E-006).**
+
+For the charity-receipt and migration-claim-binding functions the design pack specifies, `MECHANISM_NECESSITY.md` §5 shows a non-transferable recognition receipt (or plain direct donation) preserves those functions while eliminating the migration-pathway monetization surface (FC4) and the post-genesis governance re-concentration surface (FC3's durability problem), at the cost only of investor liquidity. For a fuller new-ledger product whose payment/staking/fee/bootstrap functions are unspecified (§3a), this comparison is **incomplete** — a simpler mechanism cannot be shown to dominate functions that have not been defined.
+
+**Disposition:** partially triggered for the specified functions; open for the unspecified ones. Depends on the program's product-scope decision, not a fixed property of the mechanism.
+
+---
+
+## Aggregate mechanism disposition (repaired)
 
 ```text
-REJECT_OR_REDESIGN
+UNDERLYING_MECHANISM: CONTINUE_WITH_CONDITIONS
+ECONOMIC_GATE_PASS: false
 ```
 
-for the transferable fixed-pool token as currently specified. See `operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/AUDIT_REPORT.md` for the full disposition and redesign directions, and `NONCLAIMS_AND_OPEN_QUESTIONS.md` for the limits of what this analysis can and cannot support.
+The charity-bound migration-receipt concept is **not shown to be economically incoherent**. The transferable fixed-pool token *as currently underspecified* should not be defended by default and should not be treated as economically gate-passed. Two of seven conditions (FC4's pathway component, FC6) are mathematically/structurally proven residual risks requiring redesign or policy gates regardless of further modelling; the remaining five are conditional on integration choices, product-scope decisions, or assumptions this seat cannot close alone.
+
+### Conditions for continuation
+
+1. Specify target ledger functions (§3a) before defending or ruling out transferability (FC1, FC7).
+2. Prefer a non-transferable or delayed-transfer claim if the specified functions do not require float (FC1, FC4, FC7).
+3. Do not default governance weight to proportional/token-weighted; if governance is linked to allocation at all, use a continuously-enforced cap or nontransferable rule, and verify durability past genesis (FC3).
+4. Do not present concave or per-identity-capped allocation as a whale-concentration fix without an identity/Sybil-resistance layer; linear pro-rata avoids the Sybil trap but does not solve concentration (FC6).
+5. Treat stolen/tainted-fund migration and charity rebate/circularity as residual social/legal/AML surfaces requiring policy-level mitigation (KYC-adjacent charity vetting, legal review, monitoring) — cryptography alone does not solve either (FC2, FC4).
+6. Consider sealed/precommitted donation windows to remove denominator-timing advantages for informed late actors (FC5).
+7. Keep legal/regulatory classification of the fixed-pool floating implied allocation ratio out of this seat's conclusions; route it to Track F (FC7, E-006).
+
+**Not** `ECONOMIC_GATE_PASS`. Not a legal conclusion. Not live-funds authorization. Not an R-round assignment.
+
+## Preserved findings (E-008 / BGEN-ECON-REV-007)
+
+The following findings, independently re-derived by the second-family (Grok) reconstruction, are unchanged by this repair and remain the load-bearing evidence base:
+
+1. Linear pro-rata is approximately split-mass invariant (aside from integer-floor residuals) but preserves contribution-proportional concentration.
+2. Concave and per-identity-capped allocation rules are Sybil-sensitive without an identity layer.
+3. A fixed pool creates denominator uncertainty and extreme undersubscription/oversubscription outcomes (issuing the entire pool to a trivial donation, or diluting a large donation to a rounding error).
+4. Conditional rebate incidence reduces charity retention exactly one-for-one, given an arrangement exists at zero additional cost.
+5. Cryptographic control does not establish legal ownership — the migration pathway for stolen/tainted funds is real regardless of profitability assumptions.
+6. Transferability adds resale and post-genesis re-concentration surfaces beyond what a non-transferable claim would carry.
+
+See `CROSS_MODEL_COMPARISON.md` for the side-by-side numeric comparison against the independent Grok model.

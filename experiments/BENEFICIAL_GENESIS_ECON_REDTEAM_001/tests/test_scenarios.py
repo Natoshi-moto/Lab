@@ -33,6 +33,20 @@ class TestScenarioDeterminism(unittest.TestCase):
             result = run_scenario(manifest)
             self.assertGreaterEqual(result["unissued_remainder"], 0)
 
+    def test_duplicate_donor_id_fails_closed(self):
+        manifest = {
+            "scenario_id": "duplicate_probe",
+            "seed": 1,
+            "pool_units": 1000,
+            "allocation_scheme": "EXACT_PRO_RATA",
+            "donors": [
+                {"id": "same", "sats": 100},
+                {"id": "same", "sats": 200},
+            ],
+        }
+        with self.assertRaises(ValueError):
+            run_scenario(manifest)
+
 
 class TestSybilSplitFinding(unittest.TestCase):
     def test_concave_scheme_is_profitably_split(self):
@@ -53,27 +67,56 @@ class TestSybilSplitFinding(unittest.TestCase):
         self.assertTrue(probe["sybil_split_is_profitable"])
         # single identity is bound by the 10% cap; split recovers most of the
         # attacker's true linear (uncapped) share.
-        self.assertEqual(Fraction(probe["single_identity_share"]), Fraction(1, 10))
-        self.assertGreater(Fraction(probe["split_total_share"]), Fraction(1, 2))
+        self.assertEqual(Fraction(probe["single_identity_share_of_pool"]), Fraction(1, 10))
+        self.assertGreater(Fraction(probe["split_total_share_of_pool"]), Fraction(1, 2))
 
 
 class TestRebateFinding(unittest.TestCase):
-    def test_rebate_attack_gain_equals_rebate_amount(self):
-        result = run_scenario(load("07_rebate_sweep"))
-        for donor_id, row in result["attack_analysis"]["rebate_attack"].items():
-            sats = next(d["sats"] for d in load("07_rebate_sweep")["donors"] if d["id"] == donor_id)
-            expected_gain = Fraction(row["rebate_rate"]) * sats
-            self.assertEqual(Fraction(row["rebate_attack_gain"]), expected_gain)
-            if expected_gain > 0:
-                self.assertGreater(Fraction(row["rebated_utility"]), Fraction(row["honest_utility"]))
+    def test_conditional_arithmetic_is_exactly_one_for_one(self):
+        # E-008 preserved finding, now under the repaired field names.
+        manifest = load("07_rebate_sweep")
+        result = run_scenario(manifest)
+        for donor_id, row in result["attack_analysis"]["rebate_and_collusion"].items():
+            sats = next(d["sats"] for d in manifest["donors"] if d["id"] == donor_id)
+            rebate_rate = Fraction(row["rebate_rate"])
+            expected = rebate_rate * sats
+            self.assertEqual(Fraction(row["conditional"]["rebate_sats"]), expected)
+            # scenarios 07/08/18 assume the arrangement already exists with
+            # no frictions, so expected must equal conditional by default.
+            self.assertEqual(
+                Fraction(row["expected_with_frictions"]["expected_rebate_sats"]), expected
+            )
+            self.assertFalse(row["claims"]["predictable_aggregate_destruction_of_charity_benefit"])
+
+    def test_low_access_scenario_shows_expected_far_below_conditional(self):
+        result = run_scenario(load("27_rebate_access_frictions"))
+        row = result["attack_analysis"]["rebate_and_collusion"]["arbitrary_donor_seeking_rebate"]
+        conditional = Fraction(row["conditional"]["rebate_sats"])
+        expected = Fraction(row["expected_with_frictions"]["expected_rebate_sats"])
+        self.assertLess(expected, conditional / 5)
 
 
-class TestStolenKeyFinding(unittest.TestCase):
-    def test_stolen_key_laundering_gain_is_full_gross_value_at_zero_cost(self):
+class TestTaintedFundFinding(unittest.TestCase):
+    def test_decomposed_fields_present_and_pathway_disclosed(self):
         result = run_scenario(load("10_stolen_key_donation"))
-        row = result["attack_analysis"]["stolen_key_laundering"]["stolen_key_attacker"]
-        self.assertEqual(row["true_economic_cost_borne_by_attacker"], "0")
-        self.assertGreater(Fraction(row["laundering_gain"]), Fraction(0))
+        row = result["attack_analysis"]["tainted_fund_migration"]["stolen_key_attacker"]
+        for field in (
+            "legal_cost_basis",
+            "source_asset_opportunity_value",
+            "gross_token_output",
+            "risk_adjusted_token_value",
+            "realizable_token_value",
+            "net_migration_profit",
+        ):
+            self.assertIn(field, row)
+        self.assertTrue(row["interpretation"]["pathway_exists"])
+        self.assertFalse(row["interpretation"]["zero_cost_unconditionally_profitable_laundering_proven"])
+
+    def test_sensitivity_grid_present_with_mixed_outcomes(self):
+        result = run_scenario(load("10_stolen_key_donation"))
+        grid = result["attack_analysis"]["tainted_fund_sensitivity_grid"]
+        outcomes = {row["profitable"] for row in grid}
+        self.assertEqual(outcomes, {True, False})
 
 
 class TestDenominatorShockFinding(unittest.TestCase):
@@ -89,18 +132,42 @@ class TestUndersubscriptionFinding(unittest.TestCase):
         result = run_scenario(load("19_undersubscribed_pool"))
         self.assertEqual(result["unissued_remainder"], 0)
         self.assertEqual(
-            result["concentration"]["by_beneficial_owner"]["top1_share"], "1"
+            result["concentration"]["by_beneficial_owner"]["top1_share_of_pool"], "1"
         )
 
 
-class TestGovernanceCapFinding(unittest.TestCase):
-    def test_cap_keeps_single_owner_under_majority(self):
-        result = run_scenario(load("14_governance_capped"))
-        self.assertFalse(result["governance"]["crosses_simple_majority"])
+class TestGovernanceConditionality(unittest.TestCase):
+    def test_governance_is_not_computed_unless_requested(self):
+        # E-003 repair target: scenarios that do not opt in via
+        # governance_rules must not default to any governance assumption.
+        result = run_scenario(load("01_whale_50"))
+        self.assertIsNone(result["governance"])
 
-    def test_proportional_governance_can_cross_majority(self):
-        result = run_scenario(load("13_governance_proportional"))
-        self.assertTrue(result["governance"]["crosses_simple_majority"])
+    def test_no_governance_rule_grants_no_control(self):
+        result = run_scenario(load("13_governance_rules_comparison"))
+        self.assertFalse(result["governance"]["none"]["crosses_simple_majority"])
+
+    def test_nontransferable_equal_prevents_capture_by_size(self):
+        result = run_scenario(load("13_governance_rules_comparison"))
+        self.assertFalse(result["governance"]["nontransferable_equal"]["crosses_simple_majority"])
+
+    def test_token_weighted_governance_can_cross_majority(self):
+        result = run_scenario(load("13_governance_rules_comparison"))
+        self.assertTrue(result["governance"]["token_weighted"]["crosses_simple_majority"])
+        self.assertTrue(result["governance"]["token_weighted"]["transferable"])
+
+    def test_nontransferable_proportional_matches_token_weighted_numerically(self):
+        result = run_scenario(load("13_governance_rules_comparison"))
+        prop = result["governance"]["nontransferable_proportional"]
+        tok = result["governance"]["token_weighted"]
+        self.assertEqual(prop["max_holder_share"], tok["max_holder_share"])
+        self.assertFalse(prop["transferable"])
+        self.assertTrue(tok["transferable"])
+
+    def test_continuously_capped_holds_whale_under_majority(self):
+        result = run_scenario(load("14_governance_continuously_capped"))
+        self.assertFalse(result["governance"]["continuously_capped_500bps"]["crosses_simple_majority"])
+        self.assertFalse(result["governance"]["continuously_capped_1000bps"]["crosses_simple_majority"])
 
 
 class TestLockupFinding(unittest.TestCase):

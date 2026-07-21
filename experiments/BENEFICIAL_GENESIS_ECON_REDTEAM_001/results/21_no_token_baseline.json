@@ -4,19 +4,26 @@
   "baseline_breakeven_price": "11157247/10000000",
   "concentration": {
     "by_account": {
-      "gini": "0",
-      "hhi": "0",
+      "gini_of_issued": "0",
+      "hhi_of_issued": "0",
       "holder_count": 501,
-      "top10_share": "0",
-      "top1_share": "0"
+      "top10_share_of_issued": "0",
+      "top10_share_of_pool": "0",
+      "top1_share_of_issued": "0",
+      "top1_share_of_pool": "0",
+      "total_issued": 0
     },
     "by_beneficial_owner": {
-      "gini": "0",
-      "hhi": "0",
+      "gini_of_issued": "0",
+      "hhi_of_issued": "0",
       "owner_count": 501,
-      "top10_share": "0",
-      "top1_share": "0"
-    }
+      "top10_share_of_issued": "0",
+      "top10_share_of_pool": "0",
+      "top1_share_of_issued": "0",
+      "top1_share_of_pool": "0",
+      "total_issued": 0
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
   },
   "donor_count": 501,
   "donor_economics": {

@@ -1,23 +1,38 @@
 {
   "task_id": "TSK-BGEN-ECON-REDTEAM-001",
+  "repair_task_id": "TSK-BGEN-ECON-REPAIR-002",
   "github_issue": 34,
   "parent_issue": 33,
+  "repair_github_issue": 38,
   "seat": "Economics Designer/Red-Team",
   "status_authority": "NONE",
-  "mode": "PROPOSE_ONLY / ECONOMIC_REDTEAM",
+  "mode": "PROPOSE_ONLY / ECONOMIC_REDTEAM_REPAIR",
   "round_assignment": null,
   "independent_review_claimed": false,
   "branch": "claude/bgen-econ-redteam-001",
   "subject_repository": "Natoshi-moto/Lab",
   "subject_commit": "22ce8c11297ad4c08606277ee83dc845797ba220",
   "subject_commit_description": "Merged Beneficial Genesis research base (main merge of PR #27)",
-  "branch_tip": "f45e946325483a6441cb510c46f55aafbac20956",
+  "original_submission_commit": "b5887791338b146daad8f5233ce0e25bf24fe357",
+  "controlling_review_ids": [
+    "PR35#pullrequestreview-4743521321",
+    "PR35#pullrequestreview-4743694588"
+  ],
+  "independent_breaker_evidence_merge_commit": "d8523b29ca7a1e0433ab5afdb494ed8452450dde",
+  "independent_breaker_pr": 37,
+  "repair_start_head": "d8523b29ca7a1e0433ab5afdb494ed8452450dde",
+  "branch_tip": "pending_commit",
   "draft_pr": 35,
   "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/35",
   "authorized_paths": [
     "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
     "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
     "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**"
+  ],
+  "grok_breaker_paths_preserved_unchanged": [
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001/**"
   ],
   "scope_respected": true,
   "paths_outside_scope_modified": [],
@@ -29,14 +44,33 @@
   "synthetic_only": true,
   "secrets_committed": false,
   "market_price_predicted": false,
+  "repair_items_implemented": {
+    "E-001_stolen_asset_economics": "model/tainted_funds.py: decomposed legal_cost_basis/opportunity_value/gross_output/risk_adjusted_value/realizable_value/net_migration_profit + sensitivity grid",
+    "E-002_rebate_incidence": "model/collusion.py: conditional (arrangement-exists) vs expected (access/enforcement/detection frictions) rebate incidence, side by side",
+    "E-003_governance_conditionality": "model/governance.py: 5 named rules (none/nontransferable_equal/nontransferable_proportional/token_weighted/continuously_capped), opt-in per scenario via governance_rules, no default assumption",
+    "E-004_mechanism_necessity_scope": "MECHANISM_NECESSITY.md narrowed to charity+migration-receipt functions; added target-ledger-function matrix (SS3a) for unspecified functions",
+    "E-005_implementation_and_metric_repairs": "model/metrics.py: explicit share_of_pool vs share_of_issued, no mixed denominators; model/allocation.py: lottery draws without replacement; duplicate donor_id rejected fail-closed; assumption-asserting tests replaced",
+    "E-006_language_boundary": "removed 'token sale'/'investment contract' wording; replaced with 'fixed-pool floating implied allocation ratio' throughout",
+    "E-007_complete_failure_condition_map": "FAILURE_CONDITIONS.md maps all 7 issue #34 failure conditions (FC1-FC7, previously 6) each classified as mathematically_proven/conditional_simulation_result/structural_risk/empirical_unknown/policy_legal_question",
+    "E-008_preserve_confirmed_findings": "FAILURE_CONDITIONS.md 'Preserved findings' section retains all 6 REV-007 findings unchanged",
+    "E-009_cross_model_and_repository_checks": "CROSS_MODEL_COMPARISON.md added; all required commands run (see command_results)"
+  },
   "command_results": {
     "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": {
       "exit_code": 0,
-      "summary": "26 scenarios executed; results/*.json and results/TABLES.md written"
+      "summary": "27 scenarios executed; results/*.json and results/TABLES.md regenerated"
     },
     "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v": {
       "exit_code": 0,
-      "summary": "26 tests OK"
+      "summary": "54 tests OK"
+    },
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py": {
+      "exit_code": 0,
+      "summary": "28 scenarios OK (read-only re-run of frozen Grok package; zero diff afterward)"
+    },
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests -v": {
+      "exit_code": 0,
+      "summary": "25 tests OK (frozen Grok suite, read-only)"
     },
     "python3 -m unittest discover -s tests -v": {
       "exit_code": 0,
@@ -46,9 +80,13 @@
       "exit_code": 0,
       "summary": "PASS with WARN WORKTREE_DIRTY before commit"
     },
+    "git diff --check": {
+      "exit_code": 0,
+      "summary": "clean"
+    },
     "git status --short (pre-commit)": {
       "exit_code": 0,
-      "summary": "only new files under the three authorized paths"
+      "summary": "only changed/new files under the three Claude-authorized paths; zero diff under Grok Breaker paths"
     }
   },
   "commands_not_run": {
@@ -62,26 +100,32 @@
     "ALTERNATIVES_COMPARISON.md": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/ALTERNATIVES_COMPARISON.md",
     "FAILURE_CONDITIONS.md": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md",
     "NONCLAIMS_AND_OPEN_QUESTIONS.md": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/NONCLAIMS_AND_OPEN_QUESTIONS.md",
-    "simulator": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/**, simulate.py",
-    "scenario_manifests": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/*.json (26 files)",
+    "CROSS_MODEL_COMPARISON.md": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/CROSS_MODEL_COMPARISON.md",
+    "simulator": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/** (allocation.py, metrics.py, population.py, scenario.py, governance.py, tainted_funds.py, collusion.py), simulate.py",
+    "scenario_manifests": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/*.json (27 files)",
     "machine_readable_results": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/*.json, results/TABLES.md",
     "audit_report": "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/AUDIT_REPORT.md"
   },
   "failure_condition_disposition": {
-    "FC-1_token_unnecessary_beyond_reward": "TRIGGERED",
-    "FC-2_rebate_destroys_charity_benefit": "TRIGGERED",
-    "FC-3_governance_capture_by_donation_alone": "TRIGGERED_MITIGABLE_WITH_UNVERIFIED_CONTINUOUS_ENFORCEMENT",
-    "FC-4_stolen_fund_laundering_incentive": "TRIGGERED",
-    "FC-5_timing_cutoff_privileged_allocation": "PARTIALLY_TRIGGERED_BOUNDED",
-    "FC-6_simpler_mechanism_dominates": "TRIGGERED"
+    "FC1_token_unnecessary_beyond_reward": "PARTIALLY_TRIGGERED_OPEN_PENDING_LEDGER_FUNCTION_SPEC",
+    "FC2_rebate_destroys_charity_benefit": "NOT_TRIGGERED_AS_UNCONDITIONAL_CONDITIONAL_ARITHMETIC_PRESERVED",
+    "FC3_governance_capture_by_donation_alone": "CONDITIONAL_ON_INTEGRATION_RULE",
+    "FC4_stolen_fund_laundering_incentive": "PATHWAY_PROVEN_PROFITABILITY_CONDITIONAL",
+    "FC5_timing_cutoff_privileged_allocation": "PARTIALLY_TRIGGERED_BOUNDED",
+    "FC6_identity_dependent_mitigation": "MATHEMATICALLY_PROVEN_TRIGGERED",
+    "FC7_simpler_mechanism_dominates": "PARTIALLY_TRIGGERED_SCOPED_TO_SPECIFIED_FUNCTIONS"
   },
-  "gate_recommendation": "REJECT_OR_REDESIGN",
-  "second_family_breaker_review_completed": false,
+  "gate_recommendation": "CONTINUE_WITH_CONDITIONS",
+  "economic_gate_pass": false,
+  "second_family_breaker_review_completed": true,
+  "second_family_breaker_review_scope": "applies to original submission b588779...; repaired package not yet re-reviewed",
   "residual_risks": [
     "no secondary-market re-concentration model (structural argument only, not simulated)",
     "CONCAVE_LOG scheme uses IEEE-754 float weights, reproducible per-toolchain but not claimed bit-identical across all Python builds",
     "governance-cap durability after genesis (Track E) not verifiable from this seat",
-    "adversarial scenario space not exhaustively enumerable; joint/combined attacker strategies not simulated"
+    "adversarial scenario space not exhaustively enumerable; joint/combined attacker strategies not simulated",
+    "tainted-fund and rebate-friction default assumption values are illustrative, not calibrated to any real data",
+    "repaired package itself has not undergone a fresh second-family review"
   ],
   "nonclaims": [
     "no merge or promotion authority",
@@ -91,8 +135,9 @@
     "no legal conclusions",
     "no market-price prediction or empirical calibration",
     "no change to the Beneficial Genesis cryptographic verifier",
-    "no claim of cross-family independent review"
+    "no claim of cross-family independent review of the repaired package specifically",
+    "no modification of the Grok Breaker evidence paths"
   ],
-  "receipt_schema": "bgen.econ-redteam-001.receipt/v1",
+  "receipt_schema": "bgen.econ-redteam-001.receipt/v2-repair",
   "label": "SANITIZED_TASK_RECEIPT"
 }
