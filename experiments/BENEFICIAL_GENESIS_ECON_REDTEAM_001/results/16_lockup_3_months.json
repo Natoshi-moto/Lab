@@ -1,0 +1,52 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {},
+  "baseline_breakeven_price": "18406393/25000000",
+  "concentration": {
+    "by_account": {
+      "gini_of_issued": "24260676706/50099874249",
+      "hhi_of_issued": "751300124092997/9999949800063001",
+      "holder_count": 501,
+      "top10_share_of_issued": "29587363/99999749",
+      "top10_share_of_pool": "29587363/100000000",
+      "top1_share_of_issued": "27164474/99999749",
+      "top1_share_of_pool": "13582237/50000000",
+      "total_issued": 99999749
+    },
+    "by_beneficial_owner": {
+      "gini_of_issued": "24260676706/50099874249",
+      "hhi_of_issued": "751300124092997/9999949800063001",
+      "owner_count": 501,
+      "top10_share_of_issued": "29587363/99999749",
+      "top10_share_of_pool": "29587363/100000000",
+      "top1_share_of_issued": "27164474/99999749",
+      "top1_share_of_pool": "13582237/50000000",
+      "total_issued": 99999749
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
+  },
+  "donor_count": 501,
+  "donor_economics": {
+    "1.5": {
+      "mean_utility": "68102559158899609/2505000000000",
+      "per_donor": {
+        "speculator": {
+          "gross_token_value": "749999976123423/25000000",
+          "liquid_token_value": "59249998113750417/2500000000",
+          "net_cost": "20000000",
+          "utility": "9249998113750417/2500000000"
+        }
+      },
+      "profitable_donor_count": 501,
+      "token_value_per_unit": "55219179/50000000",
+      "unprofitable_donor_count": 0
+    }
+  },
+  "governance": null,
+  "pool_units": 100000000,
+  "scenario_id": "16_lockup_3_months",
+  "scheme_params": {},
+  "seed": 1015,
+  "total_eligible_units": 73625572,
+  "unissued_remainder": 251
+}

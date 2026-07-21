@@ -1,0 +1,55 @@
+{
+  "allocation_scheme": "RANDOM_LOTTERY_COMPONENT",
+  "attack_analysis": {},
+  "baseline_breakeven_price": "71138889/100000000",
+  "concentration": {
+    "by_account": {
+      "gini_of_issued": "210166165/391405248",
+      "hhi_of_issued": "89277090069491/1249993600008192",
+      "holder_count": 501,
+      "top10_share_of_issued": "12228915/33333248",
+      "top10_share_of_pool": "7337349/20000000",
+      "top1_share_of_issued": "3287827/12499968",
+      "top1_share_of_pool": "3287827/12500000",
+      "total_issued": 99999744
+    },
+    "by_beneficial_owner": {
+      "gini_of_issued": "210166165/391405248",
+      "hhi_of_issued": "89277090069491/1249993600008192",
+      "owner_count": 501,
+      "top10_share_of_issued": "12228915/33333248",
+      "top10_share_of_pool": "7337349/20000000",
+      "top1_share_of_issued": "3287827/12499968",
+      "top1_share_of_pool": "3287827/12500000",
+      "total_issued": 99999744
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
+  },
+  "donor_count": 501,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-23712963/65234375",
+      "per_donor": {
+        "whale_01": {
+          "gross_token_value": "233892360004203/12500000",
+          "liquid_token_value": "233892360004203/12500000",
+          "net_cost": "20000000",
+          "utility": "-16107639995797/12500000"
+        }
+      },
+      "profitable_donor_count": 9,
+      "token_value_per_unit": "71138889/100000000",
+      "unprofitable_donor_count": 492
+    }
+  },
+  "governance": null,
+  "pool_units": 100000000,
+  "scenario_id": "24_random_lottery_component",
+  "scheme_params": {
+    "lottery_share_bps": 1000,
+    "winners": 10
+  },
+  "seed": 1024,
+  "total_eligible_units": 71138889,
+  "unissued_remainder": 256
+}

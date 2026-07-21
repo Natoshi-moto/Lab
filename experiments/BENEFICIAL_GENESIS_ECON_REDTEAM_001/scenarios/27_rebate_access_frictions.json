@@ -1,0 +1,36 @@
+{
+  "scenario_id": "27_rebate_access_frictions",
+  "seed": 1027,
+  "pool_units": 100000000,
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "scheme_params": {},
+  "token_value_multipliers": [1.0],
+  "rebate_friction_assumptions": {
+    "access_probability": "1/20",
+    "arrangement_cost_sats": 200000,
+    "enforcement_probability": "4/5",
+    "detection_probability": "3/10",
+    "detection_loss_fraction": "1/2"
+  },
+  "donors": [
+    {
+      "id": "arbitrary_donor_seeking_rebate",
+      "sats": 5000000,
+      "rebate_rate": "1/2",
+      "colluding_arrangement_exists": false,
+      "group": "arbitrary_donor_seeking_rebate",
+      "note": "models a donor who does NOT already have a colluding-charity arrangement and must find/negotiate one against the immutable genesis charity set, unlike scenarios 07/08/18 where an arrangement is assumed to already exist"
+    },
+    {
+      "id": "already_colluding_donor",
+      "sats": 5000000,
+      "rebate_rate": "1/2",
+      "colluding_arrangement_exists": true,
+      "group": "already_colluding_donor",
+      "note": "control row: identical rate and sats, but an arrangement is assumed to already exist, matching the scenario 07/08/18 convention, to show the conditional-vs-expected gap side by side"
+    }
+  ],
+  "generators": [
+    {"kind": "small_donors", "count": 200, "sats_min": 10000, "sats_max": 200000, "id_prefix": "honest", "block": 0}
+  ]
+}

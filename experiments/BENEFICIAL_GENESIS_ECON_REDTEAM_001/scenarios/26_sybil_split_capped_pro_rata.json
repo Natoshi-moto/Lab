@@ -1,0 +1,36 @@
+{
+  "scenario_id": "26_sybil_split_capped_pro_rata",
+  "seed": 1026,
+  "pool_units": 100000000,
+  "allocation_scheme": "CAPPED_PRO_RATA",
+  "scheme_params": {
+    "cap_bps": 1000
+  },
+  "token_value_multipliers": [
+    1.0
+  ],
+  "donors": [
+    {
+      "id": "attacker",
+      "sats": 210000000,
+      "role": "attacker_sybil",
+      "group": "attacker"
+    }
+  ],
+  "generators": [
+    {
+      "kind": "small_donors",
+      "count": 500,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "small",
+      "block": 0
+    }
+  ],
+  "split_identity_probes": [
+    {
+      "donor_id": "attacker",
+      "into": 20
+    }
+  ]
+}

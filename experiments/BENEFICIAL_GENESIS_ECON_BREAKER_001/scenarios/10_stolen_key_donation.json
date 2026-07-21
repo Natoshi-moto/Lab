@@ -1,0 +1,41 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "attacker",
+      "eligible_sats": 10000000,
+      "label": "stolen_key"
+    },
+    {
+      "donor_id": "honest",
+      "eligible_sats": 10000000
+    }
+  ],
+  "id": "10_stolen_key_donation",
+  "laundering": {
+    "alternative_realization_fraction": 0.7,
+    "attacker_donor_id": "attacker",
+    "include_sensitivity": true,
+    "legal_cost_basis_sats": 0.0,
+    "liquidation_haircut_on_token": 0.15,
+    "lockup_months": 0.0,
+    "opportunity_fractions": [
+      0.2,
+      0.5,
+      0.7,
+      1.0
+    ],
+    "seizure_probability_if_migrate": 0.2,
+    "seizure_probability_if_spend_source": 0.3,
+    "token_multipliers": [
+      0.1,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "token_value_per_unit_in_sats": 1.0
+  },
+  "pool": 1000000000,
+  "title": "Stolen-key attacker donation with opportunity-cost model",
+  "token_value_per_unit_in_sats": 1.0
+}

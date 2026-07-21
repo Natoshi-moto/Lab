@@ -1,0 +1,31 @@
+{
+  "scenario_id": "24_random_lottery_component",
+  "seed": 1024,
+  "pool_units": 100000000,
+  "allocation_scheme": "RANDOM_LOTTERY_COMPONENT",
+  "scheme_params": {
+    "lottery_share_bps": 1000,
+    "winners": 10
+  },
+  "token_value_multipliers": [
+    1.0
+  ],
+  "donors": [
+    {
+      "id": "whale_01",
+      "sats": 20000000,
+      "role": "whale",
+      "group": "whale_01"
+    }
+  ],
+  "generators": [
+    {
+      "kind": "small_donors",
+      "count": 500,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "small",
+      "block": 0
+    }
+  ]
+}

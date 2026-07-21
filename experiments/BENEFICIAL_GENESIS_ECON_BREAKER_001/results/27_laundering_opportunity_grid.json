@@ -1,0 +1,425 @@
+{
+  "allocation": {
+    "allocations": [
+      {
+        "allocation": 100000000,
+        "donor_id": "attacker",
+        "eligible_sats": 10000000,
+        "identity_id": "attacker",
+        "label": "attacker",
+        "share_of_issued": 0.1,
+        "share_of_pool": 0.1,
+        "weight": 10000000
+      },
+      {
+        "allocation": 900000000,
+        "donor_id": "rest",
+        "eligible_sats": 90000000,
+        "identity_id": "rest",
+        "label": "rest",
+        "share_of_issued": 0.9,
+        "share_of_pool": 0.9,
+        "weight": 90000000
+      }
+    ],
+    "notes": [],
+    "pool": 1000000000,
+    "remainder_unissued": 0,
+    "rule": "pro_rata",
+    "total_eligible_sats": 100000000,
+    "total_issued": 1000000000,
+    "total_weight": 100000000
+  },
+  "concentration": {
+    "denominator_note": "share_of_pool uses fixed pool; share_of_issued uses actually issued units. Under floor remainder or caps these diverge; do not mix them.",
+    "gini_of_eligible_sats": 0.4,
+    "gini_of_issued_units": 0.4,
+    "hhi_of_eligible_sats": 0.8200000000000001,
+    "hhi_of_issued_units": 0.8200000000000001,
+    "n_recipients": 2,
+    "pool": 1000000000,
+    "top10_share_of_issued": 1.0,
+    "top10_share_of_pool": 1.0,
+    "top1_share_of_issued": 0.9,
+    "top1_share_of_pool": 0.9,
+    "total_issued": 1000000000
+  },
+  "denominator": {
+    "fixed_pool": 1000000000,
+    "fixed_pool_floating_implied_exchange_ratio_sats_per_unit": 0.1,
+    "oversubscribed": false,
+    "ratio_note": "This is the model-implied eligible-sats weight per unit face under full issuance approximation (T/pool). It is not a promised redemption rate, market price, or legal classification.",
+    "remainder_unissued": 0,
+    "total_eligible_sats": 100000000,
+    "total_issued": 1000000000,
+    "undersubscribed": true
+  },
+  "donor_economics": [
+    {
+      "allocation_units": 100000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 10000000.0,
+      "donor_id": "attacker",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 90000000.0
+    },
+    {
+      "allocation_units": 900000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 90000000.0,
+      "donor_id": "rest",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 810000000.0
+    }
+  ],
+  "evidence_class": "deterministic_synthetic_simulation",
+  "failure_condition_flags": {
+    "FC1_token_necessity_unresolved": true,
+    "FC2_rebate_destroys_charity_benefit": {
+      "conditional_arithmetic_reduction": null,
+      "flagged": false,
+      "note": "rebate destruction not claimed as unconditional behavioral prediction"
+    },
+    "FC3_governance_capture_by_donation": {
+      "flagged": false,
+      "note": "FC-3 not charged against allocation mechanism alone",
+      "rule_under_test": "none"
+    },
+    "FC4_stolen_fund_incentive": {
+      "flagged": true,
+      "note": "profitable under the scenario's stated opportunity/token assumptions; pathway_exists=true regardless of net profit"
+    },
+    "FC5_timing_privileged_allocation": {
+      "flagged": false,
+      "note": "cutoff is deterministic given tip; miner influence on cutoff is residual"
+    },
+    "FC6_identity_dependency": {
+      "flagged": false,
+      "note": "caps/concavity without identity layer are Sybil-exploitable"
+    },
+    "FC7_dominated_by_simpler_mechanism": {
+      "flagged": null,
+      "note": "policy comparison; see MECHANISM_NECESSITY.md \u2014 not auto-decided here"
+    }
+  },
+  "governance": {
+    "continuously_capped": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "attacker",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "attacker",
+            0.5
+          ],
+          [
+            "rest",
+            0.5
+          ]
+        ]
+      },
+      "notes": [
+        "cap_fraction_of_issued=0.05",
+        "capped weights are renormalized to sum to 1.0",
+        "cap is continuous on weight, not a one-time soft suggestion"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "rest",
+        "n": 2,
+        "sum": 1.0
+      }
+    },
+    "none": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "attacker",
+        "max_weight": 0.0,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "attacker",
+            0.0
+          ],
+          [
+            "rest",
+            0.0
+          ]
+        ]
+      },
+      "notes": [
+        "no governance rights from allocation"
+      ],
+      "weights_summary": {
+        "max": 0.0,
+        "max_id": "rest",
+        "n": 2,
+        "sum": 0.0
+      }
+    },
+    "nontransferable_equal": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "attacker",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "attacker",
+            0.5
+          ],
+          [
+            "rest",
+            0.5
+          ]
+        ]
+      },
+      "notes": [
+        "one equal nontransferable vote per recipient; not proportional to donation"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "rest",
+        "n": 2,
+        "sum": 1.0
+      }
+    },
+    "nontransferable_proportional": {
+      "majority": {
+        "any_single_actor_controls": true,
+        "controllers": [
+          "rest"
+        ],
+        "max_actor": "rest",
+        "max_weight": 0.9,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "rest",
+            0.9
+          ],
+          [
+            "attacker",
+            0.1
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "nontransferable_proportional freezes weights at genesis"
+      ],
+      "weights_summary": {
+        "max": 0.9,
+        "max_id": "rest",
+        "n": 2,
+        "sum": 1.0
+      }
+    },
+    "token_weighted": {
+      "majority": {
+        "any_single_actor_controls": true,
+        "controllers": [
+          "rest"
+        ],
+        "max_actor": "rest",
+        "max_weight": 0.9,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "rest",
+            0.9
+          ],
+          [
+            "attacker",
+            0.1
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "token_weighted implies transferability of voting power with tokens"
+      ],
+      "weights_summary": {
+        "max": 0.9,
+        "max_id": "rest",
+        "n": 2,
+        "sum": 1.0
+      }
+    }
+  },
+  "id": "27_laundering_opportunity_grid",
+  "laundering": {
+    "allocation_units": 100000000,
+    "assumptions": {
+      "alternative_realization_fraction": 0.9,
+      "discount_factor": 1.0,
+      "liquidation_haircut_on_token": 0.15,
+      "lockup_months": 0.0,
+      "monthly_discount_rate": 0.01,
+      "seizure_probability_if_migrate": 0.2,
+      "seizure_probability_if_spend_source": 0.3,
+      "token_value_per_unit_in_sats": 0.5,
+      "transaction_risk_cost_sats": 0.0
+    },
+    "donated_sats": 10000000,
+    "gross_token_output": 50000000.0,
+    "interpretation": {
+      "pathway_exists": true,
+      "pathway_note": "Cryptographic control of stolen keys admits a claim; legal ownership is not checked by the verifier (design residual risk).",
+      "profitable_under_these_assumptions": true,
+      "zero_cost_note": "Net profit is conditional on token value, alternative realization, seizure probabilities, haircuts, and lockup. legal_cost_basis=0 does not imply source_asset_opportunity_value=0.",
+      "zero_cost_profitable_laundering_proven": false
+    },
+    "legal_cost_basis_sats": 0.0,
+    "naive_zero_basis_gross_minus_legal_basis": 34000000.0,
+    "net_laundering_profit": 27700000.0,
+    "risk_adjusted_token_value": 34000000.0,
+    "sensitivity": [
+      {
+        "alternative_realization_fraction": 0.2,
+        "net_laundering_profit": 5400000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 6800000.0,
+        "source_asset_opportunity_value": 1400000.0,
+        "token_value_per_unit_in_sats": 0.1
+      },
+      {
+        "alternative_realization_fraction": 0.5,
+        "net_laundering_profit": 3300000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 6800000.0,
+        "source_asset_opportunity_value": 3500000.0,
+        "token_value_per_unit_in_sats": 0.1
+      },
+      {
+        "alternative_realization_fraction": 0.7,
+        "net_laundering_profit": 1900000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 6800000.0,
+        "source_asset_opportunity_value": 4900000.0,
+        "token_value_per_unit_in_sats": 0.1
+      },
+      {
+        "alternative_realization_fraction": 1.0,
+        "net_laundering_profit": -200000.0,
+        "profitable": false,
+        "risk_adjusted_token_value": 6800000.0,
+        "source_asset_opportunity_value": 7000000.0,
+        "token_value_per_unit_in_sats": 0.1
+      },
+      {
+        "alternative_realization_fraction": 0.2,
+        "net_laundering_profit": 32600000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 34000000.0,
+        "source_asset_opportunity_value": 1400000.0,
+        "token_value_per_unit_in_sats": 0.5
+      },
+      {
+        "alternative_realization_fraction": 0.5,
+        "net_laundering_profit": 30500000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 34000000.0,
+        "source_asset_opportunity_value": 3500000.0,
+        "token_value_per_unit_in_sats": 0.5
+      },
+      {
+        "alternative_realization_fraction": 0.7,
+        "net_laundering_profit": 29100000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 34000000.0,
+        "source_asset_opportunity_value": 4900000.0,
+        "token_value_per_unit_in_sats": 0.5
+      },
+      {
+        "alternative_realization_fraction": 1.0,
+        "net_laundering_profit": 27000000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 34000000.0,
+        "source_asset_opportunity_value": 7000000.0,
+        "token_value_per_unit_in_sats": 0.5
+      },
+      {
+        "alternative_realization_fraction": 0.2,
+        "net_laundering_profit": 66600000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 68000000.0,
+        "source_asset_opportunity_value": 1400000.0,
+        "token_value_per_unit_in_sats": 1.0
+      },
+      {
+        "alternative_realization_fraction": 0.5,
+        "net_laundering_profit": 64500000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 68000000.0,
+        "source_asset_opportunity_value": 3500000.0,
+        "token_value_per_unit_in_sats": 1.0
+      },
+      {
+        "alternative_realization_fraction": 0.7,
+        "net_laundering_profit": 63100000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 68000000.0,
+        "source_asset_opportunity_value": 4900000.0,
+        "token_value_per_unit_in_sats": 1.0
+      },
+      {
+        "alternative_realization_fraction": 1.0,
+        "net_laundering_profit": 61000000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 68000000.0,
+        "source_asset_opportunity_value": 7000000.0,
+        "token_value_per_unit_in_sats": 1.0
+      },
+      {
+        "alternative_realization_fraction": 0.2,
+        "net_laundering_profit": 134600000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 136000000.0,
+        "source_asset_opportunity_value": 1400000.0,
+        "token_value_per_unit_in_sats": 2.0
+      },
+      {
+        "alternative_realization_fraction": 0.5,
+        "net_laundering_profit": 132500000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 136000000.0,
+        "source_asset_opportunity_value": 3500000.0,
+        "token_value_per_unit_in_sats": 2.0
+      },
+      {
+        "alternative_realization_fraction": 0.7,
+        "net_laundering_profit": 131100000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 136000000.0,
+        "source_asset_opportunity_value": 4900000.0,
+        "token_value_per_unit_in_sats": 2.0
+      },
+      {
+        "alternative_realization_fraction": 1.0,
+        "net_laundering_profit": 129000000.0,
+        "profitable": true,
+        "risk_adjusted_token_value": 136000000.0,
+        "source_asset_opportunity_value": 7000000.0,
+        "token_value_per_unit_in_sats": 2.0
+      }
+    ],
+    "source_asset_opportunity_value": 6300000.0
+  },
+  "nonclaims": [
+    "not empirical prediction",
+    "not market price forecast",
+    "not legal conclusion",
+    "not live funds"
+  ],
+  "probes": {},
+  "rebate": null,
+  "title": "Laundering grid: high opportunity value vs high token EV"
+}

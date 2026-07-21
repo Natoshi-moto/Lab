@@ -1,0 +1,203 @@
+{
+  "schema": "bgen.econ-retest-003.verification-matrix/v1",
+  "task": "BGEN-ECON-RETEST-003",
+  "subject_commit": "0cb2ec36c098750316059fd3ccfa05e65eb8d67b",
+  "subject_pr": 35,
+  "status_authority": "NONE",
+  "package_decision": "REPAIRED_PACKAGE_PASS",
+  "preserved_mechanism_disposition": {
+    "UNDERLYING_MECHANISM": "CONTINUE_WITH_CONDITIONS",
+    "ECONOMIC_GATE_PASS": false
+  },
+  "checks": [
+    {
+      "id": "V-001",
+      "claim": "Every public allocation function directly rejects duplicate or malformed participant IDs, invalid weights, invalid pools, caps and winner counts",
+      "result": "PASS",
+      "evidence": [
+        "Source inspection: exact_pro_rata, capped_pro_rata, concave_sqrt, concave_log, time_weighted, random_lottery_component each call validate_participants(...)",
+        "Independent probe rejected: duplicate ids, empty id, non-string id, bool weight, float weight, negative weight, negative pool, bool pool, invalid cap_bps (0/-1/10001/True/1.5), invalid winners (0/-1/True/1.5)",
+        "Package tests: tests/test_allocation.py::TestSharedParticipantValidator (11 tests) OK"
+      ],
+      "files_inspected": [
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/allocation.py",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_allocation.py"
+      ]
+    },
+    {
+      "id": "V-002",
+      "claim": "cap_then_renormalize reports three stages, never claims hard final cap, final shares can exceed nominal clip at small holder counts",
+      "result": "PASS",
+      "evidence": [
+        "governance_weights(..., 'cap_then_renormalize') returns raw_proportional_weights, pre_normalization_clipped_weights, and final weights",
+        "notes explicitly state 'not a hard final per-holder cap'",
+        "Independent probe: 1-holder final=1 > clip=1/2; 2-holder final a=5/8 > clip=1/2; 3-holder final a=4/9 > clip=2/5",
+        "Scenario 14 result JSON reports raw_proportional_weights, pre_normalization_clipped_weights, final_normalized_weights for both 1000bps and 500bps keys",
+        "Package tests: TestCapThenRenormalize (1/2/3-holder exceeds-clip, three stages, notes) OK"
+      ],
+      "files_inspected": [
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/governance.py",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_governance.py",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/14_governance_cap_then_renormalize.json"
+      ]
+    },
+    {
+      "id": "V-003",
+      "claim": "Receipt two-commit binding fields are accurate and non-self-referential",
+      "result": "PASS",
+      "evidence": [
+        "receipt.repair_logic_commit = 69b27a3725d50f1913ac12268cffede2bddca1d8 (exists; subject is micro-repair code/doc commit)",
+        "receipt.receipt_binding_parent_commit = 69b27a3725d50f1913ac12268cffede2bddca1d8 (parent of tip 0cb2ec3)",
+        "receipt has no branch_tip field",
+        "receipt text does not contain tip SHA 0cb2ec36c098750316059fd3ccfa05e65eb8d67b",
+        "receipt_self_binding_note documents the self-referential prohibition",
+        "tip commit 0cb2ec3 only rewrites the receipt hash fields (binding commit), as expected"
+      ],
+      "files_inspected": [
+        "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/RECEIPT.json"
+      ]
+    },
+    {
+      "id": "V-004-E001",
+      "claim": "Tainted-fund profit is assumption-conditional (E-001)",
+      "result": "PASS",
+      "evidence": [
+        "model/tainted_funds.py decomposes legal_cost_basis / opportunity_value / risk_adjusted / realizable / net_migration_profit",
+        "Independent probe produced both profitable (net=190000) and unprofitable (net=-937500) cells under different assumptions",
+        "claims field / interpretation retract zero-cost unconditional laundering framing",
+        "Package tests: TestTaintedFundDecomposition OK including mixed sensitivity outcomes"
+      ]
+    },
+    {
+      "id": "V-004-E002",
+      "claim": "Rebate behavior is conditional on access and enforcement (E-002)",
+      "result": "PASS",
+      "evidence": [
+        "model/collusion.py reports conditional and expected_with_frictions side by side",
+        "claims.predictable_aggregate_destruction_of_charity_benefit = false",
+        "Low-access probe: expected rebate collapses (access 1/100 * enforcement 1/2)",
+        "Package scenario tests for conditional one-for-one and low-access gap OK"
+      ]
+    },
+    {
+      "id": "V-004-E003",
+      "claim": "Governance findings depend on named integration rules (E-003)",
+      "result": "PASS",
+      "evidence": [
+        "GOVERNANCE_RULES = none / nontransferable_equal / nontransferable_proportional / token_weighted / cap_then_renormalize",
+        "continuously_capped not in active rule set",
+        "governance is opt-in per scenario; tests assert not computed unless requested"
+      ]
+    },
+    {
+      "id": "V-004-E004",
+      "claim": "Mechanism-necessity scope remains narrowed; open ledger-function matrix (E-004)",
+      "result": "PASS",
+      "evidence": [
+        "FAILURE_CONDITIONS.md FC1/FC7 partial/open pending target-ledger-function specification",
+        "MECHANISM_NECESSITY.md repair notes and open-question matrix present"
+      ]
+    },
+    {
+      "id": "V-004-E005",
+      "claim": "Metrics use explicit denominators; lottery without replacement; duplicate IDs fail-closed (E-005)",
+      "result": "PASS",
+      "evidence": [
+        "metrics public API: top_n_share_of_issued, top_n_share_of_pool (no mixed bare top_n_share)",
+        "random_lottery_component executable body uses remaining_ids.pop / remaining_weights.pop; does not call random.choices",
+        "without-replacement probe: 3 distinct winners when winners=3 and population=3"
+      ]
+    },
+    {
+      "id": "V-004-E006",
+      "claim": "No legal classification language as affirmative claims (E-006)",
+      "result": "PASS",
+      "evidence": [
+        "grep: 'token sale' / 'investment contract' appear only in repair notes retracting prior wording or non-claims stating they are not used",
+        "Active framing uses 'fixed-pool floating implied allocation ratio'"
+      ]
+    },
+    {
+      "id": "V-004-E007",
+      "claim": "All seven failure conditions mapped (E-007)",
+      "result": "PASS",
+      "evidence": [
+        "FAILURE_CONDITIONS.md maps FC1 through FC7 with evidence class and disposition each",
+        "Receipt failure_condition_disposition contains all seven keys"
+      ]
+    },
+    {
+      "id": "V-004-E008",
+      "claim": "Preserved confirmed findings retained (E-008)",
+      "result": "PASS",
+      "evidence": [
+        "FAILURE_CONDITIONS.md contains 'Preserved findings (E-008 / BGEN-ECON-REV-007)' section",
+        "Breaker DECISION.json still records REV-007 as PRESERVED_AND_REDERIVED for the pre-repair subject; retest confirms repaired package keeps the narrower confirmed findings"
+      ]
+    },
+    {
+      "id": "V-004-E009",
+      "claim": "Cross-model comparison and repository checks present (E-009)",
+      "result": "PASS",
+      "evidence": [
+        "CROSS_MODEL_COMPARISON.md present and names both packages",
+        "This retest re-ran Claude sim/tests, frozen Breaker sim/tests, full lab suite, nexus doctor, git diff --check"
+      ]
+    },
+    {
+      "id": "V-005",
+      "claim": "Preserved UNDERLYING_MECHANISM CONTINUE_WITH_CONDITIONS and ECONOMIC_GATE_PASS false",
+      "result": "PASS",
+      "evidence": [
+        "Claude FAILURE_CONDITIONS.md aggregate disposition unchanged",
+        "Claude audit report gate recommendation unchanged",
+        "Claude receipt economic_gate_pass=false, gate_recommendation=CONTINUE_WITH_CONDITIONS",
+        "This retest does not promote to ECONOMIC_GATE_PASS"
+      ]
+    }
+  ],
+  "independent_probe_highlights": {
+    "cap_then_renormalize_1_holder": {
+      "cap_bps": 5000,
+      "raw": {"only": "1"},
+      "clipped": {"only": "1/2"},
+      "final": {"only": "1"},
+      "exceeds_nominal_clip": true
+    },
+    "cap_then_renormalize_2_holder": {
+      "cap_bps": 5000,
+      "final_a": "5/8",
+      "nominal_clip": "1/2",
+      "exceeds_nominal_clip": true
+    },
+    "cap_then_renormalize_3_holder": {
+      "cap_bps": 4000,
+      "final_a": "4/9",
+      "nominal_clip": "2/5",
+      "exceeds_nominal_clip": true
+    },
+    "tainted_fund_mixed_sign": {
+      "profitable_net_example": "190000",
+      "unprofitable_net_example": "-937500"
+    },
+    "lottery_without_replacement": {
+      "winners_requested": 3,
+      "distinct_winners": 3
+    }
+  },
+  "limitations": [
+    "Same-repository different-provider seat; not a multi-human economic panel",
+    "Does not re-open clean-room reconstruction of the Breaker package; Breaker paths re-run read-only only",
+    "Does not claim bit-identical float behavior of CONCAVE_LOG across all Python builds",
+    "Does not simulate secondary-market re-concentration durability past genesis",
+    "Does not make legal, market-price, or live-funds claims"
+  ],
+  "nonclaims": [
+    "no merge or promotion authority",
+    "no STATUS.json change",
+    "no R-round assignment",
+    "no live activity",
+    "no legal conclusions",
+    "no ECONOMIC_GATE_PASS claim"
+  ]
+}

@@ -1,0 +1,2165 @@
+{
+  "allocation": {
+    "allocations": [
+      {
+        "allocation": 5000000,
+        "donor_id": "d0000",
+        "eligible_sats": 50000,
+        "identity_id": "d0000",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0001",
+        "eligible_sats": 50000,
+        "identity_id": "d0001",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0002",
+        "eligible_sats": 50000,
+        "identity_id": "d0002",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0003",
+        "eligible_sats": 50000,
+        "identity_id": "d0003",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0004",
+        "eligible_sats": 50000,
+        "identity_id": "d0004",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0005",
+        "eligible_sats": 50000,
+        "identity_id": "d0005",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0006",
+        "eligible_sats": 50000,
+        "identity_id": "d0006",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0007",
+        "eligible_sats": 50000,
+        "identity_id": "d0007",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0008",
+        "eligible_sats": 50000,
+        "identity_id": "d0008",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0009",
+        "eligible_sats": 50000,
+        "identity_id": "d0009",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0010",
+        "eligible_sats": 50000,
+        "identity_id": "d0010",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0011",
+        "eligible_sats": 50000,
+        "identity_id": "d0011",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0012",
+        "eligible_sats": 50000,
+        "identity_id": "d0012",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0013",
+        "eligible_sats": 50000,
+        "identity_id": "d0013",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0014",
+        "eligible_sats": 50000,
+        "identity_id": "d0014",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0015",
+        "eligible_sats": 50000,
+        "identity_id": "d0015",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0016",
+        "eligible_sats": 50000,
+        "identity_id": "d0016",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0017",
+        "eligible_sats": 50000,
+        "identity_id": "d0017",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0018",
+        "eligible_sats": 50000,
+        "identity_id": "d0018",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0019",
+        "eligible_sats": 50000,
+        "identity_id": "d0019",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0020",
+        "eligible_sats": 50000,
+        "identity_id": "d0020",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0021",
+        "eligible_sats": 50000,
+        "identity_id": "d0021",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0022",
+        "eligible_sats": 50000,
+        "identity_id": "d0022",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0023",
+        "eligible_sats": 50000,
+        "identity_id": "d0023",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0024",
+        "eligible_sats": 50000,
+        "identity_id": "d0024",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0025",
+        "eligible_sats": 50000,
+        "identity_id": "d0025",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0026",
+        "eligible_sats": 50000,
+        "identity_id": "d0026",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0027",
+        "eligible_sats": 50000,
+        "identity_id": "d0027",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0028",
+        "eligible_sats": 50000,
+        "identity_id": "d0028",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0029",
+        "eligible_sats": 50000,
+        "identity_id": "d0029",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0030",
+        "eligible_sats": 50000,
+        "identity_id": "d0030",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0031",
+        "eligible_sats": 50000,
+        "identity_id": "d0031",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0032",
+        "eligible_sats": 50000,
+        "identity_id": "d0032",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0033",
+        "eligible_sats": 50000,
+        "identity_id": "d0033",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0034",
+        "eligible_sats": 50000,
+        "identity_id": "d0034",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0035",
+        "eligible_sats": 50000,
+        "identity_id": "d0035",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0036",
+        "eligible_sats": 50000,
+        "identity_id": "d0036",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0037",
+        "eligible_sats": 50000,
+        "identity_id": "d0037",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0038",
+        "eligible_sats": 50000,
+        "identity_id": "d0038",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0039",
+        "eligible_sats": 50000,
+        "identity_id": "d0039",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0040",
+        "eligible_sats": 50000,
+        "identity_id": "d0040",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0041",
+        "eligible_sats": 50000,
+        "identity_id": "d0041",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0042",
+        "eligible_sats": 50000,
+        "identity_id": "d0042",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0043",
+        "eligible_sats": 50000,
+        "identity_id": "d0043",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0044",
+        "eligible_sats": 50000,
+        "identity_id": "d0044",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0045",
+        "eligible_sats": 50000,
+        "identity_id": "d0045",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0046",
+        "eligible_sats": 50000,
+        "identity_id": "d0046",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0047",
+        "eligible_sats": 50000,
+        "identity_id": "d0047",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0048",
+        "eligible_sats": 50000,
+        "identity_id": "d0048",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0049",
+        "eligible_sats": 50000,
+        "identity_id": "d0049",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0050",
+        "eligible_sats": 50000,
+        "identity_id": "d0050",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0051",
+        "eligible_sats": 50000,
+        "identity_id": "d0051",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0052",
+        "eligible_sats": 50000,
+        "identity_id": "d0052",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0053",
+        "eligible_sats": 50000,
+        "identity_id": "d0053",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0054",
+        "eligible_sats": 50000,
+        "identity_id": "d0054",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0055",
+        "eligible_sats": 50000,
+        "identity_id": "d0055",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0056",
+        "eligible_sats": 50000,
+        "identity_id": "d0056",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0057",
+        "eligible_sats": 50000,
+        "identity_id": "d0057",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0058",
+        "eligible_sats": 50000,
+        "identity_id": "d0058",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0059",
+        "eligible_sats": 50000,
+        "identity_id": "d0059",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0060",
+        "eligible_sats": 50000,
+        "identity_id": "d0060",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0061",
+        "eligible_sats": 50000,
+        "identity_id": "d0061",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0062",
+        "eligible_sats": 50000,
+        "identity_id": "d0062",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0063",
+        "eligible_sats": 50000,
+        "identity_id": "d0063",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0064",
+        "eligible_sats": 50000,
+        "identity_id": "d0064",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0065",
+        "eligible_sats": 50000,
+        "identity_id": "d0065",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0066",
+        "eligible_sats": 50000,
+        "identity_id": "d0066",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0067",
+        "eligible_sats": 50000,
+        "identity_id": "d0067",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0068",
+        "eligible_sats": 50000,
+        "identity_id": "d0068",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0069",
+        "eligible_sats": 50000,
+        "identity_id": "d0069",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0070",
+        "eligible_sats": 50000,
+        "identity_id": "d0070",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0071",
+        "eligible_sats": 50000,
+        "identity_id": "d0071",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0072",
+        "eligible_sats": 50000,
+        "identity_id": "d0072",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0073",
+        "eligible_sats": 50000,
+        "identity_id": "d0073",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0074",
+        "eligible_sats": 50000,
+        "identity_id": "d0074",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0075",
+        "eligible_sats": 50000,
+        "identity_id": "d0075",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0076",
+        "eligible_sats": 50000,
+        "identity_id": "d0076",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0077",
+        "eligible_sats": 50000,
+        "identity_id": "d0077",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0078",
+        "eligible_sats": 50000,
+        "identity_id": "d0078",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0079",
+        "eligible_sats": 50000,
+        "identity_id": "d0079",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0080",
+        "eligible_sats": 50000,
+        "identity_id": "d0080",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0081",
+        "eligible_sats": 50000,
+        "identity_id": "d0081",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0082",
+        "eligible_sats": 50000,
+        "identity_id": "d0082",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0083",
+        "eligible_sats": 50000,
+        "identity_id": "d0083",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0084",
+        "eligible_sats": 50000,
+        "identity_id": "d0084",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0085",
+        "eligible_sats": 50000,
+        "identity_id": "d0085",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0086",
+        "eligible_sats": 50000,
+        "identity_id": "d0086",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0087",
+        "eligible_sats": 50000,
+        "identity_id": "d0087",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0088",
+        "eligible_sats": 50000,
+        "identity_id": "d0088",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0089",
+        "eligible_sats": 50000,
+        "identity_id": "d0089",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0090",
+        "eligible_sats": 50000,
+        "identity_id": "d0090",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0091",
+        "eligible_sats": 50000,
+        "identity_id": "d0091",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0092",
+        "eligible_sats": 50000,
+        "identity_id": "d0092",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0093",
+        "eligible_sats": 50000,
+        "identity_id": "d0093",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0094",
+        "eligible_sats": 50000,
+        "identity_id": "d0094",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0095",
+        "eligible_sats": 50000,
+        "identity_id": "d0095",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0096",
+        "eligible_sats": 50000,
+        "identity_id": "d0096",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0097",
+        "eligible_sats": 50000,
+        "identity_id": "d0097",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0098",
+        "eligible_sats": 50000,
+        "identity_id": "d0098",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 5000000,
+        "donor_id": "d0099",
+        "eligible_sats": 50000,
+        "identity_id": "d0099",
+        "label": "small",
+        "share_of_issued": 0.005,
+        "share_of_pool": 0.005,
+        "weight": 50000
+      },
+      {
+        "allocation": 500000000,
+        "donor_id": "exchange_omnibus",
+        "eligible_sats": 5000000,
+        "identity_id": "exchange_omnibus",
+        "label": "exchange",
+        "share_of_issued": 0.5,
+        "share_of_pool": 0.5,
+        "weight": 5000000
+      }
+    ],
+    "notes": [],
+    "pool": 1000000000,
+    "remainder_unissued": 0,
+    "rule": "pro_rata",
+    "total_eligible_sats": 10000000,
+    "total_issued": 1000000000,
+    "total_weight": 10000000
+  },
+  "concentration": {
+    "denominator_note": "share_of_pool uses fixed pool; share_of_issued uses actually issued units. Under floor remainder or caps these diverge; do not mix them.",
+    "gini_of_eligible_sats": 0.4900990099009901,
+    "gini_of_issued_units": 0.4900990099009901,
+    "hhi_of_eligible_sats": 0.2525,
+    "hhi_of_issued_units": 0.2525,
+    "n_recipients": 101,
+    "pool": 1000000000,
+    "top10_share_of_issued": 0.545,
+    "top10_share_of_pool": 0.545,
+    "top1_share_of_issued": 0.5,
+    "top1_share_of_pool": 0.5,
+    "total_issued": 1000000000
+  },
+  "denominator": {
+    "fixed_pool": 1000000000,
+    "fixed_pool_floating_implied_exchange_ratio_sats_per_unit": 0.01,
+    "oversubscribed": false,
+    "ratio_note": "This is the model-implied eligible-sats weight per unit face under full issuance approximation (T/pool). It is not a promised redemption rate, market price, or legal classification.",
+    "remainder_unissued": 0,
+    "total_eligible_sats": 10000000,
+    "total_issued": 1000000000,
+    "undersubscribed": true
+  },
+  "donor_economics": [
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0000",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0001",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0002",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0003",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0004",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0005",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0006",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0007",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0008",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0009",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0010",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0011",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0012",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0013",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0014",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0015",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0016",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0017",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0018",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0019",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0020",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0021",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0022",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0023",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0024",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0025",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0026",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0027",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0028",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0029",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0030",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0031",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0032",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0033",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0034",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0035",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0036",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0037",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0038",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0039",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0040",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0041",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0042",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0043",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0044",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0045",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0046",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0047",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0048",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0049",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0050",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0051",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0052",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0053",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0054",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0055",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0056",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0057",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0058",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0059",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0060",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0061",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0062",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0063",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0064",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0065",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0066",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0067",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0068",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0069",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0070",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0071",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0072",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0073",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0074",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0075",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0076",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0077",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0078",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0079",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0080",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0081",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0082",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0083",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0084",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0085",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0086",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0087",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0088",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0089",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0090",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0091",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0092",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0093",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0094",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0095",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0096",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0097",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0098",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 5000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 50000.0,
+      "donor_id": "d0099",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 4950000.0
+    },
+    {
+      "allocation_units": 500000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 5000000.0,
+      "donor_id": "exchange_omnibus",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 495000000.0
+    }
+  ],
+  "evidence_class": "deterministic_synthetic_simulation",
+  "failure_condition_flags": {
+    "FC1_token_necessity_unresolved": true,
+    "FC2_rebate_destroys_charity_benefit": {
+      "conditional_arithmetic_reduction": null,
+      "flagged": false,
+      "note": "rebate destruction not claimed as unconditional behavioral prediction"
+    },
+    "FC3_governance_capture_by_donation": {
+      "flagged": false,
+      "note": "FC-3 not charged against allocation mechanism alone",
+      "rule_under_test": "none"
+    },
+    "FC4_stolen_fund_incentive": {
+      "flagged": false,
+      "note": "laundering pathway exists but profitable laundering not unconditionally proven"
+    },
+    "FC5_timing_privileged_allocation": {
+      "flagged": false,
+      "note": "cutoff is deterministic given tip; miner influence on cutoff is residual"
+    },
+    "FC6_identity_dependency": {
+      "flagged": false,
+      "note": "caps/concavity without identity layer are Sybil-exploitable"
+    },
+    "FC7_dominated_by_simpler_mechanism": {
+      "flagged": null,
+      "note": "policy comparison; see MECHANISM_NECESSITY.md \u2014 not auto-decided here"
+    }
+  },
+  "governance": {
+    "continuously_capped": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "exchange_omnibus",
+        "max_weight": 0.09090909090909091,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "exchange_omnibus",
+            0.09090909090909091
+          ],
+          [
+            "d0000",
+            0.00909090909090909
+          ],
+          [
+            "d0001",
+            0.00909090909090909
+          ]
+        ]
+      },
+      "notes": [
+        "cap_fraction_of_issued=0.05",
+        "capped weights are renormalized to sum to 1.0",
+        "cap is continuous on weight, not a one-time soft suggestion"
+      ],
+      "weights_summary": {
+        "max": 0.09090909090909091,
+        "max_id": "exchange_omnibus",
+        "n": 101,
+        "sum": 1.0
+      }
+    },
+    "none": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "d0000",
+        "max_weight": 0.0,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "d0000",
+            0.0
+          ],
+          [
+            "d0001",
+            0.0
+          ],
+          [
+            "d0002",
+            0.0
+          ]
+        ]
+      },
+      "notes": [
+        "no governance rights from allocation"
+      ],
+      "weights_summary": {
+        "max": 0.0,
+        "max_id": "exchange_omnibus",
+        "n": 101,
+        "sum": 0.0
+      }
+    },
+    "nontransferable_equal": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "d0000",
+        "max_weight": 0.009900990099009901,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "d0000",
+            0.009900990099009901
+          ],
+          [
+            "d0001",
+            0.009900990099009901
+          ],
+          [
+            "d0002",
+            0.009900990099009901
+          ]
+        ]
+      },
+      "notes": [
+        "one equal nontransferable vote per recipient; not proportional to donation"
+      ],
+      "weights_summary": {
+        "max": 0.009900990099009901,
+        "max_id": "exchange_omnibus",
+        "n": 101,
+        "sum": 1.0
+      }
+    },
+    "nontransferable_proportional": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "exchange_omnibus",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "exchange_omnibus",
+            0.5
+          ],
+          [
+            "d0000",
+            0.005
+          ],
+          [
+            "d0001",
+            0.005
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "nontransferable_proportional freezes weights at genesis"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "exchange_omnibus",
+        "n": 101,
+        "sum": 1.0
+      }
+    },
+    "token_weighted": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "exchange_omnibus",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "exchange_omnibus",
+            0.5
+          ],
+          [
+            "d0000",
+            0.005
+          ],
+          [
+            "d0001",
+            0.005
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "token_weighted implies transferability of voting power with tokens"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "exchange_omnibus",
+        "n": 101,
+        "sum": 1.0
+      }
+    }
+  },
+  "id": "04_exchange_omnibus_vs_small_donors",
+  "laundering": null,
+  "nonclaims": [
+    "not empirical prediction",
+    "not market price forecast",
+    "not legal conclusion",
+    "not live funds"
+  ],
+  "probes": {},
+  "rebate": null,
+  "title": "Exchange omnibus claim vs 10000 small donors"
+}

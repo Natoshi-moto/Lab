@@ -1,0 +1,107 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {
+    "denominator_shock": {
+      "dilution": "2010611/100000000",
+      "post_shock_share_of_pool": "354373/20000000",
+      "post_shock_total_eligible": 56437708,
+      "pre_shock_share_of_pool": "945619/25000000",
+      "pre_shock_total_eligible": 26437708,
+      "reference_donor_id": "early_donor_reference"
+    },
+    "tainted_fund_migration": {
+      "compromise_race_attacker": {
+        "allocation_units": 8859325,
+        "assumptions": {
+          "alternative_realization_fraction": "1/2",
+          "liquidation_haircut": "3/20",
+          "lockup_discount": "1",
+          "lockup_months": 0,
+          "seizure_probability_alternative_path": "3/10",
+          "seizure_probability_migration_path": "3/10",
+          "token_value_per_unit": "14109427/25000000",
+          "transaction_cost_sats": "0"
+        },
+        "donated_sats": 5000000,
+        "gross_token_output": "4999999974271/1000000",
+        "interpretation": {
+          "pathway_exists": true,
+          "pathway_note": "cryptographic control admits a claim; legal ownership is not checked by the verifier (a design residual risk documented independently of this package)",
+          "profitable_under_these_assumptions": true,
+          "zero_cost_unconditionally_profitable_laundering_proven": false
+        },
+        "legal_cost_basis": "0",
+        "net_migration_profit": "244999996938249/200000000",
+        "realizable_token_value": "594999996938249/200000000",
+        "risk_adjusted_token_value": "594999996938249/200000000",
+        "source_asset_opportunity_value": "1750000"
+      }
+    }
+  },
+  "baseline_breakeven_price": "14109427/25000000",
+  "concentration": {
+    "by_account": {
+      "gini_of_issued": "14867266363/20399978172",
+      "hhi_of_issued": "214674717485495/1428568371430207",
+      "holder_count": 204,
+      "top10_share_of_issued": "65894014/99999893",
+      "top10_share_of_pool": "32947007/50000000",
+      "top1_share_of_issued": "26577975/99999893",
+      "top1_share_of_pool": "1063119/4000000",
+      "total_issued": 99999893
+    },
+    "by_beneficial_owner": {
+      "gini_of_issued": "14867266363/20399978172",
+      "hhi_of_issued": "214674717485495/1428568371430207",
+      "owner_count": 204,
+      "top10_share_of_issued": "65894014/99999893",
+      "top10_share_of_pool": "32947007/50000000",
+      "top1_share_of_issued": "26577975/99999893",
+      "top1_share_of_pool": "1063119/4000000",
+      "total_issued": 99999893
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
+  },
+  "donor_count": 204,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-1509708689/5100000000",
+      "per_donor": {
+        "compromise_race_attacker": {
+          "gross_token_value": "4999999974271/1000000",
+          "liquid_token_value": "4999999974271/1000000",
+          "net_cost": "5000000",
+          "utility": "-25729/1000000"
+        },
+        "early_donor_reference": {
+          "gross_token_value": "4999999974271/5000000",
+          "liquid_token_value": "4999999974271/5000000",
+          "net_cost": "1000000",
+          "utility": "-25729/5000000"
+        },
+        "locked_out_donor_01": {
+          "gross_token_value": "14999999922813/1000000",
+          "liquid_token_value": "14999999922813/1000000",
+          "net_cost": "15000000",
+          "utility": "-77187/1000000"
+        },
+        "locked_out_donor_02": {
+          "gross_token_value": "14999999922813/1000000",
+          "liquid_token_value": "14999999922813/1000000",
+          "net_cost": "15000000",
+          "utility": "-77187/1000000"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "14109427/25000000",
+      "unprofitable_donor_count": 204
+    }
+  },
+  "governance": null,
+  "pool_units": 100000000,
+  "scenario_id": "11_quantum_cutoff_freeze",
+  "scheme_params": {},
+  "seed": 1011,
+  "total_eligible_units": 56437708,
+  "unissued_remainder": 107
+}

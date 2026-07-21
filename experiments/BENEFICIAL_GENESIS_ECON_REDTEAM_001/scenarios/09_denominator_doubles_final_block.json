@@ -1,0 +1,66 @@
+{
+  "scenario_id": "09_denominator_doubles_final_block",
+  "seed": 1009,
+  "pool_units": 100000000,
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "scheme_params": {},
+  "token_value_multipliers": [
+    1.0
+  ],
+  "donors": [
+    {
+      "id": "early_donor_reference",
+      "sats": 1000000,
+      "role": "early_donor",
+      "group": "early_donor_reference",
+      "block": 0
+    },
+    {
+      "id": "late_block_donor_01",
+      "sats": 25000000,
+      "role": "late_donor",
+      "group": "late_block_donor_01",
+      "block": 99
+    },
+    {
+      "id": "late_block_donor_02",
+      "sats": 25000000,
+      "role": "late_donor",
+      "group": "late_block_donor_02",
+      "block": 99
+    },
+    {
+      "id": "late_block_donor_03",
+      "sats": 25000000,
+      "role": "late_donor",
+      "group": "late_block_donor_03",
+      "block": 99
+    },
+    {
+      "id": "late_block_donor_04",
+      "sats": 25000000,
+      "role": "late_donor",
+      "group": "late_block_donor_04",
+      "block": 99
+    }
+  ],
+  "generators": [
+    {
+      "kind": "small_donors",
+      "count": 200,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "honest",
+      "block": 0
+    }
+  ],
+  "denominator_shock": {
+    "reference_donor_id": "early_donor_reference",
+    "add_donor_ids": [
+      "late_block_donor_01",
+      "late_block_donor_02",
+      "late_block_donor_03",
+      "late_block_donor_04"
+    ]
+  }
+}

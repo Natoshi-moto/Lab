@@ -1,0 +1,68 @@
+{
+  "allocation_scheme": "TIME_WEIGHTED",
+  "attack_analysis": {},
+  "baseline_breakeven_price": "36701763/100000000",
+  "concentration": {
+    "by_account": {
+      "gini_of_issued": "11156658026/20299979903",
+      "hhi_of_issued": "592873905582523/9999980200009801",
+      "holder_count": 203,
+      "top10_share_of_issued": "44614096/99999901",
+      "top10_share_of_pool": "2788381/6250000",
+      "top1_share_of_issued": "16348013/99999901",
+      "top1_share_of_pool": "16348013/100000000",
+      "total_issued": 99999901
+    },
+    "by_beneficial_owner": {
+      "gini_of_issued": "11156658026/20299979903",
+      "hhi_of_issued": "592873905582523/9999980200009801",
+      "owner_count": 203,
+      "top10_share_of_issued": "44614096/99999901",
+      "top10_share_of_pool": "2788381/6250000",
+      "top1_share_of_issued": "16348013/99999901",
+      "top1_share_of_pool": "16348013/100000000",
+      "total_issued": 99999901
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
+  },
+  "donor_count": 203,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-519067791/2900000000",
+      "per_donor": {
+        "early_donor": {
+          "gross_token_value": "600000898646919/100000000",
+          "liquid_token_value": "600000898646919/100000000",
+          "net_cost": "5000000",
+          "utility": "100000898646919/100000000"
+        },
+        "late_donor": {
+          "gross_token_value": "16000023474561/4000000",
+          "liquid_token_value": "16000023474561/4000000",
+          "net_cost": "5000000",
+          "utility": "-3999976525439/4000000"
+        },
+        "mid_donor": {
+          "gross_token_value": "31250046422217/6250000",
+          "liquid_token_value": "31250046422217/6250000",
+          "net_cost": "5000000",
+          "utility": "46422217/6250000"
+        }
+      },
+      "profitable_donor_count": 26,
+      "token_value_per_unit": "36701763/100000000",
+      "unprofitable_donor_count": 177
+    }
+  },
+  "governance": null,
+  "pool_units": 100000000,
+  "scenario_id": "23_time_weighted_late_donor_disadvantage",
+  "scheme_params": {
+    "early_bonus_bps": 5000,
+    "epoch_close_block": 100,
+    "epoch_open_block": 0
+  },
+  "seed": 1023,
+  "total_eligible_units": 36701763,
+  "unissued_remainder": 99
+}

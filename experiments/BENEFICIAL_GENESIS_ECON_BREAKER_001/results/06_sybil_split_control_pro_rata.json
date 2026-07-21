@@ -1,0 +1,462 @@
+{
+  "allocation": {
+    "allocations": [
+      {
+        "allocation": 500000000,
+        "donor_id": "honest",
+        "eligible_sats": 10000,
+        "identity_id": "honest",
+        "label": "honest",
+        "share_of_issued": 0.5,
+        "share_of_pool": 0.5,
+        "weight": 10000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil0",
+        "eligible_sats": 1000,
+        "identity_id": "sybil0",
+        "label": "sybil0",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil1",
+        "eligible_sats": 1000,
+        "identity_id": "sybil1",
+        "label": "sybil1",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil2",
+        "eligible_sats": 1000,
+        "identity_id": "sybil2",
+        "label": "sybil2",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil3",
+        "eligible_sats": 1000,
+        "identity_id": "sybil3",
+        "label": "sybil3",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil4",
+        "eligible_sats": 1000,
+        "identity_id": "sybil4",
+        "label": "sybil4",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil5",
+        "eligible_sats": 1000,
+        "identity_id": "sybil5",
+        "label": "sybil5",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil6",
+        "eligible_sats": 1000,
+        "identity_id": "sybil6",
+        "label": "sybil6",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil7",
+        "eligible_sats": 1000,
+        "identity_id": "sybil7",
+        "label": "sybil7",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil8",
+        "eligible_sats": 1000,
+        "identity_id": "sybil8",
+        "label": "sybil8",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      },
+      {
+        "allocation": 50000000,
+        "donor_id": "sybil9",
+        "eligible_sats": 1000,
+        "identity_id": "sybil9",
+        "label": "sybil9",
+        "share_of_issued": 0.05,
+        "share_of_pool": 0.05,
+        "weight": 1000
+      }
+    ],
+    "notes": [],
+    "pool": 1000000000,
+    "remainder_unissued": 0,
+    "rule": "pro_rata",
+    "total_eligible_sats": 20000,
+    "total_issued": 1000000000,
+    "total_weight": 20000
+  },
+  "concentration": {
+    "denominator_note": "share_of_pool uses fixed pool; share_of_issued uses actually issued units. Under floor remainder or caps these diverge; do not mix them.",
+    "gini_of_eligible_sats": 0.4090909090909091,
+    "gini_of_issued_units": 0.4090909090909091,
+    "hhi_of_eligible_sats": 0.275,
+    "hhi_of_issued_units": 0.275,
+    "n_recipients": 11,
+    "pool": 1000000000,
+    "top10_share_of_issued": 0.95,
+    "top10_share_of_pool": 0.95,
+    "top1_share_of_issued": 0.5,
+    "top1_share_of_pool": 0.5,
+    "total_issued": 1000000000
+  },
+  "denominator": {
+    "fixed_pool": 1000000000,
+    "fixed_pool_floating_implied_exchange_ratio_sats_per_unit": 2e-05,
+    "oversubscribed": false,
+    "ratio_note": "This is the model-implied eligible-sats weight per unit face under full issuance approximation (T/pool). It is not a promised redemption rate, market price, or legal classification.",
+    "remainder_unissued": 0,
+    "total_eligible_sats": 20000,
+    "total_issued": 1000000000,
+    "undersubscribed": true
+  },
+  "donor_economics": [
+    {
+      "allocation_units": 500000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 10000.0,
+      "donor_id": "honest",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 499990000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil0",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil1",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil2",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil3",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil4",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil5",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil6",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil7",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil8",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    },
+    {
+      "allocation_units": 50000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000.0,
+      "donor_id": "sybil9",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 49999000.0
+    }
+  ],
+  "evidence_class": "deterministic_synthetic_simulation",
+  "failure_condition_flags": {
+    "FC1_token_necessity_unresolved": true,
+    "FC2_rebate_destroys_charity_benefit": {
+      "conditional_arithmetic_reduction": null,
+      "flagged": false,
+      "note": "rebate destruction not claimed as unconditional behavioral prediction"
+    },
+    "FC3_governance_capture_by_donation": {
+      "flagged": false,
+      "note": "FC-3 not charged against allocation mechanism alone",
+      "rule_under_test": "none"
+    },
+    "FC4_stolen_fund_incentive": {
+      "flagged": false,
+      "note": "laundering pathway exists but profitable laundering not unconditionally proven"
+    },
+    "FC5_timing_privileged_allocation": {
+      "flagged": false,
+      "note": "cutoff is deterministic given tip; miner influence on cutoff is residual"
+    },
+    "FC6_identity_dependency": {
+      "flagged": false,
+      "note": "caps/concavity without identity layer are Sybil-exploitable"
+    },
+    "FC7_dominated_by_simpler_mechanism": {
+      "flagged": null,
+      "note": "policy comparison; see MECHANISM_NECESSITY.md \u2014 not auto-decided here"
+    }
+  },
+  "governance": {
+    "continuously_capped": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "honest",
+        "max_weight": 0.09090909090909091,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "honest",
+            0.09090909090909091
+          ],
+          [
+            "sybil0",
+            0.09090909090909091
+          ],
+          [
+            "sybil1",
+            0.09090909090909091
+          ]
+        ]
+      },
+      "notes": [
+        "cap_fraction_of_issued=0.05",
+        "capped weights are renormalized to sum to 1.0",
+        "cap is continuous on weight, not a one-time soft suggestion"
+      ],
+      "weights_summary": {
+        "max": 0.09090909090909091,
+        "max_id": "sybil9",
+        "n": 11,
+        "sum": 1.0
+      }
+    },
+    "none": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "honest",
+        "max_weight": 0.0,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "honest",
+            0.0
+          ],
+          [
+            "sybil0",
+            0.0
+          ],
+          [
+            "sybil1",
+            0.0
+          ]
+        ]
+      },
+      "notes": [
+        "no governance rights from allocation"
+      ],
+      "weights_summary": {
+        "max": 0.0,
+        "max_id": "sybil9",
+        "n": 11,
+        "sum": 0.0
+      }
+    },
+    "nontransferable_equal": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "honest",
+        "max_weight": 0.09090909090909091,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "honest",
+            0.09090909090909091
+          ],
+          [
+            "sybil0",
+            0.09090909090909091
+          ],
+          [
+            "sybil1",
+            0.09090909090909091
+          ]
+        ]
+      },
+      "notes": [
+        "one equal nontransferable vote per recipient; not proportional to donation"
+      ],
+      "weights_summary": {
+        "max": 0.09090909090909091,
+        "max_id": "sybil9",
+        "n": 11,
+        "sum": 1.0
+      }
+    },
+    "nontransferable_proportional": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "honest",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "honest",
+            0.5
+          ],
+          [
+            "sybil0",
+            0.05
+          ],
+          [
+            "sybil1",
+            0.05
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "nontransferable_proportional freezes weights at genesis"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "honest",
+        "n": 11,
+        "sum": 1.0
+      }
+    },
+    "token_weighted": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "honest",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "honest",
+            0.5
+          ],
+          [
+            "sybil0",
+            0.05
+          ],
+          [
+            "sybil1",
+            0.05
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "token_weighted implies transferability of voting power with tokens"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "honest",
+        "n": 11,
+        "sum": 1.0
+      }
+    }
+  },
+  "id": "06_sybil_split_control_pro_rata",
+  "laundering": null,
+  "nonclaims": [
+    "not empirical prediction",
+    "not market price forecast",
+    "not legal conclusion",
+    "not live funds"
+  ],
+  "probes": {
+    "pro_rata_split": {
+      "note": "exact equality of sum may differ by floor remainder distribution; share of contribution mass is preserved",
+      "split_invariant": true,
+      "split_sum_allocation": 1000000000,
+      "whole_allocation": 1000000000
+    }
+  },
+  "rebate": null,
+  "title": "Same split under pro_rata (control)"
+}

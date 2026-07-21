@@ -1,0 +1,52 @@
+{
+  "allocation_scheme": "NO_TOKEN",
+  "attack_analysis": {},
+  "baseline_breakeven_price": "11157247/10000000",
+  "concentration": {
+    "by_account": {
+      "gini_of_issued": "0",
+      "hhi_of_issued": "0",
+      "holder_count": 501,
+      "top10_share_of_issued": "0",
+      "top10_share_of_pool": "0",
+      "top1_share_of_issued": "0",
+      "top1_share_of_pool": "0",
+      "total_issued": 0
+    },
+    "by_beneficial_owner": {
+      "gini_of_issued": "0",
+      "hhi_of_issued": "0",
+      "owner_count": 501,
+      "top10_share_of_issued": "0",
+      "top10_share_of_pool": "0",
+      "top1_share_of_issued": "0",
+      "top1_share_of_pool": "0",
+      "total_issued": 0
+    },
+    "denominator_note": "*_of_issued divides by the actually issued total; *_of_pool divides by the fixed pool and also reflects any unissued remainder. Gini/HHI are defined over the issued distribution only. Do not mix the two denominators."
+  },
+  "donor_count": 501,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-111572470/501",
+      "per_donor": {
+        "whale_01": {
+          "gross_token_value": "0",
+          "liquid_token_value": "0",
+          "net_cost": "60000000",
+          "utility": "-60000000"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "11157247/10000000",
+      "unprofitable_donor_count": 501
+    }
+  },
+  "governance": null,
+  "pool_units": 100000000,
+  "scenario_id": "21_no_token_baseline",
+  "scheme_params": {},
+  "seed": 1021,
+  "total_eligible_units": 111572470,
+  "unissued_remainder": 100000000
+}

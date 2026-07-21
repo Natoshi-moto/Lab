@@ -1,0 +1,47 @@
+{
+  "scenario_id": "23_time_weighted_late_donor_disadvantage",
+  "seed": 1023,
+  "pool_units": 100000000,
+  "allocation_scheme": "TIME_WEIGHTED",
+  "scheme_params": {
+    "epoch_open_block": 0,
+    "epoch_close_block": 100,
+    "early_bonus_bps": 5000
+  },
+  "token_value_multipliers": [
+    1.0
+  ],
+  "donors": [
+    {
+      "id": "early_donor",
+      "sats": 5000000,
+      "role": "early_donor",
+      "group": "early_donor",
+      "block": 0
+    },
+    {
+      "id": "mid_donor",
+      "sats": 5000000,
+      "role": "mid_donor",
+      "group": "mid_donor",
+      "block": 50
+    },
+    {
+      "id": "late_donor",
+      "sats": 5000000,
+      "role": "late_donor",
+      "group": "late_donor",
+      "block": 100
+    }
+  ],
+  "generators": [
+    {
+      "kind": "small_donors",
+      "count": 200,
+      "sats_min": 10000,
+      "sats_max": 200000,
+      "id_prefix": "small",
+      "block": 50
+    }
+  ]
+}

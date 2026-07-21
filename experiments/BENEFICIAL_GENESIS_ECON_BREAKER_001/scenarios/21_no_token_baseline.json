@@ -1,0 +1,16 @@
+{
+  "allocation_rule": "no_token",
+  "contributions": [
+    {
+      "donor_id": "d1",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "d2",
+      "eligible_sats": 2000000
+    }
+  ],
+  "id": "21_no_token_baseline",
+  "pool": 1000000000,
+  "title": "No-token baseline: pure charitable donation"
+}

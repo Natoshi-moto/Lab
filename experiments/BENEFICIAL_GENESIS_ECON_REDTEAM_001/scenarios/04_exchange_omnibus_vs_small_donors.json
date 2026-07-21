@@ -1,0 +1,29 @@
+{
+  "scenario_id": "04_exchange_omnibus_vs_small_donors",
+  "seed": 1004,
+  "pool_units": 100000000,
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "scheme_params": {},
+  "token_value_multipliers": [
+    1.0
+  ],
+  "donors": [
+    {
+      "id": "exchange_omnibus",
+      "sats": 8000000000,
+      "role": "exchange_omnibus",
+      "group": "exchange_omnibus",
+      "note": "single on-chain claim representing an unmodelled number of underlying retail customers; the protocol sees exactly one beneficial-owner group here by construction, which is itself the finding"
+    }
+  ],
+  "generators": [
+    {
+      "kind": "small_donors",
+      "count": 10000,
+      "sats_min": 1000,
+      "sats_max": 2000000,
+      "id_prefix": "small",
+      "block": 0
+    }
+  ]
+}

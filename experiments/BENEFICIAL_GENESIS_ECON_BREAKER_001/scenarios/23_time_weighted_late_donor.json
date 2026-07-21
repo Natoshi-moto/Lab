@@ -1,0 +1,19 @@
+{
+  "allocation_rule": "time_weighted",
+  "contributions": [
+    {
+      "donor_id": "early",
+      "eligible_sats": 1000000,
+      "time_weight": 3
+    },
+    {
+      "donor_id": "late",
+      "eligible_sats": 1000000,
+      "time_weight": 1
+    }
+  ],
+  "id": "23_time_weighted_late_donor",
+  "pool": 1000000000,
+  "timing_game_present": true,
+  "title": "Time-weighted rule late-donor disadvantage"
+}
