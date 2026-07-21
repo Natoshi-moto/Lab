@@ -1,8 +1,79 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="nexus-block" content="managed"><meta name="nexus-emits" content="system.environment.selected system.companion.selected lattice.imprint lattice.library.changed nexus.notify nexus.launch vibe.save"><meta name="nexus-consumes" content="vibe.result"><title>First Contact</title>
 <script src="../../engines/nexus-block-client.js"></script><script src="../../engines/eidolon-schema.js"></script><script src="../../engines/eidolon-creature-renderer.js"></script><script src="../../engines/eidolon-environment-renderer.js"></script><script src="../../engines/eidolon-storage.js"></script>
 <style>
-:root{--void:#07070b;--s1:#111119;--s2:#181824;--ink:#f2eadb;--ink2:#b7aa91;--ink3:#726956;--amber:#e6a51a;--cyan:#86d7ff;--rose:#ef7691;--line:rgba(255,255,255,.13);--display:ui-serif,Georgia,serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--void);color:var(--ink);font-family:var(--mono);overflow:hidden}canvas{display:block}.grain{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.055) .5px,transparent .5px);background-size:24px 24px;mix-blend-mode:screen;opacity:.35}.wrap{position:relative;z-index:2;min-height:100%;display:grid;grid-template-columns:200px 1fr 1fr;gap:14px;padding:18px;align-items:start}.panel{border:1px solid var(--line);background:linear-gradient(180deg,rgba(17,17,25,.92),rgba(7,7,11,.78));border-radius:24px;box-shadow:0 28px 90px rgba(0,0,0,.46);backdrop-filter:blur(18px)}.left{padding:16px;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;max-height:100vh}.kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber)}h1{font-family:var(--display);font-size:22px;line-height:1.1;margin:10px 0}.copy{color:var(--ink2);line-height:1.5;max-width:50ch;font-size:11px;display:none}.stage{display:contents}.card{position:relative;min-height:200px;aspect-ratio:16/9;border:1px solid rgba(255,255,255,.12);border-radius:20px;overflow:hidden;background:#050508}.card canvas{position:absolute;inset:0;width:100%;height:100%}.card-copy{padding:10px 16px;border:1px solid rgba(255,255,255,.12);border-top:none;background:rgba(5,5,10,.80);backdrop-filter:blur(16px)}.creature-col .card-copy{border-bottom:none}.world-col{display:flex;flex-direction:column;gap:0}.world-col .card-copy{border-radius:0 0 16px 16px}#creature-card,#world-card{border-bottom-left-radius:0;border-bottom-right-radius:0}.label{font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.18em}.name{font-family:var(--display);font-size:25px;margin-top:6px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.stat{padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:10px;color:var(--ink2);font-size:11px}.actions,.control-grid{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}.control-grid{display:grid;grid-template-columns:1fr 1fr}.left .control-grid{grid-template-columns:1fr}.btn,button{border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.06);color:var(--ink);font-family:var(--mono);padding:10px 14px;cursor:pointer}button:hover{border-color:var(--amber);color:#fff}.primary{background:var(--amber);border-color:var(--amber);color:#07070b;font-weight:800;font-size:13px;padding:13px 18px;box-shadow:0 0 28px rgba(230,165,26,.4),0 4px 16px rgba(0,0,0,.4);letter-spacing:.08em}.ghost{color:var(--ink2)}.lock{border-color:rgba(134,215,255,.24);color:var(--cyan)}.lock[aria-pressed=true]{background:rgba(134,215,255,.14);box-shadow:0 0 0 1px rgba(134,215,255,.24) inset}.status{margin-top:12px;font-size:10px;color:var(--cyan);min-height:18px}.note{font-size:11px;color:var(--ink3);line-height:1.6;margin-top:12px}.deck{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.mini{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px;background:rgba(255,255,255,.045);min-height:72px}.mini.active{border-color:var(--amber);box-shadow:0 0 22px rgba(230,165,26,.15)}.mini-k{font-size:8px;text-transform:uppercase;letter-spacing:.15em;color:var(--ink3)}.mini-n{font-family:var(--display);font-size:15px;margin-top:5px}.mini-s{font-size:9px;color:var(--ink3);margin-top:4px}.fine{border-color:rgba(134,215,255,.26);color:var(--cyan)}.next{margin-top:14px;padding:12px;border:1px solid rgba(134,215,255,.16);border-radius:16px;background:rgba(134,215,255,.055);color:var(--ink2);font-size:11px;line-height:1.55}.next b{color:var(--cyan)}.card.locked{outline:2px solid rgba(134,215,255,.42);box-shadow:0 0 38px rgba(134,215,255,.12)}.card.accepted{animation:contactAccept 680ms ease-out}@keyframes contactAccept{0%{filter:brightness(1)}45%{filter:brightness(1.35) saturate(1.25)}100%{filter:brightness(1)}}.creature-col{display:flex;flex-direction:column;gap:0}.fc-axes{padding:10px 14px 14px;display:flex;flex-direction:column;gap:6px;border:1px solid rgba(255,255,255,.10);border-top:none;border-radius:0 0 20px 20px;background:rgba(5,5,10,.72);backdrop-filter:blur(16px)}.fc-axis{display:grid;grid-template-columns:56px 1fr 28px;align-items:center;gap:6px}.fc-axis-label{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.12em;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fc-axis-slider{width:100%;height:3px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.1);border-radius:2px;cursor:pointer;outline:none}.fc-axis-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--amber);border:none;cursor:pointer}.fc-axis-slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--amber);border:none;cursor:pointer}.fc-axis-val{font-size:9px;color:var(--ink2);font-family:var(--mono);text-align:right}@media(max-width:880px){html,body{overflow:auto}.wrap{grid-template-columns:1fr;padding:12px}.card{min-height:160px;aspect-ratio:16/9}.fc-axes{border-radius:0 0 14px 14px}.control-grid,.deck{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*{animation-duration:1ms!important;transition-duration:1ms!important}}
-</style></head><body><div class="grain"></div><main class="wrap"><section class="panel left"><div><div class="kicker">First Contact · live Eidolon forge</div><h1>Choose the being and the world.</h1><div class="next"><b>What happens next:</b> your world becomes the desktop, your companion appears bottom-left, your Library receives the specs. Wallet balance starts at 0 NEX. No NEX is granted.</div></div><div><div class="control-grid"><button id="roll-companion">↺ companion</button><button id="roll-world">↺ world</button><button id="lock-companion" class="lock" aria-pressed="false">lock companion</button><button id="lock-world" class="lock" aria-pressed="false">lock world</button></div><div class="actions"><button id="roll-both">↺ randomize unlocked</button><button id="multiforge" class="fine">9 options</button><button id="accept" class="primary">Accept contact</button></div><div class="status" id="status">Live preview. Nothing is final until Accept contact.</div></div></section><div class="creature-col"><article class="card" id="creature-card"><canvas id="creature"></canvas></article><div class="card-copy"><div class="label">Companion</div><div id="creature-name" class="name">—</div></div><div class="fc-axes" id="fc-axes-panel"></div></div><div class="world-col"><article class="card" id="world-card"><canvas id="env"></canvas></article><div class="card-copy"><div class="label">Home World</div><div id="world-name" class="name">—</div></div></div></main><script>
+:root{--void:#07070b;--s1:#111119;--s2:#181824;--ink:#f2eadb;--ink2:#b7aa91;--ink3:#726956;--amber:#e6a51a;--cyan:#86d7ff;--rose:#ef7691;--line:rgba(255,255,255,.13);--display:ui-serif,Georgia,serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--void);color:var(--ink);font-family:var(--mono);overflow:hidden}
+canvas{display:block}
+.grain{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.055) .5px,transparent .5px);background-size:24px 24px;mix-blend-mode:screen;opacity:.35}
+/* Fit the iframe / host shell: no page-level scroll for primary actions */
+.wrap{position:relative;z-index:2;height:100%;max-height:100%;display:grid;grid-template-columns:minmax(200px,230px) minmax(0,1fr) minmax(0,1fr);gap:10px;padding:12px;align-items:stretch;overflow:hidden}
+.panel{border:1px solid var(--line);background:linear-gradient(180deg,rgba(17,17,25,.92),rgba(7,7,11,.78));border-radius:18px;box-shadow:0 28px 90px rgba(0,0,0,.46);backdrop-filter:blur(18px)}
+/* Left: intro can shrink; dock (accept) always visible */
+.left{padding:12px;display:flex;flex-direction:column;gap:10px;min-height:0;max-height:100%;overflow:hidden}
+.left-intro{flex:0 1 auto;min-height:0;overflow:hidden}
+.left-intro .next{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;margin-top:8px;padding:8px 10px;font-size:10px}
+.left-dock{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.08)}
+.kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
+h1{font-family:var(--display);font-size:18px;line-height:1.15;margin:6px 0 0}
+.copy{color:var(--ink2);line-height:1.5;max-width:50ch;font-size:11px;display:none}
+.stage{display:contents}
+.card{position:relative;flex:1 1 auto;min-height:100px;max-height:min(38vh,280px);border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;background:#050508}
+.card canvas{position:absolute;inset:0;width:100%;height:100%}
+.card-copy{padding:8px 12px;border:1px solid rgba(255,255,255,.12);border-top:none;background:rgba(5,5,10,.80);backdrop-filter:blur(16px);flex:0 0 auto}
+.creature-col .card-copy{border-bottom:none}
+.world-col,.creature-col{display:flex;flex-direction:column;gap:0;min-height:0;max-height:100%;overflow:hidden}
+.world-col .card-copy{border-radius:0 0 14px 14px}
+#creature-card,#world-card{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.label{font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.18em}
+.name{font-family:var(--display);font-size:18px;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+.stat{padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:10px;color:var(--ink2);font-size:11px}
+.actions,.control-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:0}
+.control-grid{display:grid;grid-template-columns:1fr 1fr}
+.left .control-grid{grid-template-columns:1fr 1fr}
+.btn,button{border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.06);color:var(--ink);font-family:var(--mono);padding:8px 10px;cursor:pointer;font-size:11px}
+button:hover{border-color:var(--amber);color:#fff}
+.primary{background:var(--amber);border-color:var(--amber);color:#07070b;font-weight:800;font-size:12px;padding:11px 14px;box-shadow:0 0 28px rgba(230,165,26,.4),0 4px 16px rgba(0,0,0,.4);letter-spacing:.06em;width:100%}
+.ghost{color:var(--ink2)}
+.lock{border-color:rgba(134,215,255,.24);color:var(--cyan)}
+.lock[aria-pressed=true]{background:rgba(134,215,255,.14);box-shadow:0 0 0 1px rgba(134,215,255,.24) inset}
+.status{margin-top:4px;font-size:10px;color:var(--cyan);min-height:16px;line-height:1.35}
+.note{font-size:11px;color:var(--ink3);line-height:1.6;margin-top:12px}
+.deck{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.mini{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px;background:rgba(255,255,255,.045);min-height:72px}
+.mini.active{border-color:var(--amber);box-shadow:0 0 22px rgba(230,165,26,.15)}
+.mini-k{font-size:8px;text-transform:uppercase;letter-spacing:.15em;color:var(--ink3)}
+.mini-n{font-family:var(--display);font-size:15px;margin-top:5px}
+.mini-s{font-size:9px;color:var(--ink3);margin-top:4px}
+.fine{border-color:rgba(134,215,255,.26);color:var(--cyan)}
+.next{margin-top:8px;padding:8px 10px;border:1px solid rgba(134,215,255,.16);border-radius:12px;background:rgba(134,215,255,.055);color:var(--ink2);font-size:10px;line-height:1.45}
+.next b{color:var(--cyan)}
+.card.locked{outline:2px solid rgba(134,215,255,.42);box-shadow:0 0 38px rgba(134,215,255,.12)}
+.card.accepted{animation:contactAccept 680ms ease-out}
+@keyframes contactAccept{0%{filter:brightness(1)}45%{filter:brightness(1.35) saturate(1.25)}100%{filter:brightness(1)}}
+/* Axes are the scroll menu — contained so they never bury Accept */
+.fc-axes{padding:8px 12px 10px;display:flex;flex-direction:column;gap:4px;border:1px solid rgba(255,255,255,.10);border-top:none;border-radius:0 0 16px 16px;background:rgba(5,5,10,.72);backdrop-filter:blur(16px);flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain}
+.fc-axis{display:grid;grid-template-columns:52px 1fr 26px;align-items:center;gap:4px}
+.fc-axis-label{font-size:8px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-axis-slider{width:100%;height:3px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.1);border-radius:2px;cursor:pointer;outline:none}
+.fc-axis-slider::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--amber);border:none;cursor:pointer}
+.fc-axis-slider::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--amber);border:none;cursor:pointer}
+.fc-axis-val{font-size:8px;color:var(--ink2);font-family:var(--mono);text-align:right}
+.actions{display:flex;flex-direction:column;gap:7px}
+.actions .primary{order:1}
+.actions #roll-both,.actions #multiforge{order:2}
+@media(max-width:880px){
+  html,body{overflow:auto}
+  .wrap{grid-template-columns:1fr;grid-auto-rows:auto;height:auto;max-height:none;overflow:visible;padding:10px}
+  .left{max-height:none;overflow:visible}
+  .left-intro .next{-webkit-line-clamp:unset;display:block}
+  .card{min-height:140px;max-height:220px}
+  .fc-axes{max-height:40vh}
+  .control-grid,.deck{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:1ms!important;transition-duration:1ms!important}}
+</style></head><body><div class="grain"></div><main class="wrap"><section class="panel left"><div class="left-intro"><div class="kicker">First Contact · live Eidolon forge</div><h1>Choose the being and the world.</h1><div class="next"><b>What happens next:</b> your world becomes the desktop, your companion appears bottom-left, your Library receives the specs. Wallet balance starts at 0 NEX. No NEX is granted.</div></div><div class="left-dock"><div class="control-grid"><button id="roll-companion">↺ companion</button><button id="roll-world">↺ world</button><button id="lock-companion" class="lock" aria-pressed="false">lock companion</button><button id="lock-world" class="lock" aria-pressed="false">lock world</button></div><div class="actions"><button id="accept" class="primary">Accept contact</button><button id="roll-both">↺ randomize unlocked</button><button id="multiforge" class="fine">9 options</button></div><div class="status" id="status">Live preview. Nothing is final until Accept contact.</div></div></section><div class="creature-col"><article class="card" id="creature-card"><canvas id="creature"></canvas></article><div class="card-copy"><div class="label">Companion</div><div id="creature-name" class="name">—</div></div><div class="fc-axes" id="fc-axes-panel"></div></div><div class="world-col"><article class="card" id="world-card"><canvas id="env"></canvas></article><div class="card-copy"><div class="label">Home World</div><div id="world-name" class="name">—</div></div></div></main><script>
 'use strict';
 const SELECTED_ENV_KEY='nexus:selected-environment:v1';
 const SELECTED_COMPANION_KEY='nexus:selected-companion:v1';
