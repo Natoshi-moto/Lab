@@ -1,0 +1,88 @@
+{
+  "schema": "bgen.econ-retest-003.decision/v1",
+  "task": "BGEN-ECON-RETEST-003",
+  "status_authority": "NONE",
+  "subject": {
+    "repository": "Natoshi-moto/Lab",
+    "pr": 35,
+    "commit": "0cb2ec36c098750316059fd3ccfa05e65eb8d67b",
+    "branch": "claude/bgen-econ-redteam-001",
+    "description": "Repaired Claude economics package after BGEN-ECON-REPAIR-002 + micro-repair (shared validator, cap_then_renormalize rename, two-commit receipt binding)"
+  },
+  "frozen_breaker_reference": {
+    "package": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001",
+    "original_decision_on_pre_repair_subject": "HOLD_FOR_REPAIR",
+    "breaker_pr": 37,
+    "re_run_this_retest": "read-only; 28 scenarios OK; 25 tests OK; zero post-run diff"
+  },
+  "seat": {
+    "role": "Fresh different-family economics retest",
+    "provider_model_label": "xAI Grok interactive CLI (grok-4.5 class)",
+    "resumed_prior_breaker_session": false,
+    "independence_note": "Different provider family from Claude; fresh session dedicated to retest of repaired package at exact head 0cb2ec3"
+  },
+  "package_decision": {
+    "decision": "REPAIRED_PACKAGE_PASS",
+    "aliases_considered": [
+      "REPAIR_AGAIN",
+      "REPAIRED_PACKAGE_PASS"
+    ],
+    "rationale": [
+      "All five mandated independent verification axes pass at subject commit 0cb2ec3",
+      "Public allocation functions fail-closed via shared validate_participants with direct tests",
+      "cap_then_renormalize reports three stages, discloses non-hard-cap property, and demonstrates final share exceeding nominal clip at 1/2/3 holders",
+      "Receipt repair_logic_commit / receipt_binding_parent_commit are accurate and non-self-referential (no tip SHA inside receipt)",
+      "E-001 through E-009 repairs still hold under independent source inspection, probes, and package tests",
+      "No new repair blockers found that would require REPAIR_AGAIN"
+    ]
+  },
+  "preserved_mechanism_disposition": {
+    "UNDERLYING_MECHANISM": "CONTINUE_WITH_CONDITIONS",
+    "ECONOMIC_GATE_PASS": false,
+    "note": "This retest accepts the repaired package as an honest, scope-clean economics analysis. It does not convert CONTINUE_WITH_CONDITIONS into ECONOMIC_GATE_PASS. Residual risks FC4 pathway and FC6 remain controlling for any future gate decision."
+  },
+  "command_results": {
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": {
+      "exit_code": 0,
+      "summary": "27 scenarios OK; results regenerated with no residual subject-path edit required from this retest"
+    },
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v": {
+      "exit_code": 0,
+      "summary": "72 tests OK"
+    },
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py": {
+      "exit_code": 0,
+      "summary": "28 scenarios OK; zero git diff under Breaker paths afterward"
+    },
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests -v": {
+      "exit_code": 0,
+      "summary": "25 tests OK"
+    },
+    "python3 -m unittest discover -s tests -v": {
+      "exit_code": 0,
+      "summary": "185 tests OK"
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS"
+    },
+    "git diff --check": {
+      "exit_code": 0,
+      "summary": "clean"
+    }
+  },
+  "commands_not_run": {
+    "./nexus verify": "R-round custody/exchange kernel scope; this task assigns no R-round",
+    "./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND": "out of scope; must not reopen R001 ledger",
+    "./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND": "out of scope; must not reopen R002 ledger"
+  },
+  "nonclaims": [
+    "no merge or promotion authority",
+    "no STATUS.json change",
+    "no R-round assignment",
+    "no live activity",
+    "no legal conclusions",
+    "no ECONOMIC_GATE_PASS claim",
+    "no modification of Claude subject package or frozen Breaker package bytes by this retest"
+  ]
+}
