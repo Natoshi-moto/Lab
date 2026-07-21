@@ -1,0 +1,76 @@
+{
+  "task_id": "BGEN-EPISTEMIC-AUDIT-001",
+  "seat": "Independent epistemic auditor",
+  "provider_model_label": "Anthropic Claude Fable 5 (claude-fable-5) — self-declared label; like every provider label in this repository, not independently verifiable from repository bytes (see audit finding C-20)",
+  "status_authority": "NONE",
+  "mode": "REPORT_ONLY / EPISTEMIC_AUDIT",
+  "round_assignment": null,
+  "independent_review_claimed": true,
+  "independence_note": "Fresh session; pre-audit freeze committed before opening economics package contents (c9f2abc750ac8897cff99b80909fee5c0261c671); freeze's honesty statement records residual anchoring from the task prompt, issue #33's lineage summary, and shared-model priors with Claude-attributed prior seats",
+  "branch": "fable/bgen-epistemic-audit-001",
+  "subject_repository": "Natoshi-moto/Lab",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "subject_commit_equals_origin_main_at_start": true,
+  "audit_commits": {
+    "pre_audit_freeze_commit": "c9f2abc750ac8897cff99b80909fee5c0261c671",
+    "reproduction_commit": "4121f369bf29e3894b8d0998cbe6083b39b511ad",
+    "documents_commit": "8a2e8df89b18c10f4aeffc191a1a5cbd948fda71"
+  },
+  "receipt_binding_parent_commit": "8a2e8df89b18c10f4aeffc191a1a5cbd948fda71",
+  "receipt_self_binding_note": "This receipt is added in a follow-up commit whose own SHA is, by construction, not contained in it (same two-commit pattern as the econ receipts).",
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**"
+  ],
+  "scope_respected": true,
+  "paths_outside_scope_modified": [],
+  "subject_packages_modified": false,
+  "status_json_modified": false,
+  "live_funds_used": false,
+  "real_charities_selected": false,
+  "legal_conclusions_made": false,
+  "secrets_committed": false,
+  "environment": {
+    "python": "3.14.6",
+    "node": "24.14.0",
+    "npm_ci_required": true,
+    "note": "fresh worktree fails 11 lab tests (missing @noble/ed25519) until npm ci; documented as an audit finding since prior receipts omit this prerequisite"
+  },
+  "command_results": {
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_DESIGN_001/tests": {"exit_code": 0, "summary": "37 tests OK"},
+    "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py": {"exit_code": 0, "summary": "PASS; 34 executable invalid vectors; byte-stable fixtures"},
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": {"exit_code": 0, "summary": "27 scenarios; zero byte diff after rerun"},
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests": {"exit_code": 0, "summary": "72 tests OK"},
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py": {"exit_code": 0, "summary": "28 scenarios; zero byte diff after rerun"},
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests": {"exit_code": 0, "summary": "25 tests OK"},
+    "python3 -m unittest discover -s tests": {"exit_code": 0, "summary": "185 tests OK after npm ci (9F/2E before, environmental)"},
+    "node experiments/BENEFICIAL_GENESIS_RETEST_002/verify.mjs": {"exit_code": 0, "summary": "43 agreements, 0 disagreements, 0 crashes"},
+    "./nexus doctor": {"exit_code": 0, "summary": "PASS"},
+    "git diff --check": {"exit_code": 0, "summary": "clean"},
+    "python3 experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/repro/independent_repro.py": {"exit_code": 0, "summary": "35/35 checks PASS"},
+    "python3 experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/repro/adversarial_probes.py": {"exit_code": 0, "summary": "33/33 probes PASS"}
+  },
+  "commands_not_run": {
+    "./nexus verify": "scoped to R-round custody/exchange kernels; this task assigns no R-round",
+    "./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND": "out of scope; must not reopen R001 ledger",
+    "./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND": "out of scope; must not reopen R002 ledger"
+  },
+  "verdicts": {
+    "evidence_package": "TRUSTWORTHY_WITH_STATED_LIMITS",
+    "underlying_mechanism": "CONTINUE_WITH_CONDITIONS",
+    "real_world_readiness": "RESEARCH_ONLY"
+  },
+  "deliverables": "see experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/README.md",
+  "nonclaims": [
+    "no merge or promotion authority; the audit PR remains draft",
+    "no R-round assignment; no STATUS.json change",
+    "no live funds, charity selection, solicitation, token issuance, deployment, or production authorization",
+    "no legal conclusions (legal questions scoped for counsel in OPEN_QUESTIONS.md)",
+    "cross-model agreement not treated as proof of truth",
+    "reproduction validates computation, not real-world transfer",
+    "the pre-audit freeze does not prove perfect independence"
+  ],
+  "receipt_schema": "bgen.epistemic-audit-001.receipt/v1",
+  "label": "SANITIZED_TASK_RECEIPT"
+}
