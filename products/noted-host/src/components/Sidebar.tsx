@@ -1,6 +1,6 @@
 // Sweep 23 — collapsible sidebar with two new routes (Inbox, Atlas).
 //
-// Two render shapes — expanded (~220px) and rail-collapsed (~48px). The
+// Two render shapes — expanded (148px) and rail-collapsed (48px). The
 // root <aside> stays mounted in both shapes; the cumulative-verify
 // primary navigation follows the locked Noted Phase 0.1 order; legacy routes stay deep-linkable.
 
@@ -16,7 +16,7 @@ import { useDevMode } from '../useDevMode'
 const STORAGE_KEY = 'verse-studio:sidebar:collapsed'
 
 const linkBase =
-  'n-sidebar-link block rounded-lg px-3 py-2 text-sm transition-colors duration-150'
+  'n-sidebar-link block rounded-lg px-2 py-1.5 text-xs transition-colors duration-150'
 const linkInactive =
   'text-ink-soft hover:bg-surface-3/70 hover:text-ink'
 const linkActive =
@@ -96,7 +96,7 @@ function Item({ to, label }: { to: string, label: string }) {
 
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="px-3 pt-4 pb-1 text-[10px] uppercase tracking-[0.18em] text-ink-faint">
+    <div className="px-2 pt-3 pb-1 text-[9px] uppercase tracking-[0.14em] text-ink-faint">
       {children}
     </div>
   )
@@ -227,17 +227,17 @@ export function Sidebar() {
 
   return (
     <aside
-      className="w-60 shrink-0 border-r border-line n-sidebar-surface flex flex-col"
+      className="w-[148px] shrink-0 border-r border-line n-sidebar-surface flex flex-col"
       data-test="sidebar"
       data-collapsed="false"
       data-focus-hide="sidebar"
     >
-      <div className="px-4 py-4 border-b border-line/80 flex items-start justify-between gap-3">
-        <div className="min-w-0 flex items-start gap-3">
+      <div className="px-2 py-3 border-b border-line/80 flex items-start justify-between gap-1.5">
+        <div className="min-w-0 flex items-start gap-1.5">
           <AppMark />
           <div className="min-w-0 pt-0.5">
-            <div className="text-base font-semibold tracking-tight text-ink">{APP_NAME}</div>
-            {APP_TAGLINE ? <div className="text-[11px] leading-snug text-ink-faint mt-1 max-w-[150px]">{APP_TAGLINE}</div> : null}
+            <div className="text-sm font-semibold tracking-tight text-ink truncate">{APP_NAME}</div>
+            {APP_TAGLINE ? <div className="text-[10px] leading-snug text-ink-faint mt-1 line-clamp-2">{APP_TAGLINE}</div> : null}
           </div>
         </div>
         <button

@@ -11,6 +11,8 @@ import {
 } from '../../bridges'
 
 const NEXUS_AGENT_SRC = './nexus/nexus-agent-v0.14-scrubbed.html'
+const AGENT_SCALE = 0.8
+const AGENT_INVERSE_SCALE = `${100 / AGENT_SCALE}%`
 
 type PendingImport = {
   envelope: NexusEventEnvelope<PromptSnapshotPayload>
@@ -105,8 +107,23 @@ export function NexusAgentStudio(): JSX.Element {
         </aside>
       )}
       {error && <div className="shrink-0 border-b border-bad px-4 py-2 text-xs text-bad" data-test="prompt-import-error">Import failed: {error}</div>}
-      <div className="flex-1 min-h-0 bg-black">
-        <iframe ref={iframeRef} title="Nexus Agent v0.14 scrubbed" src={NEXUS_AGENT_SRC} className="block h-full w-full border-0 bg-black" data-test="nexus-agent-iframe" referrerPolicy="no-referrer" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin" />
+      <div className="flex-1 min-h-0 overflow-hidden bg-black">
+        <iframe
+          ref={iframeRef}
+          title="Nexus Agent v0.14 scrubbed"
+          src={NEXUS_AGENT_SRC}
+          className="block border-0 bg-black"
+          style={{
+            width: AGENT_INVERSE_SCALE,
+            height: AGENT_INVERSE_SCALE,
+            transform: `scale(${AGENT_SCALE})`,
+            transformOrigin: 'top left',
+          }}
+          data-test="nexus-agent-iframe"
+          data-agent-scale={AGENT_SCALE}
+          referrerPolicy="no-referrer"
+          sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin"
+        />
       </div>
     </section>
   )
