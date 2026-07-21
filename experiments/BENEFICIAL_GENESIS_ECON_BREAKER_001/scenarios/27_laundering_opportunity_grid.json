@@ -1,0 +1,23 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "attacker",
+      "eligible_sats": 10000000
+    },
+    {
+      "donor_id": "rest",
+      "eligible_sats": 90000000
+    }
+  ],
+  "id": "27_laundering_opportunity_grid",
+  "laundering": {
+    "alternative_realization_fraction": 0.9,
+    "attacker_donor_id": "attacker",
+    "include_sensitivity": true,
+    "legal_cost_basis_sats": 0.0,
+    "token_value_per_unit_in_sats": 0.5
+  },
+  "pool": 1000000000,
+  "title": "Laundering grid: high opportunity value vs high token EV"
+}

@@ -1,0 +1,65 @@
+{
+  "allocation_rule": "capped_pro_rata",
+  "cap_sats_per_identity": 1000,
+  "contributions": [
+    {
+      "donor_id": "sybil0",
+      "eligible_sats": 1000,
+      "identity_id": "sybil0"
+    },
+    {
+      "donor_id": "sybil1",
+      "eligible_sats": 1000,
+      "identity_id": "sybil1"
+    },
+    {
+      "donor_id": "sybil2",
+      "eligible_sats": 1000,
+      "identity_id": "sybil2"
+    },
+    {
+      "donor_id": "sybil3",
+      "eligible_sats": 1000,
+      "identity_id": "sybil3"
+    },
+    {
+      "donor_id": "sybil4",
+      "eligible_sats": 1000,
+      "identity_id": "sybil4"
+    },
+    {
+      "donor_id": "sybil5",
+      "eligible_sats": 1000,
+      "identity_id": "sybil5"
+    },
+    {
+      "donor_id": "sybil6",
+      "eligible_sats": 1000,
+      "identity_id": "sybil6"
+    },
+    {
+      "donor_id": "sybil7",
+      "eligible_sats": 1000,
+      "identity_id": "sybil7"
+    },
+    {
+      "donor_id": "sybil8",
+      "eligible_sats": 1000,
+      "identity_id": "sybil8"
+    },
+    {
+      "donor_id": "sybil9",
+      "eligible_sats": 1000,
+      "identity_id": "sybil9"
+    },
+    {
+      "donor_id": "honest",
+      "eligible_sats": 10000,
+      "identity_id": "honest"
+    }
+  ],
+  "id": "26_sybil_split_capped_pro_rata",
+  "identity_layer": false,
+  "pool": 1000000000,
+  "title": "Sybil split defeats per-identity cap without identity layer"
+}

@@ -1,0 +1,26 @@
+{
+  "allocation_rule": "lottery_without_replacement",
+  "contributions": [
+    {
+      "donor_id": "w",
+      "eligible_sats": 7000
+    },
+    {
+      "donor_id": "a",
+      "eligible_sats": 1000
+    },
+    {
+      "donor_id": "b",
+      "eligible_sats": 1000
+    },
+    {
+      "donor_id": "c",
+      "eligible_sats": 1000
+    }
+  ],
+  "id": "24_random_lottery_component",
+  "lottery_seed": 42,
+  "lottery_winner_slots": 3,
+  "pool": 1000000000,
+  "title": "Weighted lottery without replacement"
+}

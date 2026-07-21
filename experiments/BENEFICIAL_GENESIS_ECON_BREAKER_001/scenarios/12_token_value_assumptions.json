@@ -1,0 +1,20 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "d1",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "d2",
+      "eligible_sats": 1000000
+    }
+  ],
+  "id": "12_token_value_assumptions",
+  "notes": [
+    "re-run mentally with tv in {0.5,1.0,2.0}; utility = tv*units - donated"
+  ],
+  "pool": 1000000000,
+  "title": "Donor utility under token EV below/equal/above donated face (assumptions)",
+  "token_value_per_unit_in_sats": 1.0
+}

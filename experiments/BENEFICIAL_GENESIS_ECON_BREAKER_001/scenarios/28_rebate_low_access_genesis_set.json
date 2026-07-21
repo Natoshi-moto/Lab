@@ -1,0 +1,31 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "d1",
+      "eligible_sats": 5000000
+    },
+    {
+      "donor_id": "d2",
+      "eligible_sats": 5000000
+    }
+  ],
+  "id": "28_rebate_low_access_genesis_set",
+  "pool": 1000000000,
+  "rebate": {
+    "access_probability": 0.01,
+    "arrangement_cost_sats": 200000,
+    "detection_probability": 0.3,
+    "donations_by_charity": [
+      {
+        "charity_id": "CHARITY_ALPHA",
+        "colluding": false,
+        "donated_sats": 10000000,
+        "rebate_rate": 0.5
+      }
+    ],
+    "enforcement_probability": 0.5,
+    "rebate_rate_if_colluding": 0.5
+  },
+  "title": "Rebate arithmetic vs low access to colluding genesis charity"
+}

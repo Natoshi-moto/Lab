@@ -1,0 +1,25 @@
+{
+  "allocation_rule": "concave_log",
+  "contributions": [
+    {
+      "donor_id": "whale",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "s1",
+      "eligible_sats": 1000
+    },
+    {
+      "donor_id": "s2",
+      "eligible_sats": 1000
+    },
+    {
+      "donor_id": "s3",
+      "eligible_sats": 1000
+    }
+  ],
+  "id": "25_concave_log_whale",
+  "identity_layer": false,
+  "pool": 1000000000,
+  "title": "Concave log weighting with whale"
+}

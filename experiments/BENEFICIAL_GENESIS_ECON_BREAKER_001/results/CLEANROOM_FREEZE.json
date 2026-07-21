@@ -1,0 +1,845 @@
+{
+  "breaker_branch": "grok/bgen-econ-breaker-001",
+  "cleanroom_sources_inspected": [
+    "issues #33 #34 #36",
+    "PR #35 controlling adjudication review text and metadata only",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/{README,TECHNICAL_DESIGN,THREAT_MODEL,protocol/allocation.py,schemas/protocol_constants.json,fixtures/EXPECTED.json,fixtures/genesis/CONTEXT.json}",
+    "experiments/BENEFICIAL_GENESIS_RETEST_002 cleanroom format samples",
+    "operations/receipts/BENEFICIAL_GENESIS_DIFF_RETEST_002/RECEIPT.json format sample"
+  ],
+  "forbidden_inventory_count": 72,
+  "forbidden_path_inventory_sha256": [
+    {
+      "bytes": 6906,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/ALTERNATIVES_COMPARISON.md",
+      "sha256": "6bc6559161020711c4a9d4f4f443c8d76ed8c81438b788623c6997e8ebda1cde"
+    },
+    {
+      "bytes": 7973,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md",
+      "sha256": "97a493575974a899b475f936b6785c8cb294eb2440a330bfc5cf5c07ba44ff6e"
+    },
+    {
+      "bytes": 6851,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FORMAL_MODEL.md",
+      "sha256": "5e5710dac4fa4bbf61caa5aa7c9e3a8912ad2c2a459e2c7d9f76b571c2eb2dc6"
+    },
+    {
+      "bytes": 12341,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/MECHANISM_NECESSITY.md",
+      "sha256": "ce761cd1137821be055420d973e30b38030e094483baeba02747ff7697110708"
+    },
+    {
+      "bytes": 5952,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/NONCLAIMS_AND_OPEN_QUESTIONS.md",
+      "sha256": "295ae41a706e63ae059da0bf23fd95708d4e052bd7764e1356fae81c95dced62"
+    },
+    {
+      "bytes": 4670,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/README.md",
+      "sha256": "9f54c448f2bca60660d051024bf687547c41dbfae133bb0e60b3e6a976df6b0c"
+    },
+    {
+      "bytes": 337,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/__init__.py",
+      "sha256": "b605d3f241cf3014f4f387fc68c9b15bc8438c5878e77ff8c33d83eed591e6b7"
+    },
+    {
+      "bytes": 5815,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/allocation.py",
+      "sha256": "d52d7289b4c9b05d3763a70ebf14461b1d1e0529812ef12fb2a1584ea6a5c468"
+    },
+    {
+      "bytes": 2054,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/metrics.py",
+      "sha256": "a3ec251d2a12078adadd61cfd8e75e0e17c49d79a8711ebdc3fc513109a300b8"
+    },
+    {
+      "bytes": 1774,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/population.py",
+      "sha256": "51dafefe9bd455337d84a0d412e76f9e85832a6668db038dfadee2ef91a2aae3"
+    },
+    {
+      "bytes": 13389,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/scenario.py",
+      "sha256": "eb6819a2aa3eef327828fb622156ffbe79dbb93799e6ce70552920d59f3e23c4"
+    },
+    {
+      "bytes": 1870,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/01_whale_50.json",
+      "sha256": "de54f52917f7113c1920c193df909b1b3fc41a1203f42be8b8fc8ee1baf42221"
+    },
+    {
+      "bytes": 1882,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/02_whale_80.json",
+      "sha256": "1ba8d78383c832e321d777fba5b0569b742fcf2ece6adbe3ee5660321218851e"
+    },
+    {
+      "bytes": 1875,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/03_whale_99.json",
+      "sha256": "d685f7ab96bd1bd8abb25e2ae41b0c25a0c6c40413a35e150bfa92d0cbba40c3"
+    },
+    {
+      "bytes": 1950,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/04_exchange_omnibus_vs_small_donors.json",
+      "sha256": "d327b57fcc011aad33a5cf67a959dfe26c6e52b695f6bbb24ed867c747c10373"
+    },
+    {
+      "bytes": 97915,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/05_sybil_split_concave.json",
+      "sha256": "7affa945ed8f6bf991bc839474919d05df18c87b08da81db8830bc7b7659b676"
+    },
+    {
+      "bytes": 95909,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/06_sybil_split_control_pro_rata.json",
+      "sha256": "c4bb3992e716470b2b179d3470e14c24d56faab15028df93ca882de1b772f812"
+    },
+    {
+      "bytes": 6797,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/07_rebate_sweep.json",
+      "sha256": "c987671c98c0ab992b048187207d1775e962e551c2b42de0c49fd1db2f5ede1e"
+    },
+    {
+      "bytes": 2187,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/08_secret_rebate_whale.json",
+      "sha256": "6a653f2f0066d0b335b6558538b761e5980e789e89005dd48f76837bbb8aac90"
+    },
+    {
+      "bytes": 3180,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/09_denominator_doubles_final_block.json",
+      "sha256": "86e039dbf2ade818bbef030a8441a1837cec2089ab782d1e1241929a6edbad24"
+    },
+    {
+      "bytes": 2233,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/10_stolen_key_donation.json",
+      "sha256": "cb1649a726c547f1318a3d7264f77e9b4853dc54eca9c15a98cb9aad0603e9c5"
+    },
+    {
+      "bytes": 3228,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/11_quantum_cutoff_freeze.json",
+      "sha256": "9f6b6669ff5c45db3236b4268daf3a160d4396e8c65d8772567dd3cc512eb63b"
+    },
+    {
+      "bytes": 2818,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/12_token_value_below_equal_above.json",
+      "sha256": "7dc1c60a4248ba72d2fa5c6f43bba5c803047b2940e18ce401965c9d22d78824"
+    },
+    {
+      "bytes": 1882,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/13_governance_proportional.json",
+      "sha256": "de68a7f7a7bf8b40315964073612eb7b31b19d5a90dcfab5e7bacebbc79edff2"
+    },
+    {
+      "bytes": 1846,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/14_governance_capped.json",
+      "sha256": "31bc0b433677ccc791a6634519419c3b87b1a1bb2674931183a1d9d7645722d8"
+    },
+    {
+      "bytes": 1903,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/15_lockup_0_months.json",
+      "sha256": "7f3c9b9d0cb9111ac9be74e8c9956d8a6c012d3a08c3002dc287d04b7f2008f7"
+    },
+    {
+      "bytes": 1913,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/16_lockup_3_months.json",
+      "sha256": "72f65432be3ea6bdf395c56054756901c13ff6c02081156c66b9b7a8c7e12714"
+    },
+    {
+      "bytes": 1912,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/17_lockup_12_months.json",
+      "sha256": "c553ffe3b5715eeda6882a3476a00cb569131abac5499249be141594cde289d0"
+    },
+    {
+      "bytes": 3750,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/18_charity_set_single_vs_multi.json",
+      "sha256": "70734a75a7a9d5513e7a4b1868fb04638d37256bd4f144b6946b36997091dd72"
+    },
+    {
+      "bytes": 1416,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/19_undersubscribed_pool.json",
+      "sha256": "f27a7d11e63f583752249bc5c3dcf8761e8661f8cfa2bfb1f08faf74b31898bf"
+    },
+    {
+      "bytes": 1665,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/20_oversubscribed_pool.json",
+      "sha256": "97d9cf7a2899234f28fba3044917c122df2dafbdf2a35e10b707cc397fcd12fe"
+    },
+    {
+      "bytes": 1065,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/21_no_token_baseline.json",
+      "sha256": "b3c407996d9cc1db29462d03c00e11ffa33ad564422af7c5bc617a2d01fb8a52"
+    },
+    {
+      "bytes": 1845,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/22_capped_pro_rata_whale.json",
+      "sha256": "858e4a07d01f47ed7774ab7607b1ab2cdb3a88237889fdbb69f547b0715c9f70"
+    },
+    {
+      "bytes": 2453,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/23_time_weighted_late_donor_disadvantage.json",
+      "sha256": "3aab713cfd63c2b36cc6c35b75eea5e9a55befbdb8648ac5bd70b063f5bfb3cf"
+    },
+    {
+      "bytes": 1933,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/24_random_lottery_component.json",
+      "sha256": "945962a8a63dca9947483f92175ed15cecdb23e1060eb028d8f4dc1d83d72256"
+    },
+    {
+      "bytes": 1856,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/25_concave_log_whale.json",
+      "sha256": "0c56b26b63b6a316a406918c885c051a6394c51918a73bb87b9e6c34f7817469"
+    },
+    {
+      "bytes": 6436,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/26_sybil_split_capped_pro_rata.json",
+      "sha256": "2311eaf221f45476ec56d08e8915250753a314a62c016a5ff488a1172b85ab44"
+    },
+    {
+      "bytes": 866,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/SUMMARY.json",
+      "sha256": "63196e86dbd17c20f87f3ce4af54a58dedca38909152d84f31dbe65aeba39538"
+    },
+    {
+      "bytes": 11300,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/results/TABLES.md",
+      "sha256": "965ed8403e81827d5986efb272566192f8aa3770d29ad394f5562d309d4cff88"
+    },
+    {
+      "bytes": 455,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/01_whale_50.json",
+      "sha256": "78986c7d8cac09c7f844ce0e66de9654f25b9b4f148abe747204ddd019f83fed"
+    },
+    {
+      "bytes": 456,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/02_whale_80.json",
+      "sha256": "760d7e31d2bd2fe1acbf2d10f278b3470fc5447f41e96c43b6d9741581bbdc78"
+    },
+    {
+      "bytes": 457,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/03_whale_99.json",
+      "sha256": "14a4274f132f4a9af1aa41676b5c7637fb7ad30ab1c8906b5104a7f69ae55239"
+    },
+    {
+      "bytes": 748,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/04_exchange_omnibus_vs_small_donors.json",
+      "sha256": "18aa0d56e70578e80da730912862aa62c3bc6bf2a7ab37fc4f18580678984a63"
+    },
+    {
+      "bytes": 549,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/05_sybil_split_concave.json",
+      "sha256": "d6d640e049e04c8420aa17fe5f59878daded868fa1396d7cc04da27d8e864bf0"
+    },
+    {
+      "bytes": 560,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/06_sybil_split_control_pro_rata.json",
+      "sha256": "250d3ceb4069ea8e39d1b4ad6a51d0df4dd228ac56e1fd04ebff374dac65a879"
+    },
+    {
+      "bytes": 1392,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/07_rebate_sweep.json",
+      "sha256": "af7d0d4461fd066da6e54150f71c1cfd6cc309980ba555209255271092e5c777"
+    },
+    {
+      "bytes": 535,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/08_secret_rebate_whale.json",
+      "sha256": "f1de9c4d954a02b98e3ee86a826244dd9e8dcb61ed923ad64a304732536ec8f8"
+    },
+    {
+      "bytes": 1197,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/09_denominator_doubles_final_block.json",
+      "sha256": "a130b8865f2b1af72f1165a1d1ae0703ae4e84a72aab7abba5516741670be17b"
+    },
+    {
+      "bytes": 515,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/10_stolen_key_donation.json",
+      "sha256": "d6f0243307c787e86c6d0dd0ed5053f83930ac5ec29c310040f5f3cd2e6d542f"
+    },
+    {
+      "bytes": 1286,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/11_quantum_cutoff_freeze.json",
+      "sha256": "65cde4c078fad320490fceaae487d1c4aaa20e7487c1aca144408486d0b467e5"
+    },
+    {
+      "bytes": 486,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/12_token_value_below_equal_above.json",
+      "sha256": "f475fbd44715543c23bf1529cd083dd3b581571ef1ac492e239f466f2a84a42a"
+    },
+    {
+      "bytes": 470,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/13_governance_proportional.json",
+      "sha256": "4bf351d90aa0418332eca05804160e5147bf499723f4cc096e19c320fc03bcb5"
+    },
+    {
+      "bytes": 453,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/14_governance_capped.json",
+      "sha256": "ac9b8f976cc4a36922d0d2ba37d140e251c8bdb6fc4df8758d3dfbc5debadf4f"
+    },
+    {
+      "bytes": 493,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/15_lockup_0_months.json",
+      "sha256": "af7dc49bad7ad766fe0a66bc3313a179069f24e6463c4885e4454920073cfa8a"
+    },
+    {
+      "bytes": 493,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/16_lockup_3_months.json",
+      "sha256": "9f77aa34131fa69e1af2e45ad17c99b9114e8ec71c7105bcbe32a521c091bb27"
+    },
+    {
+      "bytes": 495,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/17_lockup_12_months.json",
+      "sha256": "12f5baf056b9f095ac224976318c53eab5447b25ace1ca9cf6ee89a8676f932b"
+    },
+    {
+      "bytes": 1297,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/18_charity_set_single_vs_multi.json",
+      "sha256": "aa08fb897f37900c46fe8427f39df7cb811125323c61927931ad5d7dd2011ef8"
+    },
+    {
+      "bytes": 353,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/19_undersubscribed_pool.json",
+      "sha256": "abd0026d89b2f3ba79ad309e8583d8ecddb8601610aab4fa056d64f424ca24b5"
+    },
+    {
+      "bytes": 396,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/20_oversubscribed_pool.json",
+      "sha256": "6f2e9030173077611d27d422e46a6729a955553bde793bd120ebce26bd3fa272"
+    },
+    {
+      "bytes": 454,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/21_no_token_baseline.json",
+      "sha256": "5fce7fafe36646fd160354acb87d6c795ffb6445bf86bd5e630518ff83739f7b"
+    },
+    {
+      "bytes": 485,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/22_capped_pro_rata_whale.json",
+      "sha256": "d66c719fa22197f16ca0a336ea408fc5a7ed45b35091baa40e2da467954bc00c"
+    },
+    {
+      "bytes": 779,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/23_time_weighted_late_donor_disadvantage.json",
+      "sha256": "dc3b50716ae75badc639da478d4c3f1970d9b916a4d37e21ff435d0ace14a28a"
+    },
+    {
+      "bytes": 521,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/24_random_lottery_component.json",
+      "sha256": "c17b635843564231e539053dade1126a1c74e28f4bb8d55b4807d3bfc461e0c2"
+    },
+    {
+      "bytes": 461,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/25_concave_log_whale.json",
+      "sha256": "8993d3fc8d7bd9e0c5b5f5d59b6d4a073b40120106abeea0e6b9e15c1689f95c"
+    },
+    {
+      "bytes": 575,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/scenarios/26_sybil_split_capped_pro_rata.json",
+      "sha256": "55d022ddd0cb3cc06947c6550cf1bf232f3774d99b16a04b7422cb345086686c"
+    },
+    {
+      "bytes": 4391,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py",
+      "sha256": "e185d0cef81e7ec9aa0fd2bbc5a63738a06a5eaa7470b196cb637d1526370292"
+    },
+    {
+      "bytes": 0,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 3065,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_allocation.py",
+      "sha256": "0af9038248ff20dea1d1b31ea1a1cc4400571ec82f634d9dc7d6e8554fbfcbdf"
+    },
+    {
+      "bytes": 1486,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_metrics.py",
+      "sha256": "aa2db106ac6859638218dc2422a116a83a319e33e2cb985008764614a1bbf605"
+    },
+    {
+      "bytes": 5119,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests/test_scenarios.py",
+      "sha256": "b0cf6d8073fbe6f0853b9a065976ddaf325baa481ac54834aaa9dec3bbc13fea"
+    },
+    {
+      "bytes": 7592,
+      "path": "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/AUDIT_REPORT.md",
+      "sha256": "970fdb501db62a0f52876c94f43c7df24208e105023cf6786597acf27ccf9003"
+    },
+    {
+      "bytes": 4866,
+      "path": "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/RECEIPT.json",
+      "sha256": "b5e88ba87cbd578f1a26c5e638eb3852e220fb56c71c04def4389f9fe2b2d112"
+    }
+  ],
+  "forbidden_paths_not_content_opened_before_freeze": [
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**"
+  ],
+  "frozen_at_utc": "2026-07-21T10:30:37Z",
+  "github_issue": 36,
+  "independent_decisions_pre_differential": {
+    "claude_package": "PENDING_POST_FREEZE_DIFFERENTIAL",
+    "note": "Claude package decision requires post-freeze content review of PR #35",
+    "underlying_mechanism": "CONTINUE_WITH_CONDITIONS"
+  },
+  "independent_package_file_count": 86,
+  "independent_package_file_inventory_sha256": [
+    {
+      "bytes": 2733,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/ALTERNATIVES_COMPARISON.md",
+      "sha256": "2374c3b8e632861a1e37215b40dfbd9ce6783dd88dbd2228443b91fc4f03fa6c"
+    },
+    {
+      "bytes": 6762,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/CLEANROOM_INTERPRETATION.md",
+      "sha256": "760e34c5f90986c963d7ca11be6abc2ee0a6f185a275541554d6a24da121760e"
+    },
+    {
+      "bytes": 3781,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/FAILURE_CONDITIONS.md",
+      "sha256": "1ffe9e94036d7727b03dfc531b50d7ccbf883050838aa376174b902077073a0e"
+    },
+    {
+      "bytes": 5068,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/FORMAL_MODEL.md",
+      "sha256": "c6b7b5ae2e9e7e4ddf980b1ff7a3e765281bdb7cb6c7ea77d47123a66cdb5881"
+    },
+    {
+      "bytes": 4062,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/MECHANISM_NECESSITY.md",
+      "sha256": "a223b20db5c88552c73192f6f0fe22d397e3169ff9fbb319a3423dd7f58130b9"
+    },
+    {
+      "bytes": 1677,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/NONCLAIMS_AND_OPEN_QUESTIONS.md",
+      "sha256": "a38986d35ca95f1fb4e3e89c0633848e2f00d1dd675a3746929504c8e846fe39"
+    },
+    {
+      "bytes": 1560,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/README.md",
+      "sha256": "453c1496b4ab7fcd04a01677481535bbf336328e36972b794ea9e35bfa19cffd"
+    },
+    {
+      "bytes": 1580,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/REV_ITEM_RESPONSES.md",
+      "sha256": "e5b951382275b7dc3364bf6b9a5ae2b3eb39117c62c967751faa2b54fa1d37c5"
+    },
+    {
+      "bytes": 874,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__init__.py",
+      "sha256": "6ce73b0af4af68cfa92c4106f25f5e324f43795a6665f5e205809211e1ca8cc3"
+    },
+    {
+      "bytes": 966,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__pycache__/__init__.cpython-314.pyc",
+      "sha256": "ed170f01d7af7d95947a57bf7efdc21de5a0b6c5f7be9309c591c6a9beec078b"
+    },
+    {
+      "bytes": 17263,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__pycache__/allocation.cpython-314.pyc",
+      "sha256": "b2692fd717270eb951fbf937b8f8a493c4763aae0161e418b0380ade53db1faf"
+    },
+    {
+      "bytes": 6966,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__pycache__/governance.cpython-314.pyc",
+      "sha256": "9a8a783d7549ae32b0c50aac5ceba38898f5d55941423a749340ba4d6d8aff30"
+    },
+    {
+      "bytes": 4600,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__pycache__/laundering.cpython-314.pyc",
+      "sha256": "fdff91312ba84e8d0b6dd6cb00929473247733e59934e899e7f3694824ac2ec4"
+    },
+    {
+      "bytes": 5740,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__pycache__/metrics.cpython-314.pyc",
+      "sha256": "d0b8c4aed7036a1fd1cd2914c635b2c9f9f444456b907ccf93206203ee7f3592"
+    },
+    {
+      "bytes": 5512,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__pycache__/rebate.cpython-314.pyc",
+      "sha256": "1d0ea9d335e5f224abbb87eb4076650356c1105ffca9e52896819353e7c15b2f"
+    },
+    {
+      "bytes": 13896,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/__pycache__/scenario.cpython-314.pyc",
+      "sha256": "7d762f172ce7b4403dfa5ec685d6196f7d50245f428b56e54c82e55ff88e0cfe"
+    },
+    {
+      "bytes": 15285,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/allocation.py",
+      "sha256": "58eb16f524146c9af3a56804e0df6c34c08507edae79e1155622c3db7bc37e35"
+    },
+    {
+      "bytes": 5483,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/governance.py",
+      "sha256": "e9474c400e6cca8214aaa7b93186ce4d41bde1cc5fe4c71dacf399f03463eac4"
+    },
+    {
+      "bytes": 5905,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/laundering.py",
+      "sha256": "3bad6a9eb3d8cf9028393b6675bff63d0ccfbc04cf336e842e83fa4946102e1b"
+    },
+    {
+      "bytes": 3111,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/metrics.py",
+      "sha256": "817cd570d11b73c4ac808e3dc1fa723f8dd49d26d705b35472ec370e1f4baf18"
+    },
+    {
+      "bytes": 6606,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/rebate.py",
+      "sha256": "025ec19beef5d7e3149f216347bcfca30ab3004ea416d9c9c6f2ab334ba2fe8b"
+    },
+    {
+      "bytes": 12334,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/model/scenario.py",
+      "sha256": "41929ce042e95906c9e0ede5997b6098f1cb99c28022fb8f1148be1fac53daeb"
+    },
+    {
+      "bytes": 6950,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/01_whale_50.json",
+      "sha256": "5ec67469c121b46cae8dfed40d48f8066256ff765aa583f080121a9d0acc1a41"
+    },
+    {
+      "bytes": 7032,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/02_whale_80.json",
+      "sha256": "afcd67becb853a59546c2bca0b469bbfff53b50782b77b4a1af3e16257eee86a"
+    },
+    {
+      "bytes": 7119,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/03_whale_99.json",
+      "sha256": "b81e09440b8e2953573ee3114045faa8f8a76082a5ba441f29ee8518ac8e1326"
+    },
+    {
+      "bytes": 63302,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/04_exchange_omnibus_vs_small_donors.json",
+      "sha256": "ffb3495c69cef038d2a8e36bcc792956913089f5c096d216f98331e6f8add3fa"
+    },
+    {
+      "bytes": 13341,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/05_sybil_split_concave.json",
+      "sha256": "a3afabe7ad90fe1ad13c501048f9d6f22a5bbf218d5d8ad9a293c17b0c50fb7b"
+    },
+    {
+      "bytes": 12834,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/06_sybil_split_control_pro_rata.json",
+      "sha256": "a50d0955d327fbac3edf96e7b8dc32668598d9b3c6a6d642a2abe311f0367c27"
+    },
+    {
+      "bytes": 9003,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/07_rebate_sweep.json",
+      "sha256": "aa7f150756f7900731ca6c4bf1188af904528f51c529771394a51bf5a3eaf7e0"
+    },
+    {
+      "bytes": 8941,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/08_secret_rebate_whale.json",
+      "sha256": "06a6e57aeaba0c8a0799d5f24949a5ead9046541b8ef2844ecaa51024e26a925"
+    },
+    {
+      "bytes": 7121,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/09_denominator_doubles_final_block.json",
+      "sha256": "50ca714e9e3d9b551f6b7c8c7cd3f514722ae7eae23263370d0d717faad06cc9"
+    },
+    {
+      "bytes": 12938,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/10_stolen_key_donation.json",
+      "sha256": "cde5ee6d0706fa74ea70dd6ec4653d8c901689a78551ad2edc934d8530c366af"
+    },
+    {
+      "bytes": 7310,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/11_quantum_cutoff_freeze.json",
+      "sha256": "032de37f12194e5364fcca2a72df5576ef294e1194b455eaf329b5a5c533ecea"
+    },
+    {
+      "bytes": 6914,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/12_token_value_assumptions.json",
+      "sha256": "30722251ed2f3c3cc17ce3298f72c8eb495e239cd9aada02861c0ac71ccf53c7"
+    },
+    {
+      "bytes": 8402,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/13_governance_proportional.json",
+      "sha256": "a00e476f2dab966392f889079be31958b2e6547a028ca98d76af5635f69c000f"
+    },
+    {
+      "bytes": 8387,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/14_governance_capped.json",
+      "sha256": "98f9764d0574a79073d83830a0abffdedd12f3cdfdda53722a0abdf4bc770616"
+    },
+    {
+      "bytes": 8303,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/15_lockup_0_months.json",
+      "sha256": "87e8c53e32310a9cf97a4a64e73324ab48f71b9e1662e0156c5f3b8eea719802"
+    },
+    {
+      "bytes": 8339,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/16_lockup_3_months.json",
+      "sha256": "e4c2b3a67c2f434aaf140dc4d57d0fa01e3058e029e1bfef39439b9b10a30995"
+    },
+    {
+      "bytes": 8342,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/17_lockup_12_months.json",
+      "sha256": "28cd988559086b7bd0cd51285f44aebb098cd24855d94579473b628d6a087520"
+    },
+    {
+      "bytes": 8359,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/18_charity_set_single_vs_multi.json",
+      "sha256": "4e564d72b8de6dac1178c0434945580867cd480db38fb2f036a9181c6644b977"
+    },
+    {
+      "bytes": 6156,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/19_undersubscribed_pool.json",
+      "sha256": "d7b6b4c5235359372e672702015a86fbf37e19064a7b1fc07c5d293860265226"
+    },
+    {
+      "bytes": 6896,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/20_oversubscribed_pool.json",
+      "sha256": "75fd079cdbb448aa8a74b3941fffbb82858002ded1d2ea2b37d173a119ee227e"
+    },
+    {
+      "bytes": 6784,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/21_no_token_baseline.json",
+      "sha256": "e936b09538432a1187304287abc30fd88709dc037c09f1dc11f93daa566758b5"
+    },
+    {
+      "bytes": 8091,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/22_capped_pro_rata_whale.json",
+      "sha256": "5ea511ba5d90a68dc7f68026400202e76227332f5faaf34e99708505586889e0"
+    },
+    {
+      "bytes": 7185,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/23_time_weighted_late_donor.json",
+      "sha256": "557fac1f2a54f20abcd5a9f4bb61c7a565b561e755d030c4e728c87fdc48272d"
+    },
+    {
+      "bytes": 8819,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/24_random_lottery_component.json",
+      "sha256": "5d61e6b5bbdf4860a07387fbb22bc7edf1eca99e701be6c9a1b36c13140df98a"
+    },
+    {
+      "bytes": 8705,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/25_concave_log_whale.json",
+      "sha256": "553a491508f601701d58bd33430b5e34c41358f4c2049a855710d9802394d3c8"
+    },
+    {
+      "bytes": 13136,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/26_sybil_split_capped_pro_rata.json",
+      "sha256": "f82872e6232e4cf5ff193a5dc20517dc89c86aa0a1035ca0ca62f25f9d483be6"
+    },
+    {
+      "bytes": 12962,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/27_laundering_opportunity_grid.json",
+      "sha256": "fb702e762662e79ce5ef91f46681300916154ec1a5d3a4545efde7dd6fe1ee1a"
+    },
+    {
+      "bytes": 8392,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/28_rebate_low_access_genesis_set.json",
+      "sha256": "908da541b506f894c5b9dfcfe016bab9c8a74662045a72da91e778b1d1cff037"
+    },
+    {
+      "bytes": 11752,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/SUMMARY.json",
+      "sha256": "2c27e9725d1924720206127c01f5e6b2b6efb62cb71dc797060bfa14bbdb1d30"
+    },
+    {
+      "bytes": 3207,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/results/TABLES.md",
+      "sha256": "7873183e9003ad5e1174731f65252c6682cff5b8a0bc4c7e77706481e6ec2d69"
+    },
+    {
+      "bytes": 428,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/01_whale_50.json",
+      "sha256": "dd1bca8bead8e7fda9c3a0c2668bb850a5400dce146c85c3d0c0c767d5fce323"
+    },
+    {
+      "bytes": 428,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/02_whale_80.json",
+      "sha256": "e1fb3e5cd3ce9302700fbe3ce566368be3cef382eef0a25f01cd9c8a35481659"
+    },
+    {
+      "bytes": 427,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/03_whale_99.json",
+      "sha256": "f8fc48a0d4472066aa7c7095dc9e2f568be8aaaba675761c1f6c14c7fa6c3a7a"
+    },
+    {
+      "bytes": 9788,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/04_exchange_omnibus_vs_small_donors.json",
+      "sha256": "401269acd62a2c0f8815ad6d3b816ef2731206be58a6194fdea1fa2d42a29d76"
+    },
+    {
+      "bytes": 1341,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/05_sybil_split_concave.json",
+      "sha256": "26a377d58e0a308441ff52d09f973a93b0e440bdc87903fcc36c4ff50f393d20"
+    },
+    {
+      "bytes": 1403,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/06_sybil_split_control_pro_rata.json",
+      "sha256": "d8ab360610da5ad5df35fa616b61fe1a48ee56f8c768da3c3f25389e39e6f608"
+    },
+    {
+      "bytes": 662,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/07_rebate_sweep.json",
+      "sha256": "5669acbbe03d84d7b6fe290b3e1fa7c7c0865c15d147380657037dac330bf3c5"
+    },
+    {
+      "bytes": 876,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/08_secret_rebate_whale.json",
+      "sha256": "993e0d1e92d4a58a54e364e25fb72c65675c6a05ae4f5a4e4c1bcd515f56e53b"
+    },
+    {
+      "bytes": 635,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/09_denominator_doubles_final_block.json",
+      "sha256": "e89c45096c241d49d96aedd80ef78d67b741fad6f595f00ca3e7b4036883da44"
+    },
+    {
+      "bytes": 933,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/10_stolen_key_donation.json",
+      "sha256": "df66603df71aec06c212401c9831b6024d3c21ac039943b060b7d3938bd12e86"
+    },
+    {
+      "bytes": 565,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/11_quantum_cutoff_freeze.json",
+      "sha256": "7d486e1410b897a2ad7346697d5455de150f3f6c9029fbba391bc32ff597aec7"
+    },
+    {
+      "bytes": 479,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/12_token_value_assumptions.json",
+      "sha256": "c47dd9826d437c9316e282fac561d6803281d7c99fe49404ef2bfc640ee32f1e"
+    },
+    {
+      "bytes": 509,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/13_governance_proportional.json",
+      "sha256": "2ecb7ff8750e072f283cba012f39c6651eeff51b9d7870514695e0b5bd1f3264"
+    },
+    {
+      "bytes": 536,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/14_governance_capped.json",
+      "sha256": "fa3541722166650c58a277b80227c2268535423174554e982f5a2e0a96854b14"
+    },
+    {
+      "bytes": 591,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/15_lockup_0_months.json",
+      "sha256": "d629ef4c037ce49c91b1aff9a4337a9617f6f4f50ea7c7fb1508a6bfaa3c3ce9"
+    },
+    {
+      "bytes": 591,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/16_lockup_3_months.json",
+      "sha256": "4183929668187fad849300d426331af1e761f30adcfe93f5ab962f52097607c8"
+    },
+    {
+      "bytes": 594,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/17_lockup_12_months.json",
+      "sha256": "2c73d0fa6aaaa8193ac150df01557022bc2dc0c73cf849e5b1b2e8536ea7d0ae"
+    },
+    {
+      "bytes": 664,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/18_charity_set_single_vs_multi.json",
+      "sha256": "978e94b32707459aaeaa0667284e407642813c6864fa5202413f16e82db5683f"
+    },
+    {
+      "bytes": 249,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/19_undersubscribed_pool.json",
+      "sha256": "342d6316c9a87bb9dd890e95bf2ace11d00c85c1d825db29c3497e7f705715db"
+    },
+    {
+      "bytes": 322,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/20_oversubscribed_pool.json",
+      "sha256": "3ca7a8b55db7efa39a70e1269f7b3399e5a052565bd3552f4e618492e454a9b0"
+    },
+    {
+      "bytes": 309,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/21_no_token_baseline.json",
+      "sha256": "93ef010b2f87ffffc00469df9f7d8ba4fd817bd36af69ed1878f76fe45fa1d40"
+    },
+    {
+      "bytes": 488,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/22_capped_pro_rata_whale.json",
+      "sha256": "df120bcbd75ae55dbbe26bd9033ee24d2e7694f99346982805dca003ecaa3a23"
+    },
+    {
+      "bytes": 404,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/23_time_weighted_late_donor.json",
+      "sha256": "53cd99ffde8e422c4ca9dca3c25f647b3aa0cde9bfd050a2026a9bbecb7f1d16"
+    },
+    {
+      "bytes": 499,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/24_random_lottery_component.json",
+      "sha256": "783be084f6b1a31560e569f69e11533492323d4fb011668c8fabef155e5180aa"
+    },
+    {
+      "bytes": 458,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/25_concave_log_whale.json",
+      "sha256": "021fe195c24853563121aaed825b717fd9498fc9455b565d7056a6b24143d34f"
+    },
+    {
+      "bytes": 1367,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/26_sybil_split_capped_pro_rata.json",
+      "sha256": "58fe3f20f054d8ba6cfc525a3041ac0d8763705eb2ede4c3dc98790244d97f7b"
+    },
+    {
+      "bytes": 554,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/27_laundering_opportunity_grid.json",
+      "sha256": "0089d3735f087c93c5a4a9843abd48d63608d0f518f1528e0ed81e2de310508d"
+    },
+    {
+      "bytes": 713,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/scenarios/28_rebate_low_access_genesis_set.json",
+      "sha256": "17a92b98d794df413d9ba299a37675545984a913227d15cf89c26121668807f1"
+    },
+    {
+      "bytes": 4440,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py",
+      "sha256": "905a8d56b6420d8bad467ffc7e767df6d4e2b25a3fc3b4f6249197de56c057a8"
+    },
+    {
+      "bytes": 15,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/__init__.py",
+      "sha256": "a449ec3232cbf02f684cf2a9c32e4823181ea7a7e976094fa4f4d33c535d510f"
+    },
+    {
+      "bytes": 10227,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/__pycache__/test_allocation.cpython-314.pyc",
+      "sha256": "29cd21d3abac1ad72de5f1d831683efe9c3e58e729dea8773392d45fd8eff47f"
+    },
+    {
+      "bytes": 10610,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/__pycache__/test_metrics_gov_launder_rebate.cpython-314.pyc",
+      "sha256": "a8c2ec39f8c621c5053553ca1bad0ce630b0ad693a560fe4a4e48dfb40a7a563"
+    },
+    {
+      "bytes": 6685,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/test_allocation.py",
+      "sha256": "ec59e0f58504c5e9b60b6cf81a91a22a5bf8f8691b38e535a1505594b414bbb4"
+    },
+    {
+      "bytes": 7560,
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests/test_metrics_gov_launder_rebate.py",
+      "sha256": "b5288f9833d48b7d24fdf7052d7752c6cbc560a552a78699960dd3ad776c056b"
+    }
+  ],
+  "rev_items_addressed_independently": [
+    "BGEN-ECON-REV-001",
+    "BGEN-ECON-REV-002",
+    "BGEN-ECON-REV-003",
+    "BGEN-ECON-REV-004",
+    "BGEN-ECON-REV-005",
+    "BGEN-ECON-REV-006",
+    "BGEN-ECON-REV-007"
+  ],
+  "schema": "bgen.econ-breaker-001.cleanroom-freeze/v1",
+  "seat": {
+    "environment": "Linux; Python 3; gh authenticated",
+    "model_label": "Grok interactive CLI (grok-4.5 class)",
+    "network": true,
+    "note": "Fresh different-family economics reconstruction; not a resume of Claude PR #35",
+    "prior_econ_redteam_content_opened": false,
+    "provider": "xAI"
+  },
+  "simulator": {
+    "command": "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py",
+    "n_scenarios": 28,
+    "tests": "25 unittest cases"
+  },
+  "subject_branch": "claude/bgen-econ-redteam-001",
+  "subject_commit": "b5887791338b146daad8f5233ce0e25bf24fe357",
+  "subject_pr": 35,
+  "task": "TSK-BGEN-ECON-BREAKER-001"
+}

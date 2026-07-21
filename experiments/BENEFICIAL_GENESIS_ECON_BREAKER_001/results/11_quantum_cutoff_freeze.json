@@ -1,0 +1,268 @@
+{
+  "allocation": {
+    "allocations": [
+      {
+        "allocation": 250000000,
+        "donor_id": "post_policy",
+        "eligible_sats": 1000000,
+        "identity_id": "post_policy",
+        "label": "post_policy",
+        "share_of_issued": 0.25,
+        "share_of_pool": 0.25,
+        "weight": 1000000
+      },
+      {
+        "allocation": 750000000,
+        "donor_id": "pre_cutoff",
+        "eligible_sats": 3000000,
+        "identity_id": "pre_cutoff",
+        "label": "pre_cutoff",
+        "share_of_issued": 0.75,
+        "share_of_pool": 0.75,
+        "weight": 3000000
+      }
+    ],
+    "notes": [],
+    "pool": 1000000000,
+    "remainder_unissued": 0,
+    "rule": "pro_rata",
+    "total_eligible_sats": 4000000,
+    "total_issued": 1000000000,
+    "total_weight": 4000000
+  },
+  "concentration": {
+    "denominator_note": "share_of_pool uses fixed pool; share_of_issued uses actually issued units. Under floor remainder or caps these diverge; do not mix them.",
+    "gini_of_eligible_sats": 0.25,
+    "gini_of_issued_units": 0.25,
+    "hhi_of_eligible_sats": 0.625,
+    "hhi_of_issued_units": 0.625,
+    "n_recipients": 2,
+    "pool": 1000000000,
+    "top10_share_of_issued": 1.0,
+    "top10_share_of_pool": 1.0,
+    "top1_share_of_issued": 0.75,
+    "top1_share_of_pool": 0.75,
+    "total_issued": 1000000000
+  },
+  "denominator": {
+    "fixed_pool": 1000000000,
+    "fixed_pool_floating_implied_exchange_ratio_sats_per_unit": 0.004,
+    "oversubscribed": false,
+    "ratio_note": "This is the model-implied eligible-sats weight per unit face under full issuance approximation (T/pool). It is not a promised redemption rate, market price, or legal classification.",
+    "remainder_unissued": 0,
+    "total_eligible_sats": 4000000,
+    "total_issued": 1000000000,
+    "undersubscribed": true
+  },
+  "donor_economics": [
+    {
+      "allocation_units": 250000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 1000000.0,
+      "donor_id": "post_policy",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 249000000.0
+    },
+    {
+      "allocation_units": 750000000.0,
+      "assumed_token_value_per_unit_in_sats": 1.0,
+      "donated_sats": 3000000.0,
+      "donor_id": "pre_cutoff",
+      "note": "utility under declared token-value assumption only",
+      "rebate_received_sats": 0.0,
+      "utility_sats_equivalent": 747000000.0
+    }
+  ],
+  "evidence_class": "deterministic_synthetic_simulation",
+  "failure_condition_flags": {
+    "FC1_token_necessity_unresolved": true,
+    "FC2_rebate_destroys_charity_benefit": {
+      "conditional_arithmetic_reduction": null,
+      "flagged": false,
+      "note": "rebate destruction not claimed as unconditional behavioral prediction"
+    },
+    "FC3_governance_capture_by_donation": {
+      "flagged": false,
+      "note": "FC-3 not charged against allocation mechanism alone",
+      "rule_under_test": "none"
+    },
+    "FC4_stolen_fund_incentive": {
+      "flagged": false,
+      "note": "laundering pathway exists but profitable laundering not unconditionally proven"
+    },
+    "FC5_timing_privileged_allocation": {
+      "flagged": true,
+      "note": "quantum_compromise_cutoff_height is a policy input; classical auth after cutoff rejects in verifier; economic model notes adverse selection around declaration timing"
+    },
+    "FC6_identity_dependency": {
+      "flagged": false,
+      "note": "caps/concavity without identity layer are Sybil-exploitable"
+    },
+    "FC7_dominated_by_simpler_mechanism": {
+      "flagged": null,
+      "note": "policy comparison; see MECHANISM_NECESSITY.md \u2014 not auto-decided here"
+    }
+  },
+  "governance": {
+    "continuously_capped": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "post_policy",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "post_policy",
+            0.5
+          ],
+          [
+            "pre_cutoff",
+            0.5
+          ]
+        ]
+      },
+      "notes": [
+        "cap_fraction_of_issued=0.05",
+        "capped weights are renormalized to sum to 1.0",
+        "cap is continuous on weight, not a one-time soft suggestion"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "pre_cutoff",
+        "n": 2,
+        "sum": 1.0
+      }
+    },
+    "none": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "post_policy",
+        "max_weight": 0.0,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "post_policy",
+            0.0
+          ],
+          [
+            "pre_cutoff",
+            0.0
+          ]
+        ]
+      },
+      "notes": [
+        "no governance rights from allocation"
+      ],
+      "weights_summary": {
+        "max": 0.0,
+        "max_id": "pre_cutoff",
+        "n": 2,
+        "sum": 0.0
+      }
+    },
+    "nontransferable_equal": {
+      "majority": {
+        "any_single_actor_controls": false,
+        "controllers": [],
+        "max_actor": "post_policy",
+        "max_weight": 0.5,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "post_policy",
+            0.5
+          ],
+          [
+            "pre_cutoff",
+            0.5
+          ]
+        ]
+      },
+      "notes": [
+        "one equal nontransferable vote per recipient; not proportional to donation"
+      ],
+      "weights_summary": {
+        "max": 0.5,
+        "max_id": "pre_cutoff",
+        "n": 2,
+        "sum": 1.0
+      }
+    },
+    "nontransferable_proportional": {
+      "majority": {
+        "any_single_actor_controls": true,
+        "controllers": [
+          "pre_cutoff"
+        ],
+        "max_actor": "pre_cutoff",
+        "max_weight": 0.75,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "pre_cutoff",
+            0.75
+          ],
+          [
+            "post_policy",
+            0.25
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "nontransferable_proportional freezes weights at genesis"
+      ],
+      "weights_summary": {
+        "max": 0.75,
+        "max_id": "pre_cutoff",
+        "n": 2,
+        "sum": 1.0
+      }
+    },
+    "token_weighted": {
+      "majority": {
+        "any_single_actor_controls": true,
+        "controllers": [
+          "pre_cutoff"
+        ],
+        "max_actor": "pre_cutoff",
+        "max_weight": 0.75,
+        "threshold": 0.5,
+        "top3": [
+          [
+            "pre_cutoff",
+            0.75
+          ],
+          [
+            "post_policy",
+            0.25
+          ]
+        ]
+      },
+      "notes": [
+        "proportional to allocation units",
+        "token_weighted implies transferability of voting power with tokens"
+      ],
+      "weights_summary": {
+        "max": 0.75,
+        "max_id": "pre_cutoff",
+        "n": 2,
+        "sum": 1.0
+      }
+    }
+  },
+  "id": "11_quantum_cutoff_freeze",
+  "laundering": null,
+  "nonclaims": [
+    "not empirical prediction",
+    "not market price forecast",
+    "not legal conclusion",
+    "not live funds"
+  ],
+  "probes": {},
+  "rebate": null,
+  "title": "Classical-key compromise declared mid-epoch (timing residual)"
+}

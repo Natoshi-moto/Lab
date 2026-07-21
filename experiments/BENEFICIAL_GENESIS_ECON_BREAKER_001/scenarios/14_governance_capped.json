@@ -1,0 +1,26 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "whale",
+      "eligible_sats": 6000000
+    },
+    {
+      "donor_id": "a",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "b",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "c",
+      "eligible_sats": 2000000
+    }
+  ],
+  "gov_cap_fraction": 0.05,
+  "governance_rule_under_test": "continuously_capped",
+  "id": "14_governance_capped",
+  "pool": 1000000000,
+  "title": "Continuously capped governance with renormalization"
+}

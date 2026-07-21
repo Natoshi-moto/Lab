@@ -1,0 +1,16 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "a",
+      "eligible_sats": 10000000000
+    },
+    {
+      "donor_id": "b",
+      "eligible_sats": 10000000000
+    }
+  ],
+  "id": "20_oversubscribed_pool",
+  "pool": 1000000000,
+  "title": "Massively oversubscribed pool (eligible >> pool)"
+}

@@ -1,0 +1,22 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "early",
+      "eligible_sats": 1000000,
+      "label": "early",
+      "time_weight": 2
+    },
+    {
+      "donor_id": "late_whale",
+      "eligible_sats": 1000000,
+      "label": "late",
+      "time_weight": 1
+    }
+  ],
+  "id": "09_denominator_doubles_final_block",
+  "pool": 1000000000,
+  "timing_game_present": true,
+  "timing_note": "Fixed pool means late mass dilutes early donors' share; cutoff height is deterministic given tip but miner can influence inclusion near boundary",
+  "title": "Final-block denominator doubles (early vs late donor)"
+}

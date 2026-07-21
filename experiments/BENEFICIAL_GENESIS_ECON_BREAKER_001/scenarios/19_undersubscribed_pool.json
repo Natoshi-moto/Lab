@@ -1,0 +1,12 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "only",
+      "eligible_sats": 1000
+    }
+  ],
+  "id": "19_undersubscribed_pool",
+  "pool": 1000000000,
+  "title": "Massively undersubscribed pool (eligible << pool)"
+}

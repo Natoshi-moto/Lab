@@ -1,0 +1,25 @@
+{
+  "allocation_rule": "pro_rata",
+  "contributions": [
+    {
+      "donor_id": "whale",
+      "eligible_sats": 6000000
+    },
+    {
+      "donor_id": "a",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "b",
+      "eligible_sats": 1000000
+    },
+    {
+      "donor_id": "c",
+      "eligible_sats": 2000000
+    }
+  ],
+  "governance_rule_under_test": "token_weighted",
+  "id": "13_governance_proportional",
+  "pool": 1000000000,
+  "title": "Token-weighted governance (conditional integration)"
+}
