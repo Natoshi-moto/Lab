@@ -1,0 +1,112 @@
+{
+  "task_id": "TSK-BGEN-ECON-RETEST-003",
+  "seat": "Fresh different-family economics retest",
+  "provider_model_label": "xAI Grok interactive CLI (grok-4.5 class)",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / FRESH_DIFFERENT_FAMILY_RETEST",
+  "round_assignment": null,
+  "resumed_prior_breaker_session": false,
+  "independent_review_claimed": true,
+  "independence_note": "Different provider family from Claude package; fresh session; retest of repaired package at exact subject commit, not a resume of BGEN-ECON-BREAKER-001 conversation state",
+  "branch": "grok/bgen-econ-retest-003",
+  "subject_repository": "Natoshi-moto/Lab",
+  "subject_pr": 35,
+  "subject_branch": "claude/bgen-econ-redteam-001",
+  "subject_commit": "0cb2ec36c098750316059fd3ccfa05e65eb8d67b",
+  "stacked_base_branch": "claude/bgen-econ-redteam-001",
+  "prior_breaker_pr": 37,
+  "prior_breaker_package": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001",
+  "prior_breaker_decision_on_pre_repair_subject": "HOLD_FOR_REPAIR",
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_003/**"
+  ],
+  "scope_respected": true,
+  "paths_outside_scope_modified": [],
+  "subject_package_modified": false,
+  "breaker_package_modified": false,
+  "status_json_modified": false,
+  "cryptographic_verifier_modified": false,
+  "real_charities_selected": false,
+  "live_funds_used": false,
+  "legal_conclusions_made": false,
+  "synthetic_only": true,
+  "secrets_committed": false,
+  "market_price_predicted": false,
+  "verification_axes": {
+    "V-001_public_allocation_validator": "PASS",
+    "V-002_cap_then_renormalize_stages_and_disclosure": "PASS",
+    "V-003_receipt_two_commit_binding": "PASS",
+    "V-004_E001_through_E009": "PASS",
+    "V-005_preserved_mechanism_disposition": "PASS"
+  },
+  "package_decision": "REPAIRED_PACKAGE_PASS",
+  "preserved_mechanism_disposition": {
+    "UNDERLYING_MECHANISM": "CONTINUE_WITH_CONDITIONS",
+    "ECONOMIC_GATE_PASS": false
+  },
+  "command_results": {
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": {
+      "exit_code": 0,
+      "summary": "27 scenarios OK"
+    },
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v": {
+      "exit_code": 0,
+      "summary": "72 tests OK"
+    },
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py": {
+      "exit_code": 0,
+      "summary": "28 scenarios OK; zero git diff under Breaker paths afterward"
+    },
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests -v": {
+      "exit_code": 0,
+      "summary": "25 tests OK"
+    },
+    "python3 -m unittest discover -s tests -v": {
+      "exit_code": 0,
+      "summary": "185 tests OK"
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS"
+    },
+    "git diff --check": {
+      "exit_code": 0,
+      "summary": "clean"
+    },
+    "git rev-parse HEAD at task start": {
+      "exit_code": 0,
+      "summary": "0cb2ec36c098750316059fd3ccfa05e65eb8d67b"
+    }
+  },
+  "commands_not_run": {
+    "./nexus verify": "R-round custody/exchange kernel scope; this task assigns no R-round",
+    "./nexus audit-check --audit-id AUD-R001-CLAUDE-BLIND": "out of scope; must not reopen R001 ledger",
+    "./nexus audit-check --audit-id AUD-R002-CLAUDE-BLIND": "out of scope; must not reopen R002 ledger"
+  },
+  "deliverables": {
+    "readme": "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/README.md",
+    "decision": "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/results/DECISION.json",
+    "verification_matrix": "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/results/VERIFICATION_MATRIX.json",
+    "audit_report": "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003/AUDIT_REPORT.md"
+  },
+  "residual_risks_unchanged_by_pass": [
+    "FC4 pathway: stolen/tainted-fund migration remains structurally available",
+    "FC6: concave/capped allocation remains Sybil-exploitable without identity layer",
+    "secondary-market re-concentration durability not simulated",
+    "target ledger functions still unspecified for transferability necessity"
+  ],
+  "nonclaims": [
+    "no merge or promotion authority",
+    "no R-round assignment",
+    "no change to STATUS.json",
+    "no live funds, real charity selection, or public solicitation",
+    "no legal conclusions",
+    "no market-price prediction",
+    "no ECONOMIC_GATE_PASS claim",
+    "no modification of Claude subject package or frozen Breaker package"
+  ],
+  "receipt_schema": "bgen.econ-retest-003.receipt/v1",
+  "label": "SANITIZED_TASK_RECEIPT"
+}
