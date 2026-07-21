@@ -1,0 +1,2467 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {
+    "sybil_split": {
+      "attacker": {
+        "single_identity_share": "10791953/25000000",
+        "split_gain": "-53/25000000",
+        "split_into": 400,
+        "split_total_share": "107919/250000",
+        "sybil_split_is_profitable": false
+      }
+    }
+  },
+  "baseline_breakeven_price": "92661633/100000000",
+  "concentration": {
+    "by_account": {
+      "gini": "9586153643/44999792100",
+      "hhi": "3232473061574/2499976900053361",
+      "holder_count": 900,
+      "top10_share": "1067019/50000000",
+      "top1_share": "42867/20000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "15103467674/25049884269",
+      "hhi": "20344706280238/108694647828407",
+      "owner_count": 501,
+      "top10_share": "5636213/12500000",
+      "top1_share": "107919/250000"
+    }
+  },
+  "donor_count": 900,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-2378315247/5000000000",
+      "per_donor": {
+        "attacker_split_000": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_001": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_002": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_003": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_004": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_005": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_006": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_007": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_008": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_009": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_010": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_011": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_012": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_013": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_014": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_015": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_016": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_017": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_018": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_019": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_020": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_021": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_022": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_023": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_024": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_025": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_026": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_027": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_028": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_029": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_030": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_031": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_032": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_033": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_034": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_035": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_036": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_037": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_038": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_039": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_040": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_041": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_042": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_043": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_044": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_045": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_046": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_047": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_048": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_049": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_050": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_051": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_052": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_053": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_054": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_055": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_056": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_057": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_058": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_059": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_060": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_061": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_062": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_063": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_064": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_065": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_066": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_067": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_068": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_069": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_070": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_071": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_072": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_073": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_074": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_075": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_076": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_077": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_078": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_079": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_080": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_081": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_082": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_083": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_084": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_085": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_086": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_087": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_088": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_089": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_090": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_091": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_092": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_093": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_094": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_095": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_096": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_097": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_098": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_099": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_100": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_101": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_102": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_103": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_104": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_105": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_106": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_107": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_108": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_109": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_110": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_111": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_112": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_113": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_114": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_115": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_116": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_117": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_118": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_119": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_120": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_121": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_122": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_123": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_124": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_125": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_126": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_127": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_128": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_129": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_130": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_131": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_132": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_133": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_134": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_135": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_136": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_137": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_138": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_139": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_140": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_141": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_142": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_143": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_144": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_145": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_146": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_147": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_148": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_149": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_150": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_151": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_152": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_153": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_154": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_155": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_156": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_157": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_158": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_159": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_160": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_161": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_162": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_163": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_164": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_165": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_166": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_167": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_168": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_169": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_170": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_171": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_172": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_173": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_174": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_175": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_176": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_177": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_178": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_179": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_180": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_181": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_182": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_183": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_184": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_185": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_186": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_187": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_188": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_189": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_190": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_191": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_192": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_193": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_194": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_195": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_196": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_197": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_198": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_199": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_200": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_201": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_202": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_203": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_204": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_205": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_206": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_207": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_208": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_209": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_210": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_211": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_212": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_213": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_214": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_215": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_216": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_217": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_218": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_219": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_220": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_221": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_222": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_223": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_224": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_225": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_226": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_227": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_228": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_229": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_230": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_231": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_232": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_233": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_234": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_235": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_236": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_237": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_238": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_239": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_240": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_241": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_242": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_243": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_244": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_245": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_246": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_247": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_248": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_249": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_250": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_251": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_252": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_253": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_254": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_255": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_256": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_257": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_258": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_259": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_260": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_261": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_262": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_263": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_264": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_265": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_266": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_267": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_268": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_269": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_270": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_271": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_272": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_273": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_274": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_275": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_276": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_277": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_278": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_279": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_280": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_281": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_282": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_283": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_284": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_285": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_286": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_287": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_288": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_289": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_290": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_291": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_292": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_293": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_294": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_295": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_296": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_297": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_298": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_299": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_300": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_301": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_302": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_303": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_304": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_305": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_306": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_307": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_308": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_309": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_310": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_311": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_312": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_313": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_314": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_315": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_316": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_317": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_318": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_319": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_320": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_321": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_322": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_323": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_324": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_325": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_326": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_327": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_328": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_329": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_330": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_331": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_332": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_333": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_334": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_335": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_336": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_337": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_338": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_339": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_340": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_341": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_342": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_343": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_344": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_345": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_346": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_347": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_348": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_349": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_350": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_351": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_352": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_353": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_354": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_355": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_356": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_357": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_358": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_359": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_360": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_361": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_362": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_363": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_364": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_365": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_366": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_367": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_368": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_369": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_370": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_371": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_372": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_373": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_374": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_375": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_376": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_377": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_378": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_379": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_380": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_381": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_382": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_383": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_384": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_385": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_386": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_387": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_388": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_389": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_390": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_391": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_392": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_393": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_394": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_395": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_396": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_397": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_398": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        },
+        "attacker_split_399": {
+          "gross_token_value": "9999950771727/100000000",
+          "liquid_token_value": "9999950771727/100000000",
+          "net_cost": "100000",
+          "utility": "-49228273/100000000"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "92661633/100000000",
+      "unprofitable_donor_count": 900
+    }
+  },
+  "governance": {
+    "by_account": {
+      "gini": "9586153643/44999792100",
+      "hhi": "3232473061574/2499976900053361",
+      "holder_count": 900,
+      "top10_share": "1067019/50000000",
+      "top1_share": "42867/20000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "15103467674/25049884269",
+      "hhi": "20344706280238/108694647828407",
+      "owner_count": 501,
+      "top10_share": "5636213/12500000",
+      "top1_share": "107919/250000"
+    },
+    "crosses_blocking_third": true,
+    "crosses_simple_majority": false,
+    "max_owner_governance_share": "21583800/49999769"
+  },
+  "pool_units": 100000000,
+  "scenario_id": "06_sybil_split_control_pro_rata",
+  "scheme_params": {},
+  "seed": 1006,
+  "total_eligible_units": 92661633,
+  "unissued_remainder": 462
+}

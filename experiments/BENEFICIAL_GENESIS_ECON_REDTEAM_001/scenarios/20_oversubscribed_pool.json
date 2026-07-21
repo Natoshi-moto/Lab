@@ -1,0 +1,13 @@
+{
+  "scenario_id": "20_oversubscribed_pool",
+  "seed": 1020,
+  "pool_units": 100000000,
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "scheme_params": {},
+  "token_value_multipliers": [1.0],
+  "governance_cap_bps": "PROPORTIONAL",
+  "donors": [],
+  "generators": [
+    {"kind": "small_donors", "count": 2000, "sats_min": 1000000, "sats_max": 500000000, "id_prefix": "whale_class", "block": 0}
+  ]
+}

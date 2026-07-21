@@ -1,0 +1,97 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {
+    "denominator_shock": {
+      "dilution": "2010611/100000000",
+      "post_shock_share": "354373/20000000",
+      "post_shock_total_eligible": 56437708,
+      "pre_shock_share": "945619/25000000",
+      "pre_shock_total_eligible": 26437708,
+      "reference_donor_id": "early_donor_reference"
+    },
+    "stolen_key_laundering": {
+      "compromise_race_attacker": {
+        "laundering_gain": "4999999974271/1000000",
+        "note": "attacker's cost basis is the theft victim's loss, not the attacker's; the protocol allocates identically to an honest donor of equal sats",
+        "true_economic_cost_borne_by_attacker": "0"
+      }
+    }
+  },
+  "baseline_breakeven_price": "14109427/25000000",
+  "concentration": {
+    "by_account": {
+      "gini": "14867266363/20399978172",
+      "hhi": "214674717485495/1428568371430207",
+      "holder_count": 204,
+      "top10_share": "32947007/50000000",
+      "top1_share": "1063119/4000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "14867266363/20399978172",
+      "hhi": "214674717485495/1428568371430207",
+      "owner_count": 204,
+      "top10_share": "32947007/50000000",
+      "top1_share": "1063119/4000000"
+    }
+  },
+  "donor_count": 204,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-1509708689/5100000000",
+      "per_donor": {
+        "compromise_race_attacker": {
+          "gross_token_value": "4999999974271/1000000",
+          "liquid_token_value": "4999999974271/1000000",
+          "net_cost": "5000000",
+          "utility": "-25729/1000000"
+        },
+        "early_donor_reference": {
+          "gross_token_value": "4999999974271/5000000",
+          "liquid_token_value": "4999999974271/5000000",
+          "net_cost": "1000000",
+          "utility": "-25729/5000000"
+        },
+        "locked_out_donor_01": {
+          "gross_token_value": "14999999922813/1000000",
+          "liquid_token_value": "14999999922813/1000000",
+          "net_cost": "15000000",
+          "utility": "-77187/1000000"
+        },
+        "locked_out_donor_02": {
+          "gross_token_value": "14999999922813/1000000",
+          "liquid_token_value": "14999999922813/1000000",
+          "net_cost": "15000000",
+          "utility": "-77187/1000000"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "14109427/25000000",
+      "unprofitable_donor_count": 204
+    }
+  },
+  "governance": {
+    "by_account": {
+      "gini": "14867266363/20399978172",
+      "hhi": "214674717485495/1428568371430207",
+      "holder_count": 204,
+      "top10_share": "32947007/50000000",
+      "top1_share": "1063119/4000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "14867266363/20399978172",
+      "hhi": "214674717485495/1428568371430207",
+      "owner_count": 204,
+      "top10_share": "32947007/50000000",
+      "top1_share": "1063119/4000000"
+    },
+    "crosses_blocking_third": false,
+    "crosses_simple_majority": false,
+    "max_owner_governance_share": "26577975/99999893"
+  },
+  "pool_units": 100000000,
+  "scenario_id": "11_quantum_cutoff_freeze",
+  "scheme_params": {},
+  "seed": 1011,
+  "total_eligible_units": 56437708,
+  "unissued_remainder": 107
+}

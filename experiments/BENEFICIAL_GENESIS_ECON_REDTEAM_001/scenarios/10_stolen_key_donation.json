@@ -1,0 +1,15 @@
+{
+  "scenario_id": "10_stolen_key_donation",
+  "seed": 1010,
+  "pool_units": 100000000,
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "scheme_params": {},
+  "token_value_multipliers": [1.0],
+  "governance_cap_bps": "PROPORTIONAL",
+  "donors": [
+    {"id": "stolen_key_attacker", "sats": 10000000, "stolen": true, "role": "attacker_stolen", "group": "stolen_key_attacker"}
+  ],
+  "generators": [
+    {"kind": "small_donors", "count": 500, "sats_min": 10000, "sats_max": 200000, "id_prefix": "honest", "block": 0}
+  ]
+}

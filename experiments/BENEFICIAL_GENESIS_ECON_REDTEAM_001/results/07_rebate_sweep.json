@@ -1,0 +1,206 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {
+    "rebate_attack": {
+      "rebate_100pct": {
+        "charity_loss": "5000000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "5000000",
+        "rebate_rate": "1",
+        "rebated_utility": "31249999159191/6250000",
+        "secret": false
+      },
+      "rebate_10pct": {
+        "charity_loss": "500000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "500000",
+        "rebate_rate": "1/10",
+        "rebated_utility": "3124999159191/6250000",
+        "secret": false
+      },
+      "rebate_20pct": {
+        "charity_loss": "1000000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "1000000",
+        "rebate_rate": "1/5",
+        "rebated_utility": "6249999159191/6250000",
+        "secret": false
+      },
+      "rebate_30pct": {
+        "charity_loss": "1500000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "1500000",
+        "rebate_rate": "3/10",
+        "rebated_utility": "9374999159191/6250000",
+        "secret": false
+      },
+      "rebate_40pct": {
+        "charity_loss": "2000000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "2000000",
+        "rebate_rate": "2/5",
+        "rebated_utility": "12499999159191/6250000",
+        "secret": false
+      },
+      "rebate_50pct": {
+        "charity_loss": "2500000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "2500000",
+        "rebate_rate": "1/2",
+        "rebated_utility": "15624999159191/6250000",
+        "secret": false
+      },
+      "rebate_60pct": {
+        "charity_loss": "3000000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "3000000",
+        "rebate_rate": "3/5",
+        "rebated_utility": "18749999159191/6250000",
+        "secret": false
+      },
+      "rebate_70pct": {
+        "charity_loss": "3500000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "3500000",
+        "rebate_rate": "7/10",
+        "rebated_utility": "21874999159191/6250000",
+        "secret": false
+      },
+      "rebate_80pct": {
+        "charity_loss": "4000000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "4000000",
+        "rebate_rate": "4/5",
+        "rebated_utility": "24999999159191/6250000",
+        "secret": false
+      },
+      "rebate_90pct": {
+        "charity_loss": "4500000",
+        "honest_utility": "-840809/6250000",
+        "rebate_attack_gain": "4500000",
+        "rebate_rate": "9/10",
+        "rebated_utility": "28124999159191/6250000",
+        "secret": false
+      }
+    }
+  },
+  "baseline_breakeven_price": "26806937/25000000",
+  "concentration": {
+    "by_account": {
+      "gini": "4049505608/6387483137",
+      "hhi": "61298991709291/2499986800017424",
+      "holder_count": 511,
+      "top10_share": "1165743/2500000",
+      "top1_share": "1165743/25000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "4049505608/6387483137",
+      "hhi": "61298991709291/2499986800017424",
+      "owner_count": 511,
+      "top10_share": "1165743/2500000",
+      "top1_share": "1165743/25000000"
+    }
+  },
+  "donor_count": 511,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "85936615371079/1596875000",
+      "per_donor": {
+        "rebate_0pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "5000000",
+          "utility": "-840809/6250000"
+        },
+        "rebate_100pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "0",
+          "utility": "31249999159191/6250000"
+        },
+        "rebate_10pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "4500000",
+          "utility": "3124999159191/6250000"
+        },
+        "rebate_20pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "4000000",
+          "utility": "6249999159191/6250000"
+        },
+        "rebate_30pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "3500000",
+          "utility": "9374999159191/6250000"
+        },
+        "rebate_40pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "3000000",
+          "utility": "12499999159191/6250000"
+        },
+        "rebate_50pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "2500000",
+          "utility": "15624999159191/6250000"
+        },
+        "rebate_60pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "2000000",
+          "utility": "18749999159191/6250000"
+        },
+        "rebate_70pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "1500000",
+          "utility": "21874999159191/6250000"
+        },
+        "rebate_80pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "1000000",
+          "utility": "24999999159191/6250000"
+        },
+        "rebate_90pct": {
+          "gross_token_value": "31249999159191/6250000",
+          "liquid_token_value": "31249999159191/6250000",
+          "net_cost": "500000",
+          "utility": "28124999159191/6250000"
+        }
+      },
+      "profitable_donor_count": 10,
+      "token_value_per_unit": "26806937/25000000",
+      "unprofitable_donor_count": 501
+    }
+  },
+  "governance": {
+    "by_account": {
+      "gini": "4049505608/6387483137",
+      "hhi": "61298991709291/2499986800017424",
+      "holder_count": 511,
+      "top10_share": "1165743/2500000",
+      "top1_share": "1165743/25000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "4049505608/6387483137",
+      "hhi": "61298991709291/2499986800017424",
+      "owner_count": 511,
+      "top10_share": "1165743/2500000",
+      "top1_share": "1165743/25000000"
+    },
+    "crosses_blocking_third": false,
+    "crosses_simple_majority": false,
+    "max_owner_governance_share": "1165743/24999934"
+  },
+  "pool_units": 100000000,
+  "scenario_id": "07_rebate_sweep",
+  "scheme_params": {},
+  "seed": 1007,
+  "total_eligible_units": 107227748,
+  "unissued_remainder": 264
+}

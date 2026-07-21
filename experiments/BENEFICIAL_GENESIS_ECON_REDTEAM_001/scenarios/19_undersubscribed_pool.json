@@ -1,0 +1,13 @@
+{
+  "scenario_id": "19_undersubscribed_pool",
+  "seed": 1019,
+  "pool_units": 100000000,
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "scheme_params": {},
+  "token_value_multipliers": [1.0],
+  "governance_cap_bps": "PROPORTIONAL",
+  "donors": [
+    {"id": "only_donor", "sats": 1000, "role": "sole_donor", "group": "only_donor"}
+  ],
+  "generators": []
+}

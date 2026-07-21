@@ -1,0 +1,63 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {},
+  "baseline_breakeven_price": "1/100000",
+  "concentration": {
+    "by_account": {
+      "gini": "0",
+      "hhi": "1",
+      "holder_count": 1,
+      "top10_share": "1",
+      "top1_share": "1"
+    },
+    "by_beneficial_owner": {
+      "gini": "0",
+      "hhi": "1",
+      "owner_count": 1,
+      "top10_share": "1",
+      "top1_share": "1"
+    }
+  },
+  "donor_count": 1,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "0",
+      "per_donor": {
+        "only_donor": {
+          "gross_token_value": "1000",
+          "liquid_token_value": "1000",
+          "net_cost": "1000",
+          "utility": "0"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "1/100000",
+      "unprofitable_donor_count": 0
+    }
+  },
+  "governance": {
+    "by_account": {
+      "gini": "0",
+      "hhi": "1",
+      "holder_count": 1,
+      "top10_share": "1",
+      "top1_share": "1"
+    },
+    "by_beneficial_owner": {
+      "gini": "0",
+      "hhi": "1",
+      "owner_count": 1,
+      "top10_share": "1",
+      "top1_share": "1"
+    },
+    "crosses_blocking_third": true,
+    "crosses_simple_majority": true,
+    "max_owner_governance_share": "1"
+  },
+  "pool_units": 100000000,
+  "scenario_id": "19_undersubscribed_pool",
+  "scheme_params": {},
+  "seed": 1019,
+  "total_eligible_units": 1000,
+  "unissued_remainder": 0
+}

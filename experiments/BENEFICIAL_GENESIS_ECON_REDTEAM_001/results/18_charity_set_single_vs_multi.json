@@ -1,0 +1,117 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {
+    "charity_breakdown": {
+      "donor_controlled_charity": {
+        "net_retained": "3000000",
+        "total_donated": "15000000",
+        "total_rebated": "12000000"
+      },
+      "honest_charity": {
+        "net_retained": "20000000",
+        "total_donated": "20000000",
+        "total_rebated": "0"
+      },
+      "unspecified": {
+        "net_retained": "20556532",
+        "total_donated": "20556532",
+        "total_rebated": "0"
+      }
+    },
+    "rebate_attack": {
+      "donor_to_donor_controlled_charity_01": {
+        "charity_loss": "8000000",
+        "honest_utility": "-8855161/25000000",
+        "rebate_attack_gain": "8000000",
+        "rebate_rate": "4/5",
+        "rebated_utility": "199999991144839/25000000",
+        "secret": true
+      },
+      "donor_to_donor_controlled_charity_02": {
+        "charity_loss": "4000000",
+        "honest_utility": "-11372147/25000000",
+        "rebate_attack_gain": "4000000",
+        "rebate_rate": "4/5",
+        "rebated_utility": "99999988627853/25000000",
+        "secret": true
+      }
+    }
+  },
+  "baseline_breakeven_price": "13889133/25000000",
+  "concentration": {
+    "by_account": {
+      "gini": "4939636917/6799992860",
+      "hhi": "1061870033565659/9999979000011025",
+      "holder_count": 204,
+      "top10_share": "65147167/100000000",
+      "top1_share": "17999683/100000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "4939636917/6799992860",
+      "hhi": "1061870033565659/9999979000011025",
+      "owner_count": 204,
+      "top10_share": "65147167/100000000",
+      "top1_share": "17999683/100000000"
+    }
+  },
+  "donor_count": 204,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "19999902776069/340000000",
+      "per_donor": {
+        "donor_to_donor_controlled_charity_01": {
+          "gross_token_value": "249999991144839/25000000",
+          "liquid_token_value": "249999991144839/25000000",
+          "net_cost": "2000000",
+          "utility": "199999991144839/25000000"
+        },
+        "donor_to_donor_controlled_charity_02": {
+          "gross_token_value": "124999988627853/25000000",
+          "liquid_token_value": "124999988627853/25000000",
+          "net_cost": "1000000",
+          "utility": "99999988627853/25000000"
+        },
+        "donor_to_honest_charity_01": {
+          "gross_token_value": "249999991144839/25000000",
+          "liquid_token_value": "249999991144839/25000000",
+          "net_cost": "10000000",
+          "utility": "-8855161/25000000"
+        },
+        "donor_to_honest_charity_02": {
+          "gross_token_value": "249999991144839/25000000",
+          "liquid_token_value": "249999991144839/25000000",
+          "net_cost": "10000000",
+          "utility": "-8855161/25000000"
+        }
+      },
+      "profitable_donor_count": 2,
+      "token_value_per_unit": "13889133/25000000",
+      "unprofitable_donor_count": 202
+    }
+  },
+  "governance": {
+    "by_account": {
+      "gini": "4939636917/6799992860",
+      "hhi": "1061870033565659/9999979000011025",
+      "holder_count": 204,
+      "top10_share": "65147167/100000000",
+      "top1_share": "17999683/100000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "4939636917/6799992860",
+      "hhi": "1061870033565659/9999979000011025",
+      "owner_count": 204,
+      "top10_share": "65147167/100000000",
+      "top1_share": "17999683/100000000"
+    },
+    "crosses_blocking_third": false,
+    "crosses_simple_majority": false,
+    "max_owner_governance_share": "17999683/99999895"
+  },
+  "pool_units": 100000000,
+  "scenario_id": "18_charity_set_single_vs_multi",
+  "scheme_params": {},
+  "seed": 1018,
+  "total_eligible_units": 55556532,
+  "unissued_remainder": 105
+}

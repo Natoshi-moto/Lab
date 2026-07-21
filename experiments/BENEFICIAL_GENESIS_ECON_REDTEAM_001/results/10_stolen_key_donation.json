@@ -1,0 +1,71 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {
+    "stolen_key_laundering": {
+      "stolen_key_attacker": {
+        "laundering_gain": "999999939381597/100000000",
+        "note": "attacker's cost basis is the theft victim's loss, not the attacker's; the protocol allocates identically to an honest donor of equal sats",
+        "true_economic_cost_borne_by_attacker": "0"
+      }
+    }
+  },
+  "baseline_breakeven_price": "62847081/100000000",
+  "concentration": {
+    "by_account": {
+      "gini": "3402368178/8349979793",
+      "hhi": "135552755100923/4999975800029282",
+      "holder_count": 501,
+      "top10_share": "935949/5000000",
+      "top1_share": "15911637/100000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "3402368178/8349979793",
+      "hhi": "135552755100923/4999975800029282",
+      "owner_count": 501,
+      "top10_share": "935949/5000000",
+      "top1_share": "15911637/100000000"
+    }
+  },
+  "donor_count": 501,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-2534832267/8350000000",
+      "per_donor": {
+        "stolen_key_attacker": {
+          "gross_token_value": "999999939381597/100000000",
+          "liquid_token_value": "999999939381597/100000000",
+          "net_cost": "10000000",
+          "utility": "-60618403/100000000"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "62847081/100000000",
+      "unprofitable_donor_count": 501
+    }
+  },
+  "governance": {
+    "by_account": {
+      "gini": "3402368178/8349979793",
+      "hhi": "135552755100923/4999975800029282",
+      "holder_count": 501,
+      "top10_share": "935949/5000000",
+      "top1_share": "15911637/100000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "3402368178/8349979793",
+      "hhi": "135552755100923/4999975800029282",
+      "owner_count": 501,
+      "top10_share": "935949/5000000",
+      "top1_share": "15911637/100000000"
+    },
+    "crosses_blocking_third": false,
+    "crosses_simple_majority": false,
+    "max_owner_governance_share": "15911637/99999758"
+  },
+  "pool_units": 100000000,
+  "scenario_id": "10_stolen_key_donation",
+  "scheme_params": {},
+  "seed": 1010,
+  "total_eligible_units": 62847081,
+  "unissued_remainder": 242
+}

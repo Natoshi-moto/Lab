@@ -1,0 +1,20 @@
+{
+  "scenario_id": "18_charity_set_single_vs_multi",
+  "seed": 1018,
+  "pool_units": 100000000,
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "scheme_params": {},
+  "token_value_multipliers": [1.0],
+  "governance_cap_bps": "PROPORTIONAL",
+  "track_charity_breakdown": true,
+  "donors": [
+    {"id": "donor_to_honest_charity_01", "sats": 10000000, "charity_id": "honest_charity", "rebate_rate": "0", "group": "donor_to_honest_charity_01"},
+    {"id": "donor_to_honest_charity_02", "sats": 10000000, "charity_id": "honest_charity", "rebate_rate": "0", "group": "donor_to_honest_charity_02"},
+    {"id": "donor_to_donor_controlled_charity_01", "sats": 10000000, "charity_id": "donor_controlled_charity", "rebate_rate": "4/5", "secret_rebate": true, "group": "donor_to_donor_controlled_charity_01",
+     "note": "this donor and the destination charity are modelled as under common control, so most of the nominal donation round-trips back off-protocol"},
+    {"id": "donor_to_donor_controlled_charity_02", "sats": 5000000, "charity_id": "donor_controlled_charity", "rebate_rate": "4/5", "secret_rebate": true, "group": "donor_to_donor_controlled_charity_02"}
+  ],
+  "generators": [
+    {"kind": "small_donors", "count": 200, "sats_min": 10000, "sats_max": 200000, "id_prefix": "small", "block": 0}
+  ]
+}

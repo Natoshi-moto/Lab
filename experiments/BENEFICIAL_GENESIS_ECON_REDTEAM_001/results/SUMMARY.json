@@ -1,0 +1,31 @@
+{
+  "scenario_count": 26,
+  "scenario_ids": [
+    "01_whale_50",
+    "02_whale_80",
+    "03_whale_99",
+    "04_exchange_omnibus_vs_small_donors",
+    "05_sybil_split_concave",
+    "06_sybil_split_control_pro_rata",
+    "07_rebate_sweep",
+    "08_secret_rebate_whale",
+    "09_denominator_doubles_final_block",
+    "10_stolen_key_donation",
+    "11_quantum_cutoff_freeze",
+    "12_token_value_below_equal_above",
+    "13_governance_proportional",
+    "14_governance_capped",
+    "15_lockup_0_months",
+    "16_lockup_3_months",
+    "17_lockup_12_months",
+    "18_charity_set_single_vs_multi",
+    "19_undersubscribed_pool",
+    "20_oversubscribed_pool",
+    "21_no_token_baseline",
+    "22_capped_pro_rata_whale",
+    "23_time_weighted_late_donor_disadvantage",
+    "24_random_lottery_component",
+    "25_concave_log_whale",
+    "26_sybil_split_capped_pro_rata"
+  ]
+}

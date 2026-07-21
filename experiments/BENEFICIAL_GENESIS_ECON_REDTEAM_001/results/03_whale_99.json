@@ -1,0 +1,63 @@
+{
+  "allocation_scheme": "EXACT_PRO_RATA",
+  "attack_analysis": {},
+  "baseline_breakeven_price": "82031373/1562500",
+  "concentration": {
+    "by_account": {
+      "gini": "16549067382/16699959085",
+      "hhi": "9800973026506387/9999951000060025",
+      "holder_count": 501,
+      "top10_share": "1547403/1562500",
+      "top1_share": "98999851/100000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "16549067382/16699959085",
+      "hhi": "9800973026506387/9999951000060025",
+      "owner_count": 501,
+      "top10_share": "1547403/1562500",
+      "top1_share": "98999851/100000000"
+    }
+  },
+  "donor_count": 501,
+  "donor_economics": {
+    "1.0": {
+      "mean_utility": "-1339845759/52187500",
+      "per_donor": {
+        "whale_01": {
+          "gross_token_value": "8121093704325423/1562500",
+          "liquid_token_value": "8121093704325423/1562500",
+          "net_cost": "5197500000",
+          "utility": "-45674577/1562500"
+        }
+      },
+      "profitable_donor_count": 0,
+      "token_value_per_unit": "82031373/1562500",
+      "unprofitable_donor_count": 501
+    }
+  },
+  "governance": {
+    "by_account": {
+      "gini": "16549067382/16699959085",
+      "hhi": "9800973026506387/9999951000060025",
+      "holder_count": 501,
+      "top10_share": "1547403/1562500",
+      "top1_share": "98999851/100000000"
+    },
+    "by_beneficial_owner": {
+      "gini": "16549067382/16699959085",
+      "hhi": "9800973026506387/9999951000060025",
+      "owner_count": 501,
+      "top10_share": "1547403/1562500",
+      "top1_share": "98999851/100000000"
+    },
+    "crosses_blocking_third": true,
+    "crosses_simple_majority": true,
+    "max_owner_governance_share": "98999851/99999755"
+  },
+  "pool_units": 100000000,
+  "scenario_id": "03_whale_99",
+  "scheme_params": {},
+  "seed": 1003,
+  "total_eligible_units": 5250007872,
+  "unissued_remainder": 245
+}
