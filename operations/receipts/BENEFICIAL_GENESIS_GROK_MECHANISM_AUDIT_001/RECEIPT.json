@@ -17,6 +17,11 @@
     "blinding_breach": false
   },
   "freeze_commit": "895f8b54d68349e470ebf853ab841de45c5a8269",
+  "package_commit": "48e53ce2d893641476cfd1f7ca0201e5184313a8",
+  "audit_commits": [
+    "895f8b54d68349e470ebf853ab841de45c5a8269",
+    "48e53ce2d893641476cfd1f7ca0201e5184313a8"
+  ],
   "authorized_write_paths": [
     "experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/**",
     "operations/audits/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/**",
