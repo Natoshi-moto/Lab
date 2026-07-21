@@ -1,0 +1,50 @@
+{
+  "schema": "bgen.r1-retest.decision/v1",
+  "task": "BGEN-R1-RETEST",
+  "status_authority": "NONE",
+  "subject_pr": 50,
+  "subject_head_commit": "a591167a4046ef73762c78080a27898450b0f1e4",
+  "repair_logic_commit": "3c83a13497be94f1cb5a05bec37f10ba81d8903b",
+  "retest_branch": "codex/bgen-r1-retest-001",
+  "seat": {
+    "provider": "OpenAI",
+    "surface": "Codex",
+    "model_string": "GPT-5",
+    "different_family_from_repair_seat": true,
+    "blind_to_repair_diff": false
+  },
+  "staleness": "NONE_OBSERVED: local tested HEAD equalled remote draft PR #50 head at capture",
+  "package_decision": "REPAIRED_PACKAGE_PASS",
+  "decision_scope": [
+    "TRIB-F-001 negative lottery share counterexample",
+    "strict type/range gates for lottery_share_bps and early_bonus_bps",
+    "type/sign handling and safe population bound for winners",
+    "type/sign handling and supply conservation for pool",
+    "public allocation supply invariant",
+    "committed 27-scenario result reproducibility"
+  ],
+  "ECONOMIC_GATE_PASS": false,
+  "pre_repair_reproduction": {
+    "source": "repair logic parent commit",
+    "input": {"donors": [["a", 100]], "pool": 100, "lottery_share_bps": -1000, "winners": 1},
+    "allocation": {"a": 110},
+    "total_issued": 110,
+    "result": "FAILURE_CLASS_REPRODUCED"
+  },
+  "post_repair": {
+    "controlling_counterexample": "ParticipantValidationError",
+    "subject_tests": "78 tests passed",
+    "independent_tests": "8 tests passed",
+    "simulation": "27 scenarios regenerated",
+    "committed_results": "29/29 files SHA-256 identical before and after; git diff empty"
+  },
+  "status_json_modified_in_repair_pr_scope": false,
+  "live_activity": false,
+  "nonclaims": [
+    "No merge or promotion authority",
+    "No STATUS.json change",
+    "No live funds or activity",
+    "No claim of exhaustive input-space verification",
+    "No economic, legal, market, privacy, or production-readiness conclusion"
+  ]
+}

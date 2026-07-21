@@ -1,0 +1,43 @@
+{
+  "schema": "bgen.r1-retest.receipt/v1",
+  "task": "BGEN-R1-RETEST",
+  "seat": "OpenAI Codex",
+  "model_string": "GPT-5",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / DIFFERENT_FAMILY_RETEST",
+  "blind_to_repair_diff": false,
+  "subject_pr": 50,
+  "subject_issue": 51,
+  "subject_head_commit": "a591167a4046ef73762c78080a27898450b0f1e4",
+  "repair_logic_commit": "3c83a13497be94f1cb5a05bec37f10ba81d8903b",
+  "branch": "codex/bgen-r1-retest-001",
+  "package_decision": "REPAIRED_PACKAGE_PASS",
+  "ECONOMIC_GATE_PASS": false,
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_R1/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_R1/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_R1/**"
+  ],
+  "scope_respected": true,
+  "status_json_modified": false,
+  "historical_audits_rewritten": false,
+  "live_activity": false,
+  "subject_staleness_at_capture": false,
+  "commands": {
+    "historical allocation loaded from 3c83a13^": "exit 0; reproduced 110 issued from pool 100",
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v": "exit 0; 78 tests OK",
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py": "exit 0; 27 scenarios; 29/29 result hashes unchanged",
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_RETEST_R1/tests -v": "exit 0; 8 tests OK",
+    "npm ci --ignore-scripts --no-audit --no-fund": "exit 0; restored pinned @noble/ed25519 3.1.0 required by repository-wide verifier tests",
+    "python3 -m unittest discover -s tests -v": "exit 0 after pinned npm dependency install; 185 tests OK (initial run had 11 environment-only failures from missing @noble/ed25519)",
+    "./nexus doctor": "exit 0; PASS with expected WORKTREE_DIRTY warning",
+    "./nexus verify": "exit 0; PASS"
+  },
+  "nonclaims": [
+    "No merge or promotion authority",
+    "No STATUS.json change",
+    "No live activity",
+    "No ECONOMIC_GATE_PASS",
+    "No exhaustive verification beyond tested domains"
+  ]
+}
