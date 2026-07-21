@@ -38,5 +38,6 @@
   "receipt_self_binding_note": "Logic commit hash fields are filled in a follow-up binding commit so this receipt does not contain the SHA of the commit that finalizes its own bytes.",
   "audit_logic_commit": "7e59f822682f727c882f824cae89da4879b81ffa",
   "receipt_binding_parent_commit": "7e59f822682f727c882f824cae89da4879b81ffa",
-  "draft_pr": null
+  "draft_pr": 43,
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/43"
 }
