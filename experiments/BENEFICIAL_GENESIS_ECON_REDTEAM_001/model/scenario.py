@@ -190,6 +190,11 @@ def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
     weight_pairs = [(d["id"], d["sats"]) for d in donors]
     total_eligible = sum(w for _, w in weight_pairs)
 
+    if type(pool) is not int or pool < 0:
+        raise alloc.ParticipantValidationError(
+            f"pool_units must be a non-negative int, got {pool!r}"
+        )
+
     if scheme_name == "NO_TOKEN":
         allocation = {donor_id: 0 for donor_id, _ in weight_pairs}
     elif scheme_name == "RANDOM_LOTTERY_COMPONENT":
@@ -198,9 +203,17 @@ def run_scenario(manifest: dict[str, Any]) -> dict[str, Any]:
         donor_blocks = {d["id"]: d.get("block", 0) for d in donors}
         allocation = alloc.time_weighted(weight_pairs, pool, donor_blocks=donor_blocks, **scheme_params)
     else:
+        if scheme_name not in alloc.SCHEMES:
+            raise ValueError(f"unknown allocation scheme: {scheme_name!r}")
         allocation = alloc.SCHEMES[scheme_name](weight_pairs, pool, **scheme_params)
 
+    # R1 / TRIB-F-001: refuse any result that leaves the closed interval [0, pool].
+    alloc.enforce_supply_invariant(allocation, pool)
     unissued = metrics.unissued_remainder(allocation, pool)
+    if unissued < 0:
+        raise alloc.ParticipantValidationError(
+            f"supply invariant violated: unissued_remainder={unissued} is negative"
+        )
     concentration = _concentration_block(allocation, pool, donors)
 
     governance_block = None
