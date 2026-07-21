@@ -1,0 +1,10 @@
+NEXUS DOCTOR: PASS
+  PASS required_paths
+  PASS symlink_policy
+  PASS json_parse
+  PASS secret_patterns
+  PASS privacy_ignore_rules
+  PASS seed_handoff_binding
+  PASS git_repository
+  WARN  WORKTREE_DIRTY
+NON-CLAIM: A pass is not an exhaustive security, privacy or semantic audit.

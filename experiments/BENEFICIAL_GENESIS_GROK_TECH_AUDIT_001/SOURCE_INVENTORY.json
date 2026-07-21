@@ -1,0 +1,55 @@
+{
+  "schema": "bgen.grok-tech-audit.source-inventory/v1",
+  "audit_id": "BGEN-GROK-TECH-AUDIT-001",
+  "frozen_subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "freeze_commit": "a07ff58a446a66d8492435cfb441f6fb03b0bf06",
+  "inspected": {
+    "pre_freeze": [
+      "STATUS.json",
+      "AGENTS.md",
+      "README_START_HERE.md (partial)",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/TECHNICAL_DESIGN.md",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/THREAT_MODEL_AND_NONCLAIMS.md",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/constants.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/allocation.py",
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/schemas/protocol_constants.json",
+      "GitHub issue #33 (exact)",
+      "GitHub issue #34 (exact)",
+      "pasted task prompt (controlling contract)"
+    ],
+    "post_freeze": [
+      "experiments/BENEFICIAL_GENESIS_DESIGN_001/** (protocol, tests, fixtures, verify_evidence, EXPECTED.json)",
+      "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/** (README, model/*, tests, simulate, results samples)",
+      "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/** (README, model/allocation API, tests via execution)",
+      "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+      "experiments/BENEFICIAL_GENESIS_RETEST_002/** (README, verify.mjs execution, tests)",
+      "operations/receipts/BENEFICIAL_GENESIS_{DESIGN_001,ECON_REDTEAM_001,ECON_BREAKER_001,ECON_RETEST_003,DIFF_RETEST_002}/RECEIPT.json",
+      "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003 (via DECISION/matrix in experiment package)",
+      "GitHub PR #35, #37, #39 metadata only (number/title/state/mergeCommit)",
+      "experiments/R016_PCX_INTEGRATED_CUSTODY_GATE/README.md (prerequisite check for full lab tests)",
+      "experiments/R015_PCX_INDEPENDENT_DURABILITY_VERIFIER_MODEL/README.md (partial)",
+      "git ancestry of subject merge 8349de7"
+    ]
+  },
+  "not_inspected_or_not_deep_read": [
+    "Full prose of every economics result JSON (spot-checked structure; suites re-ran)",
+    "Full audit markdown bodies under operations/audits/BENEFICIAL_GENESIS_ECON_* (receipts and retest DECISION used as primary)",
+    "Issue #26, #31, #36, #38 bodies (referenced by receipts only)",
+    "PR review comment bodies for #35/#37/#39"
+  ],
+  "permanently_forbidden_not_opened": [
+    "PR #40",
+    "PR #42",
+    "branch fable/bgen-epistemic-audit-001",
+    "branch codex/bgen-technical-audit-001",
+    "experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+    "experiments/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+    "sibling 2x2 audit findings/handoffs"
+  ],
+  "blinding_breach": false
+}

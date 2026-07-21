@@ -1,0 +1,30 @@
+test_cap_reduces_whale_weight (test_allocation.TestCapped.test_cap_reduces_whale_weight) ... ok
+test_sybil_defeats_cap_without_identity (test_allocation.TestCapped.test_sybil_defeats_cap_without_identity) ... ok
+test_independent_math_sqrt_split (test_allocation.TestConcaveSybil.test_independent_math_sqrt_split) ... ok
+test_sqrt_sybil_gain (test_allocation.TestConcaveSybil.test_sqrt_sybil_gain) ... ok
+test_deterministic_seed (test_allocation.TestLottery.test_deterministic_seed) ... ok
+test_without_replacement_unique_winners (test_allocation.TestLottery.test_without_replacement_unique_winners) ... ok
+test_nothing_issued (test_allocation.TestNoToken.test_nothing_issued) ... ok
+test_bool_eligible_rejected (test_allocation.TestProRata.test_bool_eligible_rejected) ... ok
+test_duplicate_donor_fails_closed (test_allocation.TestProRata.test_duplicate_donor_fails_closed) ... ok
+test_share_of_pool_vs_issued (test_allocation.TestProRata.test_share_of_pool_vs_issued) ... ok
+test_split_invariance_mass (test_allocation.TestProRata.test_split_invariance_mass) ... ok
+test_supply_invariant (test_allocation.TestProRata.test_supply_invariant) ... ok
+test_capped_renormalizes (test_metrics_gov_launder_rebate.TestGovernance.test_capped_renormalizes) ... ok
+test_none_no_control (test_metrics_gov_launder_rebate.TestGovernance.test_none_no_control) ... ok
+test_token_weighted_whale_control (test_metrics_gov_launder_rebate.TestGovernance.test_token_weighted_whale_control) ... ok
+test_high_token_can_be_profitable (test_metrics_gov_launder_rebate.TestLaundering.test_high_token_can_be_profitable) ... ok
+test_separates_opportunity_from_legal_basis (test_metrics_gov_launder_rebate.TestLaundering.test_separates_opportunity_from_legal_basis) ... ok
+test_concentration_report_labels_both (test_metrics_gov_launder_rebate.TestMetrics.test_concentration_report_labels_both) ... ok
+test_gini_equal (test_metrics_gov_launder_rebate.TestMetrics.test_gini_equal) ... ok
+test_gini_unequal (test_metrics_gov_launder_rebate.TestMetrics.test_gini_unequal) ... ok
+test_hhi_monopoly (test_metrics_gov_launder_rebate.TestMetrics.test_hhi_monopoly) ... ok
+test_top_n_denominators_differ (test_metrics_gov_launder_rebate.TestMetrics.test_top_n_denominators_differ) ... ok
+test_conditional_one_for_one (test_metrics_gov_launder_rebate.TestRebate.test_conditional_one_for_one) ... ok
+test_low_access_reduces_expected (test_metrics_gov_launder_rebate.TestRebate.test_low_access_reduces_expected) ... ok
+test_all_scenarios_run_twice_identical (test_metrics_gov_launder_rebate.TestScenariosDeterminism.test_all_scenarios_run_twice_identical) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.020s
+
+OK

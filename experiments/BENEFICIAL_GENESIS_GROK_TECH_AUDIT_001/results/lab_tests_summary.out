@@ -1,0 +1,24 @@
+======================================================================
+ERROR: test_convergence_gate_summary (test_r013_pcx_convergence.R013PCXConvergenceTests.test_convergence_gate_summary)
+======================================================================
+ERROR: test_saved_and_claim_evidence_bindings_are_fail_closed (test_r013_pcx_convergence.R013PCXConvergenceTests.test_saved_and_claim_evidence_bindings_are_fail_closed)
+======================================================================
+FAIL: test_deterministic_byte_mutation_fuzz_converges (test_r013_pcx_convergence.R013PCXConvergenceTests.test_deterministic_byte_mutation_fuzz_converges)
+======================================================================
+FAIL: test_independent_verifiers_emit_byte_identical_report (test_r013_pcx_convergence.R013PCXConvergenceTests.test_independent_verifiers_emit_byte_identical_report)
+======================================================================
+FAIL: test_cold_verifier_converges_anchored_and_unanchored (test_r015_independent_durability_verifier.R015IndependentDurabilityVerifierTests.test_cold_verifier_converges_anchored_and_unanchored)
+======================================================================
+FAIL: test_common_prefix_anchor_confirms_two_divergent_suffixes_without_choice (test_r015_independent_durability_verifier.R015IndependentDurabilityVerifierTests.test_common_prefix_anchor_confirms_two_divergent_suffixes_without_choice) (transcript='c-first.json')
+======================================================================
+FAIL: test_common_prefix_anchor_confirms_two_divergent_suffixes_without_choice (test_r015_independent_durability_verifier.R015IndependentDurabilityVerifierTests.test_common_prefix_anchor_confirms_two_divergent_suffixes_without_choice) (transcript='d-first.json')
+======================================================================
+FAIL: test_external_anchor_classification_and_honest_prefix_limit (test_r015_independent_durability_verifier.R015IndependentDurabilityVerifierTests.test_external_anchor_classification_and_honest_prefix_limit)
+======================================================================
+FAIL: test_older_valid_transcript_passes_unanchored_but_newer_anchor_is_ahead (test_r015_independent_durability_verifier.R015IndependentDurabilityVerifierTests.test_older_valid_transcript_passes_unanchored_but_newer_anchor_is_ahead)
+======================================================================
+FAIL: test_both_verifiers_fail_closed_on_a_validly_reframed_bad_signature (test_r016_independent_verifier.R016IndependentVerifierTests.test_both_verifiers_fail_closed_on_a_validly_reframed_bad_signature)
+======================================================================
+FAIL: test_verifiers_match_saved_report_and_repeat_exactly (test_r016_independent_verifier.R016IndependentVerifierTests.test_verifiers_match_saved_report_and_repeat_exactly)
+Ran 185 tests in 27.514s
+FAILED (failures=9, errors=2)

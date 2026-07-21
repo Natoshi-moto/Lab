@@ -1,0 +1,114 @@
+{
+  "schema": "bgen.grok-tech-audit.findings/v1",
+  "audit_id": "BGEN-GROK-TECH-AUDIT-001",
+  "frozen_subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "findings": [
+    {
+      "id": "F-001",
+      "severity": "MEDIUM",
+      "title": "Design README fixture catalog counts are stale",
+      "locators": [
+        "experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md:77-78",
+        "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/EXPECTED.json"
+      ],
+      "evidence": [
+        "verify_evidence.py PASS with executable_invalid_cases=34, documentary_only_cases=1, residual_risks=8",
+        "README claims 29 executable invalid vectors and 6 documentary-only scenarios",
+        "probe P-DOC-001 FAIL"
+      ],
+      "counterevidence": [
+        "Executable evidence gate itself is consistent with EXPECTED.json; only README prose drifts"
+      ],
+      "confidence": "high",
+      "falsifier": "README counts match EXPECTED.json and evidence gate output",
+      "repair": "Update README catalog counts to 34 executable / 1 documentary / 8 residual (or generate from EXPECTED)"
+    },
+    {
+      "id": "F-002",
+      "severity": "LOW",
+      "title": "Rejection-code taxonomy looser than fixture attack names",
+      "locators": [
+        "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/EXPECTED.json",
+        "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/constants.py:44-96"
+      ],
+      "evidence": [
+        "wrong_output_index -> AMOUNT_MISMATCH",
+        "nullifier_domain_omission -> NULLIFIER_INVALID despite NULLIFIER_DOMAIN_OMISSION existing",
+        "inclusion_after_cutoff -> HEADER_ANCESTRY_INVALID"
+      ],
+      "counterevidence": [
+        "Evidence gate still rejects all executable invalid fixtures fail-closed"
+      ],
+      "confidence": "high",
+      "falsifier": "Fixture expected codes match attack-class-specific rejection codes",
+      "repair": "Prefer specific codes; document intentional overloads"
+    },
+    {
+      "id": "F-003",
+      "severity": "MEDIUM",
+      "title": "Full lab tests and nexus verify fail without @noble/ed25519",
+      "locators": [
+        "experiments/R013_PCX_CONSERVED_CLAIM/independent_verifier.mjs",
+        "experiments/R016_PCX_INTEGRATED_CUSTODY_GATE/independent_verifier.mjs",
+        "tests/test_r016_independent_verifier.py"
+      ],
+      "evidence": [
+        "unittest discover -s tests: 9 failures + 2 errors, ERR_MODULE_NOT_FOUND @noble/ed25519",
+        "./nexus verify exit 2 same error"
+      ],
+      "counterevidence": [
+        "All Beneficial Genesis package suites prescribed by this audit passed without Noble"
+      ],
+      "confidence": "high",
+      "classification": "environmental_missing_prerequisite_not_bgen_logic_defect",
+      "falsifier": "Documented npm install or vendored noble makes full suite and nexus verify pass",
+      "repair": "Document and pin Node dependency for independent verifiers"
+    },
+    {
+      "id": "F-004",
+      "severity": "LOW",
+      "title": "Economics SCHEMES registry omits lottery",
+      "locators": [
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/model/allocation.py:217-223"
+      ],
+      "evidence": [
+        "SCHEMES lacks random_lottery_component; lottery requires rng argument"
+      ],
+      "counterevidence": [
+        "Scenario runner and direct tests cover lottery"
+      ],
+      "confidence": "high",
+      "falsifier": "Registry includes lottery with explicit rng factory contract",
+      "repair": "Document special-case or extend registry"
+    },
+    {
+      "id": "F-005",
+      "severity": "INFO",
+      "title": "Residual research risks correctly disclosed and not closed by tests",
+      "locators": [
+        "experiments/BENEFICIAL_GENESIS_DESIGN_001/THREAT_MODEL_AND_NONCLAIMS.md",
+        "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/FAILURE_CONDITIONS.md",
+        "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/results/DECISION.json"
+      ],
+      "evidence": [
+        "Synthetic crypto, no real Bitcoin consensus, FC4 pathway, FC6 Sybil without identity, ECONOMIC_GATE_PASS false"
+      ],
+      "counterevidence": [],
+      "confidence": "high",
+      "falsifier": "Production Bitcoin+PQ+identity layers with independent economic gate pass evidence",
+      "repair": "None required for honesty; continue research tracks B/C/D/E/F per issue #33"
+    }
+  ],
+  "non_findings": [
+    "design_allocation_supply_conservation",
+    "bool_as_int_rejection",
+    "duplicate_json_key_rejection",
+    "claude_design_prorata_composition_match",
+    "lottery_without_replacement",
+    "metrics_denominator_split",
+    "subject_path_integrity_after_simulators",
+    "receipt_commit_sha_resolution",
+    "no_status_json_mutation",
+    "no_blinding_breach"
+  ]
+}

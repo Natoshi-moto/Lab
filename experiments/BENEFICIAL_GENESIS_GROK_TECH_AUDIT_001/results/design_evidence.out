@@ -1,0 +1,16 @@
+.....................................
+----------------------------------------------------------------------
+Ran 37 tests in 0.063s
+
+OK
+BGEN evidence gate: starting
+  required files: OK
+  synthetic labels: OK
+  unittests: OK
+  valid + allocation: OK
+  invalid catalog: OK (executed=34, documentary=1, residual=8)
+  fixture byte determinism: OK
+  operational-material scan: OK
+  rejection codes sync: OK
+BGEN evidence gate: PASS
+{"documentary_only_cases": 1, "executable_invalid_cases": 34, "experiment": "BENEFICIAL_GENESIS_DESIGN_001", "rejection_code_count": 51, "residual_risks": 8, "result": "PASS"}
