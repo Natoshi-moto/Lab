@@ -1,0 +1,19 @@
+{
+  "schema": "nexus.status/v2",
+  "lab_id": "NEXUS-LAB",
+  "status_authority": "NONE",
+  "research_only": true,
+  "current_round": "NOTED_STOP_THE_LINE_001",
+  "foundation_status": "PROPOSAL_ONLY_OPERATOR_CRITICAL",
+  "current_mode": "FEATURE_VELOCITY_HOSTILE_PENDING_OPERATOR_ADOPT",
+  "last_completed_action": "STOP_THE_LINE_PACKET_AUTHORED_OVER_ASSAULT_SPINE",
+  "next_action_id": "ACT-NOTED-STOPLINE-001_OPERATOR_D1_D5",
+  "active_tasks": [],
+  "open_assurance_blocks": 0,
+  "open_defect_blocks": 0,
+  "notes": [
+    "Does not replace NOTED_SOVEREIGNTY_ASSAULT_001; raises cost of ignoring it.",
+    "Not a security certification. Not implementation authority.",
+    "G-01..G-03 default RED until evidence or waiver."
+  ]
+}

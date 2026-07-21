@@ -40,6 +40,7 @@ End of THIS phase = system the sim is designed IN / FOR / BUILT INTO.
 | 11 | **`GROK_PICKUP.md`** | **Fresh Grok session — one-command handoff + history walk + 5 options** |
 | 12 | Sister: `../BENEFICIAL_GENESIS_UNIFIED_THESIS_001/CANONICAL_CHECKPOINT_001.md` | All |
 | 13 | Sister: `../../operations/proposals/NOTED_SOVEREIGNTY_ASSAULT_001/README.md` | All — hardening/sovereignty campaign proposal (threat spine, Snooper design, cold-drop bar); lives under `operations/proposals/` per `CONTAINMENT.md`, not duplicated here |
+| 14 | Sister: `../../operations/proposals/NOTED_STOP_THE_LINE_001/README.md` | All — **stop-the-line** layer: hard gates, productivity tax, waiver-only escape; makes assault packet unignorable for planning |
 
 ## Non-claims
 

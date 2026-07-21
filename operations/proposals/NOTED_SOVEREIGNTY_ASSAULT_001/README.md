@@ -47,3 +47,9 @@ A one-line pointer has been added to `experiments/NOTED_PROJECT_OS_001/README.md
 ## Non-claims
 
 Same as the rest of this programme: research only, no price/value endorsement, multi-AI agreement is not independence, this proposal is not permission. See `PURPOSE_AND_NONCLAIMS.md` at the Lab root and `CANONICAL_CHECKPOINT_001.md`.
+
+---
+
+## Sister packet (do not ignore)
+
+**`operations/proposals/NOTED_STOP_THE_LINE_001/`** raises the **cost of ignoring this campaign**. It defines hard gates, a feature-work productivity tax, and a waiver-only escape hatch. Read it after this folder’s threat spine. It does not replace T-IDs; it makes them **economically unavoidable**.
