@@ -1,0 +1,105 @@
+{
+  "schema": "nexus.receipt/v1",
+  "receipt_id": "RCT-NOTED-PROJECT-OS-PHASE-2-001",
+  "operation": "noted-project-os-phase-2-agent-prompt-import",
+  "status_authority": "NONE",
+  "seat": "SEAT-CODEX-IMPLEMENT",
+  "baseline_commit": "eded9d135cc640eb1dc440f628307d2f893acd5b",
+  "verified_at_commit": "761aee6bc60b238671d25e3c3daf77a1e9654801",
+  "started_at": "2026-07-21T23:10:00+01:00",
+  "finished_at": "2026-07-21T23:54:00+01:00",
+  "exit_code": 0,
+  "inputs": [
+    { "path": "README_START_HERE.md" },
+    { "path": "STATUS.json" },
+    { "path": "NEXT_ACTION.md" },
+    { "path": "constitution/*.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/seats/CODEX_IMPLEMENTER.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/CANONICAL_DIRECTION.md" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/TECH_SPEC.md", "sections": "§3.2, §6 Phase 2, §8.2 A4/A6" },
+    { "path": "experiments/NOTED_PROJECT_OS_001/DIAGNOSTIC_SUITE.md", "sections": "§4.3 ODS-AG-001 and ODS-PR-001" },
+    { "path": "products/noted-host/src/studios/nexusAgent/NexusAgentStudio.tsx" },
+    { "path": "products/noted-host/public/nexus/nexus-agent-v0.12.html" },
+    { "path": "products/noted-host/src/bridges/nexusPromptImportStub.ts" },
+    { "path": "/home/anon/Downloads/Nexus_Agent_v0_14_patched.html", "classification": "operator-provided local seed; not committed as-is" }
+  ],
+  "outputs": [
+    {
+      "path": "products/nexus-blocks/blocks/nexus-agent/nexus-agent-v0.14-scrubbed.html",
+      "sha256": "bad1aeb3a1e506bf415260158765c2f8c65623628cb78c547daabcc15e035f32",
+      "change": "Preferred v0.14 lineage with factory-empty embedded export and a host prompt-import bridge; byte-identical runtime mirror ships under noted-host/public."
+    },
+    {
+      "path": "products/nexus-blocks/blocks/nexus-agent/nexus-agent-host-bridge.js",
+      "sha256": "3c2e17b4b0f7a340f559de0f321b570dce6c2093cbba0b470c59b7093280a756",
+      "change": "Adds an iframe-only prompt snapshot proposal using noted.write and requiresApproval=true; byte-identical runtime mirror ships under noted-host/public."
+    },
+    {
+      "path": "products/noted-host/src/bridges/nexusPromptImport.ts",
+      "sha256": "8c22ee0ad0484705a96524191431a3959d2c791a0b118498b813c34c2117395c",
+      "change": "Promotes the no-write stub to validated prompt creation with a reversible receipt bound to source envelope and snapshot references."
+    },
+    {
+      "path": "products/noted-host/src/studios/nexusAgent/NexusAgentStudio.tsx",
+      "sha256": "1e3868813517132e253bb17fc4fdafda330b952b34e6ca0a2848c955f9b257f2",
+      "change": "Loads the scrubbed v0.14 block, trusts only its iframe window, previews requests, and requires an operator click before IndexedDB mutation."
+    },
+    {
+      "path": "products/noted-host/src/studios/prompts/PromptStudio.tsx",
+      "sha256": "269236c8222914bc44ab5c35f7bf23b29f6a48c5afe19dcdbddea01325f2df87",
+      "change": "Shows saved prompt records so an approved import is operator-visible in the prompts UI."
+    },
+    {
+      "path": "products/noted-host/scripts/agent-prompt-smoke.mjs",
+      "sha256": "b8d6a214b21897ae9c8c8eb0ee5c51f6abee835b250a56017a276c7a749bfc3a",
+      "change": "Natural Phase 2 runner for ODS-AG-001 and ODS-PR-001, including factory scrub, preview gate, approval, IDB-backed UI visibility, and browser errors."
+    },
+    {
+      "path": "products/noted-host/noted-v0.01.html",
+      "sha256": "3dd3d032fd553ca0f7223c8c39442bf3bdc171f44a28807cf583f217dd49cefd",
+      "change": "Regenerated single-file host artifact from the Phase 2 source."
+    },
+    {
+      "path": "products/noted-host/verse-studio.html",
+      "sha256": "3dd3d032fd553ca0f7223c8c39442bf3bdc171f44a28807cf583f217dd49cefd",
+      "change": "Regenerated compatibility single-file host artifact from the Phase 2 source."
+    }
+  ],
+  "claims": [
+    "The #/nexus-agent route loads the scrubbed v0.14 asset and its embedded-data payload contains empty tier1 and tier2 factory objects.",
+    "The committed Agent assets contain no embedded personal session, named test agent, selected provider, or hardcoded API key from the local seed.",
+    "A prompt snapshot from the tracked Agent iframe is previewed without mutation; only explicit approval writes through Noted createPrompt into the prompts IndexedDB store.",
+    "The approved prompt title appears in Prompt Studio and the import returns a receipt tied to the source envelope and prompt record.",
+    "Existing bridge:smoke and ODS-1 P0 behavior remains green in development, and ODS P0 remains green against production preview."
+  ],
+  "non_claims": [
+    "This Phase 2 proposal is not production-ready and has status_authority NONE.",
+    "The scrub checklist and browser runner are not a full Nexus Agent security audit.",
+    "This does not implement Phase 3, Phase 4, Phase 5, broker queue UX, creature work, Nostr publishing, or sim-frame work.",
+    "This does not authorize tokens, real-world value, custody, redemption, or economic claims.",
+    "The Agent still depends on documented public CDNs and optional user-configured provider networking; a fully offline Agent bundle is not claimed.",
+    "TECH_SPEC §8.2 A4/A6 still require SEAT-GROK-DRIVE/operator manual acceptance; browser automation is runtime evidence, not operator acceptance.",
+    "The receipt is committed after the immutable verified product commit named by verified_at_commit; the receipt-only commit does not alter verified product files."
+  ],
+  "checks": [
+    { "command": "python3 experiments/NOTED_PROJECT_OS_001/tools/verify_registry.py", "exit_code": 0, "result": "PASS registry: 3 package(s) ok" },
+    { "command": "cd products/noted-host && npm ci", "exit_code": 0, "result": "Added and audited 166 packages; npm audit reported 5 vulnerabilities (1 low, 3 moderate, 1 high)." },
+    { "command": "cd products/noted-host && npm run typecheck", "exit_code": 0, "result": "PASS; tsc --noEmit returned no errors." },
+    { "command": "cd products/noted-host && npm run build", "exit_code": 0, "result": "PASS; Vite transformed 304 modules and pack.js emitted both single-file artifacts." },
+    { "command": "cd products/noted-host && npm run bridge:smoke", "exit_code": 0, "result": "PASS in dev mode with trusted and untrusted bridge assertions and zero console/page errors." },
+    { "command": "cd products/noted-host && npm run ods:p0", "exit_code": 0, "result": "PASS in dev mode for all nine ODS-1 P0 cases." },
+    { "command": "cd products/noted-host && npm run ods:p0 -- --preview", "exit_code": 0, "result": "PASS in preview mode for all nine ODS-1 P0 cases." },
+    { "command": "cd products/noted-host && npm run agent:prompt-smoke", "exit_code": 0, "result": "PASS ODS-AG-001 and ODS-PR-001 including approved prompt visibility in Prompt Studio." },
+    { "command": "./nexus doctor", "exit_code": 0, "result": "PASS after generated node_modules was moved outside the repository worktree." },
+    { "command": "python3 -m unittest discover -s tests -v", "exit_code": 0, "result": "PASS; 190 tests." },
+    { "command": "./nexus verify", "exit_code": 0, "result": "PASS." },
+    { "command": "git diff --check eded9d135cc640eb1dc440f628307d2f893acd5b..761aee6bc60b238671d25e3c3daf77a1e9654801", "exit_code": 0, "result": "PASS; no whitespace errors." }
+  ],
+  "limitations": [
+    "The first npm ci attempt inside the managed sandbox failed with EPERM when executing esbuild; the identical command passed after approved execution outside that sandbox.",
+    "Running repository doctor while node_modules was installed found dependency symlinks and permissive third-party JSON; the generated dependency directory was moved to /tmp and the full doctor/unit/verify sequence then passed.",
+    "The initial Phase 2 browser run proved the IndexedDB write and success receipt but exposed that Prompt Studio did not render saved Prompt records; Phase 2 added a bounded saved-record strip and the rerun passed.",
+    "npm audit reported five dependency findings; dependency remediation is outside this Phase 2 task."
+  ],
+  "next": "NEXT: SEAT-GROK-DRIVE for TECH_SPEC §8.2 A4/A6 manual acceptance. Do not begin Phase 3."
+}
