@@ -1,0 +1,103 @@
+{
+  "schema": "nexus.challenge-claims/v1",
+  "commission_id": "BGEN-DEV-CULTURE-CHALLENGE-001",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "subject_memo_sha256": "4cdd8a9a7de15bd60b4441e049af3ef6ae3e39c37f7aedae5d79fcb4dfb3e783",
+  "status_authority": "NONE",
+  "claims": [
+    {
+      "id": "C01_MOTIVE_MIXTURE",
+      "claim": "Donor behavior may reflect mixed altruistic, expressive, pressure, and financial motives.",
+      "disposition": "SUPPORTS",
+      "reason": "The literature makes motive mixture plausible, but the mix and moral-licensing mechanism remain unmeasured for this project."
+    },
+    {
+      "id": "C02_MORAL_LICENSING_LOAD_BEARING",
+      "claim": "Moral licensing materially explains the transparency-risk mechanism.",
+      "disposition": "BREAKS",
+      "reason": "No inspected project evidence connects prior moral conduct to later harmful conduct, and the memo's defensible core does not require that mechanism."
+    },
+    {
+      "id": "C03_BEHAVIORAL_LITERATURE_TRANSPORT",
+      "claim": "Warm-glow, social-pressure, and charity-lottery results support the memo's project-specific directional verdicts.",
+      "disposition": "BREAKS",
+      "reason": "The constructs are real but the memo supplies no citations, construct mapping, effect-size transport, or population comparability."
+    },
+    {
+      "id": "C04_CODE_BEHAVIOR_EVIDENCE_ASYMMETRY",
+      "claim": "Code review cannot by itself establish donor behavior under unrealized incentives.",
+      "disposition": "SUPPORTS",
+      "reason": "Repository evidence classes and prior audit language consistently separate deterministic software checks from unmeasured behavioral validity."
+    },
+    {
+      "id": "C05_OPENNESS_STRENGTHENS_CODE_CORRECTNESS",
+      "claim": "Transparency strengthened code correctness and demonstrated this four times.",
+      "disposition": "WEAKENS",
+      "reason": "Open review enabled documented defect discovery, but no counterfactual identifies openness as the cause or proves the categorical claim."
+    },
+    {
+      "id": "C06_CAVEATS_FILTER_CASUAL_SPECULATORS",
+      "claim": "Dense rigor and caveats filter casual speculators.",
+      "disposition": "WEAKENS",
+      "reason": "This is falsifiable but unmeasured; caveats can instead deter careful donors or be ignored by speculative participants."
+    },
+    {
+      "id": "C07_SOPHISTICATED_CAPITAL_NOT_DETERRED",
+      "claim": "Rigor does not deter sophisticated capital and primarily benefits it.",
+      "disposition": "BREAKS",
+      "reason": "Sophisticated actors may exit after pricing low returns, constraints, compliance, or reputational risk, while defenders also benefit from exact specifications."
+    },
+    {
+      "id": "C08_OPENNESS_DUAL_USE",
+      "claim": "Open specifications can accelerate both adversarial optimization and defensive review.",
+      "disposition": "SUPPORTS",
+      "reason": "Both pathways are coherent and consistent with inspected repository history, while their relative magnitude remains unverified."
+    },
+    {
+      "id": "C09_ATTACKERS_MOVE_FIRST_DEFAULT",
+      "claim": "Financially motivated actors generally act before volunteer defenders, making attacker-first the realistic default.",
+      "disposition": "BREAKS",
+      "reason": "The memo supplies no base rate or timing evidence and credible defender-first counter-scenarios exist."
+    },
+    {
+      "id": "C10_NET_EFFECT_AMBIGUOUS_TIME_DEPENDENT",
+      "claim": "The net effect of open sourcing is ambiguous and time-dependent.",
+      "disposition": "WEAKENS",
+      "reason": "Underdetermination is warranted, but time dependence and an actor race are untested moderators rather than established findings."
+    },
+    {
+      "id": "C11_DEV_CULTURE_MISMATCHED",
+      "claim": "The existing adversarial culture is mismatched to donor-motivation risk.",
+      "disposition": "WEAKENS",
+      "reason": "Code checks are insufficient for donor behavior, but the same governance discipline can preregister and challenge behavioral experiments."
+    },
+    {
+      "id": "C12_BOUNDED_PILOT_AS_LEVER",
+      "claim": "A bounded revealed-preference pilot is the lever that fixes the shared root cause.",
+      "disposition": "WEAKENS",
+      "reason": "A preregistered pilot can test bounded causal hypotheses but cannot validate rare sophisticated attacks, population motives, or launch-scale safety."
+    },
+    {
+      "id": "C13_SECRECY_IS_NOT_SAFETY",
+      "claim": "Closing the source would not by itself remove economic-design vulnerabilities.",
+      "disposition": "SUPPORTS",
+      "reason": "The vulnerabilities can persist independent of disclosure, though the memo does not quantify secrecy's effect on discovery latency."
+    },
+    {
+      "id": "C14_BGEN_CODE_AUDIT",
+      "claim": "The correctness or security of Beneficial Genesis implementation packages.",
+      "disposition": "OUT_OF_SCOPE",
+      "reason": "The commission expressly excludes turning this challenge into a code audit of Beneficial Genesis packages."
+    }
+  ],
+  "overall_disposition": "CHALLENGE_SURVIVES_WITH_NARROWING",
+  "overall_reason": "The memo survives as a DRAFT statement of evidence-class asymmetry and dual-use openness, but its motive taxonomy, filtering claim, sophisticated-capital primacy, attacker-first default, and pilot sufficiency require demotion or refutation.",
+  "non_claims": [
+    "No merge or promotion authorization.",
+    "No live-activity authorization.",
+    "No legal conclusions.",
+    "No economic-security or money claims.",
+    "No claim that the memo is true or false beyond reasoned-argument evidence.",
+    "Silence is not a pass; unresolved verification is UNABLE_TO_VERIFY."
+  ]
+}
