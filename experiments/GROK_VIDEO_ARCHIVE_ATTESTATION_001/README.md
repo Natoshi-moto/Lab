@@ -4,123 +4,172 @@
 **status_authority:** `NONE`  
 **Track slug:** `GVA-001`  
 **Date opened (UTC):** 2026-07-22  
-**Operator intent:** Use accelerated on-screen text video as a **lightweight public archive stamp**, systematically test whether Grok (and similar systems) are a valid **instrument** for documentation, proof-shaped claims, and **attestation-like** external visibility — while treating Grok trust as **net zero** (same order as trusting the operator alone).
+**Revised (UTC):** 2026-07-22 — primary subject clarified: **multi-model live screen sessions**, not generic PDF-in-video
 
-## Terminology (fix the wording)
+---
 
-| Word people say | What we mean here | What we do **not** mean |
-|-----------------|-------------------|-------------------------|
-| **Attestation** | A checkable statement that *some bytes / some text / some event* were observed or recovered under declared conditions | Court-grade proof, multi-party crypto attestation, “impartial third party signed your life” |
-| **Archive stamp** | Content published to a public platform so *retrieval attempts* can be repeated later | Permanent, uncensorable, or provider-honest storage |
-| **Instrument validity** | Does the method reliably do the job we claim under tests? | “Grok is trustworthy” |
-| **External validation** | Someone else *can try* the same recovery steps | Independent science or independence from xAI/operator |
+## Primary subject (what the operator actually means)
 
-You said “attentation” — the usual term is **attestation**. We use that word carefully and narrowly.
+This is **not** mainly “put a whitepaper in a video.”
+
+It is about sessions where the human runs **3+ models at once on one screen** — heavy parallel reasoning, tools, ARC-style work, long context, multi-pane UIs, scroll storms, diffs, terminals, handoffs — and wants a **lightweight way to archive that mess publicly** so that:
+
+1. Wall-clock video can be **sped up hard** (order-of-magnitude ×; exact **F** is experimental — often people think ~60×, we measure).  
+2. A **human cannot usefully follow** the session at that speed.  
+3. A **vision-capable system (Grok, etc.)** can still scrape / summarize / recover **on-screen text** (and structure) from the frames.  
+4. Publishing that video is a **public stamp** — “this density of work existed as pixels at least once on a retrievable object.”  
+5. Dogfood: run **this research itself** as multi-model screen work and release the archive via the same path.
+
+### Why that setting matters
+
+| Single-doc slide video | Multi-model screen session |
+|------------------------|----------------------------|
+| Clean fonts, known layout | Overlapping panes, cursors, animations |
+| Controlled character set | Mixed UI chrome, code, chat bubbles, ARC grids |
+| One hashable source file | **No single clean transcript** unless recovered |
+| Easy ground truth | Ground truth is the **recording + optional seat logs** |
+| Low operator realism | **This is how the Lab is actually operated** |
+
+If the instrument only works on clean slides and dies on a real 3-model desk, it is **not valid for the intended use**.
+
+---
+
+## Terminology
+
+| Word | Meaning here | Not meaning |
+|------|----------------|-------------|
+| **Attestation** (not “attentation”) | Checkable claim that *under conditions X we recovered Y from public object Z* | Court proof; impartial oracle; money settlement |
+| **Session archive stamp** | Public video (and hash/URL) of a multi-model session | Permanent uncensorable history |
+| **Instrument validity** | Does recovery work at useful F on **real multi-pane sessions**? | “Trust Grok” |
+| **Net-zero trust** | `trust(Grok as truth/money oracle) ≈ trust(operator) ≈ 0` | Utility of OCR helper may still be > 0 |
+
+---
 
 ## One-sentence hypothesis
 
-> Encoding documentation as on-screen text in a video, playing it at high speed (human-illegible), publishing that video where Grok can see it, and asking Grok (or a re-run of the same class of model) to recover the text, can act as a **lightweight, public, re-tryable archive + recovery pipeline** — but **must not** be treated as trusted independent proof of truth, money, or operator honesty.
+> High-speed public video of **real multi-model operator screens** (3+ models, dense reasoning/ARC/tools) can serve as a **lightweight, re-tryable archive + text-recovery instrument**, while remaining **net-zero** as independent attestation of truth or operator honesty.
 
-## Motivation (operator framing, cleaned only for structure)
+---
 
-1. Humans cannot read text at extreme playback speed; a vision-language system sometimes still can.  
-2. That asymmetry might let you pack a lot of documentation into short wall-clock video.  
-3. Publishing the video “somewhere online” creates a **public object** others can download and re-test.  
-4. Releasing **this experiment itself** via the same method is the demonstration (dogfood).  
-5. Epistemic stance: Grok is **not** more trustworthy than you for money or final truth — **net zero**. People *can* use recovery as a convenience check; they **should not** treat it as impartial authority.
+## Motivation (operator framing)
 
-## What would count as success (instrument validity)
+1. Multi-model sessions produce **more state than chat logs alone** — layout, simultaneity, who scrolled what, visual ARC boards, side-by-side contradictions.  
+2. Full lossless multi-track logging is heavy; **one screen record** is already how humans work.  
+3. Speed-up makes the archive **short wall-clock** for publish/share; recovery pulls density back out.  
+4. Grok (or any VLM) is a **recovery instrument**, not a priest. Same trust band as you for final truth.  
+5. Demonstrate by **doing** GVA-001 work under 3+ models and stamping that session.
 
-Success is **not** “people trust Grok.” Success is measured properties, e.g.:
+---
 
-| Property | Pass looks like | Fail looks like |
-|----------|-----------------|-----------------|
-| **Recoverability** | Declared text corpus is recovered with measured character/line accuracy above threshold | Garbled, invented, or missing sections |
-| **Speed envelope** | At chosen × speed, human spot-check fails “can you read this live?”; model recovery still works (or we record the cliff) | Either humans can still read, or model fails before useful density |
-| **Re-run stability** | Same video + same prompt class → similar recovery (document variance) | Wildly different transcripts run-to-run |
-| **Public stamp retrievability** | URL/id still yields the same bytes or we detect change | Silent edit, delete, or different media |
-| **Honest non-claim hold** | All public materials say net-zero trust | Marketing language that Grok “proves” truth |
+## Success = instrument properties (not vibes)
 
-## What this explicitly does **not** prove
+| Property | Pass (on multi-model sessions) | Fail |
+|----------|--------------------------------|------|
+| **Pane-aware recoverability** | Recovers identifiable text from ≥N panes/models with scored accuracy | Collapses everything into one mush / invents dialogue |
+| **Speed envelope F** | Humans fail “follow the session live at F×”; model still recovers above threshold | Humans can follow, or model dies before useful F |
+| **ARC/grid survival** | Structured on-screen grids/boards not totally destroyed in recovery | Fabricated grids that look plausible |
+| **Temporal density** | Can answer “what was on screen around wall-clock t?” better than chance | Only vague session vibe |
+| **Re-run stability** | Same video + prompt class → bounded variance | Wildly different “who said what” each run |
+| **Stamp retrievability** | Public URL still yields same bytes or change is detected | Silent replace/delete without notice |
+| **Non-claim hold** | Never marketed as multi-party or money-grade proof | “Grok verified the research” hype |
 
-- Truth of the *content* (only recovery of glyphs/text that appeared on frames)  
-- That the operator did not forge the video  
-- That xAI/Grok is impartial (product of one company; correlated with whatever Grok is)  
-- Chain of custody stronger than “platform said so”  
-- Legal evidence standard, financial settlement, or multi-party attestation  
-- That sped-up text is invisible to all humans (some may still read frames/screenshots)  
-- Permanent availability  
+---
 
-## Mechanism (draft protocol)
+## Explicit non-proofs
+
+- That the models’ *reasoning was correct*  
+- That the operator did not edit the recording  
+- That three panes = three independent auditors (still one human + one merger culture)  
+- Impartiality of Grok/xAI  
+- Legal evidence or financial attestation  
+- That no human can freeze-frame and read (they can; speed only blocks **live** follow)  
+
+---
+
+## Protocol (two tiers)
+
+### Tier A — Controlled fixture (calibration)
+
+Still useful so scores are honest:
+
+1. Known text D, hash H, clean render, factor F.  
+2. Recover D′, score edit distance.  
+3. Map the **F cliff** before trusting Tier B numbers.
+
+### Tier B — Primary: multi-model session stamp (the real experiment)
 
 ```text
-1. Author source document D (markdown/plain text) with version hash H = sha256(D).
-2. Render D to on-screen pages (fixed font, high contrast, known layout).
-3. Encode video V at real-time duration T_real (human-readable).
-4. Time-compress to V_fast at factor F (e.g. 30×–60× — exact F is an experimental variable).
-5. Compute sha256(V_fast), publish to chosen public surface (X/Grok upload path, plus mirror if any).
-6. Record public URL / post id / time (UTC) in a Lab receipt.
-7. RECOVERY seat: ask Grok (and optionally a second vision pipeline) to extract text → D'.
-8. Score: edit distance / section hit rate between D and D'; bind scores to H and sha256(V_fast).
-9. Adversarial: mutate frames, re-encode, crop, change F; see what breaks.
-10. Dogfood: publish THIS experiment’s README (or a freeze of it) via the same pipeline as V_fast_public.
+1. Operator runs a real session: ≥3 model UIs visible (chat/tools/ARC/terminal as applicable).
+2. Screen-record full desktop (or declared crop). Note wall-clock start/end UTC.
+3. Optional: parallel seat logs / git tip SHAs for partial ground truth (declare what was saved).
+4. Produce V_real (1×) and V_fast (F×). Hash both.
+5. Publish V_fast (and/or V_real) to public surface (X/Grok path + any mirror).
+6. Receipt: URL, post id, UTC, sha256, F, resolution, which models/panes were in frame.
+7. RECOVERY: Grok (and optionally a second VLM) extracts:
+   - per-pane transcripts/summaries
+   - notable on-screen claims
+   - timeline markers
+8. VERIFIER scores against:
+   - optional seat logs (if any)
+   - freeze-frame human sample of K random timestamps
+   - never against “vibes”
+9. ATTACKER: crop a pane out, re-encode, add adversarial on-screen text, change F.
+10. Dogfood: a GVA-001 working session itself becomes a stamped V_fast.
 ```
 
-Exact F, codec, resolution, and prompt templates are **to be fixed in a later freeze** before claim any numbers.
+**F, codec, resolution, pane layout** freeze before any “validated” claim.
 
-## Roles (not product lock-in)
+---
+
+## Roles
 
 | Role | Job |
 |------|-----|
-| BUILDER | Render pipeline, hashing, publish checklist |
-| RECOVERY | Run Grok (or alternate) extraction; save raw model output |
-| VERIFIER | Score D vs D'; no shared context that spoils the score |
-| ATTACKER | Tamper media, prompt-injection on-screen, font tricks |
-| OPERATOR | Go/no-go, public release, never claim money use |
+| OPERATOR | Runs the 3+ model desk; go/no-go on publish |
+| BUILDER | Record/export/hash/publish checklist |
+| RECOVERY | Grok/VLM extraction; raw outputs saved |
+| VERIFIER | Scoring only; no “it looked fine” |
+| ATTACKER | Media/prompt/layout attacks |
 
-**Same-family note:** Using only Grok to recover a Grok-published video is **not** independent multi-party attestation. It is one ecosystem looking at itself. Say so every time.
+Grok recovering a Grok-hosted multi-model video is **one ecosystem**. Not independence.
+
+---
 
 ## Trust model (net zero)
 
 ```text
-trust(Grok_as_oracle)  ≈  trust(operator_alone)  ≈  0   for money / final truth
-utility(Grok_as_OCR_archive_helper)  may be  > 0     for convenience recovery
+trust(Grok as oracle of truth/money)     ≈ trust(operator) ≈ 0
+utility(Grok as high-speed session OCR)  may be > 0 for archive recovery
+trust(3 panes on one desk)               ≠ 3 independent institutions
 ```
 
-Public third parties get:
+---
 
-- A **method** they can attempt  
-- A **hash** they can recompute if they have the file  
-- **Not** a reason to wire funds or silence dissent  
-
-## Deliverables (when operator accepts build)
+## Deliverables
 
 | Artifact | Path habit |
 |----------|------------|
 | This README | `experiments/GROK_VIDEO_ARCHIVE_ATTESTATION_001/` |
-| Proposal status | `operations/proposals/GVA_001/` |
-| Fixtures (short text, known hash) | `fixtures/` |
-| Scoring script (stdlib) | `score_recovery.py` (later) |
-| Receipts of publishes | `operations/receipts/GVA_001_*/` |
-| Round publication | `communications/publications/rounds/GVA-001/` |
+| Proposal | `operations/proposals/GVA_001/` |
+| Session receipts | `operations/receipts/GVA_001_SESSION_*/` |
+| Recovery scores | under experiment `results/` (later) |
+| Publications | `communications/publications/rounds/GVA-001/` |
 
-## Immediate next steps (proposal phase only)
+---
 
-1. Operator accepts or kills this proposal.  
-2. Freeze variables: F (speed), resolution, font, max chars/page, publish surface.  
-3. Build a **10-line** fixture video and run one recovery trial (numbers or `UNABLE_TO_VERIFY`).  
-4. Dogfood release of the frozen protocol text via V_fast on Grok/X.  
-5. File results with non-claims; no STATUS claim of “validated instrument” without scores.
+## Next steps
 
-## Related Lab objects
+1. Operator confirms Tier B as primary (this revision).  
+2. Freeze minimum session profile: e.g. “3 chat UIs + 1 terminal” or “ARC + 2 models.”  
+3. One **short** real multi-model recording + one F× publish trial.  
+4. Score with freeze-frame human sample + any logs.  
+5. Only then discuss dogfood public release language.
 
-- External witness language (different problem): `operations/audits/.../EXTERNAL_WITNESS_ARCHITECTURE.md`  
-- Distrust register: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`  
-- Proposed-features scrutiny path if seats attack this design  
+---
 
 ## Non-claims
 
-- Not a product, not a wallet, not a token  
-- Not impartial third-party attestation  
-- Not a substitute for git + hashes + multiple honest mirrors  
+- Not a product, wallet, token, or custody system  
+- Not impartial multi-party attestation  
+- Not proof that multi-model agreement is science  
 - `status_authority: NONE`

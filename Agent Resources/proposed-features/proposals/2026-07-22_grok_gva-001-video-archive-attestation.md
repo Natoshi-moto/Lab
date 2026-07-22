@@ -9,13 +9,14 @@
 
 ## One line
 
-> Test sped-up on-screen-text video + public Grok/X stamp as a lightweight archive/recovery instrument — **not** as trusted independent attestation.
+> Test sped-up **multi-model (3+) live screen sessions** + public stamp as a lightweight archive/recovery instrument — **not** trusted independent attestation.
 
 ## Problem
 
-- Chat and local disks die; operators want a **dense, public, re-tryable** documentation stamp.  
-- Humans cannot read extreme-speed on-screen text; vision models sometimes can → possible density win.  
-- Risk: people treat “Grok said it” as impartial proof. Operator stance: **net zero** trust for money/truth.
+- Real Lab work is **3+ models on one desk**, not a single clean PDF: ARC, tools, parallel reasoning, scroll storms.  
+- Chat logs miss simultaneity and layout; full instrumentation is heavy; screen record already exists.  
+- Speed-up packs the session; VLM recovery may pull text back; public post = stamp.  
+- Risk: “Grok watched my three models so it’s validated.” Stance: **net zero** for money/truth; three panes ≠ three institutions.
 
 ## Proposed research (not a product feature)
 

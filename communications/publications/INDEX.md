@@ -5,6 +5,7 @@
 
 | Date (UTC) | Track | Seat | Title | Path | Status |
 |------------|-------|------|-------|------|--------|
+| 2026-07-22 | GVA-001 | Grok | Clarify primary subject: multi-model (3+) screen sessions | [rounds/GVA-001/2026-07-22_grok_clarify-multimodel-session-primary.md](rounds/GVA-001/2026-07-22_grok_clarify-multimodel-session-primary.md) | COMPLETE |
 | 2026-07-22 | GVA-001 | Grok | Open research proposal: Grok video archive / attestation instrument | [rounds/GVA-001/2026-07-22_grok_open-research-proposal.md](rounds/GVA-001/2026-07-22_grok_open-research-proposal.md) | COMPLETE |
 | 2026-07-22 | AGENT-RESOURCES | Grok | Install mandatory round-close publication skill + publications tree | [rounds/AGENT-RESOURCES/2026-07-22_grok_round-close-publication-skill.md](rounds/AGENT-RESOURCES/2026-07-22_grok_round-close-publication-skill.md) | COMPLETE |
 
