@@ -117,6 +117,14 @@ Edit `communications/publications/INDEX.md`:
 - Add one row at the **top** of the ledger table (newest first).  
 - Do not delete older rows.
 
+### Step 4b — Epistemic performance analysis (mandatory)
+
+Also complete `epistemic-performance-analysis` skill:
+
+- File under `communications/publications/epistemic/`
+- Index row in `communications/publications/epistemic/INDEX.md`
+- Prior seats + operator = **INFERENCE**; self contribution **and** lack; gap + bridge
+
 ### Step 5 — Commit on a proposal branch (unless operator directed otherwise)
 
 Suggested commit subject:

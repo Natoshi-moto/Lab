@@ -9,7 +9,7 @@
 
 ## Desk intent (one line)
 
-Multi-seat Lab desk coordination plane live; GVA-001 multi-model session archive proposal open; agent-resources PR branch active.
+RAM + mandatory epistemic analyses live; semantic routing bridge documented; website white paper/tech spec drafted (not built); GVA-001 + agent-resources still on PR branch.
 
 ## In flight
 

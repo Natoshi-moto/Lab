@@ -9,6 +9,8 @@
 |------|----------|------------|
 | **Statements** | Readiness declarations, public posture, press notes | `statements/` |
 | **Publications** | **Mandatory** end-of-round seat reports (what / why / verified); cumulative evolution log | [`publications/`](publications/README.md) |
+| **Epistemic analyses** | **Mandatory** seat-on-seat + operator performance as **INFERENCE**; self-gap | [`publications/epistemic/`](publications/epistemic/INDEX.md) |
+| **Website design** | White paper + tech spec for distrust-first public surface | [`website/`](website/README.md) |
 | **Tutorials** | How to enter the lab, how to run doctor/verify, how to file a return | `tutorials/` |
 | **Docs for humans** | Plain-language explainers that may later leave the repo | `docs/` |
 | **Press / external** | Drafts for journalists, partners, public posts | `press/` |

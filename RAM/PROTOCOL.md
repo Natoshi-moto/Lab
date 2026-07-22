@@ -48,6 +48,11 @@ Add a **newest-first** row to `RAM/bus/INDEX.md`.
 | `ALERT` | Operator chaos / conflict / do not merge yet |
 | `REQUEST_RELEASE` | Please drop lock X |
 | `NOTE` | Coordination note only |
+| `EPISTEMIC` | Pointer to `communications/publications/epistemic/` filing |
+
+Every message should include `semantic_class:` one of  
+`OBSERVED | INFERENCE | OPERATOR_VERBATIM | PROPOSAL | RECEIPT | ALERT | HANDOFF`  
+(see `docs/SEMANTIC_ROUTING_BRIDGE.md`).
 
 ### Minimum message body
 

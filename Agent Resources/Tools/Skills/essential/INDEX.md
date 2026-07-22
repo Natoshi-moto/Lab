@@ -14,7 +14,7 @@ ChatGPT, or anything else that lands in this repo. Skills here are written by
 
 1. **Enter the repo:** also obey root `AGENTS.md`. This index does not replace it.
 2. **New request:** match it against the trigger column below. Open that skill and follow its "When to use this" section.
-3. **End of every real work round:** run **`round-close-publication`** even if no other skill matched. This is not optional.
+3. **End of every real work round:** run **`round-close-publication`** and **`epistemic-performance-analysis`** even if no other skill matched. This is not optional.
 4. **Operator pastes output with no explanation:** do not demand a full recap. Open the matching skill’s *State recognition* table, match the paste, verify against real repo state, state which step finished in one line, give **only the next step**.
 5. **Output looks interrupted or claims “done” with nothing checkable:** verify before advancing. Resume the **same** step if incomplete.
 6. **No skill matches for the *work*:** proceed with the task. At round close, still file a **publication report**, and optionally draft a new skill rather than letting the workflow evaporate.
@@ -24,6 +24,7 @@ ChatGPT, or anything else that lands in this repo. Skills here are written by
 | Skill | Trigger | Path | Status | Mandatory? |
 |---|---|---|---|---|
 | **Round-close publication** | End of any real work round/session/task; “file what you did”; before walking away after checkable work | [`round-close-publication.md`](round-close-publication.md) | **ACTIVE** | **YES — every AI, every real round** |
+| **Epistemic performance analysis** | End of round + hot-desk entry; score prior seats + operator as **INFERENCE**; score self + gap + bridge | [`epistemic-performance-analysis.md`](epistemic-performance-analysis.md) | **ACTIVE** | **YES — every AI, every real round** |
 | Nexus R002 blind audit (Claude skill package) | Commissioned R002-shaped audit only | [`.claude/skills/nexus-audit/SKILL.md`](../../../../.claude/skills/nexus-audit/SKILL.md) | ACTIVE (scoped) | Only when audit is commissioned |
 
 *Add new rows when skills graduate from DRAFT. Do not leave dead ACTIVE skills — retire or delete.*
