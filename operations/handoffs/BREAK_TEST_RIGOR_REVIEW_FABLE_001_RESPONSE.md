@@ -1,13 +1,31 @@
 # BREAK test rigor review — Fable response
 
-- SEAT_NAME: Claude Fable (Anthropic)
+- SEAT_NAME: Claude Fable (Anthropic) — **started as Fable; delivery continuity broken mid-task**
 - MODEL_FAMILY: Anthropic
+- MODEL_AT_START: Fable (seat label; exact underlying model id not partitioned in original draft)
+- MODEL_MID_SESSION_DOWNGRADE: **Opus 4.8** (operator label) — **YES**
+- DOWNGRADE_CONTROL: **OUT_OF_OPERATOR_CONTROL** (provider/product routing; operator tried and could not prevent)
+- OPERATOR_FLAG: **PARAMOUNT / BREAK GLASS**
 - MAIN_SHA_INSPECTED: `85bc9d95eb2454105781a1310cea9e159489e07e` (origin/main)
 - BRANCH_TIP_INSPECTED: `8d6937b8df601fc576e6a494b398dd476cd2a720` (this review branch = main + the Grok handoff commit; no product code differs from main)
 - DIRTY_TREE: no
 - DATE_UTC: 2026-07-22
 - status_authority: NONE
 - independence_claim: NONE (same GitHub account / same Anthropic family as other Claude seats — this is differential *design* review, not third-party corroboration)
+
+## 0A) 🚨 BREAK GLASS — mid-session model downgrade (MANDATORY — do not omit)
+
+**Emergency record:** `operations/receipts/BREAK_TEST_RIGOR_REVIEW_FABLE_001/BREAK_GLASS_OPUS_4_8_DOWNGRADE.md`
+
+### VERBATIM OPERATOR QUOTE (do not paraphrase)
+
+> Opus 4.8 delivered what started off as Fable but got downgraded mid task due to the security concerns, I tried
+
+**Binding reading:** Work **started as Fable**. **Opus 4.8 delivered** the package after a **mid-task** downgrade attributed to **security concerns**. Operator **tried** to keep control and **could not** — out of operator control. This original response draft shipped **without** this section; Grok amended it onto the PR branch at operator instruction so silence is impossible.
+
+**Partition status:** `UNABLE_TO_PARTITION` — which paragraphs were written before vs after the downgrade cannot be proven from the Lab record. Treat **the whole response body as mixed-seat / post-break continuity risk**. Findings may still be useful as a map; they are **not** single-mind high-assurance Fable output.
+
+**Residual risk:** Anyone citing this file as “Fable’s review” without the quote above is misrepresenting seat continuity on security-sensitive work.
 
 ## 0) Mission restatement (one paragraph)
 

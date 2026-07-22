@@ -9,31 +9,35 @@
 
 ---
 
-## 0A) PARAMOUNT — mid-session model downgrade (operator-stated)
+## 0A) 🚨 BREAK GLASS — mid-session model downgrade (PARAMOUNT)
 
-**Operator message (paraphrased only where needed for file form; intent is load-bearing):**
+**Emergency record (full glass):**  
+`operations/receipts/BREAK_TEST_RIGOR_REVIEW_FABLE_001/BREAK_GLASS_OPUS_4_8_DOWNGRADE.md`
+
+### VERBATIM OPERATOR QUOTE (do not paraphrase)
+
+> Opus 4.8 delivered what started off as Fable but got downgraded mid task due to the security concerns, I tried
+
+### Operator-intent binding (same day, same seat trail)
 
 ```text
-Claude Fable was already working this rigor review and was
-DOWNGRADED MIDWAY THROUGH to Opus 4.8 (operator's exact label).
-
-This is OUT OF THE OPERATOR'S CONTROL. The operator does not
-decide whether Claude (Anthropic product/routing) swaps or
-downgrades the model on security-sensitive work.
-
-The operator states: this fact is PARAMOUNT and MUST be noted
-in the Lab record. Silence is not allowed.
+Work STARTED as Fable. Delivery finished under Opus 4.8 after a
+MID-TASK downgrade attributed to security concerns (provider/product
+routing). Operator TRIED to keep control and could not —
+OUT OF OPERATOR CONTROL. PARAMOUNT. Silence forbidden.
 ```
 
 ### Rules that follow from §0A
 
-1. **Any Fable response for this task must declare** start model (if known), **mid-session downgrade to Opus 4.8 (operator label)**, and that the operator did **not** authorize or control the swap.  
-2. **Do not** treat pre-downgrade reasoning and post-downgrade reasoning as one continuous high-assurance seat without labeling the break.  
-3. **Do not** market “Claude Fable reviewed the break test” without the downgrade asterisk — this is security-adjacent test design (launch vetoes).  
-4. **This is not** independent of Anthropic product behavior; it is evidence of **provider-side model control**, which strengthens `WHY_NOT_TO_TRUST_THIS_PROJECT.md` style non-claims (operator cannot guarantee which mind did which paragraph).  
-5. Receipts and the response package must keep this visible forever — do not bury it in a footnote.
+1. **Any response for this task must declare** start seat (Fable), **mid-task downgrade to Opus 4.8**, cause class (**security concerns** per operator), and **“I tried” / out of operator control**.  
+2. **Do not** treat pre-downgrade and post-downgrade reasoning as one continuous high-assurance mind without labeling the break.  
+3. **Do not** market “Claude Fable reviewed the break test” without this break-glass asterisk — security-adjacent test design (launch vetoes).  
+4. **This is evidence of provider-side model control**, which strengthens `WHY_NOT_TO_TRUST_THIS_PROJECT.md` (operator cannot guarantee which mind did which paragraph).  
+5. Receipts, break-glass file, and the response package must keep the **verbatim quote** visible forever — do not bury, soften, or rephrase it.  
+6. If a response package shipped without this disclosure (e.g. early PR #70 draft), treat that as **incomplete until amended** — not as optional polish.
 
-**Recorded by:** Grok, at operator instruction, 2026-07-22, after operator clarified: *work was already in progress; downgrade happened midway; must be noted as paramount and out of operator control.*
+**Recorded by:** Grok, at operator instruction, 2026-07-22.  
+**Quote locked:** operator message after delivery — *Opus 4.8 delivered what started off as Fable but got downgraded mid task due to the security concerns, I tried*
 
 ---
 
