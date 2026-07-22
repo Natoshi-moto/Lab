@@ -346,7 +346,7 @@ Internal AI reviews MUST identify their producer and direction. They MUST NOT be
 
 Before the first raw public tag:
 
-1. build and package `blocks/Eidolin/dist/src/runtime.js` reproducibly or remove its broken entry point;
+1. build and package `products/noted-host/public/nexus/os/blocks/Eidolin/dist/src/runtime.js` reproducibly or remove its broken entry point;
 2. make the root test command executable or document invocation consistently;
 3. remove/quarantine legacy NEX wallet, balance, send, transfer, receive, stake, mint and sats surfaces;
 4. replace raw localStorage Nostr keys with the signer interface;

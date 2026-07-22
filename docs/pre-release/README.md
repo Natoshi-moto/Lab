@@ -76,7 +76,7 @@ Run the repository checks from the root as documented by the current project:
 bash tests/run.sh
 ```
 
-At the time this document was drafted, the root script was not executable directly and the test run reported a missing `blocks/Eidolin/dist/src/runtime.js`. That is a release blocker, not an installation tip. Do not work around it and then report the tree as green.
+At the time this document was drafted, the root script was not executable directly and the test run reported a missing `products/noted-host/public/nexus/os/blocks/Eidolin/dist/src/runtime.js`. That is a release blocker, not an installation tip. Do not work around it and then report the tree as green.
 
 ## Bitcoin as foundation, not branding
 

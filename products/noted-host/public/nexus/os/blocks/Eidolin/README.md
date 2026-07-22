@@ -1,5 +1,7 @@
 # Nexus Lattice — gold stitch build
 
+> **Documentation note:** this README describes the inherited gold-stitch vertical slice. It is not yet the canonical public Eidolin app README. The proposed documentation structure and replacement drafts begin at [`docs/drafts/README.md`](docs/drafts/README.md).
+
 This is a seam-stabilized TypeScript build made from the uploaded fragmented segment outputs, with a final visual polish pass and judging packet.
 
 ## What changed
