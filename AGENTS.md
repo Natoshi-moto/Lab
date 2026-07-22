@@ -16,6 +16,7 @@
 12. **Session-close (control plane):** evidence/receipt PRs may land without rewriting the scoreboard; a work session is not closed until `STATUS.json` + `NEXT_ACTION.md` match reality. Follow `operations/process/SESSION_CLOSE.md`.
 13. **Round-close publication (mandatory for every AI):** at the end of every real work round, file a report under `communications/publications/rounds/` using `Agent Resources/Tools/Skills/essential/round-close-publication.md`, and add a newest-first row to `communications/publications/INDEX.md`. State what you did, why, what you verified, and what you did not check. Publications accumulate over time; do not overwrite prior reports to erase scars. Publication is not STATUS authority and cannot soft-close reds.
 14. **Epistemic performance analysis (mandatory for every AI):** at round close (and when entering a hot multi-seat desk), file `communications/publications/epistemic/` per `Agent Resources/Tools/Skills/essential/epistemic-performance-analysis.md`. Score prior models and the operator under explicit **INFERENCE** labels; score your own contribution **and lack**; name the semantic-routing gap; propose a bridge. Never present inference as OBSERVED.
+15. **Convergence Lab (when active):** `experiments/CONVERGENCE_LAB_001/`. AI seats design and attack theses/experiments; the Human is **Safety Gate** (promote/halt/red-line), not a co-equal peer. Multi-model agreement is not truth. Study correlated failure modes **and** residual signal/theater. See `CHARTER.md`.
 
 ## Standard checks
 
