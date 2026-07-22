@@ -14,6 +14,7 @@
   "operations_root": "operations",
   "snapshots_root": "snapshots",
   "communications_root": "communications",
+  "ram_root": "RAM",
   "data_classes": [
     "LAB_PRIVATE",
     "PROVIDER_BOUND",

@@ -30,6 +30,8 @@
     "round_publication": "communications/publications/README.md",
     "user_disclosures": "user-disclosures/README.md",
     "urgent_todos": "user-disclosures/TODO_URGENT.md",
+    "ram": "RAM/README.md",
+    "ram_board": "RAM/BOARD.md",
     "status": "STATUS.json"
   },
   "generated_indexes": [
