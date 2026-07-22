@@ -6,6 +6,9 @@
 `operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md`  
 `operations/handoffs/EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md`
 
+**Seat-routing scar (not a stop lift):** Fable 5 safeguard flag → auto-switch to Opus 4.8; one Grok log turn was canceled before filing. Canonical log:  
+`operations/receipts/SEAT_ROUTING_20260722/FABLE5_SAFEGUARD_FLAG_OPUS_SWITCH_AND_GROK_TURN_CANCEL.md`
+
 ## Halt
 
 No new break cards. No security fixes. No Phase 3. No cold drop. No round promotion.  
