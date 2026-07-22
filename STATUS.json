@@ -13,8 +13,8 @@
   "current_round": "R016",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "RESEARCH_ASSESSMENT_CLEARANCE_001; COMMS_TREE_AND_READY_STATEMENT; HYGIENE_AND_DUAL_DRIVE_BACKUP_DONE",
-  "next_action_id": "ACT-ASSESS_RESEARCH_CANDIDATES",
+  "last_completed_action": "SESSION_CLOSE_T0_INSTALLED; RESEARCH_TRACK_MENU_001; RESEARCH_ASSESSMENT_CLEARANCE_001; HYGIENE_AND_DUAL_DRIVE_BACKUP",
+  "next_action_id": "ACT-OPERATOR_SELECT_NEXT_TRACK",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "human_readable_reds": [

@@ -10,6 +10,7 @@
 8. Evidence classes are typed. Fluent repetition cannot promote a draft into evidence.
 9. Same-provider accounts are useful differential reviewers but are not automatically independent corroboration.
 10. When unable to verify, write `UNABLE_TO_VERIFY`. Silence is not a pass.
+11. **Session-close:** evidence/receipt PRs may land without rewriting the scoreboard; a work session is not closed until `STATUS.json` + `NEXT_ACTION.md` match reality. Follow `operations/process/SESSION_CLOSE.md`.
 
 ## Standard checks
 
