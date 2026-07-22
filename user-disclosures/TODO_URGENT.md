@@ -41,6 +41,25 @@ Tip SHA:
 
 | ID | Item | Status |
 |----|------|--------|
-| U-001 | Sync when operator puts recording back on (steps above) | **OPEN** |
+| U-001 | Sync when operator puts recording back on (steps above) | **DONE** |
+
+```text
+SYNC_WHEN_RECORDING_BACK: DONE
+UTC: 2026-07-22
+Seat: Claude Opus 4.8 (cross-checking Grok's round post-hoc; relay bus was bypassed, git is the record)
+Tip SHA: 1ea2ebf (origin/grok/agent-resources-round-publication-001)
+Recap (≤10 lines): Since the blind audit, Grok landed: Agent Resources Skills
+  system (round-close-publication mandatory skill), communications/publications
+  section, proposed-features w/ scrutiny templates, and user-disclosures/ folder
+  + this urgent TODO. Independently, the Claude session built (in Lab-Recovery +
+  APE repo): the recovery workspace, baton/relay/tribunal handoff system,
+  HARDER_TASKS, operator declarations D-001/D-002, the course red-team verdict,
+  and USER_DISCLOSURES in the APE publication. CONVERGENCE: both providers
+  independently built a user-disclosures section + a publications section +
+  a proposals-for-scrutiny section — corroboration per course Module 2.3.
+  DIVERGENCE (one, real): two disclosure homes — Lab user-disclosures/ (adopted
+  as CANONICAL for project-wide operator disclosures) vs APE USER_DISCLOSURES.md
+  (scoped to that publication only). Reconciled in SYNC_REPORT below; no silent
+  merge. Next slice: operator to name it (do not invent from silence).
 
 Add new urgent rows at the top of this table; do not delete historical rows — strike status to `DONE` / `CANCELLED` instead.
