@@ -9,12 +9,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "CLEANUP_PHASE_A_PARTIAL_B_READY",
+  "current_mode": "CLEANUP_PHASE_B_READY_TO_MERGE",
   "current_round": "R016",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "PR70_MERGED_FABLE_RIGOR_AND_BREAK_GLASS; PR68_CLOSED; await_PR71_whoopsie_then_PHASE_B",
-  "next_action_id": "ACT-MERGE-PR71-THEN-CLEANUP-PHASE-B",
+  "last_completed_action": "PHASE_A_ON_MAIN; PHASE_B_T06_DESTALE_BRANCH_FILED",
+  "next_action_id": "ACT-MERGE-PHASE-B-THEN-C-OR-D",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"

@@ -53,10 +53,11 @@ T-IDs refer to `../NOTED_SOVEREIGNTY_ASSAULT_001/THREAT_MODEL.md`.
 | Field | Rule |
 |-------|------|
 | **RED while** | `nexus-agent-v0.12.html` (either path) remains shipped/referenced for launch (ODS-SEC-006 FAIL) |
-| **GREEN only if** | Files removed or moved to explicitly non-shipped archive path; registry + Nexus_OS launch entries gone; scrubbed path is sole entry **or** waiver W-G04 with “known dirty legacy” label on drop |
+| **GREEN only if** | Files removed or moved to explicitly non-shipped archive path; registry + Nexus_OS launch entries gone; scrubbed path is sole entry; **and** a re-runnable check exists (prefer CI — see Fable meta G-08) **or** waiver W-G04 with “known dirty legacy” label on drop |
 | **Blocks** | Cold drop W1; any “we scrubbed the Agent” absolute claim |
+| **Launch-path note (2026-07-22)** | Tree/refs match the removal bar after PR #66 + CARD-01 PASS. **Do not** treat G-04 as fully GREEN for marketing while the only recheck is a **manual** `t06:quarantine-check` outside CI (homework can rot). |
 
-**Savage restatement:** Leaving v0.12 in the tree is leaving a blood trail that says you only cleaned the room the guests were told to look at.
+**Savage restatement:** Leaving v0.12 in the tree is leaving a blood trail that says you only cleaned the room the guests were told to look at. Removing it once without a scheduled recheck is cleaning the room and throwing away the lock.
 
 ---
 

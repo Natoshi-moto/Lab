@@ -48,13 +48,14 @@ Every T-ID below was checked against real files, not proposed from memory or gen
 - Severity: **L/M**
 - v1 assault scope: **maybe** (copy/consent fix, not urgent)
 
-**T-06 — Stale unscrubbed Agent build still committed and still reachable**
+**T-06 — Stale unscrubbed Agent build (launch path closed; history residual remains)**
 - Surface: Agent / git / cold-drop
-- Actor: anyone who unpacks the repo, opens `Nexus_OS.html` directly, or follows `legacyPath`
-- Impact (layman): an older, non-scrubbed copy of the Agent tool still sits in the repo — with what looks like real embedded test data (an agent named "Tesst," a chat session, a saved provider setting). Not loaded by the live app, but still present for anyone who digs, or opens the alternate OS shell file directly.
-- Impact (technical): **two** committed copies — `public/nexus/nexus-agent-v0.12.html` and `public/nexus/os/blocks/apps/nexus-agent-v0.12.html` — both carry an embedded `<script id="embedded-data">` blob with real tier1 session/agent/settings data (`_mode:"full"`, a named test agent, `settings:activeProvider:"groq"`). `public/nexus/block-registry.json` still lists it as `legacyPath`; `public/nexus/os/Nexus_OS.html` still lists it as a launchable app. The live studio (`NexusAgentStudio.tsx`) hardcodes v0.14-scrubbed, so this isn't reachable through normal use — but it fails a cold-drop bar as-is. `git log` confirms v0.14-scrubbed has exactly one commit (added already-scrubbed); the exposure is the still-present v0.12 files, not history on the scrubbed file.
-- Severity: **H** (privacy-bar / precedent — this specific payload is the operator's own synthetic test data, not a third party's, but the pattern is what a real leak would look like)
-- v1 assault scope: **yes** — direct `COLD_DROP_BAR.md` blocker
+- Actor: anyone who digs **git history** or an old clone that still has deleted paths
+- Impact (layman): An older, non-scrubbed Agent used to sit in the shipped tree with synthetic embedded test data. **Launch path (2026-07-22):** after PR #66 quarantine + BREAK session 1 CARD-01, those files are **gone** from `products/noted-host/public/`, and they are **not** referenced in `block-registry.json` or `Nexus_OS.html`. Live studio serves `nexus-agent-v0.14-scrubbed.html` only. **This is not “history scrubbed.”** Old commits can still contain the deleted bytes.
+- Impact (technical): **Was (pre-#66):** two committed copies under `public/nexus/` (+ OS blocks path), `legacyPath` / OS launcher refs, embedded tier1 blob. **Is (post-#66, re-verified Phase B de-stale):** no `*v0.12*` under `public/`; no registry/OS string refs; `npm run t06:quarantine-check` is the manual launch-path recheck (not yet wired into CI — see Fable G-08 / CARD-19). Residual risk = **git history + stale clones**, not the current gift bag.
+- Severity: **M** on launch path (closed for current tree); **H residual** only if someone serves history blobs or old checkouts as if current
+- v1 assault scope: **yes** — regression watch via CARD-01 / ODS-SEC-006; do not re-open as “still in public/” without re-verify
+- **Doc note (2026-07-22):** earlier text claiming “two copies still committed / still cross-referenced” is **STALE** after #66; corrected here (Whoopsie WHOOP-20260722-02)
 
 **T-07 — Escrow-based password recovery for encrypted provider keys, unverified**
 - Surface: Agent / crypto
