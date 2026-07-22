@@ -9,6 +9,34 @@
 
 ---
 
+## 0A) PARAMOUNT — mid-session model downgrade (operator-stated)
+
+**Operator message (paraphrased only where needed for file form; intent is load-bearing):**
+
+```text
+Claude Fable was already working this rigor review and was
+DOWNGRADED MIDWAY THROUGH to Opus 4.8 (operator's exact label).
+
+This is OUT OF THE OPERATOR'S CONTROL. The operator does not
+decide whether Claude (Anthropic product/routing) swaps or
+downgrades the model on security-sensitive work.
+
+The operator states: this fact is PARAMOUNT and MUST be noted
+in the Lab record. Silence is not allowed.
+```
+
+### Rules that follow from §0A
+
+1. **Any Fable response for this task must declare** start model (if known), **mid-session downgrade to Opus 4.8 (operator label)**, and that the operator did **not** authorize or control the swap.  
+2. **Do not** treat pre-downgrade reasoning and post-downgrade reasoning as one continuous high-assurance seat without labeling the break.  
+3. **Do not** market “Claude Fable reviewed the break test” without the downgrade asterisk — this is security-adjacent test design (launch vetoes).  
+4. **This is not** independent of Anthropic product behavior; it is evidence of **provider-side model control**, which strengthens `WHY_NOT_TO_TRUST_THIS_PROJECT.md` style non-claims (operator cannot guarantee which mind did which paragraph).  
+5. Receipts and the response package must keep this visible forever — do not bury it in a footnote.
+
+**Recorded by:** Grok, at operator instruction, 2026-07-22, after operator clarified: *work was already in progress; downgrade happened midway; must be noted as paramount and out of operator control.*
+
+---
+
 ## 0) One-sentence mission
 
 **Stress-test the BREAK *test itself*** (runbook, gates, cold-drop bar, evidence labels, session plan) for holes that would let a launch, cold drop, or “we’s secure enough” claim sneak through — then **add every missing probe, gate, and veto** you can justify from the code and docs. **Do not run the product break session. Do not implement fixes. Do not soften stop-the-line.**
@@ -216,12 +244,23 @@ Write:
 
 - SEAT_NAME: Claude Fable (Anthropic)
 - MODEL_FAMILY: Anthropic
+- MODEL_AT_START: <if known>
+- MODEL_MID_SESSION_DOWNGRADE: Opus 4.8 (operator label) — YES / details
+- DOWNGRADE_CONTROL: OUT_OF_OPERATOR_CONTROL (provider/product routing)
+- OPERATOR_FLAG: PARAMOUNT — security-sensitive seat continuity broken mid-task
 - MAIN_SHA_INSPECTED: <git rev-parse origin/main>
 - DATE_UTC: …
 - status_authority: NONE
 - independence_claim: NONE (same-account / same-family not independent)
 
 ## 0) Mission restatement (one paragraph)
+
+## 0A) Mid-session model downgrade (mandatory section — do not omit)
+State what was running before/after if known; state that the operator
+did not control the downgrade; state residual risk for any conclusion
+written after the swap. If unknown which paragraphs were which model:
+write UNABLE_TO_PARTITION and treat the whole response as
+downgraded-seat output.
 
 ## 1) Files actually inspected
 (list paths — not “the repo”)
@@ -300,6 +339,13 @@ You are Claude Fable on Natoshi-moto/Lab.
 MANDATORY: Read and obey in full:
   operations/handoffs/BREAK_TEST_RIGOR_REVIEW_FABLE_001.md
 
+PARAMOUNT (operator-stated): this seat was ALREADY WORKING and was
+DOWNGRADED MIDWAY to Opus 4.8. That swap is OUT OF THE OPERATOR'S
+CONTROL (Anthropic/product routing). You MUST record the mid-session
+downgrade in your response header and §0A. Do not silently present
+pre- and post-downgrade work as one continuous high-assurance mind.
+This is security-sensitive test design; the continuity break is evidence.
+
 You are NOT running BREAK session 2 product probes.
 You are NOT implementing security fixes.
 You ARE attacking the BREAK *test design* for rigor gaps and adding everything that should block launch until fixed or explicitly waived.
@@ -337,6 +383,10 @@ End with: 3 biggest holes in the test + paste-ready launch VETO checklist.
 ```text
 SEAT_NAME: Claude Fable
 MODEL_FAMILY: Anthropic
+MODEL_AT_START: <if known>
+MODEL_MID_SESSION_DOWNGRADE: Opus 4.8 (operator label) — YES
+DOWNGRADE_CONTROL: OUT_OF_OPERATOR_CONTROL
+OPERATOR_FLAG: PARAMOUNT
 MAIN_SHA_AT_START: <git rev-parse origin/main>
 DIRTY_TREE: <yes/no>
 DATE_UTC: <ISO date>
