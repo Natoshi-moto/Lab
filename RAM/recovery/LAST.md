@@ -1,28 +1,31 @@
 # LAST recovery pointer
 
 **status_authority:** `NONE`  
-**Updated UTC:** 2026-07-22  
+**Updated UTC:** 2026-07-22T19:51:20Z  
 **Seat:** grok
 
-## Last known good coordination state
+## EMERGENCY VIDEO BOUNDARY
 
-- **RAM plane:** exists at repo root  
-- **Protocol:** `RAM/PROTOCOL.md`  
-- **Board:** `RAM/BOARD.md` + `BOARD.json`  
-- **Branch context (when written):** `grok/agent-resources-round-publication-001`  
-- **Open research:** GVA-001 multi-model session video archive (proposal)  
-- **Urgent operator:** `user-disclosures/TODO_URGENT.md` (recording sync if applicable)  
-
-## If you are a new seat and confused
-
-```bash
-git status -sb
-git rev-parse --short HEAD
-head -80 RAM/BOARD.md
-head -40 RAM/bus/INDEX.md
-head -40 user-disclosures/TODO_URGENT.md
-head -40 STATUS.json
-head -40 NEXT_ACTION.md
+```text
+EVENT: STOP_THEN_START_VIDEO
+UTC: 2026-07-22T19:51:20Z
+DISCLOSURE: user-disclosures/entries/2026-07-22_emergency-video-snapshot-stop-start.md
+URGENT: U-002 OPEN until new segment confirmed
 ```
 
-Then bus a `RECOVERED` message before taking locks.
+## Last known desk state (pre-boundary)
+
+- Branch: `grok/agent-resources-round-publication-001` (PR #96 area)  
+- Recent: three-pane Eidolin mesh white paper, Magna Carta Grok reply (Lab-Recovery), epistemic skill, RAM, GVA-001  
+- Scoreboard: still operator track select on main; product reds T-01/CARD-11 open  
+
+## If you are a new seat after the segment break
+
+```bash
+head -40 user-disclosures/entries/2026-07-22_emergency-video-snapshot-stop-start.md
+head -40 user-disclosures/TODO_URGENT.md
+head -40 RAM/BOARD.md
+git rev-parse --short HEAD
+```
+
+Bus RECOVERED when new video is rolling; do not invent gap content.

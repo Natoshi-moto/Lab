@@ -6,7 +6,29 @@
 
 ---
 
-## URGENT — sync when recording is back on
+## URGENT — U-002 EMERGENCY video stop/start (NOW)
+
+**Status:** `OPEN`  
+**Logged UTC:** `2026-07-22T19:51:20Z`  
+**Disclosure:** `entries/2026-07-22_emergency-video-snapshot-stop-start.md`
+
+Operator declared **emergency video snapshot**: stopping recording, saving, starting again **immediately**.
+
+When new segment is live, seat should:
+
+1. Confirm this file + disclosure still present  
+2. Bus `RECOVERED` / note new segment rolling  
+3. Mark U-002:
+
+```text
+U-002_EMERGENCY_VIDEO_BOUNDARY: DONE
+UTC:
+Seat:
+```
+
+---
+
+## URGENT — U-001 sync when recording is back on
 
 **Status:** `OPEN`  
 **Why:** Operator is stopping to **save the screen recording** in case the PC crashes, then will **start recording again immediately** and continue building. Context between segments must not be lost.
@@ -41,6 +63,7 @@ Tip SHA:
 
 | ID | Item | Status |
 |----|------|--------|
+| **U-002** | **EMERGENCY video boundary 2026-07-22T19:51:20Z** — stop snapshot / start new segment; sync when new segment rolling | **OPEN** |
 | U-001 | Sync when operator puts recording back on (steps above) | **OPEN** |
 
 Add new urgent rows at the top of this table; do not delete historical rows — strike status to `DONE` / `CANCELLED` instead.

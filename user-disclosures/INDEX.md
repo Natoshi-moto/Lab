@@ -2,9 +2,10 @@
 
 **status_authority:** `NONE`
 
-| Date (UTC) | Slug | One line | Path |
-|------------|------|----------|------|
-| 2026-07-22 | recording-crash-pause-continue | PC crash risk — stop/save recording, resume build; urgent sync when recording back | [entries/2026-07-22_recording-crash-pause-continue.md](entries/2026-07-22_recording-crash-pause-continue.md) |
+| Date (UTC) | Type | Seat | Title | Path | Status |
+|------------|------|------|-------|------|--------|
+| 2026-07-22T19:51:20Z | disclosure | operator | **EMERGENCY** video snapshot — stop/start NOW | [entries/2026-07-22_emergency-video-snapshot-stop-start.md](entries/2026-07-22_emergency-video-snapshot-stop-start.md) | LOGGED |
+| 2026-07-22 | disclosure | operator | PC crash risk — stop/save recording, resume build; urgent sync when recording back | [entries/2026-07-22_recording-crash-pause-continue.md](entries/2026-07-22_recording-crash-pause-continue.md) | LOGGED |
 
 ## Urgent todos (not disclosures)
 
