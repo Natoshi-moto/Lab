@@ -1,23 +1,34 @@
 # NEXT ACTION
 
-**Cleanup plan:** `operations/handoffs/CLEANUP_AND_NEXT_LEG_PLAN_001.md`
+# 🛑 EMERGENCY STOP IN FORCE
 
-## Done
+**Read first:**  
+`operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md`  
+`operations/handoffs/EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md`
 
-- **Phase A** — #70 Fable rigor + break-glass; #71 Whoopsie log + plan; #68 closed.
-- **Phase B** (this PR when merged) — T-06 docs de-staled to launch-path truth.
+## Halt
 
-## Next: Phase C then D
+No new break cards. No security fixes. No Phase 3. No cold drop. No round promotion.  
+No “we’re fine because we documented it.”
 
-1. **Phase C** — park non-spine open PRs (#62, #61, #60, BGEN shelf, old #22–24/#14) with a short comment.
-2. **Phase D** — BREAK session 2 under VETO checklist  
-   (`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`, primary **CARD-04**).  
-   Fable extras: CARD-12…20 ideas in  
-   `operations/handoffs/BREAK_TEST_RIGOR_REVIEW_FABLE_001_RESPONSE.md`.
+## Only ring-0 may lift
 
-## Do not
+Operator must write an explicit lift on main (see emergency file §12).
 
-Implement product security fixes, promote R017, import NWC, Phase 3, or
-cold-drop “safe” language unless separately authorized.
+## Still true (not erased by stop)
 
-Permanent distrust: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
+- T-01 EXECUTED FAIL (CARD-04)  
+- CARD-11 pre-activation plaintext key FAIL  
+- No CSP; CDN; default proxy; forgeable receipts  
+- G-01 RED; Fable test upgrades not fully installed  
+- Control plane was stale after Phase B — that lag is part of the scar  
+- Permanent distrust: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`
+
+## After lift (operator picks one later)
+
+- Control-plane truth maintenance rules for Lab #2, and/or  
+- Install Fable cards into runbook, and/or  
+- Bounded T-01 fix task with re-probe bar, and/or  
+- Lab continues breathing with scar on main, or ends  
+
+status_authority: NONE on all of the above until operator says otherwise.
