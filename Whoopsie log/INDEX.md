@@ -5,6 +5,7 @@ Newest first. Details live under `entries/`.
 | ID | Title | Who | Realized | Severity | Still open? |
 |----|-------|-----|----------|----------|-------------|
 | [WHOOP-20260722-06](entries/WHOOP-20260722-06.md) | EMERGENCY STOP — dashboard lag after Session 2; operator halt | BOTH | LATER same day | HIGH process | yes until stop lifted |
+| [WHOOP-20260722-07](entries/WHOOP-20260722-07.md) | Seat mis-centered fear (CARD-11 intentional; presentation drift) | AI + catch by operator | LATER | HIGH epistemic | open until 3-seat audit |
 | [WHOOP-20260722-05](entries/WHOOP-20260722-05.md) | De-staled T-06 dual story (docs said FAIL after launch path PASS) | BOTH | LATER → fixed Phase B | MED | no (docs); residual history/CI |
 | [WHOOP-20260722-04](entries/WHOOP-20260722-04.md) | Opus 4.8 delivered Fable work mid-task; operator forced the record | BOTH (provider + seat continuity) | LATER (same day) | HIGH | partly (label fixed; continuity still mixed) |
 | [WHOOP-20260722-03](entries/WHOOP-20260722-03.md) | Fable response shipped without the paramount downgrade disclosure | AI (+ process) | LATER | HIGH | fixed on branch once glass added |

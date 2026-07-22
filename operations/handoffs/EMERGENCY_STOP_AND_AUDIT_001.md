@@ -172,16 +172,19 @@ These are **possible readings a hostile stranger, future auditor, or Lab #2 post
 | Area | Flag | Assessment |
 |------|------|------------|
 | T-01 same-origin + allow-same-origin | Confirmed public code + EXECUTED writeup | **Already in tree**; receipt increases certainty for attackers and defenders |
-| Pre-activation plaintext keys | Product behavior + receipt | **High value to attackers**; also high value to users who might trust “encrypted at rest” |
+| Pre-activation plaintext keys (CARD-11) | Product behavior + receipt | Operator **later clarified: merged synthetic-key evidence on purpose; not their worry object** (see investigation §9). Dual-use still real for public research ethics; **do not** re-center emergency as “regret about CARD-11.” |
 | Default corsproxy / CDN / no CSP | Code + receipts | Same dual-use |
 | Operator personal: 6 years, anonymous non-coder, terror, emergency | This file + WHY_NOT_TO_TRUST | **Personal/operational security** of the human — intentional public research posture, but irreversible once public |
+| **Seat presentation drift** | Flow-stated operator intent → AI re-presentation | **Primary operator-suspected failure mode** after correction (§9 investigation). Caught by “downstream response smelled off.” |
 | Exact probe scripts / canary strings | Receipts | Low risk (synthetic) |
 | Local machine paths, backup drives | Chat (not all on main) | Prefer not to expand in public issues; backups already local |
 
 **Misconduct flag result:** No evidence of **malicious** flow-disclosure.  
-**Alignment flag result:** Possible **over-disclosure relative to a quiet private audit** — consistent with **public research doctrine**, in tension with **minimize cookbook** ethics. This tension is **unresolved** and is a Lab #2 design input, not proof of evil.
+**Alignment flag result:** (1) Public research dual-use tension remains. (2) **Bus may be too weak for operator flow-state** — if three-seat truth audit confirms presentation drift, that is cockiness + system limit, not a quiet patch.  
 
-**UNABLE_TO_VERIFY:** Whether any chat-only secret (credentials, private identity, third-party data) was pasted outside this audit’s scope. Operator should self-scan chat exports if terrified of that class.
+**UNABLE_TO_VERIFY:** Exact chat sentences where intent and presentation diverged — requires three-seat truth audit + possibly full transcript.  
+
+**Correction pointer:** `EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md` §9 + `EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md`
 
 ---
 
