@@ -1,41 +1,29 @@
 # NEXT ACTION
 
-# 🛑 EMERGENCY STOP STILL IN FORCE (until you lift it)
+## Operator status
 
-**Read:**  
-`operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md`  
+Epistemic emergency episode: **closed on the operator’s side** (personal resolution).  
+Product/research **default halt** remains until a short formal lift is written (one paragraph is enough — see `EMERGENCY_STOP_AND_AUDIT_001.md` §12). Prefer **no more long verbatim dumps**; use short task orders.
 
-## Done (epistemic episode)
+## Where main is
 
-| Item | Status |
+| Item | State |
 |------|--------|
-| Three-seat truth audit | **Complete on main** — Claude #84, Codex #85, Grok #82 |
-| Aggregate | `operations/handoffs/EMERGENCY_TRUTH_AUDIT_001_AGGREGATE.md` |
-| Seal | **Unsealed** after all three filed — receipt `operations/receipts/EMERGENCY_TRUTH_AUDIT_UNSEAL_20260722/` |
-| Whoopsie 08 | Operator cockiness / multi-terminal diagnosis **on main** |
-| CARD-11 | Intentional research FAIL — **not** the terror object |
-| Presentation drift | Seats mis-centered fear until §9; blind audits agree on shape |
+| Three-seat truth audit | Complete (#84, #85, #82) + aggregate |
+| Unseal + Whoopsie 08 | Done |
+| Session 2 break map | On main (T-01 FAIL, CARD-11 FAIL, etc.) |
+| Round | R016 |
 
-## Halt remains
+## Do next (reorient)
 
-No product security fixes, Phase 3, cold drop, round promotion, or “documented = safe” until **you** write an explicit lift (emergency file §12).
+1. Sync + backup (operator / drive seat).  
+2. Optional **personal blind map** — fresh seat, main only, for *your* reorientation (not a project promotion). Handoff: `operations/handoffs/PERSONAL_BLIND_MAP_001.md`.  
+3. When ready to build/break again: formal lift + **one** bounded task (process first recommended: session-close STATUS or Fable cards into runbook).
 
-## Still true (product / research)
+## Still true
 
-- T-01 EXECUTED FAIL (Agent co-tenant of host storage)  
-- CARD-11 pre-activation plaintext key path FAIL (synthetic evidence)  
-- No CSP; CDN; default proxy; forgeable receipts  
-- G-01 RED; Fable runbook upgrades not fully installed  
-- Programme = epistemic procedure + AI safety research — **not money**  
+- T-01 / G-01 red; no CSP; CDN; proxy; forgeable receipts  
+- Research-only; not money; multi-seat agreement ≠ independence  
+- `WHY_NOT_TO_TRUST_THIS_PROJECT.md`
 
-## Your fork (only you)
-
-1. **Swan song v0.0.1** — leave stop; scar stands; optional Lab #2 later  
-2. **Keep building upward** — lift stop in writing, then **one** next task only (e.g. session-close STATUS rule, install Fable cards, or T-01 fix bar)
-
-## Optional cleanup
-
-- Merge or close draft **#78** (earlier Codex cleanup audit)  
-- Full conversation publish vs leave local-only (hash already public)
-
-status_authority: NONE until operator says otherwise.
+status_authority: NONE
