@@ -6,12 +6,12 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R016` |
-| Mode | `BREAK_SESSION_2_READY` |
+| Mode | `BREAK_TEST_RIGOR_REVIEW_FABLE_READY` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `ORCH_001_T1_T5_ON_MAIN; BREAK_SESSION_1_RECORDED; handoff BREAK_SESSION_2 ready` |
-| Next action | `ACT-BREAK-SESSION-2-CARD-04` |
+| Last completed action | `ORCH_001_T1_T5_ON_MAIN; BREAK_SESSION_1_RECORDED; BREAK_SESSION_2_HANDOFF; FABLE_TEST_RIGOR_HANDOFF_FILED` |
+| Next action | `ACT-BREAK-TEST-RIGOR-REVIEW-FABLE` |
 
 ## Active tasks
 
