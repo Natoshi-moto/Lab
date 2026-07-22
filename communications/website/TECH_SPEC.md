@@ -191,6 +191,11 @@ Preview builds on PRs optional.
 | **P3** | Experiments + break plain-language |
 | **P4** | GVA page + optional video embeds |
 | **P5** | Content lint in CI + Pages deploy |
+| **P6** | `/play` `/mesh` `/genesis` static pages from DISTRIBUTED_SOCIAL_GAMIFIED.md |
+| **P7** | Client Nostr draft/sign/publish for lineage (human-gated); optional user PDS |
+
+See also: [`DISTRIBUTED_SOCIAL_GAMIFIED.md`](DISTRIBUTED_SOCIAL_GAMIFIED.md)
+
 
 ---
 

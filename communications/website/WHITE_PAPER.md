@@ -86,8 +86,15 @@ Success is when a hostile stranger can answer in five minutes:
 /ram                      Latest BOARD (read-only; clearly volatile)
 /audit                    How to blind-audit this lab
 /gva                      Video archive / attestation instrument (non-proof)
+/play                     Gamification loops (synthetic standing only)
+/genesis                  Eidolin genesis download + hashes
+/mesh                     BYO Nostr / PDS / IRC / P2P — you own the network
+/relays                   Community relay hints (non-mandatory)
+/social-not               Explicit: we are not your only social network
 /legal                    MIT + non-claims + no solicitation
 ```
+
+**Distributed social + game design (detail):** [`DISTRIBUTED_SOCIAL_GAMIFIED.md`](DISTRIBUTED_SOCIAL_GAMIFIED.md)
 
 ---
 

@@ -153,7 +153,8 @@ Align with `communications/website/WHITE_PAPER.md` distrust-first surface, **plu
 | `/desk` | Explain three-pane; download app |
 | `/genesis` | Eidolin genesis pack + hashes + mutate guide |
 | `/lineages` | Browser for published forks (optional) |
-| `/mesh` | How to join IRC/Nostr/P2P; relay list (community-curated) |
+| `/mesh` | How to join IRC/Nostr/P2P; **BYO network** (see website DISTRIBUTED_SOCIAL_GAMIFIED) |
+| `/play` | Gamified standing / quests (synthetic only) |
 | `/distrust` | Permanent non-claims + reds |
 | `/governance` | Semantic routing + Magna Carta limits |
 | `/gva` | Optional sped-up multi-model session stamps |
