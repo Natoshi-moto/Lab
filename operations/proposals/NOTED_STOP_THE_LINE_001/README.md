@@ -77,3 +77,7 @@ Hard gates can turn GREEN. **They do not erase** the Lab-wide load-bearing regis
 **[`WHY_NOT_TO_TRUST_THIS_PROJECT.md`](../../WHY_NOT_TO_TRUST_THIS_PROJECT.md)**
 
 Anonymous operator, non-coder, non-CS, AI-built machinery, `status_authority: NONE` — reasons that remain true if every T-ID closes. That document is the programme hinge: **push through with evidence, or break in public.**
+
+## Hardening plan sister (sequencing, not a gate substitute)
+
+**[`../NOTED_MEMBRANE_HARDENING_001/`](../NOTED_MEMBRANE_HARDENING_001/)** proposes **how to pay** the assault tax (mutual distrust doctrine + H0–H5 order). It does not turn gates GREEN by existing. Gates still need evidence or waiver.

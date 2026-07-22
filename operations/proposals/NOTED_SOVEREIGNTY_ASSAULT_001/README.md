@@ -50,6 +50,8 @@ Same as the rest of this programme: research only, no price/value endorsement, m
 
 ---
 
-## Sister packet (do not ignore)
+## Sister packets (do not ignore)
 
 **`operations/proposals/NOTED_STOP_THE_LINE_001/`** raises the **cost of ignoring this campaign**. It defines hard gates, a feature-work productivity tax, and a waiver-only escape hatch. Read it after this folder’s threat spine. It does not replace T-IDs; it makes them **economically unavoidable**.
+
+**`operations/proposals/NOTED_MEMBRANE_HARDENING_001/`** is Grok-drive’s **updated hardening plan** (mutual distrust doctrine, sequenced H0–H5 work packages, claims lockdown, Claude review brief). It does **not** renumber T-IDs or close findings. Read after this folder + stop-the-line.
