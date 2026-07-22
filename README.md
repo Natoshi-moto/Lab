@@ -6,6 +6,12 @@
 
 ➡️ Begin with [`README_START_HERE.md`](README_START_HERE.md).
 
+## Communications
+
+Press notes, tutorials, and human-facing statements: [`communications/`](communications/README.md).  
+Research-readiness statement (human judgment; not a product cert):  
+[`communications/statements/2026-07-22_READY_FOR_SERIOUS_RESEARCH.md`](communications/statements/2026-07-22_READY_FOR_SERIOUS_RESEARCH.md).
+
 ## Why not to trust this project
 
 **Load-bearing.** Read [`WHY_NOT_TO_TRUST_THIS_PROJECT.md`](WHY_NOT_TO_TRUST_THIS_PROJECT.md) before treating anything here as safe, authoritative, or product-ready. It lists permanent reasons rooted in anonymous non-coder operation, AI seats, research-only doctrine, and structural limits that **do not go away** when tests pass.
