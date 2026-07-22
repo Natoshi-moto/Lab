@@ -25,6 +25,7 @@ ChatGPT, or anything else that lands in this repo. Skills here are written by
 |---|---|---|---|---|
 | **Round-close publication** | End of any real work round/session/task; “file what you did”; before walking away after checkable work | [`round-close-publication.md`](round-close-publication.md) | **ACTIVE** | **YES — every AI, every real round** |
 | **Epistemic performance analysis** | End of round + hot-desk entry; score prior seats + operator as **INFERENCE**; score self + gap + bridge | [`epistemic-performance-analysis.md`](epistemic-performance-analysis.md) | **ACTIVE** | **YES — every AI, every real round** |
+| **Emergency multi-drive snapshot** | “spam the drives” / emergency backup / USB snapshot | [`emergency-multi-drive-snapshot.md`](emergency-multi-drive-snapshot.md) | **ACTIVE** | On operator request |
 | Nexus R002 blind audit (Claude skill package) | Commissioned R002-shaped audit only | [`.claude/skills/nexus-audit/SKILL.md`](../../../../.claude/skills/nexus-audit/SKILL.md) | ACTIVE (scoped) | Only when audit is commissioned |
 
 *Add new rows when skills graduate from DRAFT. Do not leave dead ACTIVE skills — retire or delete.*

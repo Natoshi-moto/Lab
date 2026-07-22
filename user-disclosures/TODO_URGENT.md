@@ -63,7 +63,36 @@ Tip SHA:
 
 | ID | Item | Status |
 |----|------|--------|
+| **U-004** | **Plug USB stick** and run emergency snapshot so USB autodiscovers `lab-emergency-snapshots/` | **OPEN** |
+| **U-003** | **Research:** which AIs can push to which cloud services (when/how); fit as skill/tool — see section below | **OPEN** |
 | **U-002** | **EMERGENCY video boundary 2026-07-22T19:51:20Z** — stop snapshot / start new segment; sync when new segment rolling | **OPEN** |
 | U-001 | Sync when operator puts recording back on (steps above) | **OPEN** |
+
+---
+
+## U-003 — Cloud push capability research (TODO)
+
+**Status:** `OPEN`  
+**Ask:** Which seats / tools can push Lab backups to which clouds, **when**, **how**, and how that becomes an automatic skill without stuffing secrets in git.
+
+| Provider / surface | Likely seat/tool path | Auth model | Fit | Notes to verify |
+|--------------------|----------------------|------------|-----|-----------------|
+| GitHub (private backup repo) | Any seat with `gh` + human PAT/SSH | Human-held credential | Strong | Mirror push of bundle or private repo |
+| Cloudflare R2 / S3 | Local CLI (`aws`/`rclone`) not “the model” | Keys in env / rclone config **off-repo** | Strong for automation | Skill runs `rclone sync` if configured |
+| Google Drive | rclone / human browser | OAuth local | Medium | AI should not hold OAuth long-term |
+| Dropbox | rclone | OAuth | Medium | same |
+| iCloud | generally poor for automation on Linux | — | Weak | Prefer USB + local disks |
+| xAI / Grok | **no** generic “upload my disk” API for seats | — | N/A | Chat cannot be the backup bus |
+| Claude / ChatGPT | Files API / project uploads **not** full-repo disaster recovery | Provider limits | Weak for full repo | OK for small receipts only |
+| Self-host (Syncthing, Nextcloud) | Local daemons | Device trust | Strong | Best “automatic” after setup |
+
+**Workflow fit (proposal):**
+
+1. **Primary:** `emergency_snapshot.sh` → all local + USB disks (this skill).  
+2. **Secondary (optional):** post-hook `operations/backup/cloud_push.sh` that only runs if `~/.config/lab-backup/rclone.conf` exists **outside git**.  
+3. **Never:** commit cloud keys; never ask a chat model to “remember” passwords.  
+4. **Seat role:** detect operator phrase → run local spam → if cloud hook present, run it → receipt lists destinations.
+
+**Deliverable when done:** short `operations/backup/CLOUD_PUSH_RESEARCH.md` + optional hook script stub.
 
 Add new urgent rows at the top of this table; do not delete historical rows — strike status to `DONE` / `CANCELLED` instead.
