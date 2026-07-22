@@ -6,12 +6,12 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R016` |
-| Mode | `R016_USER_AUTHORIZED_PROMOTION_MERGED` |
+| Mode | `NOTED_STOP_LINE_ADOPTED_BREAK_PREP` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `R016_EXACT_AUDITED_HEAD_USER_AUTHORIZED_AND_MERGED` |
-| Next action | `ACT-R017_REVIEW_AND_ADJUDICATE_PR_22` |
+| Last completed action | `ORCH_001_T1_GREEN_VERIFY_RECEIPT_ON_MAIN; stop-the-line and sovereignty-assault distrust docs on main; R016 remains the last human-authorized promoted round` |
+| Next action | `ACT-ORCH-001-T06-THEN-BREAK-PREP` |
 
 ## Active tasks
 
