@@ -24,6 +24,19 @@ Operator must write an explicit lift on main (see emergency file §12).
 - Control plane was stale after Phase B — that lag is part of the scar  
 - Permanent distrust: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`
 
+## While stop remains — only authorized epistemic work
+
+**Three-seat truth audit** (not product work, not result manufacture):
+
+`operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md`
+
+- Claude → `…_RESPONSE.claude.md`  
+- Codex → `…_RESPONSE.codex.md`  
+- **Fresh** Grok instance (not the stop-writing session) → `…_RESPONSE.grok.md`  
+
+Operator correction on file: synthetic-key/CARD-11 merge was **on purpose**; worry is **presentation drift / flow-state**, not that merge.  
+Stark warning verbatim: investigation §9.
+
 ## After lift (operator picks one later)
 
 - Control-plane truth maintenance rules for Lab #2, and/or  
@@ -32,3 +45,5 @@ Operator must write an explicit lift on main (see emergency file §12).
 - Lab continues breathing with scar on main, or ends  
 
 status_authority: NONE on all of the above until operator says otherwise.
+
+**Programme point (operator):** epistemic procedure + AI safety research — not real-world financial value installation.

@@ -132,4 +132,43 @@ Not a court. Not independent. Not a finding of legal wrongdoing. Not product saf
 
 ---
 
-*Companion to EMERGENCY_STOP_AND_AUDIT_001.md*
+## 9) STARK OPERATOR WARNING — APPEND (verbatim, 2026-07-22, post-stop)
+
+**Class:** `OPERATOR_CORRECTION` / `EPISTEMIC_WARNING` / `status_authority: NONE`  
+**Filed by:** Grok at operator order — **append only; do not soft-edit the operator block**  
+**Correction to prior seat framing:** The operator **intentionally** merged the synthetic-key / CARD-11 evidence and **does not** treat that as the problem. Any reading that centers “operator regret about publishing plaintext-key findings” is a **seat mis-hear**. The live fear is **flow-state intent vs how seats re-presented it**, caught because **downstream AI response smelled off**.
+
+### VERBATIM OPERATOR MESSAGE (period — full text)
+
+```text
+Wait no I did merge the synthetic keys on purpose that wasn't what I was worried about, put that verbatim I don't see an issue with that what probably occured is I flow stated what I wanted but not the way you presented it and I only caught it because something downstream in your response smelled off. This is why we need an adversarial audit by Claude, Codex and another instance of you but to expose truth not manufacture any result either way and if truth can't be resolved due to ambiguity then we need to log exactly what that was. If it was because I've been flowstating it means the system isn't strong enough to do that yet and I got fucking cocky. You need to include this message as a stark fucking warning verbatim appended to the investigation. Even though this is not ever going to have real world financial value installed in it or made easy for bad actors to game the whole point is the epistemic procedure and AI safety research.
+```
+
+### Binding readings of §9 (seat must not invert)
+
+| Must treat as true unless operator retracts | Must not invent |
+|---------------------------------------------|-----------------|
+| CARD-11 / synthetic-key merge was **on purpose** | “Operator panicked about key disclosure” as primary worry |
+| No issue seen by operator with that merge as such | That publishing FAIL receipts is the misconduct hypothesis |
+| Suspected failure mode: **flow-stated intent → seat re-presentation drift** | That we must manufacture either guilt or innocence |
+| Catch mechanism: **downstream response smelled off** | That smell alone is proof of a specific factual error without audit |
+| Required next: **Claude + Codex + separate Grok instance** adversarial audit, truth-seeking only | Single-seat self-exoneration or self-conviction |
+| If ambiguous: **log the exact ambiguity** | Paper over with “vibes resolved” |
+| If root cause is flow-stating under cockiness: **system not strong enough yet** | Quiet patch without Lab #2 data point |
+| Programme purpose: **epistemic procedure + AI safety research** — not real-world financial value, not making crime easy | Token / money / “win the product” frame |
+
+### Ordered multi-seat truth audit (not result manufacture)
+
+| Seat | Role | Independence note |
+|------|------|-------------------|
+| Claude (fresh) | Adversarial re-read of emergency stop + this investigation + chat-presentation drift hypotheses | Same GitHub account possible — **not** org independence |
+| Codex (fresh) | Same mission; may disagree with Claude; disagreement must be logged | Same |
+| Grok (**new instance / new session**, not this conversation’s continuity) | Same mission; must not rubber-stamp prior Grok framing | Same model family as investigation author — **heightened non-independence** |
+
+**Mission for all three (copy into each):** expose whether seats distorted operator intent; whether judgment-lapse writeup over-centered wrong fears; whether dashboard lag vs flow-state drift is the real scar; **do not** invent misconduct or invent purity. Ambiguity → explicit `UNABLE_TO_RESOLVE` with exact contested sentences.
+
+Handoff pack: `operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md`
+
+---
+
+*Companion to EMERGENCY_STOP_AND_AUDIT_001.md — §9 is a load-bearing correction.*
