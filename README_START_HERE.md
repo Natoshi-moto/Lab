@@ -62,6 +62,13 @@ classifications remains open under `DEC-2026-000002`.
 
 `NEXT_ACTION.md` contains one operator action only.
 
+## Session-close (scoreboard honesty)
+
+After a multi-PR work block, run the ritual in
+[`operations/process/SESSION_CLOSE.md`](operations/process/SESSION_CLOSE.md)
+(template: [`SESSION_CLOSE_TEMPLATE.md`](operations/process/SESSION_CLOSE_TEMPLATE.md)).
+Evidence receipts alone are not a closed session.
+
 ## Communications (press, tutorials, human docs)
 
 Outward-facing materials live under [`communications/`](communications/README.md).  

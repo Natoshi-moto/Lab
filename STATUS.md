@@ -10,8 +10,8 @@
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `RESEARCH_ASSESSMENT_CLEARANCE_001; COMMS_TREE_AND_READY_STATEMENT; HYGIENE_AND_DUAL_DRIVE_BACKUP_DONE` |
-| Next action | `ACT-ASSESS_RESEARCH_CANDIDATES` |
+| Last completed action | `SESSION_CLOSE_T0_INSTALLED; RESEARCH_TRACK_MENU_001; RESEARCH_ASSESSMENT_CLEARANCE_001; HYGIENE_AND_DUAL_DRIVE_BACKUP` |
+| Next action | `ACT-OPERATOR_SELECT_NEXT_TRACK` |
 
 ## Active tasks
 

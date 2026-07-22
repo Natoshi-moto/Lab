@@ -1,0 +1,34 @@
+{
+  "schema": "nexus.task/v1",
+  "task_id": "TSK-SESSION-CLOSE-001",
+  "status": "COMPLETE_ON_MERGE",
+  "status_authority": "USER_AUTHORIZED_IMPLEMENTATION",
+  "authority": "OPERATOR_DIRECTED_T0_PROCESS",
+  "objective": "Install session-close rule and template; file research track menu; perform first session-close locking control plane to Package A / T0 complete and operator free to select next track.",
+  "baseline_ref": "ab5d16384f6cbf200204f1b759a6a98f23f99d66",
+  "track_menu_ref": "operations/handoffs/RESEARCH_TRACK_MENU_001.md",
+  "package": "A",
+  "primary_track": "T0",
+  "allowed_write": [
+    "operations/process/",
+    "operations/tasks/TSK-SESSION-CLOSE-001.json",
+    "operations/receipts/SESSION_CLOSE_20260722_T0/",
+    "operations/handoffs/RESEARCH_TRACK_MENU_001.md",
+    "STATUS.json",
+    "STATUS.md",
+    "NEXT_ACTION.md",
+    "AGENTS.md",
+    "README_START_HERE.md"
+  ],
+  "forbidden": [
+    "product security fixes",
+    "Noted host code",
+    "soft-close of T-01 or CARD-11",
+    "token or real-world value claims",
+    "product launch authorization"
+  ],
+  "non_claims": [
+    "Process ritual is not product safety.",
+    "Track menu is not a multi-AI ranking of truth."
+  ]
+}
