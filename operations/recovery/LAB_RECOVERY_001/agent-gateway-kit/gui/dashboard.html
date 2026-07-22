@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Gateway — Inventory Dashboard</title>
+<style>
+  :root{--bg:#101418;--card:#1a2027;--ink:#e8edf2;--mut:#8b98a5;--acc:#4fc3f7;--warn:#ffb74d;--ok:#81c784;font-size:15px}
+  @media (prefers-color-scheme: light){:root{--bg:#f4f6f8;--card:#fff;--ink:#1a2027;--mut:#5b6875;--acc:#0277bd;--warn:#e65100;--ok:#2e7d32}}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg);color:var(--ink);font:1rem/1.5 system-ui,sans-serif;padding:1.5rem;max-width:1100px;margin:auto}
+  h1{font-size:1.4rem;margin-bottom:.25rem} h2{font-size:1.1rem;margin:1.5rem 0 .5rem}
+  .sub{color:var(--mut);margin-bottom:1rem}
+  .cards{display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0}
+  .card{background:var(--card);border-radius:10px;padding:1rem 1.25rem;min-width:150px;flex:1}
+  .card b{font-size:1.6rem;display:block} .card span{color:var(--mut);font-size:.85rem}
+  .warn b{color:var(--warn)} .ok b{color:var(--ok)}
+  input[type=file]{margin:.5rem 0;color:var(--mut)}
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:.85rem}
+  th,td{padding:.45rem .7rem;text-align:left;border-bottom:1px solid rgba(128,128,128,.15);word-break:break-all}
+  th{color:var(--mut);font-weight:600} code{color:var(--acc);font-family:ui-monospace,monospace}
+  .scroll{overflow-x:auto} details{margin:.5rem 0} summary{cursor:pointer;padding:.4rem 0}
+  .pill{background:var(--warn);color:#000;border-radius:999px;padding:0 .5rem;font-size:.75rem;font-weight:700}
+</style>
+</head>
+<body>
+<h1>🗂️ Agent Gateway — Inventory Dashboard</h1>
+<p class="sub">Load your <code>INVENTORY.json</code> (from <code>inventory.py</code>). Everything runs locally in this page — nothing is uploaded anywhere.</p>
+<input type="file" id="file" accept=".json">
+<div id="out"></div>
+<script>
+const $=q=>document.querySelector(q);
+const human=n=>{for(const u of['B','KB','MB','GB','TB']){if(n<1024||u==='TB')return u==='B'?n+'B':n.toFixed(1)+u;n/=1024}};
+const famKey=n=>n.replace(/\s*\((\d+)\)(?=\.[^.]+$|$)/,'').replace(/[\s_-](copy|final|new|old|backup|bak)\d*/ig,'').toLowerCase();
+$('#file').addEventListener('change',e=>{
+  const r=new FileReader();
+  r.onload=()=>{try{render(JSON.parse(r.result))}catch(err){$('#out').textContent='Could not parse: '+err}};
+  r.readAsText(e.target.files[0]);
+});
+function render(inv){
+  const files=(inv.files||[]).filter(f=>f.size>0&&f.sha256!=='SKIPPED_TOO_LARGE');
+  const byHash={},byFam={};
+  for(const f of files){(byHash[f.sha256]??=[]).push(f);(byFam[famKey(f.name)]??=[]).push(f);}
+  const dupes=Object.values(byHash).filter(g=>g.length>1).sort((a,b)=>b[0].size*(b.length-1)-a[0].size*(a.length-1));
+  const wasted=dupes.reduce((s,g)=>s+g[0].size*(g.length-1),0);
+  const div=Object.entries(byFam).filter(([k,g])=>new Set(g.map(f=>f.sha256)).size>1)
+    .sort((a,b)=>new Set(b[1].map(f=>f.sha256)).size-new Set(a[1].map(f=>f.sha256)).size);
+  let h=`<div class="cards">
+    <div class="card"><b>${files.length}</b><span>files hashed</span></div>
+    <div class="card"><b>${dupes.length}</b><span>duplicate groups</span></div>
+    <div class="card warn"><b>${div.length}</b><span>divergent families — need decisions</span></div>
+    <div class="card ok"><b>${human(wasted)}</b><span>reclaimable space</span></div></div>`;
+  h+=`<h2>⚠ Divergent families <span class="pill">DECIDE</span></h2>
+      <p class="sub">Same name, different content. For each: pick a canonical, quarantine the rest, log it in TO_DO_LIST.md.</p>`;
+  for(const [k,g] of div.slice(0,40)){
+    const vs=new Set(g.map(f=>f.sha256)).size;
+    h+=`<details><summary><code>${k}</code> — ${vs} versions, ${g.length} files</summary><div class="scroll"><table>
+        <tr><th>sha256</th><th>date</th><th>size</th><th>path</th></tr>`+
+      g.sort((a,b)=>b.mtime.localeCompare(a.mtime)).map(f=>
+        `<tr><td><code>${f.sha256.slice(0,12)}</code></td><td>${f.mtime}</td><td>${human(f.size)}</td><td>${f.path}</td></tr>`).join('')+
+      `</table></div></details>`;}
+  h+=`<h2>Exact duplicates</h2><p class="sub">Identical bytes — consolidation candidates (after a human decision).</p>`;
+  for(const g of dupes.slice(0,25)){
+    h+=`<details><summary><code>${g[0].sha256.slice(0,12)}</code> ×${g.length} — ${human(g[0].size)} each</summary>
+        <div class="scroll"><table>`+g.map(f=>`<tr><td>${f.path}</td></tr>`).join('')+`</table></div></details>`;}
+  $('#out').innerHTML=h;
+}
+</script>
+</body>
+</html>
