@@ -1,26 +1,29 @@
 # NEXT ACTION
 
-**Preferred next (operator authorized 2026-07-22):** run **Claude Fable** on
-meta-review of the BREAK *test itself* (not product probes):
+**Cleanup plan:** `operations/handoffs/CLEANUP_AND_NEXT_LEG_PLAN_001.md`
 
-`operations/handoffs/BREAK_TEST_RIGOR_REVIEW_FABLE_001.md`
+## Phase A status
 
-Paste packet is §10 of that handoff. Fable must **not** run Session 2 cards
-or implement fixes — only attack test rigor and add launch-stoppers.
+- **#70 merged** — Fable rigor response + break-glass Opus quote on `main`.
+- **#68 closed** — session 1 receipts already on `main`.
+- **#71** — Whoopsie log + this plan (merge if not already on `main`).
 
-**Then (or in parallel, separate seat):** BREAK session 2 product probes via
+## Phase B (next)
 
-`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`
+De-stale **T-06** docs only (threat model / ODS-SEC-006 / cold-drop bar)
+so the repo does not say both PASS and FAIL for v0.12.
 
-Primary product card remains **CARD-04** (T-01). Synthetic only.
-Session 1: `operations/receipts/BREAK_SESSION_20260722/`.
-ORCH-001 T1–T5 on `main`. Stop-the-line remains **ADOPTED**.
+## After B
 
-Do **not** implement security fixes, promote R017, import NWC as product,
-or start feature Phase 3 unless the operator opens a separate authorized task.
+Phase C PR hygiene → Phase D BREAK session 2 under VETO checklist
+(`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`, CARD-04).
 
-Green doctor/verify/tests do not establish security — see
-`WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
+Fable rigor findings (on main):  
+`operations/handoffs/BREAK_TEST_RIGOR_REVIEW_FABLE_001_RESPONSE.md`
 
-Parked / not current spine: draft PR #22/#23, PR #62 GITBRAID (parallel),
-BGEN draft audits, real-world value work.
+Do **not** implement product security fixes, promote R017, import NWC,
+start Phase 3, or cold-drop language unless separately authorized.
+
+Parked: #62 GITBRAID, #61/#60, BGEN #40–49, #22–24, #14.
+Permanent distrust: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
+Whoopsie log: `Whoopsie log/` (after #71 merges).

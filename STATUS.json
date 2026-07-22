@@ -9,12 +9,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "BREAK_TEST_RIGOR_REVIEW_FABLE_READY",
+  "current_mode": "CLEANUP_PHASE_A_PARTIAL_B_READY",
   "current_round": "R016",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "ORCH_001_T1_T5_ON_MAIN; BREAK_SESSION_1_RECORDED; BREAK_SESSION_2_HANDOFF; FABLE_TEST_RIGOR_HANDOFF_FILED",
-  "next_action_id": "ACT-BREAK-TEST-RIGOR-REVIEW-FABLE",
+  "last_completed_action": "PR70_MERGED_FABLE_RIGOR_AND_BREAK_GLASS; PR68_CLOSED; await_PR71_whoopsie_then_PHASE_B",
+  "next_action_id": "ACT-MERGE-PR71-THEN-CLEANUP-PHASE-B",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"

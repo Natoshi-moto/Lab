@@ -61,3 +61,8 @@ classifications remains open under `DEC-2026-000002`.
 ## Where the next action is
 
 `NEXT_ACTION.md` contains one operator action only.
+
+## Where the fuckups live
+
+[`Whoopsie log/`](Whoopsie%20log/README.md) — operator + AI accidents, noticed then / later / not yet.
+Not a fix, not a waiver, not a joke folder (even when the entries are funny).
