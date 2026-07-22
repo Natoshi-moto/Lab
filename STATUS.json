@@ -9,12 +9,12 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "NOTED_STOP_LINE_ADOPTED_BREAK_PREP",
+  "current_mode": "BREAK_SESSION_2_READY",
   "current_round": "R016",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "ORCH_001_T1_GREEN_VERIFY_RECEIPT_ON_MAIN; stop-the-line and sovereignty-assault distrust docs on main; R016 remains the last human-authorized promoted round",
-  "next_action_id": "ACT-ORCH-001-T06-THEN-BREAK-PREP",
+  "last_completed_action": "ORCH_001_T1_T5_ON_MAIN; BREAK_SESSION_1_RECORDED; handoff BREAK_SESSION_2 ready",
+  "next_action_id": "ACT-BREAK-SESSION-2-CARD-04",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "schema": "nexus.status/v2"
