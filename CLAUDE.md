@@ -15,6 +15,9 @@ publish private material or weaken the existing data-handling rules.
 4. If `STATUS.json` has no active task, do not revive a historical task. Follow
    the review or decision step in `NEXT_ACTION.md`, or wait for a bounded task.
 5. Read `AUDIT_START_HERE.md` only when the current action concerns an audit.
+6. Read `Agent Resources/Tools/Skills/essential/INDEX.md` before starting or
+   resuming any multi-step workflow that spans tool calls — including ones
+   another AI (Codex, Grok Code) started.
 
 ## Mandatory boundaries
 
