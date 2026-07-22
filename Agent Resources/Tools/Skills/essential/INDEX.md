@@ -48,3 +48,12 @@ Both may apply to the same operator block. Neither replaces the other.
 - `essential/` — this router + skills used almost every session  
 - `workflows/` — heavier multi-tool workflows  
 - `bash-templates/` — parameterized command blocks referenced from skills  
+
+## Proposed (not active skills)
+
+AI-proposed skills/features open for operator + multi-seat scrutiny:
+
+→ [`../../../proposed-features/README.md`](../../../proposed-features/README.md)  
+→ open pack: [`../../../proposed-features/proposals/2026-07-22_grok_five-skill-pitches.md`](../../../proposed-features/proposals/2026-07-22_grok_five-skill-pitches.md)
+
+Do **not** treat proposals as mandatory workflows until the operator accepts and they appear in the Index table above with status ACTIVE.

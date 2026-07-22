@@ -21,8 +21,13 @@ Skills/
     round-close-publication.md
   workflows/                — multi-tool workflows
   bash-templates/           — parameterized command blocks
+
+Agent Resources/proposed-features/   — AI feature pitches OPEN FOR SCRUTINY
+  (not skills yet; operator accepts before build)
 ```
 
+**Propose new skills/features:** [`../../proposed-features/README.md`](../../proposed-features/README.md)  
+**Current open pack:** [`../../proposed-features/proposals/2026-07-22_grok_five-skill-pitches.md`](../../proposed-features/proposals/2026-07-22_grok_five-skill-pitches.md)
 ## Provider-agnostic by design
 
 Skills assign **roles** (BUILDER, ATTACKER, DEBUGGER, VERIFIER, EVERY_AI_SEAT), never a locked product name. Swapping which tool fills a role mid-workflow is expected.
