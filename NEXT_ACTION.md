@@ -2,28 +2,22 @@
 
 **Cleanup plan:** `operations/handoffs/CLEANUP_AND_NEXT_LEG_PLAN_001.md`
 
-## Phase A status
+## Done
 
-- **#70 merged** — Fable rigor response + break-glass Opus quote on `main`.
-- **#68 closed** — session 1 receipts already on `main`.
-- **#71** — Whoopsie log + this plan (merge if not already on `main`).
+- **Phase A** — #70 Fable rigor + break-glass; #71 Whoopsie log + plan; #68 closed.
+- **Phase B** (this PR when merged) — T-06 docs de-staled to launch-path truth.
 
-## Phase B (next)
+## Next: Phase C then D
 
-De-stale **T-06** docs only (threat model / ODS-SEC-006 / cold-drop bar)
-so the repo does not say both PASS and FAIL for v0.12.
+1. **Phase C** — park non-spine open PRs (#62, #61, #60, BGEN shelf, old #22–24/#14) with a short comment.
+2. **Phase D** — BREAK session 2 under VETO checklist  
+   (`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`, primary **CARD-04**).  
+   Fable extras: CARD-12…20 ideas in  
+   `operations/handoffs/BREAK_TEST_RIGOR_REVIEW_FABLE_001_RESPONSE.md`.
 
-## After B
+## Do not
 
-Phase C PR hygiene → Phase D BREAK session 2 under VETO checklist
-(`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`, CARD-04).
+Implement product security fixes, promote R017, import NWC, Phase 3, or
+cold-drop “safe” language unless separately authorized.
 
-Fable rigor findings (on main):  
-`operations/handoffs/BREAK_TEST_RIGOR_REVIEW_FABLE_001_RESPONSE.md`
-
-Do **not** implement product security fixes, promote R017, import NWC,
-start Phase 3, or cold-drop language unless separately authorized.
-
-Parked: #62 GITBRAID, #61/#60, BGEN #40–49, #22–24, #14.
 Permanent distrust: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
-Whoopsie log: `Whoopsie log/` (after #71 merges).

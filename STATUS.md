@@ -6,12 +6,12 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R016` |
-| Mode | `CLEANUP_PHASE_A_PARTIAL_B_READY` |
+| Mode | `CLEANUP_PHASE_B_READY_TO_MERGE` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `PR70_MERGED_FABLE_RIGOR_AND_BREAK_GLASS; PR68_CLOSED; await_PR71_whoopsie_then_PHASE_B` |
-| Next action | `ACT-MERGE-PR71-THEN-CLEANUP-PHASE-B` |
+| Last completed action | `PHASE_A_ON_MAIN; PHASE_B_T06_DESTALE_BRANCH_FILED` |
+| Next action | `ACT-MERGE-PHASE-B-THEN-C-OR-D` |
 
 ## Active tasks
 
