@@ -28,6 +28,8 @@
     "next_action": "NEXT_ACTION.md",
     "skills_router": "Agent Resources/Tools/Skills/essential/INDEX.md",
     "round_publication": "communications/publications/README.md",
+    "user_disclosures": "user-disclosures/README.md",
+    "urgent_todos": "user-disclosures/TODO_URGENT.md",
     "status": "STATUS.json"
   },
   "generated_indexes": [
