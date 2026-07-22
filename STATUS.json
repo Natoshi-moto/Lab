@@ -13,8 +13,8 @@
   "current_round": "R016",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "OPERATOR_PERSONAL_RESOLUTION; THREE_SEAT_AUDIT_COMPLETE; UNSEAL_AND_WHOOPSIE_08; SYNC_AND_BACKUP_PENDING",
-  "next_action_id": "ACT-REORIENT_THEN_OPTIONAL_PERSONAL_BLIND_MAP",
+  "last_completed_action": "OPERATOR_PERSONAL_RESOLUTION; THREE_SEAT_AUDIT_COMPLETE; UNSEAL_AND_WHOOPSIE_08; DUAL_DRIVE_BACKUP_VERIFIED; PERSONAL_BLIND_MAP_CODEX_FILED; CONTROL_PLANE_BACKUP_RECONCILE",
+  "next_action_id": "ACT-HYGIENE_THEN_TRACK_MENU_OR_LIFT",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
   "human_readable_reds": [
