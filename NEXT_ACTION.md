@@ -1,26 +1,21 @@
 # NEXT ACTION
 
-Authorize/run ORCH-001 T4: quarantine the stale Agent v0.12 paths (T-06), then
-proceed to break-prep (ODS-SEC harnesses + adversary block review) per
-`operations/proposals/NOTED_STOP_THE_LINE_001/` and issue #63's living spine.
+Run **BREAK session 2** using the AI-agnostic handoff:
 
-Stop-the-line policy is **ADOPTED** by operator default (D1). Green
-`./nexus doctor` / `./nexus verify` / test-suite checks do not establish
-security, privacy, or readiness for money — see `WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
+`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`
 
-Do not describe R017 as accepted. `current_round` remains `R016`, the last
-human-authorized promoted round. Two unrelated "R017" ideas exist and neither
-is promoted:
+Primary card: **CARD-04** (T-01 same-origin / storage reach) from
+`operations/break-prep/ORCH_001_BREAK_RUNBOOK.md`, synthetic data only.
+Record results under `operations/receipts/BREAK_SESSION_<date>/`.
 
-- Draft PR #22 (old history-attestation proposal) — **parked**, museum only.
-- PR #62 "GITBRAID" — parallel process research, does not block the living
-  spine.
+Session 1 is complete (see `operations/receipts/BREAK_SESSION_20260722/`).
+ORCH-001 T1–T5 prep is on `main`. Stop-the-line remains **ADOPTED**.
 
-Also parked / museum, not part of the current story: PR #23 (R018 PQ
-admission, depends on the unpromoted #22), PR #14, PR #40–#49 (BGEN
-audit/memo drafts), PR #24, and dependabot PR #1.
+Do **not** implement security fixes, promote R017, import NWC as product,
+or start feature Phase 3 unless the operator opens a separate authorized task.
 
-This file and `STATUS.json` intentionally no longer point at "review and
-adjudicate PR #22" as the sole next step; that framing is stale relative to
-the T1 green-verify receipt and the stop-the-line/sovereignty-assault docs
-already on `main`.
+Green doctor/verify/tests do not establish security — see
+`WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
+
+Parked / not current spine: draft PR #22/#23, PR #62 GITBRAID (parallel),
+BGEN draft audits, real-world value work.
