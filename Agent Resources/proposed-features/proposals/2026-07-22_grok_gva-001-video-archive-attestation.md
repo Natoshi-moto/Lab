@@ -1,0 +1,48 @@
+# Proposal — GVA-001 Grok video archive / attestation instrument
+
+**ID:** `PROP-2026-07-22-GROK-gva-001`  
+**Date (UTC):** 2026-07-22  
+**Seat:** Grok (xAI) — drafting under operator direction  
+**status_authority:** `NONE`  
+**Proposal status:** `OPEN_FOR_SCRUTINY`  
+**Full protocol:** [`experiments/GROK_VIDEO_ARCHIVE_ATTESTATION_001/README.md`](../../../experiments/GROK_VIDEO_ARCHIVE_ATTESTATION_001/README.md)
+
+## One line
+
+> Test sped-up on-screen-text video + public Grok/X stamp as a lightweight archive/recovery instrument — **not** as trusted independent attestation.
+
+## Problem
+
+- Chat and local disks die; operators want a **dense, public, re-tryable** documentation stamp.  
+- Humans cannot read extreme-speed on-screen text; vision models sometimes can → possible density win.  
+- Risk: people treat “Grok said it” as impartial proof. Operator stance: **net zero** trust for money/truth.
+
+## Proposed research (not a product feature)
+
+| Piece | Path |
+|-------|------|
+| Experiment README + protocol | `experiments/GROK_VIDEO_ARCHIVE_ATTESTATION_001/` |
+| Proposal status | `operations/proposals/GVA_001/` |
+| Later: fixtures, scores, publish receipts | under experiment + `operations/receipts/` |
+
+## Terminology fix
+
+Operator often means **attestation** (a checkable “this was observed/recovered under conditions X”), not mystical “attention.” We define it narrowly in the experiment README so seats stop overclaiming.
+
+## Falsifiers
+
+| Claim | Kill condition |
+|-------|----------------|
+| Instrument is useful for recovery | Fixture trial accuracy below agreed threshold at chosen F |
+| Public stamp helps | Cannot re-fetch same bytes / post deleted without detection plan |
+| Net-zero stance holds | Any merge that markets Grok as impartial validator for money/truth |
+
+## Invite scrutiny
+
+**Operator + other AI seats:** attack OCR reliability, platform mutability, self-dealing (Grok reading Grok), human-still-readable frames, and claim inflation.
+
+File under `Agent Resources/proposed-features/scrutiny/` or PR comment.
+
+## Non-claims
+
+Not authorized money use. Not STATUS authority. Not independence. `status_authority: NONE`.
