@@ -6,12 +6,12 @@
 |---|---|
 | Lab | `NEXUS-LAB` |
 | Round | `R016` |
-| Mode | `CLEANUP_PHASE_B_READY_TO_MERGE` |
+| Mode | `EMERGENCY_STOP_001` |
 | Canonical target | `baseline-001` / `7a8068fc6088b81cc9a7c94b49dc77e0abe592d8` / `33d3fb549d49e1ad02ac2b2880b5ab4336a6dc29a7142d3e33e4ec2694ad8603` |
 | Open defect blocks | `0` |
 | Open assurance blocks | `0` |
-| Last completed action | `PHASE_A_ON_MAIN; PHASE_B_T06_DESTALE_BRANCH_FILED` |
-| Next action | `ACT-MERGE-PHASE-B-THEN-C-OR-D` |
+| Last completed action | `EMERGENCY_STOP_AND_AUDIT_001_FILED; SESSION2_EVIDENCE_ON_MAIN_T01_FAIL; CONTROL_PLANE_LAG_ACKNOWLEDGED` |
+| Next action | `ACT-OPERATOR_READ_EMERGENCY_STOP_THEN_LIFT_OR_END` |
 
 ## Active tasks
 

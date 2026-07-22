@@ -9,13 +9,19 @@
     "status": "CANONICAL_AS_IS",
     "tag": "baseline-001"
   },
-  "current_mode": "CLEANUP_PHASE_B_READY_TO_MERGE",
+  "current_mode": "EMERGENCY_STOP_001",
   "current_round": "R016",
   "foundation_status": "OPERATIONAL",
   "lab_id": "NEXUS-LAB",
-  "last_completed_action": "PHASE_A_ON_MAIN; PHASE_B_T06_DESTALE_BRANCH_FILED",
-  "next_action_id": "ACT-MERGE-PHASE-B-THEN-C-OR-D",
+  "last_completed_action": "EMERGENCY_STOP_AND_AUDIT_001_FILED; SESSION2_EVIDENCE_ON_MAIN_T01_FAIL; CONTROL_PLANE_LAG_ACKNOWLEDGED",
+  "next_action_id": "ACT-OPERATOR_READ_EMERGENCY_STOP_THEN_LIFT_OR_END",
   "open_assurance_blocks": 0,
   "open_defect_blocks": 0,
+  "human_readable_reds": [
+    "EMERGENCY_STOP_IN_FORCE",
+    "G-01_RED_T-01_EXECUTED_FAIL",
+    "CARD-11_PREACTIVATION_PLAINTEXT_KEY_FAIL",
+    "CONTROL_PLANE_WAS_STALE_AFTER_PHASE_B_UNTIL_THIS_STOP"
+  ],
   "schema": "nexus.status/v2"
 }

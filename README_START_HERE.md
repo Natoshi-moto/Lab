@@ -62,6 +62,15 @@ classifications remains open under `DEC-2026-000002`.
 
 `NEXT_ACTION.md` contains one operator action only.
 
+## 🛑 Emergency stop (if active)
+
+If `STATUS.json` mode is `EMERGENCY_STOP_001` or `NEXT_ACTION.md` leads with emergency halt,
+read **before anything else**:
+
+[`operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md`](operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md)
+
+Do not implement fixes or continue break/feature work until the operator lifts the stop on main.
+
 ## Where the fuckups live
 
 [`Whoopsie log/`](Whoopsie%20log/README.md) — operator + AI accidents, noticed then / later / not yet.
