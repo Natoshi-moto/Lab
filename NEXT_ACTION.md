@@ -1,58 +1,41 @@
 # NEXT ACTION
 
-# 🛑 EMERGENCY STOP IN FORCE
+# 🛑 EMERGENCY STOP STILL IN FORCE (until you lift it)
 
-**Read first:**  
+**Read:**  
 `operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md`  
-`operations/handoffs/EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md`
 
-**Seat-routing scar (not a stop lift):** Fable 5 safeguard flag → auto-switch to Opus 4.8; one Grok log turn was canceled before filing. Canonical log:  
-`operations/receipts/SEAT_ROUTING_20260722/FABLE5_SAFEGUARD_FLAG_OPUS_SWITCH_AND_GROK_TURN_CANCEL.md`
+## Done (epistemic episode)
 
-## Halt
-
-No new break cards. No security fixes. No Phase 3. No cold drop. No round promotion.  
-No “we’re fine because we documented it.”
-
-## Only ring-0 may lift
-
-Operator must write an explicit lift on main (see emergency file §12).
-
-## Still true (not erased by stop)
-
-- T-01 EXECUTED FAIL (CARD-04)  
-- CARD-11 pre-activation plaintext key FAIL  
-- No CSP; CDN; default proxy; forgeable receipts  
-- G-01 RED; Fable test upgrades not fully installed  
-- Control plane was stale after Phase B — that lag is part of the scar  
-- Permanent distrust: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`
-
-## While stop remains — only authorized epistemic work
-
-**Three-seat truth audit** (not product work, not result manufacture):
-
-`operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md`  
-`operations/handoffs/EMERGENCY_TRUTH_AUDIT_SEAL_NOTICE.md`
-
-| Seat | Output |
+| Item | Status |
 |------|--------|
-| Claude (Fable; note if Opus) | `EMERGENCY_TRUTH_AUDIT_001_RESPONSE.claude.md` |
-| Codex Sol | `EMERGENCY_TRUTH_AUDIT_001_RESPONSE.codex.md` |
-| Grok 4.5 **fresh** only | `EMERGENCY_TRUTH_AUDIT_001_RESPONSE.grok.md` |
+| Three-seat truth audit | **Complete on main** — Claude #84, Codex #85, Grok #82 |
+| Aggregate | `operations/handoffs/EMERGENCY_TRUTH_AUDIT_001_AGGREGATE.md` |
+| Seal | **Unsealed** after all three filed — receipt `operations/receipts/EMERGENCY_TRUTH_AUDIT_UNSEAL_20260722/` |
+| Whoopsie 08 | Operator cockiness / multi-terminal diagnosis **on main** |
+| CARD-11 | Intentional research FAIL — **not** the terror object |
+| Presentation drift | Seats mis-centered fear until §9; blind audits agree on shape |
 
-**SEAL:** full chat + operator final self-diagnosis are **local-only** until all three file.  
-Auditors: work from **main only**; do not open `corpus/local-only/SEALED_*`.
+## Halt remains
 
-Operator correction on main (§9): CARD-11 intentional; worry = presentation drift / smell.  
-Stark warning verbatim: investigation §9.
+No product security fixes, Phase 3, cold drop, round promotion, or “documented = safe” until **you** write an explicit lift (emergency file §12).
 
-## After lift (operator picks one later)
+## Still true (product / research)
 
-- Control-plane truth maintenance rules for Lab #2, and/or  
-- Install Fable cards into runbook, and/or  
-- Bounded T-01 fix task with re-probe bar, and/or  
-- Lab continues breathing with scar on main, or ends  
+- T-01 EXECUTED FAIL (Agent co-tenant of host storage)  
+- CARD-11 pre-activation plaintext key path FAIL (synthetic evidence)  
+- No CSP; CDN; default proxy; forgeable receipts  
+- G-01 RED; Fable runbook upgrades not fully installed  
+- Programme = epistemic procedure + AI safety research — **not money**  
 
-status_authority: NONE on all of the above until operator says otherwise.
+## Your fork (only you)
 
-**Programme point (operator):** epistemic procedure + AI safety research — not real-world financial value installation.
+1. **Swan song v0.0.1** — leave stop; scar stands; optional Lab #2 later  
+2. **Keep building upward** — lift stop in writing, then **one** next task only (e.g. session-close STATUS rule, install Fable cards, or T-01 fix bar)
+
+## Optional cleanup
+
+- Merge or close draft **#78** (earlier Codex cleanup audit)  
+- Full conversation publish vs leave local-only (hash already public)
+
+status_authority: NONE until operator says otherwise.
