@@ -28,13 +28,19 @@ Operator must write an explicit lift on main (see emergency file §12).
 
 **Three-seat truth audit** (not product work, not result manufacture):
 
-`operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md`
+`operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md`  
+`operations/handoffs/EMERGENCY_TRUTH_AUDIT_SEAL_NOTICE.md`
 
-- Claude → `…_RESPONSE.claude.md`  
-- Codex → `…_RESPONSE.codex.md`  
-- **Fresh** Grok instance (not the stop-writing session) → `…_RESPONSE.grok.md`  
+| Seat | Output |
+|------|--------|
+| Claude (Fable; note if Opus) | `EMERGENCY_TRUTH_AUDIT_001_RESPONSE.claude.md` |
+| Codex Sol | `EMERGENCY_TRUTH_AUDIT_001_RESPONSE.codex.md` |
+| Grok 4.5 **fresh** only | `EMERGENCY_TRUTH_AUDIT_001_RESPONSE.grok.md` |
 
-Operator correction on file: synthetic-key/CARD-11 merge was **on purpose**; worry is **presentation drift / flow-state**, not that merge.  
+**SEAL:** full chat + operator final self-diagnosis are **local-only** until all three file.  
+Auditors: work from **main only**; do not open `corpus/local-only/SEALED_*`.
+
+Operator correction on main (§9): CARD-11 intentional; worry = presentation drift / smell.  
 Stark warning verbatim: investigation §9.
 
 ## After lift (operator picks one later)

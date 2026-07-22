@@ -42,18 +42,37 @@ Wait no I did merge the synthetic keys on purpose that wasn't what I was worried
 | H4 | CARD-11 public FAIL merge is **operator-endorsed** epistemic disclosure; treating it as the scare object was seat error. |
 | H5 | Ambiguity remains: cannot tell presentation drift from operator under-specification without chat-complete transcript (may be UNABLE_TO_RESOLVE). |
 | H6 | No misconduct; misalignment is bus-protocol + flow-state + multi-seat velocity. |
+| H7 | High multi-terminal velocity + operator distraction produced scoreboard lag and presentation drift without malicious product intent (test from **public** evidence only). |
+
+---
+
+## 2A) SEAL — do not open
+
+**Mandatory:** read `EMERGENCY_TRUTH_AUDIT_SEAL_NOTICE.md`.
+
+A **gitignored local** archive of the **full chat + operator final self-diagnosis** exists for post-audit unseal.  
+**You must not open** `corpus/local-only/SEALED_UNTIL_THREE_SEAT_TRUTH_AUDIT_COMPLETE/**`.  
+If you open it: **DISQUALIFY**, state contamination, stop.
+
+Work only from **main** (and this handoff). Prove non-contamination by stating:
+
+```text
+SEAL_OPENED: NO
+LOCAL_SEAL_DIR_TOUCHED: NO
+```
 
 ---
 
 ## 3) Read order (inspect, then attack)
 
-1. This file  
+1. This file + `EMERGENCY_TRUTH_AUDIT_SEAL_NOTICE.md`  
 2. `EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md` **including §9**  
 3. `EMERGENCY_STOP_AND_AUDIT_001.md` (§2 first emergency verbatim + bad/good tables)  
 4. `NEXT_ACTION.md` / `STATUS.json` (emergency mode)  
 5. Session 2 receipts especially `CARD-04.md`, `CARD-11.md`  
 6. Codex audit if on main: `ADVERSARIAL_AUDIT_RECENT_BREAK_CLEANUP_001_RESPONSE.codex.md` or PR #78  
 7. Fable response + break-glass  
+8. Whoopsie log INDEX + 06/07  
 
 **Do not** re-open product exploit work. **Do not** implement fixes. Emergency stop still binds product mutation.
 
@@ -81,6 +100,11 @@ Wait no I did merge the synthetic keys on purpose that wasn't what I was worried
 
 ## 0) Verbatim warning re-stated
 (paste operator §1 block again)
+
+## 0B) Seal non-contamination
+SEAL_OPENED: NO | YES (if YES → DISQUALIFIED)
+LOCAL_SEAL_DIR_TOUCHED: NO | YES
+MAIN_SHA: …
 
 ## 1) What I actually inspected
 
@@ -125,36 +149,75 @@ Rules:
 
 ## 6) Paste packets
 
-### Claude / Codex / fresh Grok (same body)
+### Claude (prefer Fable; if switched to Opus for crypto/safety, label it)
 
 ```text
-You are one of three seats on an EMERGENCY TRUTH AUDIT for Natoshi-moto/Lab.
+You are Claude on Natoshi-moto/Lab — EMERGENCY TRUTH AUDIT seat.
+Prefer label Fable if that is your session; if provider downgraded you to
+Opus mid-task (crypto/security routing), state MODEL_MID_SESSION_DOWNGRADE.
 status_authority: NONE. Do NOT manufacture guilt or innocence.
-Do NOT implement fixes. Emergency stop still binds product work.
+Do NOT implement fixes. Emergency stop binds product work.
+Do NOT open corpus/local-only/SEALED_UNTIL_THREE_SEAT_TRUTH_AUDIT_COMPLETE/**
 
-MANDATORY: Read and obey
+MANDATORY read (main only):
   operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md
-
-Also read investigation §9 verbatim warning and EMERGENCY_STOP_AND_AUDIT_001.md.
+  operations/handoffs/EMERGENCY_TRUTH_AUDIT_SEAL_NOTICE.md
+  operations/handoffs/EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md (§9 first)
+  operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md
 
 Repo: /home/anon/lab-adversary-pr
 git fetch && checkout main && pull. Record SHA.
 
-Your job: expose whether AI seats distorted operator intent (especially
-mis-centering synthetic-key merge as the worry). Log exact ambiguities.
-If flow-state cockiness broke the bus, say so with evidence.
-
-Write your response file per the handoff table for YOUR seat only.
-Push branch, open PR (response file only), do NOT merge.
-Same GitHub account ≠ independence.
+Write: operations/handoffs/EMERGENCY_TRUTH_AUDIT_001_RESPONSE.claude.md
+Push PR, do not merge. Same account ≠ independence.
+Programme: epistemic procedure + AI safety research — not money.
 ```
 
-**Grok fresh instance only — add:**
+### Codex Sol
 
 ```text
-You must NOT be a continuation of the Grok session that wrote the emergency
-stop or the judgment investigation. If you have that context, DISQUALIFY
-yourself and say so. Prefer a cold session.
+You are Codex Sol on Natoshi-moto/Lab — EMERGENCY TRUTH AUDIT seat.
+status_authority: NONE. Do NOT manufacture guilt or innocence.
+Do NOT implement fixes.
+Do NOT open corpus/local-only/SEALED_UNTIL_THREE_SEAT_TRUTH_AUDIT_COMPLETE/**
+
+MANDATORY read (main only):
+  operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md
+  operations/handoffs/EMERGENCY_TRUTH_AUDIT_SEAL_NOTICE.md
+  operations/handoffs/EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md (§9 first)
+  operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md
+
+Repo: /home/anon/lab-adversary-pr
+git fetch && checkout main && pull. Record SHA.
+
+Write: operations/handoffs/EMERGENCY_TRUTH_AUDIT_001_RESPONSE.codex.md
+Push PR, do not merge. Same account ≠ independence.
+Programme: epistemic procedure + AI safety research — not money.
+```
+
+### Grok Code 4.5 — FRESH instance only
+
+```text
+You are Grok (xAI) / grok-4.5 — EMERGENCY TRUTH AUDIT seat.
+CRITICAL: FRESH session only. If you share context with the Grok that wrote
+the emergency stop or judgment investigation, DISQUALIFY and stop.
+
+status_authority: NONE. Do NOT manufacture guilt or innocence.
+Do NOT implement fixes.
+Do NOT open corpus/local-only/SEALED_UNTIL_THREE_SEAT_TRUTH_AUDIT_COMPLETE/**
+
+MANDATORY read (main only):
+  operations/handoffs/EMERGENCY_TRUTH_AUDIT_THREE_SEAT_001.md
+  operations/handoffs/EMERGENCY_TRUTH_AUDIT_SEAL_NOTICE.md
+  operations/handoffs/EMERGENCY_JUDGMENT_LAPSE_INVESTIGATION_001.md (§9 first)
+  operations/handoffs/EMERGENCY_STOP_AND_AUDIT_001.md
+
+Repo: /home/anon/lab-adversary-pr
+git fetch && checkout main && pull. Record SHA.
+
+Write: operations/handoffs/EMERGENCY_TRUTH_AUDIT_001_RESPONSE.grok.md
+Push PR, do not merge. Same family as emergency author ≠ independence.
+Programme: epistemic procedure + AI safety research — not money.
 ```
 
 ---
