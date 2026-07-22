@@ -3,13 +3,6 @@
   "loadBearing": true,
   "blocks": [
     {
-      "id": "nexus-agent",
-      "title": "Nexus Agent",
-      "path": "/nexus/os/blocks/apps/nexus-agent-v0.12.html",
-      "mode": "legacyIframe",
-      "future": "managedBlock"
-    },
-    {
       "id": "prompt-studio-v3",
       "title": "Prompt Studio v3",
       "path": "/nexus/os/blocks/apps/prompt-studio-v3.html",
