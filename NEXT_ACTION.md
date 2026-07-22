@@ -12,18 +12,17 @@ Product/research **default halt** remains until a short formal lift is written (
 | Three-seat truth audit | Complete (#84, #85, #82) + aggregate |
 | Unseal + Whoopsie 08 | Done |
 | Session 2 break map | On main (T-01 FAIL, CARD-11 FAIL, etc.) |
-| Dual-drive backup | **Verified** (receipt + operator hash check); archive pins `8409e4b` |
-| Personal blind map | Codex response filed (`PERSONAL_BLIND_MAP_001_RESPONSE.codex.md`) |
-| Control-plane reconcile | This hygiene pass clears false “backup pending” |
+| Dual-drive backup (historical) | Verified @ `8409e4b` / `bf524e…` |
+| Dual-drive backup (tip) | **Done** @ `e6f5324` / `5140b9…` — `BACKUP_20260722_TIP_E6F5324` |
+| Hygiene control plane | Merged #89 |
+| Personal blind map | Codex response on main |
 | Round | R016 |
 
-## Do next (hygiene → direction)
+## Do next (direction prep)
 
-1. **Land this hygiene PR** on main (operator merge).  
-2. **Optional:** re-zip dual-drive backup of post-merge tip (recommended; prior zip is good but not tip-current).  
-3. **Optional:** park non-spine draft PRs with one-line comments.  
-4. **Optional:** one-page track menu (process / Noted reds / PCX / BGEN shelf / cold-drop prep).  
-5. When ready to build/break: **formal lift** + **one** bounded task (process first recommended: session-close STATUS rule or Fable cards into runbook).
+1. **Optional:** park non-spine draft PRs with one-line “not current spine” comments.  
+2. **Optional:** one-page track menu (process / Noted reds / PCX / BGEN shelf / cold-drop prep).  
+3. When ready to build/break: **formal lift** + **one** bounded task (process first recommended: session-close STATUS rule or Fable cards into runbook).
 
 ## Still true
 
