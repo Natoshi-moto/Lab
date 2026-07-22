@@ -1,21 +1,25 @@
 # NEXT ACTION
 
-Run **BREAK session 2** using the AI-agnostic handoff:
+**Cleanup plan:** `operations/handoffs/CLEANUP_AND_NEXT_LEG_PLAN_001.md`
 
-`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`
+## Phase A (land honesty) — operator merge if open
 
-Primary card: **CARD-04** (T-01 same-origin / storage reach) from
-`operations/break-prep/ORCH_001_BREAK_RUNBOOK.md`, synthetic data only.
-Record results under `operations/receipts/BREAK_SESSION_<date>/`.
+1. Merge PR **#70** (Fable rigor + break-glass Opus quote) if not already on `main`.
+2. Merge the **Whoopsie log + cleanup plan** PR if not already on `main`.
+3. Close PR **#68** if still open (session 1 receipts already on `main` via #69).
 
-Session 1 is complete (see `operations/receipts/BREAK_SESSION_20260722/`).
-ORCH-001 T1–T5 prep is on `main`. Stop-the-line remains **ADOPTED**.
+## Then Phase B (next AI-driveable step)
 
-Do **not** implement security fixes, promote R017, import NWC as product,
-or start feature Phase 3 unless the operator opens a separate authorized task.
+De-stale **T-06** docs only (threat model / ODS-SEC-006 / cold-drop bar)
+so the repo does not say both PASS and FAIL for v0.12.
 
-Green doctor/verify/tests do not establish security — see
-`WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
+## After B
 
-Parked / not current spine: draft PR #22/#23, PR #62 GITBRAID (parallel),
-BGEN draft audits, real-world value work.
+Phase C PR hygiene → Phase D BREAK session 2 under VETO checklist
+(`operations/handoffs/BREAK_SESSION_2_HANDOFF.md`, CARD-04).
+
+Do **not** implement product security fixes, promote R017, import NWC,
+start Phase 3, or cold-drop language unless separately authorized.
+
+Parked: #62 GITBRAID, #61/#60, BGEN #40–49, #22–24, #14.
+Permanent distrust: `WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
