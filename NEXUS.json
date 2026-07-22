@@ -13,6 +13,7 @@
   "constitution_root": "constitution",
   "operations_root": "operations",
   "snapshots_root": "snapshots",
+  "communications_root": "communications",
   "data_classes": [
     "LAB_PRIVATE",
     "PROVIDER_BOUND",

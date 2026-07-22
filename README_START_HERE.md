@@ -62,6 +62,14 @@ classifications remains open under `DEC-2026-000002`.
 
 `NEXT_ACTION.md` contains one operator action only.
 
+## Communications (press, tutorials, human docs)
+
+Outward-facing materials live under [`communications/`](communications/README.md).  
+They do **not** outrank `STATUS.json`, the constitution, or `WHY_NOT_TO_TRUST_THIS_PROJECT.md`.
+
+First posture statement (serious research readiness, same epistemic stance, no token/value claim):  
+[`communications/statements/2026-07-22_READY_FOR_SERIOUS_RESEARCH.md`](communications/statements/2026-07-22_READY_FOR_SERIOUS_RESEARCH.md)
+
 ## 🛑 Emergency stop (if active)
 
 If `STATUS.json` mode is `EMERGENCY_STOP_001` or `NEXT_ACTION.md` leads with emergency halt,

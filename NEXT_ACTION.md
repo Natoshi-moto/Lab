@@ -2,33 +2,42 @@
 
 ## Operator status
 
-Epistemic emergency episode: **closed on the operator’s side** (personal resolution).  
-Product/research **default halt** remains until a short formal lift is written (one paragraph is enough — see `EMERGENCY_STOP_AND_AUDIT_001.md` §12). Prefer **no more long verbatim dumps**; use short task orders.
+**Research assessment: CLEARED** (human operator, 2026-07-22).  
+New and existing research candidates may be assessed, ranked, continued, parked, or killed under Lab rules.
+
+Epistemic emergency episode: closed on the operator’s side.  
+**Product launch / cold-drop “shipping as done” language** remains gated until a separate explicit lift.  
+Security reds stay red. Prefer short task orders.
+
+## Communications
+
+Official outward folder: [`communications/`](communications/README.md)  
+First statement: [`communications/statements/2026-07-22_READY_FOR_SERIOUS_RESEARCH.md`](communications/statements/2026-07-22_READY_FOR_SERIOUS_RESEARCH.md)  
+Clearance receipt: [`operations/receipts/RESEARCH_ASSESSMENT_CLEARANCE_001/RECEIPT.md`](operations/receipts/RESEARCH_ASSESSMENT_CLEARANCE_001/RECEIPT.md)
 
 ## Where main is
 
 | Item | State |
 |------|--------|
-| Three-seat truth audit | Complete (#84, #85, #82) + aggregate |
-| Unseal + Whoopsie 08 | Done |
-| Session 2 break map | On main (T-01 FAIL, CARD-11 FAIL, etc.) |
-| Dual-drive backup (historical) | Verified @ `8409e4b` / `bf524e…` |
-| Dual-drive backup (tip) | **Done** @ `e6f5324` / `5140b9…` — `BACKUP_20260722_TIP_E6F5324` |
-| Hygiene control plane | Merged #89 |
-| Personal blind map | Codex response on main |
+| Mode | `RESEARCH_ASSESSMENT_CLEARED` |
 | Round | R016 |
+| Hygiene + dual-drive backup | Done (#89, #90) |
+| Three-seat truth audit | Complete |
+| Serious research posture statement | Filed under `communications/statements/` |
+| Permanent distrust | Still load-bearing |
 
-## Do next (direction prep)
+## Do next
 
-1. **Optional:** park non-spine draft PRs with one-line “not current spine” comments.  
-2. **Optional:** one-page track menu (process / Noted reds / PCX / BGEN shelf / cold-drop prep).  
-3. When ready to build/break: **formal lift** + **one** bounded task (process first recommended: session-close STATUS rule or Fable cards into runbook).
+1. **Assess research candidates** (new + existing): one-page menu or direct selection.  
+2. Optional: park non-spine draft PRs.  
+3. After selection: **one** bounded task with non-claims (process first is still wise).  
+4. Separate explicit text required before treating product launch/cold-drop as authorized.
 
 ## Still true
 
-- T-01 / G-01 red; no CSP; CDN; proxy; forgeable receipts  
-- Research-only; not money; multi-seat agreement ≠ independence  
+- T-01 / G-01 red; CARD-11 research fail; membrane gaps; bus weakness recorded  
+- Research-only; **no token / no real-world economic value**  
+- Multi-seat agreement ≠ independence  
 - `WHY_NOT_TO_TRUST_THIS_PROJECT.md`  
-- Product stop still default until formal lift  
 
 status_authority: NONE
