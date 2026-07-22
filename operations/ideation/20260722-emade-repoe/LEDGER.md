@@ -88,6 +88,39 @@ Chains: build > debug > audit (<GO_BACK)(>GO_FORWARD)(GO_BACK<) > deconstruct < 
 - depends-on: [[IDEA-002]] (public test path), conflicts-with: LOOM v0.1
   Part III bracket-cut (⚡ preserved)
 
+## IDEA-001a — Wrapped spans (amendment to IDEA-001)
+- seed (operator's words, verbatim): "It has to be wrapped though so    [b]
+  dsafsdfds [b] so large areas can be ignored and small bits grepped and
+  topology etc resolve only what is definitely not going to work for a factr"
+- restatement (mine): tags are *paired wrappers*, not point-markers — `[b]`
+  opens a region, `[b]` closes it. This gives: skip-ranges (a reader jumps
+  from open to close without spending tokens on the middle — [D]/[G] become
+  mechanically enforceable), grep-anchors (small bits findable by tag), and
+  literal topology (regions, boundaries, containment). Wrapping was already
+  implicit in the seed (`[bE]…[bE]`, `[b-h-t-r-t-a=F]…[b-h-t-r-t-a]`); now
+  it is explicit core syntax.
+- operator mode-rule, recorded: in stress-testing, **resolve only what is
+  definitely not going to work as a matter of fact** — everything else stays
+  open for iteration. Fork points are not to be forced.
+- factual strikes under that rule (measured class, not taste):
+  - FS1: same-token open/close cannot self-distinguish. A parser tells open
+    from close only by counting, so (a) one stray/unclosed tag silently
+    flips read/ignore for the entire rest of the document, and (b) same-type
+    regions cannot nest. Mechanical fact, not opinion.
+  - FS2: a fixed delimiter dies when the wrapped content *contains the
+    delimiter* — and this corpus is conversations about the notation, so
+    payloads WILL contain `[b]` etc. This is the measured BREAK-1/BREAK-2
+    class from the LOOM session (starter package failed exactly this way;
+    content-addressed fences exist because of it).
+  - Neither strike kills wrapping. Both are closed by making the closer
+    distinguishable — candidates: `[b]…[/b]` (HTML-style), or keep same-token
+    for human authoring and let the IDEA-004 compiler emit collision-proof
+    content-addressed fences at storage time (author comfort preserved,
+    archive safety guaranteed).
+- effect on IDEA-004: strengthened. Author writes wrapped brackets; the
+  bracket→LOOM compiler turns spans into fenced records mechanically.
+- status: LIVE (folded into IDEA-001)
+
 ## IDEA-002 — Public iteration path
 - seed (operator's words): "I'm choosing that we're iterating on it and going
   to test it publicly whenever the scratchpad and loom skill (that we evolve)
