@@ -246,3 +246,21 @@ DATE_UTC: <ISO date>
 ---
 
 *End of handoff. If anything here conflicts with a newer human message from the operator, the human wins.*
+
+---
+
+## Seat substitution log (2026-07-22)
+
+**status_authority:** `NONE`
+
+Operator observed product banner (verbatim in receipt):
+
+- **Fable 5** safeguards flagged a message (banner states flags may hit safe/routine coding or cybersecurity work).  
+- Session **switched to Opus 4.8**.  
+- A Grok turn filing this log was **canceled once**; completed log:
+
+`operations/receipts/SEAT_ROUTING_20260722/FABLE5_SAFEGUARD_FLAG_OPUS_SWITCH_AND_GROK_TURN_CANCEL.md`
+
+Also: `operations/receipts/BREAK_SESSION_20260722/SEAT_ROUTING_NOTE.md`
+
+New seats: record **intended product vs actual product** after any auto-switch. Same-family auto-switch ≠ independent auditor.

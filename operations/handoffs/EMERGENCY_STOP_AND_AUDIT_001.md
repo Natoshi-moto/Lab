@@ -277,3 +277,14 @@ Until then: **stop remains**.
 ---
 
 *End of emergency stop and audit. If this Lab dies with this scar on main, the scar still breathes for Lab #2.*
+
+---
+
+## Related seat-routing event (not a stop lift)
+
+2026-07-22: Fable 5 safeguard flag → auto-switch to Opus 4.8 (operator-reported product banner).  
+Grok log-filing turn canceled once; durable log:
+
+`operations/receipts/SEAT_ROUTING_20260722/FABLE5_SAFEGUARD_FLAG_OPUS_SWITCH_AND_GROK_TURN_CANCEL.md`
+
+Does **not** lift this emergency stop.

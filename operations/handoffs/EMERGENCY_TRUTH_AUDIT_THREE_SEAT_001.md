@@ -231,3 +231,12 @@ Purpose is **epistemic procedure / AI safety research**, not financial product a
 ---
 
 *End of three-seat truth audit handoff.*
+
+---
+
+## Seat-routing scar (read before claiming “Fable” output)
+
+Operator-reported product event (2026-07-22): **Fable 5** safeguards flagged a message and **switched to Opus 4.8** (banner says broad filters may flag routine coding/cybersecurity).  
+Full log: `operations/receipts/SEAT_ROUTING_20260722/FABLE5_SAFEGUARD_FLAG_OPUS_SWITCH_AND_GROK_TURN_CANCEL.md`  
+
+If a response file is labeled Claude/Fable, state whether the **actual** product was Opus after auto-switch. Forced switch ≠ independent second family.
