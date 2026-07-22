@@ -1,13 +1,15 @@
 ---
 name: nexus-audit
-description: Run the read-only R002 external-witness audit against baseline-001 and return hash-bound observations.
+description: Run the read-only R002 external-witness audit against baseline-001 and return hash-bound observations. Scoped historical skill — not a general entry workflow. For every-session entry use Agent Resources/Tools/Skills/essential/INDEX.md.
 disable-model-invocation: true
 allowed-tools: Read Grep Glob Bash(./nexus *) Bash(python3 *) Bash(git status *) Bash(git diff *) Bash(git rev-parse *) Bash(git show *) Bash(sha256sum *)
 ---
 
 # Nexus R002 blind audit
 
-1. Read `AGENTS.md`, `AUDIT_START_HERE.md`, `constitution/AUDIT.md`, `operations/audits/AUD-R002-CLAUDE-BLIND/EXTERNAL_WITNESS_ARCHITECTURE.md`, and `operations/audits/AUD-R002-CLAUDE-BLIND/TARGET.json`.
+**Scope note:** This skill remains useful when an R002-shaped audit is *commissioned*. It is not the general mandatory entry skill. General entry = root `AGENTS.md` + `Agent Resources/Tools/Skills/essential/INDEX.md`. After any real audit work round, also file `communications/publications/` via `round-close-publication`.
+
+1. Read `AGENTS.md`, `Agent Resources/Tools/Skills/essential/INDEX.md`, `AUDIT_START_HERE.md`, `constitution/AUDIT.md`, `operations/audits/AUD-R002-CLAUDE-BLIND/EXTERNAL_WITNESS_ARCHITECTURE.md`, and `operations/audits/AUD-R002-CLAUDE-BLIND/TARGET.json`.
 2. Confirm `git status --short`. Do not modify the target tag or snapshot.
 3. Run:
 
