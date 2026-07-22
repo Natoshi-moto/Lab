@@ -10,6 +10,7 @@
     "ods:p0": "node scripts/ods-p0.mjs",
     "ods:p1": "node scripts/agent-prompt-smoke.mjs",
     "agent:prompt-smoke": "node scripts/agent-prompt-smoke.mjs",
+    "t06:quarantine-check": "node scripts/t06-quarantine-check.mjs",
     "ods:smoke": "node scripts/ods-p0.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"

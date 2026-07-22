@@ -18,7 +18,6 @@
       "title": "Nexus Agent v0.14 (scrubbed)",
       "kind": "managed-block",
       "path": "nexus/nexus-agent-v0.14-scrubbed.html",
-      "legacyPath": "nexus/nexus-agent-v0.12.html",
       "notedRoute": "/nexus-agent",
       "role": "Factory-empty research agent and approval-gated prompt import workspace"
     },
