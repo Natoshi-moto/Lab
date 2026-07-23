@@ -57,3 +57,12 @@ Append-only. Any seat finishing a turn adds a block at the bottom.
 - next task id: TSK-FS-000 (human) | TSK-FS-002 | TSK-FS-010
 - blocked on: operator decision; Tails env; chat export
 - non-claims restated: yes
+
+## 2026-07-23T08:00Z SEAT-GROK-MANAGER (go: task board + operator decision card)
+
+- did: TASK_BOARD.json; READY_FOR_OPERATOR.md; verify_pack requires site+board; pack 0.4.1; PR comment for operator
+- files: TASK_BOARD.json, READY_FOR_OPERATOR.md, tools/verify_pack.sh
+- claims touched: none new
+- next task id: TSK-FS-000 (human) — decision strings in READY_FOR_OPERATOR.md
+- blocked on: operator park/merge/commission; Tails; chat export
+- non-claims restated: yes

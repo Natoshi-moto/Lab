@@ -1,0 +1,71 @@
+{
+  "schema": "full-spectrum.task-board/v1",
+  "pack_id": "FULL_SPECTRUM_VISION_001",
+  "pack_version": "0.4.1",
+  "status_authority": "NONE",
+  "draft_pr": "https://github.com/Natoshi-moto/Lab/pull/101",
+  "branch": "grok/full-spectrum-vision-pack-001",
+  "cold_start": "HANDOFF_ANY_AI.md",
+  "operator_start": "OPERATOR_ONE_PAGE.md",
+  "verify": "bash operations/proposals/FULL_SPECTRUM_VISION_001/tools/verify_pack.sh",
+  "tasks": [
+    {
+      "id": "TSK-FS-000",
+      "file": "tasks/TSK-FS-000_PROMOTE_OR_PARK.md",
+      "state": "OPEN_HUMAN",
+      "assignee": "operator",
+      "blocker": "human park|merge-proposal|commission decision"
+    },
+    {
+      "id": "TSK-FS-001",
+      "file": "tasks/TSK-FS-001_PUSH_AND_PR.md",
+      "state": "DONE",
+      "receipt": "PR #101",
+      "assignee": "SEAT-GROK-MANAGER"
+    },
+    {
+      "id": "TSK-FS-002",
+      "file": "tasks/TSK-FS-002_EXPORT_CHAT_HASH.md",
+      "state": "PARTIAL",
+      "receipt": "receipts/TSK-FS-002_PARTIAL.md",
+      "blocker": "full multi-turn chat export still EXPORT_PENDING; pack tree sealed"
+    },
+    {
+      "id": "TSK-FS-010",
+      "file": "tasks/TSK-FS-010_TAILS_WORKLOAD_001.md",
+      "state": "OPEN",
+      "blocker": "requires stock Tails boot environment"
+    },
+    {
+      "id": "TSK-FS-020",
+      "file": "tasks/TSK-FS-020_NEXSIM_RECEIPT_SPEC.md",
+      "state": "DONE",
+      "receipt": "receipts/TSK-FS-020_DONE.md"
+    },
+    {
+      "id": "TSK-FS-030",
+      "file": "tasks/TSK-FS-030_MITHUB_CI_DUAL_WRITE.md",
+      "state": "DONE",
+      "receipt": "receipts/TSK-FS-030_DONE.md"
+    },
+    {
+      "id": "TSK-FS-040",
+      "file": "tasks/TSK-FS-040_HERMES_TEACHER_SKILLS_V0.md",
+      "state": "DONE",
+      "receipt": "receipts/TSK-FS-040_DONE.md"
+    },
+    {
+      "id": "TSK-FS-050",
+      "file": "tasks/TSK-FS-050_SITE_MARKDOWN_V0.md",
+      "state": "DONE",
+      "receipt": "receipts/TSK-FS-050_DONE.md"
+    }
+  ],
+  "forbidden_without_operator": [
+    "merge_as_token_launch",
+    "clear_STATUS_token_reds",
+    "claim_official_tails",
+    "claim_quantum_proof",
+    "force_push_main"
+  ]
+}

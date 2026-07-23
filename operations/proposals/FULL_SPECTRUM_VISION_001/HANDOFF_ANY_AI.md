@@ -30,7 +30,9 @@
 | Suggested PR body | `PR_BODY.md` |
 
 **Read order if cold:**  
-`HANDOFF_ANY_AI.md` → `PACK_INDEX.json` → `README.md` → `CLAIMS_REGISTER.md` → task you are assigned.
+`HANDOFF_ANY_AI.md` → `TASK_BOARD.json` → `PACK_INDEX.json` → `README.md` → `CLAIMS_REGISTER.md` → task you are assigned.  
+
+**Operator decision card:** `READY_FOR_OPERATOR.md`
 
 ---
 
