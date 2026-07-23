@@ -48,6 +48,13 @@ Sister packets (temporary risks and gates):
 
 This file is **stronger than those**: they may close T-IDs. **These reasons do not close.**
 
+> **This file is the short index. The proof is a vault.**
+> Full, verbatim adversarial reports — hash-anchored and unedited, no matter how
+> long — live in [`PROOF_YOU_SHOULDNT_TRUST_THIS_PROJECT_EVER/`](PROOF_YOU_SHOULDNT_TRUST_THIS_PROJECT_EVER/).
+> This document stays deliberately short so people **actually read it**; that vault
+> stays deliberately complete so nothing gets summarised away. See § G below for the
+> running list, each entry linking to its full receipt.
+
 ---
 
 ## Permanent reasons not to trust this project
@@ -142,6 +149,32 @@ This file is **stronger than those**: they may close T-IDs. **These reasons do n
 
 ---
 
+## G. Evidenced serious universal vulnerabilities (append-only — keep this SHORT)
+
+§A–§F are *permanent structural* reasons. This section is different: it is the
+running log of **concrete, confirmed, serious vulnerabilities of a universal
+class** — the kind that keep recurring, not one-off bugs. One tight row each.
+
+**Discipline (do not break):**
+- **One entry ≈ 2 lines.** If it needs more, it belongs in the vault, not here.
+- **Link, don't paste.** The full verbatim report goes in
+  `PROOF_YOU_SHOULDNT_TRUST_THIS_PROJECT_EVER/`; here you write only the class + a
+  one-line "so what" + the link.
+- **Append; never rewrite.** A fixed vulnerability is annotated `[MITIGATED <date>]`
+  in place — the row stays, because "we had this" is itself a reason not to trust.
+- **Class, not drama.** Name the *category* that will recur, so the list stays a
+  compass, not a changelog.
+
+| # | Date | Vulnerability class | Why it matters (one line) | Status | Full proof |
+|---|------|---------------------|---------------------------|--------|-----------|
+| U-01 | 2026-07-23 | **Declared privacy ≠ enforced privacy** in the browser product — API keys in `localStorage`/URL, a **default third-party CORS proxy**, and 71 apps on one origin with no CSP sharing one credential store | The headline "sovereign / local-first / your-keys-are-yours" claim is contradicted by the shipped code, and the green Python/Nexus gates never touch these paths — so passing tests tell you nothing about it | CONFIRMED (structural; no exploit chain proven; creds-in-export worst case *falsified*) | [vault ↗](PROOF_YOU_SHOULDNT_TRUST_THIS_PROJECT_EVER/reports/2026-07-23_NOTED_frontend-privacy-assault/) |
+
+*(This class generalises the same disease as `STRICT NO SALE` and
+`review-required`: **a promise in prose the machine does not enforce.** Watch for it
+everywhere.)*
+
+---
+
 ## Load-bearing rule — push through or break
 
 This section is **operator-mandated** as a programme hinge.
@@ -212,7 +245,13 @@ It is an **epistemic brake** installed by operator request so this Lab cannot ga
 - **Do not delete** this file to “clean up for launch.”  
 - Amendments may **add** reasons or clarify wording.  
 - Removing a reason requires operator-visible receipt explaining why it stopped being always-true (almost never valid for §A–§B).  
-- Closing a *bug* never removes reasons **1–13, 14–19, 28–32, 33–38**.
+- Closing a *bug* never removes reasons **1–13, 14–19, 28–32, 33–38**.  
+- **§G is append-only.** New evidenced vulnerabilities get one short row here; the
+  full verbatim report goes in `PROOF_YOU_SHOULDNT_TRUST_THIS_PROJECT_EVER/` with a
+  `sha256` in its `PROVENANCE.md`. A mitigated item is marked in place, **not**
+  removed — the vault never loses a receipt, and this index never loses a row.  
+- **Keep this file short on purpose.** Bloat goes in the vault. If §G ever gets too
+  long to read, that is a signal to tighten wording, never to drop entries.
 
 ---
 
