@@ -1,0 +1,18 @@
+#!/bin/sh
+# 🚨 TODDLER-PROOF pre-commit hook. Stops you committing straight onto main.
+# You should ALWAYS work on a branch. main is accepted state, not a scratchpad.
+
+branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+RED=''; NC=''
+if [ -t 2 ]; then RED='\033[1;31m'; NC='\033[0m'; fi
+
+case "$branch" in
+  main|master)
+    printf "${RED}\n" >&2
+    printf "  🛑  WHOA. You are committing directly onto '%s'.\n" "$branch" >&2
+    printf "  🌿  Work on a BRANCH, not on the truth. Do this instead:\n" >&2
+    printf "        git switch -c my-change-name\n" >&2
+    printf "      then commit again. Your staged changes are safe and still here.\n${NC}" >&2
+    exit 1 ;;
+esac
+exit 0
