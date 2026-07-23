@@ -66,9 +66,12 @@ Do not start two tracks. Operator or Manager assigns; default priority:
 | 5 | `tasks/TSK-FS-020_NEXSIM_RECEIPT_SPEC.md` | Receipt schema + example | **DONE** — `receipts/TSK-FS-020_DONE.md` |
 | 6 | `tasks/TSK-FS-030_MITHUB_CI_DUAL_WRITE.md` | CI workflow + checklist | **DONE** — `receipts/TSK-FS-030_DONE.md` |
 | 7 | `tasks/TSK-FS-040_HERMES_TEACHER_SKILLS_V0.md` | Skill stubs | **DONE** — `receipts/TSK-FS-040_DONE.md` |
+| 8 | `tasks/TSK-FS-050_SITE_MARKDOWN_V0.md` | Static site markdown | **DONE** — `receipts/TSK-FS-050_DONE.md` |
 
 **Draft PR:** https://github.com/Natoshi-moto/Lab/pull/101  
 **Operator skim:** `OPERATOR_ONE_PAGE.md`  
+**LOOM pack genesis record:** `LOOM_RECORD_001_PACK_GENESIS.md`  
+**One-shot verify:** `bash operations/proposals/FULL_SPECTRUM_VISION_001/tools/verify_pack.sh`  
 
 **Next open work for agents:** wait for **TSK-FS-000** (human) · finish chat export (**TSK-FS-002**) · **TSK-FS-010** if Tails available.
 
@@ -90,13 +93,13 @@ Architecture seats: implement only from a task file + CLAIM-IDs. Vision seats: e
 ## 6. Verify this pack integrity
 
 ```bash
-# from repo root
-test -f operations/proposals/FULL_SPECTRUM_VISION_001/HANDOFF_ANY_AI.md
-python3 operations/proposals/FULL_SPECTRUM_VISION_001/tools/check_claim_ids.sh
-# optional: jq . operations/proposals/FULL_SPECTRUM_VISION_001/PACK_INDEX.json
+# from repo root — prefer one-shot
+bash operations/proposals/FULL_SPECTRUM_VISION_001/tools/verify_pack.sh
+# or only claims:
+bash operations/proposals/FULL_SPECTRUM_VISION_001/tools/check_claim_ids.sh
 ```
 
-Expected: script exits 0 if every `CLAIM-*` in `CLAIMS.json` appears in `CLAIMS_REGISTER.md` and key docs still exist.
+Expected: exit 0. Optional: `bash …/tools/hash_pack.sh` to refresh `PACK_TREE.sha256`.
 
 ---
 

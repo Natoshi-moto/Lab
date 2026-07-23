@@ -10,12 +10,14 @@ FAIL=0
 
 need=(
   "$ROOT/HANDOFF_ANY_AI.md"
+  "$ROOT/OPERATOR_ONE_PAGE.md"
   "$ROOT/README.md"
   "$ROOT/PACK_INDEX.json"
   "$REG"
   "$JSON"
   "$ROOT/MITHUB.md"
   "$ROOT/GENESIS_TRACEABILITY.md"
+  "$ROOT/LOOM_RECORD_001_PACK_GENESIS.md"
 )
 
 for f in "${need[@]}"; do

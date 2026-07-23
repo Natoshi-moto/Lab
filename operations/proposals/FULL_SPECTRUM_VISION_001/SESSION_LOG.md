@@ -48,3 +48,12 @@ Append-only. Any seat finishing a turn adds a block at the bottom.
 - next task id: TSK-FS-000 (human) | TSK-FS-002 chat export | TSK-FS-010 Tails
 - blocked on: operator decision; no Tails in this environment
 - non-claims restated: yes
+
+## 2026-07-23T07:40Z SEAT-GROK-MANAGER (go: LOOM record + site + verify_pack)
+
+- did: LOOM_RECORD_001_PACK_GENESIS; tools/verify_pack.sh; site/*.md (TSK-FS-050); pack_version 0.4.0; claim check requires OPERATOR_ONE_PAGE + LOOM record
+- files: LOOM_RECORD_001*, tools/verify_pack.sh, site/*, receipts/TSK-FS-050_DONE.md
+- claims touched: CLAIM-GEN-*, CLAIM-FS-001, CLAIM-MIT-001
+- next task id: TSK-FS-000 (human) | TSK-FS-002 | TSK-FS-010
+- blocked on: operator decision; Tails env; chat export
+- non-claims restated: yes
