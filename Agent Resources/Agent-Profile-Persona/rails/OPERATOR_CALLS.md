@@ -18,6 +18,15 @@ SYNC              — RAM + brain only (not disk, not commit)
 SPAM THE DRIVES   — emergency multi-drive snapshot (explicit)
 ```
 
+## Two trees (important)
+
+| | Path | Branch |
+|--|------|--------|
+| **RULE** | `/home/anon/audit-lab/Lab` | careful / PR work |
+| **PLAY** | `/home/anon/Lab-PLAY` | `play/operator-abuse-sandbox` — **abuse this** |
+
+`CALL PLAY` → prefer working in **Lab-PLAY**. See `RULE_VS_PLAY.md`.
+
 ## Combo (optional)
 
 ```text
