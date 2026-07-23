@@ -2,7 +2,9 @@
 
 **Status:** `PROPOSAL / STATUS_AUTHORITY: NONE`  
 **Session (approx):** 2026-07-23 Manager seat (Grok) + Operator  
-**Chat export hash:** `EXPORT_PENDING` — replace when verbatim export is sealed/hashed  
+**Chat export hash:** `EXPORT_PENDING` — replace when verbatim multi-turn export is sealed/hashed  
+**Pack tree hash:** see `PACK_TREE.sha256` (`pack_tree_sha256=…`; regenerate via `tools/hash_pack.sh` after material edits)  
+**Pack tree hash (pre-commit working tree seal):** regenerate with `tools/hash_pack.sh`; committed value lives in `PACK_TREE.sha256` header line `pack_tree_sha256=`.  
 **Genesis pin:** see pack README / `GENESIS_TRACEABILITY.md`
 
 ---

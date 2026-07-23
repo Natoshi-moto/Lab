@@ -39,3 +39,12 @@ Append-only. Any seat finishing a turn adds a block at the bottom.
 - next task id: TSK-FS-000 (human) or TSK-FS-002 or TSK-FS-010
 - blocked on: operator park/merge; Tails machine for 010; chat export for 002
 - non-claims restated: yes
+
+## 2026-07-23T07:20Z SEAT-GROK-MANAGER (go: seal pack tree + operator one-pager)
+
+- did: OPERATOR_ONE_PAGE.md; hash_pack.sh + PACK_TREE.sha256; TSK-FS-002 partial receipt; break-status skill; handoff table update
+- files: OPERATOR_ONE_PAGE.md, tools/hash_pack.sh, PACK_TREE.sha256, receipts/TSK-FS-002_PARTIAL.md, skills/break-status/
+- claims touched: CLAIM-GEN-001, CLAIM-METH-002, CLAIM-NEX-003/004
+- next task id: TSK-FS-000 (human) | TSK-FS-002 chat export | TSK-FS-010 Tails
+- blocked on: operator decision; no Tails in this environment
+- non-claims restated: yes

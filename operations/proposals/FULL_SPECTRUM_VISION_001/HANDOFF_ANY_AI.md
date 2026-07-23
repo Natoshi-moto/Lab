@@ -61,15 +61,16 @@ Do not start two tracks. Operator or Manager assigns; default priority:
 |----------|-----------|--------|--------|
 | 1 | `tasks/TSK-FS-000_PROMOTE_OR_PARK.md` | Human: park / merge proposal / commission | **OPEN (human)** |
 | 2 | `tasks/TSK-FS-001_PUSH_AND_PR.md` | Remote branch + draft PR | **DONE** — PR #101 |
-| 3 | `tasks/TSK-FS-002_EXPORT_CHAT_HASH.md` | Seal vision chat hash into manifest | OPEN |
+| 3 | `tasks/TSK-FS-002_EXPORT_CHAT_HASH.md` | Seal vision chat + pack hashes | **PARTIAL** — pack tree hashed; chat still `EXPORT_PENDING` (`receipts/TSK-FS-002_PARTIAL.md`) |
 | 4 | `tasks/TSK-FS-010_TAILS_WORKLOAD_001.md` | Research report only | OPEN (needs Tails) |
-| 5 | `tasks/TSK-FS-020_NEXSIM_RECEIPT_SPEC.md` | Receipt schema + example | **DONE** — see `receipts/TSK-FS-020_DONE.md` |
-| 6 | `tasks/TSK-FS-030_MITHUB_CI_DUAL_WRITE.md` | CI workflow + checklist | **DONE** — see `receipts/TSK-FS-030_DONE.md` |
-| 7 | `tasks/TSK-FS-040_HERMES_TEACHER_SKILLS_V0.md` | Skill stubs | **DONE** — see `receipts/TSK-FS-040_DONE.md` |
+| 5 | `tasks/TSK-FS-020_NEXSIM_RECEIPT_SPEC.md` | Receipt schema + example | **DONE** — `receipts/TSK-FS-020_DONE.md` |
+| 6 | `tasks/TSK-FS-030_MITHUB_CI_DUAL_WRITE.md` | CI workflow + checklist | **DONE** — `receipts/TSK-FS-030_DONE.md` |
+| 7 | `tasks/TSK-FS-040_HERMES_TEACHER_SKILLS_V0.md` | Skill stubs | **DONE** — `receipts/TSK-FS-040_DONE.md` |
 
 **Draft PR:** https://github.com/Natoshi-moto/Lab/pull/101  
+**Operator skim:** `OPERATOR_ONE_PAGE.md`  
 
-**Next open work for agents:** TSK-FS-002 (hash) or TSK-FS-010 (Tails env) or wait for TSK-FS-000 human decision.
+**Next open work for agents:** wait for **TSK-FS-000** (human) · finish chat export (**TSK-FS-002**) · **TSK-FS-010** if Tails available.
 
 Architecture seats: implement only from a task file + CLAIM-IDs. Vision seats: extend doctrine only with OP attribution or new OP quote.
 

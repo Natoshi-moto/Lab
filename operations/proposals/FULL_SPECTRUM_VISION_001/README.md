@@ -36,10 +36,13 @@ See [`GENESIS_TRACEABILITY.md`](GENESIS_TRACEABILITY.md).
 
 ---
 
-## Cold start (any AI)
+## Cold start
 
-**Read [`HANDOFF_ANY_AI.md`](HANDOFF_ANY_AI.md) first.**  
-Machine index: [`PACK_INDEX.json`](PACK_INDEX.json) · claims: [`CLAIMS.json`](CLAIMS.json)
+| Who | Start here |
+|-----|------------|
+| **Any AI** | [`HANDOFF_ANY_AI.md`](HANDOFF_ANY_AI.md) |
+| **Operator (human)** | [`OPERATOR_ONE_PAGE.md`](OPERATOR_ONE_PAGE.md) |
+| Machine index | [`PACK_INDEX.json`](PACK_INDEX.json) · [`CLAIMS.json`](CLAIMS.json) · [`PACK_TREE.sha256`](PACK_TREE.sha256) |
 
 ## Read order
 

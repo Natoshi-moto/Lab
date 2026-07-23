@@ -1,7 +1,7 @@
 {
   "schema": "full-spectrum.pack-index/v1",
   "pack_id": "FULL_SPECTRUM_VISION_001",
-  "pack_version": "0.3.0",
+  "pack_version": "0.3.1",
   "status": "PROPOSAL",
   "status_authority": "NONE",
   "branch": "grok/full-spectrum-vision-pack-001",

@@ -14,5 +14,6 @@ Copy into `~/.hermes/skills/` only under a bounded install task with operator GO
 | `isomorphism-check` | Story ↔ code ↔ verify |
 | `nex-epoch0-warn` | Provisional NEX banner |
 | `mithub-pr-dual-write` | Dual-write PR discipline |
+| `break-status` | Hard reset + breaker status |
 
 No auto-learn from failed verify. Human ring-0 for promotion.
