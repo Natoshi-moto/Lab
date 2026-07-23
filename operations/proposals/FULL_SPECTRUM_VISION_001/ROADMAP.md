@@ -64,15 +64,16 @@
 
 ---
 
-## Phase 5 — Semantic substrate v0
+## Phase 5 — Semantic substrate v0 + Mithub conventions
 
 - Anchor vocabulary + SEC-ID registry for critical paths  
 - Unix pipeline stubs: map → enrich → patch → verify → receipt  
 - Hermes teacher skill pack (lab-enter, ffd-enrich, isomorphism-check)  
 - Grep recipes bound to CLAIM-IDs  
+- **Mithub v0:** dual-write PR template + CI check (claim registry ↔ `rg`); Lab as reference semantic forge  
+- Do **not** reimplement git; piggyback GitHub  
 
-**Exit:** One filmed FFD slice + one Hermes skill demo on course path.
-
+**Exit:** One filmed FFD slice + one Hermes skill demo + one dual-write PR that fails CI when anchors missing.
 ---
 
 ## Phase 6 — CAGE / PQ / offline roots (long)

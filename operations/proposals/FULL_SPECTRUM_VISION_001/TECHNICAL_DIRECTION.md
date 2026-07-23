@@ -11,9 +11,14 @@
 ```text
 HUMAN RING-0
     │
-    ├── LOOM (📜 record / ⚖ claim / 🧭 route) + GitHub
+    ├── MITHUB (portal / route — AI-age dual forge UI; never sole authority)
+    │     piggybacks git + GitHub (blobs, PRs, CI, glass)
+    │
+    ├── LOOM (📜 record / ⚖ claim / 🧭 route)  +  Git (legacy VCS)
     ├── FFD enrichment + SIGNAL SATURATION + SALIENT ANCHORS
-    ├── Grep ABI  ←→  legacy code (Noted, Nexus, engines)
+    ├── Grep ABI  ←→  legacy code  (INBREED: shared IDs both sides)
+    │
+    ├── Lab = reference semantic forge (this corpus + constitution)
     │
     ├── Noted (host people work ON / IN / THROUGH)
     │     └── Nexus OS (blocks, agent, quine, Quasi-SQL/NexusDB, wallet UI)
@@ -28,6 +33,7 @@ HUMAN RING-0
           └── CAGE / PQ monetary-validity research
 ```
 
+See [`MITHUB.md`](MITHUB.md) for portal doctrine and dual-write inbreeding rules.
 ---
 
 ## Axiom: hostile machine

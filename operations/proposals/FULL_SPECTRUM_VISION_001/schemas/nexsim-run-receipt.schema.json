@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "full-spectrum.nexsim-run-receipt/v0",
+  "title": "NexsimRunReceipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "sim_version_hash",
+    "seed",
+    "config_hash",
+    "output_hash",
+    "started_at",
+    "finished_at",
+    "host_class",
+    "opt_in_data",
+    "status_authority"
+  ],
+  "properties": {
+    "schema": { "const": "full-spectrum.nexsim-run-receipt/v0" },
+    "sim_version_hash": { "type": "string", "minLength": 7 },
+    "seed": { "type": ["string", "integer"] },
+    "config_hash": { "type": "string", "minLength": 7 },
+    "output_hash": { "type": "string", "minLength": 7 },
+    "started_at": { "type": "string" },
+    "finished_at": { "type": "string" },
+    "host_class": { "enum": ["desktop", "tails", "ci", "other"] },
+    "opt_in_data": { "type": "boolean" },
+    "operator_note": { "type": "string" },
+    "github_path": { "type": "string" },
+    "status_authority": { "const": "NONE" },
+    "epoch": { "type": "string", "description": "e.g. epoch-0" }
+  }
+}

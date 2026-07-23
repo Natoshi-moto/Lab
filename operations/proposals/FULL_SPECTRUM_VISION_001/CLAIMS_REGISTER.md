@@ -43,5 +43,10 @@
 | CLAIM-CAGE-003 | Forbidden wording: quantum-proof / unbreakable as fact | CORPUS CAGE NONCLAIMS |
 | CLAIM-GEN-001 | Whole development track must be traceable to lab genesis snapshot + this vision record | OP-14 |
 | CLAIM-GEN-002 | Three-Go mine protocol used to produce this pack | OP-14 |
+| CLAIM-MIT-001 | **Mithub** is the portal for the AI-age dual forge: git bytes + semantic layer | OP-MITHUB, MITHUB.md |
+| CLAIM-MIT-002 | Mithub **piggybacks** git/GitHub (or equivalent) for blob/PR/CI; does not year-one replace them | OP-MITHUB, MITHUB.md |
+| CLAIM-MIT-003 | Lab is the **reference semantic forge** and constitution gym for Mithub | OP-MITHUB, MITHUB.md |
+| CLAIM-MIT-004 | Code and semantic language **co-evolve (inbreed)** via shared greppable IDs and dual-write PRs | OP-MITHUB, MITHUB.md |
+| CLAIM-MIT-005 | Mithub UI is a **route** — rebuildable; never sole authority | MITHUB.md, LOOM spirit |
 
 **TENSION-001:** Lab tip `human_readable_reds` includes `NO_REAL_WORLD_TOKEN_OR_ECONOMIC_VALUE` while CLAIM-NEX-001 / CLAIM-MOOT-001 propose epoch-0 product economics. Resolution requires explicit human promotion and legal review — not silent STATUS edit.

@@ -22,6 +22,7 @@
 | `/method` | FFD, LOOM, saturation, forks, seats | OP-03, OP-07, OP-16 |
 | `/course` | Video + transcript + university | OP-04, OP-16 |
 | `/genesis` | baseline-001 + this vision pack | CLAIM-GEN-001 |
+| `/mithub` | Dual forge portal: git + semantic layer; Lab as reference forge | CLAIM-MIT-*, OP-MITHUB |
 
 ---
 
@@ -63,6 +64,18 @@ Moots are the serious layer: intellectual and artistic works you make with the t
 ## `/break` draft
 
 We pay temporary dust and permanent status to people who can prove they broke us. When the break is systemic, balances hard-reset. That is how the system is made.
+
+---
+
+## `/mithub` draft
+
+**Mithub** is the forge portal for an AI-age stack that does not throw away git.
+
+- **GitHub / git** keep the atoms (commits, PRs, CI).  
+- **LOOM + anchors + claims** keep the meaning.  
+- **Mithub** is where they are forced to co-evolve — same IDs in code and claims, dual-write PRs, agents that leave trails.  
+
+The Lab is the first serious tenant: a reference semantic forge under Full Spectrum constitution. Mithub does not replace GitHub on day one; it piggybacks it. If the portal disagrees with the repo, the portal is wrong.
 
 ---
 

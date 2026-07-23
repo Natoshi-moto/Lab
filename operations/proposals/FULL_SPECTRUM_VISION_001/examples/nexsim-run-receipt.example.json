@@ -1,0 +1,15 @@
+{
+  "schema": "full-spectrum.nexsim-run-receipt/v0",
+  "sim_version_hash": "deadbeefcafebabe",
+  "seed": 1,
+  "config_hash": "c0ffee00c0ffee00",
+  "output_hash": "feedfacefeedface",
+  "started_at": "2026-07-23T00:00:00Z",
+  "finished_at": "2026-07-23T00:05:00Z",
+  "host_class": "desktop",
+  "opt_in_data": false,
+  "operator_note": "synthetic example only — not a real run",
+  "github_path": "operations/proposals/FULL_SPECTRUM_VISION_001/examples/",
+  "status_authority": "NONE",
+  "epoch": "epoch-0"
+}

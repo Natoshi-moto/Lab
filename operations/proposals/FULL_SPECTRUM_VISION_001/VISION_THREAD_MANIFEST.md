@@ -113,6 +113,10 @@ Preserve **who said what** so the development arc can be traced to this genesis 
 ### OP-18 — Hermes teacher
 > “We turn a Hermes agent into a teacher of the university course and we make AI that is smart man search what people are doing with Hermes agents and skills and look what we've been doing here”
 
+### OP-MITHUB — Lab as semantic GitHub; portal Mithub; piggyback; inbreed
+> “You are fucking SMASHING this and you have full agency…” *(agency grant for hard rounds)*  
+> “Set up the lab so it IS a new GitHub for this semantic programing layer and there's a portal called Mithub that is GitHub for the new AI digital age that piggy backs off of existing infrastructure so code and our new language can inbreed together see if there's real shape and isomorphism in what i say”
+
 ---
 
 ## 5. Verbatim gold — Manager (MGR)
