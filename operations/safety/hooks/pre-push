@@ -1,0 +1,50 @@
+#!/bin/sh
+# 🚨 TODDLER-PROOF pre-push hook. Loud on purpose. Never merges, never edits.
+# Behaviour: HARD-BLOCK any push to main/master. Scream about public pushes.
+#            Non-interactive (safe for automation): it warns, it does not hang.
+# Install:   operations/safety/hooks/install.sh
+# Remove:    delete this file from your .git/hooks/ (see README).
+
+remote_name="$1"
+remote_url="$2"
+
+RED=''; YEL=''; NC=''
+if [ -t 2 ]; then RED='\033[1;31m'; YEL='\033[1;33m'; NC='\033[0m'; fi
+
+printf "${YEL}\n" >&2
+printf "  📤📤📤  YOU ARE ABOUT TO PUSH  📤📤📤\n" >&2
+printf "  📍 remote : %s  (%s)\n" "$remote_name" "$remote_url" >&2
+printf "${NC}" >&2
+
+blocked=0
+public=0
+case "$remote_url" in
+  *github.com*|https://*|git@*) public=1 ;;
+esac
+
+# stdin lines: <local ref> <local sha> <remote ref> <remote sha>
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "$remote_ref" ] && continue
+  printf "  🌿 pushing → %s\n" "$remote_ref" >&2
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master)
+      blocked=1 ;;
+  esac
+done
+
+if [ "$public" = "1" ]; then
+  printf "${RED}\n  🌍  THIS REMOTE IS PUBLIC. PUSHING = PUBLISHING = FOREVER.\n" >&2
+  printf "  🔑  Did you check for secrets / private personal stuff? If unsure: Ctrl-C NOW.\n${NC}" >&2
+fi
+
+if [ "$blocked" = "1" ]; then
+  printf "${RED}\n" >&2
+  printf "  🛑🛑🛑  NOPE.  DIRECT PUSH TO main/master IS FORBIDDEN.  🛑🛑🛑\n" >&2
+  printf "  main is the TRUTH. You change it with a Pull Request + a human merge.\n" >&2
+  printf "  Push a BRANCH instead:  git push -u origin <your-branch-name>\n" >&2
+  printf "  (Setting I_KNOW_WHAT_IM_DOING=1 does NOT override this. On purpose.) 🧷\n${NC}" >&2
+  exit 1
+fi
+
+printf "${YEL}  ✅ proposal push allowed. Breathe. 🐢${NC}\n\n" >&2
+exit 0
