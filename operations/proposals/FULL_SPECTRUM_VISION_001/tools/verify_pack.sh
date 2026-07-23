@@ -52,11 +52,30 @@ echo "== workflow present =="
 test -f "$REPO/.github/workflows/full-spectrum-claims.yml"
 echo "ok workflow"
 
-echo "== pack tree hash (info) =="
+echo "== pack tree hash =="
 if [[ -f "$ROOT/PACK_TREE.sha256" ]]; then
-  grep '^pack_tree_sha256=' "$ROOT/PACK_TREE.sha256" || true
+  STORED="$(sed -n 's/^pack_tree_sha256=//p' "$ROOT/PACK_TREE.sha256")"
+  TMP="$(mktemp)"
+  trap 'rm -f "$TMP"' EXIT
+  (
+    cd "$ROOT"
+    find . -type f ! -name 'PACK_TREE.sha256' -print0 \
+      | sort -z \
+      | xargs -0 sha256sum
+  ) >"$TMP"
+  CURRENT="$(sha256sum "$TMP" | awk '{print $1}')"
+  test -n "$STORED" || { echo "FAIL: pack_tree_sha256 missing"; exit 1; }
+  test "$STORED" = "$CURRENT" || {
+    echo "FAIL: pack tree seal is stale"
+    echo "stored=$STORED"
+    echo "current=$CURRENT"
+    echo "run: bash $ROOT/tools/hash_pack.sh"
+    exit 1
+  }
+  echo "ok pack_tree_sha256=$CURRENT"
 else
-  echo "WARN: PACK_TREE.sha256 missing — run tools/hash_pack.sh"
+  echo "FAIL: PACK_TREE.sha256 missing — run tools/hash_pack.sh"
+  exit 1
 fi
 
 echo "verify_pack: PASS"

@@ -76,6 +76,7 @@ Do not start two tracks. Operator or Manager assigns; default priority:
 **Operator skim:** `OPERATOR_ONE_PAGE.md`  
 **LOOM pack genesis record:** `LOOM_RECORD_001_PACK_GENESIS.md`  
 **One-shot verify:** `bash operations/proposals/FULL_SPECTRUM_VISION_001/tools/verify_pack.sh`  
+**Runnable Mithub gateway:** `portal/index.html` (browser-only experiment; no canonical write path)
 
 **Next open work for agents:** wait for **TSK-FS-000** (human) · finish chat export (**TSK-FS-002**) · **TSK-FS-010** if Tails available.
 

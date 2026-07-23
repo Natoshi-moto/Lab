@@ -1,5 +1,7 @@
 # Mithub
 
+> **Runnable gateway v0:** [`../portal/index.html`](../portal/index.html) — raw thought → separately structured experiment → Full Spectrum course path. Browser-only; cannot write canonical state.
+
 **Mithub** is the forge portal for an AI-age stack that does not throw away git.
 
 - **Git / GitHub** keep the atoms (commits, PRs, CI).  
