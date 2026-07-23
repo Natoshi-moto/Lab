@@ -66,3 +66,12 @@ Append-only. Any seat finishing a turn adds a block at the bottom.
 - next task id: TSK-FS-000 (human) — decision strings in READY_FOR_OPERATOR.md
 - blocked on: operator park/merge/commission; Tails; chat export
 - non-claims restated: yes
+
+## 2026-07-23T08:15Z SEAT-GROK-MANAGER (standing order + Fable handoff)
+
+- did: STANDING_ORDER_GO_UNTIL_FABLE.md; briefs/FABLE_FRESH_SESSION_PROMPT.md; declared diminishing returns → Fable attack review session
+- files: STANDING_ORDER_*, briefs/FABLE_FRESH_SESSION_PROMPT.md
+- claims touched: none new
+- next task id: operator opens Fable with that prompt; still TSK-FS-000 when ready
+- blocked on: Fable review; operator park/merge
+- non-claims restated: yes

@@ -32,7 +32,9 @@
 **Read order if cold:**  
 `HANDOFF_ANY_AI.md` → `TASK_BOARD.json` → `PACK_INDEX.json` → `README.md` → `CLAIMS_REGISTER.md` → task you are assigned.  
 
-**Operator decision card:** `READY_FOR_OPERATOR.md`
+**Operator decision card:** `READY_FOR_OPERATOR.md`  
+**Standing Go order:** `STANDING_ORDER_GO_UNTIL_FABLE.md`  
+**Fable fresh session prompt:** `briefs/FABLE_FRESH_SESSION_PROMPT.md`
 
 ---
 
