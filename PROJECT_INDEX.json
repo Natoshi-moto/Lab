@@ -32,6 +32,8 @@
     "urgent_todos": "user-disclosures/TODO_URGENT.md",
     "ram": "RAM/README.md",
     "ram_board": "RAM/BOARD.md",
+    "personas": "Agent Resources/Agent-Profile-Persona/README.md",
+    "persona_calls": "Agent Resources/Agent-Profile-Persona/rails/OPERATOR_CALLS.md",
     "status": "STATUS.json"
   },
   "generated_indexes": [

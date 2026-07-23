@@ -13,6 +13,7 @@ ChatGPT, or anything else that lands in this repo. Skills here are written by
 ## How to use this
 
 1. **Enter the repo:** also obey root `AGENTS.md`. This index does not replace it.
+1b. **Persona:** if Human said `CALL <NAME>`, load `Agent Resources/Agent-Profile-Persona/personas/<NAME>.md` + red zones. Else default **EXPLORER**. Personas ≠ skills (who vs how).
 2. **New request:** match it against the trigger column below. Open that skill and follow its "When to use this" section.
 3. **End of every real work round:** run **`round-close-publication`** and **`epistemic-performance-analysis`** even if no other skill matched. This is not optional.
 4. **Operator pastes output with no explanation:** do not demand a full recap. Open the matching skill’s *State recognition* table, match the paste, verify against real repo state, state which step finished in one line, give **only the next step**.

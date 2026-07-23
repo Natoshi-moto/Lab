@@ -41,6 +41,7 @@ AUDIT_START_HERE.md
 - Every AI reads `AGENTS.md`.
 - Operator verbatim disclosures (and urgent todos): [`user-disclosures/`](user-disclosures/README.md) — especially [`TODO_URGENT.md`](user-disclosures/TODO_URGENT.md).
 - **Multi-seat coordination (RAM):** [`RAM/README.md`](RAM/README.md) — seats talk between actions, soft-lock paths, recover after chaos. Read `RAM/BOARD.md` before concurrent work.
+- **Personas (CALL system):** [`Agent Resources/Agent-Profile-Persona/`](Agent%20Resources/Agent-Profile-Persona/README.md) — `CALL BREAKER` / `BUILDER` / `PLAY` / … so you can experiment hard without main/promote fuckups. Cheat sheet: [`OPERATOR_CALLS.md`](Agent%20Resources/Agent-Profile-Persona/rails/OPERATOR_CALLS.md).
 - Every AI reads the skills router: [`Agent Resources/Tools/Skills/essential/INDEX.md`](Agent%20Resources/Tools/Skills/essential/INDEX.md).
 - **End of every real work round:** file a publication report under [`communications/publications/`](communications/publications/README.md) using the mandatory skill [`round-close-publication`](Agent%20Resources/Tools/Skills/essential/round-close-publication.md). This accumulates over time; it does not replace session-close or STATUS.
 - Claude Code also loads `CLAUDE.md` and may invoke `/nexus-audit` when an audit is commissioned.
