@@ -1,14 +1,14 @@
 {
   "schema": "nexus.merge-authorization/v1",
   "pr_number": 115,
-  "authorized_head_sha": "224c7ae2711e8a9497f4f5dcd753f800e73b740c",
+  "authorized_head_sha": "2e568abea9d43685469dd8850e6e4dd33cdb586d",
   "authorized_by": "operator (GitHub: Natoshi-moto)",
-  "authorized_at_utc": "2026-07-23T20:37:47Z",
-  "statement": "Reviewed the merge-authorization gate design and this exact commit (README + workflow + MUTATION.md/CLAUDE.md wiring) with Claude across this session. Understand and accept that this replaces an unsatisfiable GitHub review requirement with an explicit, commit-bound, single-operator authorization, and that this is NOT independent review. Authorize merging this exact commit into main.",
+  "authorized_at_utc": "2026-07-23T20:43:25Z",
+  "statement": "Reviewed the merge-authorization gate including the ancestor-based fix (commit 2e568ab), which was needed after the first version proved unsatisfiable in a live test on this same PR. Understand the fix: an authorized commit may be followed only by bookkeeping commits touching operations/merge_authorizations/, never substantive content. Authorize merging this exact commit into main.",
   "status_authority": "OPERATOR_EXPLICIT",
   "non_claims": [
     "This is not independent review.",
-    "This authorization covers only commit 224c7ae2711e8a9497f4f5dcd753f800e73b740c; any new commit requires a new authorization file.",
-    "This does not certify the workflow logic is bug-free beyond the four local test cases already run — only that the operator reviewed and approved this exact commit."
+    "This authorization covers only commit 2e568abea9d43685469dd8850e6e4dd33cdb586d; any new substantive commit requires a new authorization file.",
+    "This does not certify the workflow logic is bug-free beyond the local and live test cases already run — only that the operator reviewed and approved this exact commit."
   ]
 }
