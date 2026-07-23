@@ -1,0 +1,48 @@
+name: Promotion origin
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  declare-origin:
+    name: Promotion origin declaration
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PR_BODY: ${{ github.event.pull_request.body }}
+      PR_ACTOR: ${{ github.actor }}
+    steps:
+      - name: Require origin declaration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$PR_ACTOR" == "dependabot[bot]" || "$PR_ACTOR" == "github-actions[bot]" ]]; then
+            echo "Automation PR: origin inferred from authenticated GitHub App."
+            exit 0
+          fi
+
+          if ! grep -Eq '^[-* ]*Change-Origin:[[:space:]]*(`?LAB_INTERNAL`?|https://github\.com/Natoshi-moto/Experimental-Sandbox/)' <<<"$PR_BODY"; then
+            echo "::error::Declare Change-Origin: LAB_INTERNAL or an immutable Experimental Sandbox record URL."
+            exit 1
+          fi
+
+          if grep -Eq '^[-* ]*Change-Origin:[[:space:]]*https://github\.com/Natoshi-moto/Experimental-Sandbox/' <<<"$PR_BODY"; then
+            sha="$(sed -nE 's/^[-* ]*Sandbox-Commit:[[:space:]]*`?([0-9a-f]{40})`?.*/\1/p' <<<"$PR_BODY" | head -n1)"
+            tag="$(sed -nE 's/^[-* ]*Sandbox-Tag:[[:space:]]*`?([^`[:space:]]+)`?.*/\1/p' <<<"$PR_BODY" | head -n1)"
+            test -n "$sha" || { echo "::error::Sandbox promotion requires a full 40-character Sandbox-Commit."; exit 1; }
+            test -n "$tag" || { echo "::error::Sandbox promotion requires an immutable Sandbox-Tag."; exit 1; }
+
+            resolved="$(git ls-remote --tags https://github.com/Natoshi-moto/Experimental-Sandbox.git "refs/tags/$tag" | awk '{print $1}' | head -n1)"
+            test "$resolved" = "$sha" || {
+              echo "::error::Sandbox tag does not resolve to the declared commit."
+              echo "declared=$sha resolved=${resolved:-MISSING}"
+              exit 1
+            }
+          fi
+
+          echo "Promotion origin declaration: PASS"

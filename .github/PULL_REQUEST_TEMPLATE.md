@@ -1,5 +1,9 @@
 ## Nexus proposal declaration
 
+- Change-Origin: `LAB_INTERNAL` or immutable Experimental Sandbox record URL
+- Sandbox-Commit: full 40-character SHA or `NOT_APPLICABLE`
+- Sandbox-Tag: immutable tag or `NOT_APPLICABLE`
+- Sandbox-Context: repositories and untrusted experiment context seen by proposing AI seats
 - Task / route ID:
 - Baseline commit:
 - Authority used:

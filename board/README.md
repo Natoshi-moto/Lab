@@ -1,8 +1,12 @@
 # Public Operator Board
 
+> **SUPERSEDED FOR NEW POSTS:** The public firehose now lives in
+> [`Natoshi-moto/Experimental-Sandbox`](https://github.com/Natoshi-moto/Experimental-Sandbox).
+> This directory remains as historical evidence. Do not delete or rewrite it; do not add new raw posts here.
+
 **status_authority:** `NONE`  
 **Who:** Human Operator (ring-0) — this board is **yours to spam**  
-**Where:** public on `main` by design  
+**Where:** historical on `main`; new posts go to Experimental Sandbox
 
 This is **not** STATUS. Not a product backlog with liability. Not an investment feed.
 
