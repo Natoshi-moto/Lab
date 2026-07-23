@@ -1,7 +1,7 @@
 {
   "schema": "full-spectrum.pack-index/v1",
   "pack_id": "FULL_SPECTRUM_VISION_001",
-  "pack_version": "0.2.0",
+  "pack_version": "0.3.0",
   "status": "PROPOSAL",
   "status_authority": "NONE",
   "branch": "grok/full-spectrum-vision-pack-001",
@@ -45,10 +45,18 @@
     "WEBSITE_DRAFT.md",
     "GENESIS_TRACEABILITY.md",
     "PR_BODY.md",
-    "SESSION_LOG.md"
+    "SESSION_LOG.md",
+    "skills/README.md",
+    "briefs/CLAUDE_ARCHITECTURE_BRIEF.md",
+    "receipts/TSK-FS-020_DONE.md",
+    "receipts/TSK-FS-030_DONE.md",
+    "receipts/TSK-FS-040_DONE.md"
   ],
   "tasks_dir": "tasks",
   "tools_dir": "tools",
+  "skills_dir": "skills",
+  "receipts_dir": "receipts",
+  "draft_pr": "https://github.com/Natoshi-moto/Lab/pull/101",
   "non_claims": [
     "not_merge_authorization",
     "not_investment_advice",

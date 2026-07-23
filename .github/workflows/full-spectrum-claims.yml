@@ -1,0 +1,21 @@
+# Experimental: Full Spectrum pack claim-id integrity (proposal branch / path filter)
+# status_authority: NONE — does not adopt Full Spectrum economics
+name: full-spectrum-claims
+
+on:
+  push:
+    paths:
+      - 'operations/proposals/FULL_SPECTRUM_VISION_001/**'
+      - '.github/workflows/full-spectrum-claims.yml'
+  pull_request:
+    paths:
+      - 'operations/proposals/FULL_SPECTRUM_VISION_001/**'
+      - '.github/workflows/full-spectrum-claims.yml'
+
+jobs:
+  check-claim-ids:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run claim-id integrity check
+        run: bash operations/proposals/FULL_SPECTRUM_VISION_001/tools/check_claim_ids.sh

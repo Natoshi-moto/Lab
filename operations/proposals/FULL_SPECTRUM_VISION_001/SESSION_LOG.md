@@ -30,3 +30,12 @@ Append-only. Any seat finishing a turn adds a block at the bottom.
 - next task id: TSK-FS-000 or TSK-FS-001 after push authorization
 - blocked on: operator decision park/PR/merge
 - non-claims restated: yes
+
+## 2026-07-23T07:00Z SEAT-GROK-MANAGER (Go: execute TSK-020/030/040)
+
+- did: Completed TSK-FS-040 skill stubs; TSK-FS-030 GitHub workflow full-spectrum-claims.yml; TSK-FS-020 schema README + receipts; Claude architecture brief; pack_version 0.3.0; pushed toward PR #101
+- files: skills/*, .github/workflows/full-spectrum-claims.yml, receipts/TSK-FS-0{20,30,40}_DONE.md, briefs/CLAUDE_ARCHITECTURE_BRIEF.md
+- claims touched: CLAIM-METH-001/003, CLAIM-MIT-*, CLAIM-SIM-*, CLAIM-SEM-003
+- next task id: TSK-FS-000 (human) or TSK-FS-002 or TSK-FS-010
+- blocked on: operator park/merge; Tails machine for 010; chat export for 002
+- non-claims restated: yes

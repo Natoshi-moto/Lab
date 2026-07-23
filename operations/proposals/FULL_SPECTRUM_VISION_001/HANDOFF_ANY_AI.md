@@ -57,15 +57,19 @@ Full Spectrum: glass research civilisation — epoch-0 NEX (resets) + Moots (rig
 
 Do not start two tracks. Operator or Manager assigns; default priority:
 
-| Priority | Task file | Output |
-|----------|-----------|--------|
-| 1 | `tasks/TSK-FS-000_PROMOTE_OR_PARK.md` | Human decision: park / promote pack / open PR |
-| 2 | `tasks/TSK-FS-001_PUSH_AND_PR.md` | Remote branch + draft PR (if authorized) |
-| 3 | `tasks/TSK-FS-002_EXPORT_CHAT_HASH.md` | Seal vision chat hash into manifest |
-| 4 | `tasks/TSK-FS-010_TAILS_WORKLOAD_001.md` | Research report only |
-| 5 | `tasks/TSK-FS-020_NEXSIM_RECEIPT_SPEC.md` | Receipt schema + example |
-| 6 | `tasks/TSK-FS-030_MITHUB_CI_DUAL_WRITE.md` | Wire `check_claim_ids.sh` into CI experiment |
-| 7 | `tasks/TSK-FS-040_HERMES_TEACHER_SKILLS_V0.md` | Skill stubs only |
+| Priority | Task file | Output | State |
+|----------|-----------|--------|--------|
+| 1 | `tasks/TSK-FS-000_PROMOTE_OR_PARK.md` | Human: park / merge proposal / commission | **OPEN (human)** |
+| 2 | `tasks/TSK-FS-001_PUSH_AND_PR.md` | Remote branch + draft PR | **DONE** — PR #101 |
+| 3 | `tasks/TSK-FS-002_EXPORT_CHAT_HASH.md` | Seal vision chat hash into manifest | OPEN |
+| 4 | `tasks/TSK-FS-010_TAILS_WORKLOAD_001.md` | Research report only | OPEN (needs Tails) |
+| 5 | `tasks/TSK-FS-020_NEXSIM_RECEIPT_SPEC.md` | Receipt schema + example | **DONE** — see `receipts/TSK-FS-020_DONE.md` |
+| 6 | `tasks/TSK-FS-030_MITHUB_CI_DUAL_WRITE.md` | CI workflow + checklist | **DONE** — see `receipts/TSK-FS-030_DONE.md` |
+| 7 | `tasks/TSK-FS-040_HERMES_TEACHER_SKILLS_V0.md` | Skill stubs | **DONE** — see `receipts/TSK-FS-040_DONE.md` |
+
+**Draft PR:** https://github.com/Natoshi-moto/Lab/pull/101  
+
+**Next open work for agents:** TSK-FS-002 (hash) or TSK-FS-010 (Tails env) or wait for TSK-FS-000 human decision.
 
 Architecture seats: implement only from a task file + CLAIM-IDs. Vision seats: extend doctrine only with OP attribution or new OP quote.
 
