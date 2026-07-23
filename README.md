@@ -6,6 +6,17 @@
 
 ➡️ Begin with [`README_START_HERE.md`](README_START_HERE.md).
 
+## Public operator board (spam zone)
+
+Articles, tweets, thoughts, plans, sketches — **public by design**, polish optional:  
+[`board/`](board/README.md) · firehose [`board/INBOX.md`](board/INBOX.md)
+
+## Safe lab mode (go nuts off main)
+
+Parallel thrash branches with auto CI; **main stays clean**:  
+[`lab/README.md`](lab/README.md) · registry [`lab/BRANCHES.md`](lab/BRANCHES.md)  
+Abuse worktree: `/home/anon/Lab-PLAY` · branch `play/operator-abuse-sandbox`
+
 ## Communications
 
 Press notes, tutorials, and human-facing statements: [`communications/`](communications/README.md).  

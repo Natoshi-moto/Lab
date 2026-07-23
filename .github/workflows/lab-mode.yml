@@ -1,0 +1,77 @@
+# Safe lab mode: auto-check thrash branches without protecting main's meaning.
+# Failures here only mark the lab/play branch as sick — they do not block main.
+name: Lab Mode
+
+on:
+  push:
+    branches:
+      - "lab/**"
+      - "play/**"
+  pull_request:
+    branches:
+      - "lab/**"
+      - "play/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-mode-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lab-check:
+    name: Doctor + tests (playground)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+
+      - name: Node (optional R013 deps)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: npm ci if lockfile present
+        shell: bash
+        run: |
+          if [[ -f package-lock.json ]]; then
+            npm ci --ignore-scripts --no-audit --no-fund || true
+          fi
+
+      - name: Nexus doctor
+        run: ./nexus doctor
+
+      - name: Unit tests
+        shell: bash
+        run: |
+          set +e
+          python3 -m unittest discover -s tests -v
+          code=$?
+          if [[ $code -ne 0 ]]; then
+            echo "::warning::Lab-mode tests failed (code $code). Playground is sick; main is unaffected."
+            exit $code
+          fi
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Lab Mode"
+            echo
+            echo "Branch: \`${{ github.ref_name }}\`"
+            echo
+            echo "This workflow only polices **lab/** and **play/** thrash branches."
+            echo "It does not deploy, tag, or merge to main."
+            echo "A red X here means fix or abandon the playground — not that the Lab is offline."
+          } >> "$GITHUB_STEP_SUMMARY"
