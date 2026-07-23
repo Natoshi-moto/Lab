@@ -1,0 +1,14 @@
+{
+  "schema": "nexus.merge-authorization/v1",
+  "pr_number": 115,
+  "authorized_head_sha": "224c7ae2711e8a9497f4f5dcd753f800e73b740c",
+  "authorized_by": "operator (GitHub: Natoshi-moto)",
+  "authorized_at_utc": "2026-07-23T20:37:47Z",
+  "statement": "Reviewed the merge-authorization gate design and this exact commit (README + workflow + MUTATION.md/CLAUDE.md wiring) with Claude across this session. Understand and accept that this replaces an unsatisfiable GitHub review requirement with an explicit, commit-bound, single-operator authorization, and that this is NOT independent review. Authorize merging this exact commit into main.",
+  "status_authority": "OPERATOR_EXPLICIT",
+  "non_claims": [
+    "This is not independent review.",
+    "This authorization covers only commit 224c7ae2711e8a9497f4f5dcd753f800e73b740c; any new commit requires a new authorization file.",
+    "This does not certify the workflow logic is bug-free beyond the four local test cases already run — only that the operator reviewed and approved this exact commit."
+  ]
+}
