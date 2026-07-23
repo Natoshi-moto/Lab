@@ -23,6 +23,11 @@ human objective
 - Snapshots and tags are never edited in place.
 - Audit target bytes are read-only. Observations append outside the target.
 - Privileged execution accepts a known adapter and exact inputs, not unconstrained model-authored shell text.
+- A pull request's required review is satisfied by an explicit, commit-bound
+  `operations/merge_authorizations/PR-<number>.json` file, not a GitHub
+  "Approve" click — every seat in this repo shares one account, so native
+  review approval cannot be independent. See
+  `operations/merge_authorizations/README.md`.
 
 ## Git meaning
 
@@ -34,5 +39,6 @@ human objective
 | `main` | accepted working corpus |
 | tag | historical anchor |
 | deterministic snapshot | transportable exact target |
+| `operations/merge_authorizations/PR-<number>.json` | explicit, commit-bound human merge authorization — not independent review |
 
 None of these states alone establishes factual truth.

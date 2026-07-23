@@ -1,0 +1,89 @@
+name: Merge Authorization
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: merge-authorization-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Human merge authorization
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+
+      - name: Verify authorization file matches this exact commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          pr_number="${{ github.event.pull_request.number }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+          file="operations/merge_authorizations/PR-${pr_number}.json"
+
+          if [[ ! -f "$file" ]]; then
+            echo "::error::No merge authorization found at $file"
+            echo "This PR has not been explicitly authorized by the operator for its current commit."
+            exit 1
+          fi
+
+          python3 - "$file" "$pr_number" "$head_sha" <<'PYEOF'
+          import json, sys
+          path, pr_number, head_sha = sys.argv[1], sys.argv[2], sys.argv[3]
+          with open(path) as f:
+              data = json.load(f)
+
+          required = [
+              "schema", "pr_number", "authorized_head_sha", "authorized_by",
+              "authorized_at_utc", "statement", "status_authority", "non_claims",
+          ]
+          missing = [k for k in required if k not in data]
+          if missing:
+              print(f"::error::Authorization file missing required fields: {missing}")
+              sys.exit(1)
+
+          if data["schema"] != "nexus.merge-authorization/v1":
+              print(f"::error::Unexpected schema: {data['schema']}")
+              sys.exit(1)
+
+          if str(data["pr_number"]) != str(pr_number):
+              print(f"::error::Authorization is for PR {data['pr_number']}, not this PR ({pr_number})")
+              sys.exit(1)
+
+          if data["authorized_head_sha"] != head_sha:
+              print(
+                  f"::error::Authorization covers commit {data['authorized_head_sha']}, "
+                  f"but this PR's current commit is {head_sha}. A new commit invalidates "
+                  "prior authorization; add a fresh authorization file."
+              )
+              sys.exit(1)
+
+          if data["status_authority"] != "OPERATOR_EXPLICIT":
+              print(f"::error::status_authority must be OPERATOR_EXPLICIT, got {data['status_authority']}")
+              sys.exit(1)
+
+          print(
+              f"Authorization valid: PR {pr_number} at commit {head_sha}, "
+              f"authorized by {data['authorized_by']} at {data['authorized_at_utc']}"
+          )
+          PYEOF
+
+      - name: Record evidence limits
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Merge Authorization"
+            echo
+            echo "This checks that the operator explicitly recorded authorization for this exact commit."
+            echo "It is NOT independent review and NOT a correctness, security, or privacy certification."
+          } >> "$GITHUB_STEP_SUMMARY"
