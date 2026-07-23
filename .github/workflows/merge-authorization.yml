@@ -1,0 +1,113 @@
+name: Merge Authorization
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: merge-authorization-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Human merge authorization
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out PR head with full history
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify authorization file schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          pr_number="${{ github.event.pull_request.number }}"
+          file="operations/merge_authorizations/PR-${pr_number}.json"
+
+          if [[ ! -f "$file" ]]; then
+            echo "::error::No merge authorization found at $file"
+            echo "This PR has not been explicitly authorized by the operator."
+            exit 1
+          fi
+
+          python3 - "$file" "$pr_number" <<'PYEOF'
+          import json, sys
+          path, pr_number = sys.argv[1], sys.argv[2]
+          with open(path) as f:
+              data = json.load(f)
+
+          required = [
+              "schema", "pr_number", "authorized_head_sha", "authorized_by",
+              "authorized_at_utc", "statement", "status_authority", "non_claims",
+          ]
+          missing = [k for k in required if k not in data]
+          if missing:
+              print(f"::error::Authorization file missing required fields: {missing}")
+              sys.exit(1)
+
+          if data["schema"] != "nexus.merge-authorization/v1":
+              print(f"::error::Unexpected schema: {data['schema']}")
+              sys.exit(1)
+
+          if str(data["pr_number"]) != str(pr_number):
+              print(f"::error::Authorization is for PR {data['pr_number']}, not this PR ({pr_number})")
+              sys.exit(1)
+
+          if data["status_authority"] != "OPERATOR_EXPLICIT":
+              print(f"::error::status_authority must be OPERATOR_EXPLICIT, got {data['status_authority']}")
+              sys.exit(1)
+          PYEOF
+
+      - name: Verify the authorized commit governs this PR's actual content
+        shell: bash
+        run: |
+          set -euo pipefail
+          pr_number="${{ github.event.pull_request.number }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+          file="operations/merge_authorizations/PR-${pr_number}.json"
+          authorized_sha=$(python3 -c "import json; print(json.load(open('${file}'))['authorized_head_sha'])")
+
+          if ! git cat-file -e "${authorized_sha}^{commit}" 2>/dev/null; then
+            echo "::error::authorized_head_sha ${authorized_sha} is not a commit known to this repository's history"
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor "$authorized_sha" "$head_sha"; then
+            echo "::error::authorized_head_sha ${authorized_sha} is not an ancestor of this PR's current commit ${head_sha} — it does not cover this PR's history at all"
+            exit 1
+          fi
+
+          if [[ "$authorized_sha" != "$head_sha" ]]; then
+            # The authorization commit is allowed to be an ancestor of HEAD only if
+            # every commit after it is bookkeeping (touches only files under
+            # operations/merge_authorizations/), never substantive content. This is
+            # what stops new code from silently riding in after authorization was
+            # granted, while still allowing the authorization file itself to be the
+            # very next commit on top of the content it authorizes.
+            offending=$(git diff --name-only "${authorized_sha}..${head_sha}" -- . ":(exclude)operations/merge_authorizations/**")
+            if [[ -n "$offending" ]]; then
+              echo "::error::Commit(s) after the authorized commit ${authorized_sha} change files outside operations/merge_authorizations/, so this authorization no longer covers this PR's actual current content:"
+              echo "$offending"
+              exit 1
+            fi
+          fi
+
+          echo "Authorization valid: PR ${pr_number}, authorized commit ${authorized_sha} is the content this PR's current commit ${head_sha} carries (any commits after it are authorization bookkeeping only)."
+
+      - name: Record evidence limits
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Merge Authorization"
+            echo
+            echo "This checks that the operator explicitly recorded authorization for the"
+            echo "content this PR actually carries. It is NOT independent review and NOT a"
+            echo "correctness, security, or privacy certification."
+          } >> "$GITHUB_STEP_SUMMARY"
