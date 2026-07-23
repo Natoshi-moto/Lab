@@ -10,6 +10,7 @@
 8. Evidence classes are typed. Fluent repetition cannot promote a draft into evidence.
 9. Same-provider accounts are useful differential reviewers but are not automatically independent corroboration.
 10. When unable to verify, write `UNABLE_TO_VERIFY`. Silence is not a pass.
+11. **Owner plain-language gate.** Before anything reaches ANY safety gate — merge, approve, publish, push/commit to `main`, delete, or any irreversible or outward-facing step — first tell the owner, in plain non-technical terms, what the action does, what becomes official/public/irreversible, and what is NOT affected. No bare yes/no. Drafts (branches, proposals, PRs) are always safe and need no gate. See [`operations/process/OWNER_PLAIN_LANGUAGE_GATE.md`](operations/process/OWNER_PLAIN_LANGUAGE_GATE.md). This is deliberately plain even in public; that is intended, not sloppy.
 
 ## Standard checks
 

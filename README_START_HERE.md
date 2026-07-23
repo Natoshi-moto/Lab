@@ -1,5 +1,14 @@
 # Start here — Nexus Public Research Lab
 
+> ## 🛡️ Owner safety gate — read this first
+> **Nothing becomes official until the owner is told, in plain English, exactly
+> what they are about to do — and says the go word.** Drafts (branches,
+> proposals, pull requests) are always safe and change nothing real. Only words
+> like *merge / approve / publish / push to `main` / delete* change the record,
+> and an agent must explain the consequences in plain terms **before** asking.
+> This is deliberately plain, even in public. Full rule:
+> [`operations/process/OWNER_PLAIN_LANGUAGE_GATE.md`](operations/process/OWNER_PLAIN_LANGUAGE_GATE.md).
+
 ## What this repository is
 
 This **single public Git repository is the authoritative corpus boundary** for a multi-model research laboratory. GitHub supplies history, collaboration, issues, pull requests, checks, tags, and releases. Nexus adds typed research objects, route compilation, bounded mutation, evidence handling, deterministic snapshots, and read-only audit overlays.

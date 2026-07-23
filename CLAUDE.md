@@ -43,3 +43,20 @@ python3 -m unittest tests.test_control_plane -v
 Work only on a review branch within the current task's declared scope. Record
 exact commands, outcomes, limitations, and non-claims. Merge remains
 human-authorized.
+
+## Owner plain-language gate (mandatory before any gate)
+
+Before asking the owner to open ANY gate — merge, approve, publish, push/commit
+to `main`, delete, or any irreversible or outward-facing action — you MUST first
+give the plain-language card, in words a non-engineer understands:
+
+1. What I am about to do (one plain sentence).
+2. What actually changes (what becomes official / public / gone).
+3. What becomes irreversible.
+4. What is NOT affected.
+5. The one word that triggers it (e.g. "say *merge* and it becomes official").
+
+Drafts — branches, proposals, pull requests, commits/pushes **to a branch** — are
+reversible and need no gate. Only the go word changes the record. Keep the
+language plain even in public; that is a deliberate safety choice for the owner.
+Full rule: [`operations/process/OWNER_PLAIN_LANGUAGE_GATE.md`](operations/process/OWNER_PLAIN_LANGUAGE_GATE.md).
