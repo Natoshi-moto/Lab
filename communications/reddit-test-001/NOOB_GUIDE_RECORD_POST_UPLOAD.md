@@ -36,7 +36,7 @@ Open a terminal and paste these two lines (up-arrow re-runs them next time):
 ## PART D — Upload to YouTube
 
 1. Go to youtube.com → sign in → click the **camera icon with a +** (top right) → **Upload video**.
-2. Drag in your `.webm` file(s) from `~/Videos/Screencasts/`.
+2. Drag in the **CLEAN cut** (see THE TWO-VIDEO PROTOCOL below) — not the raw chunks, unless you reviewed them and they're clean as-is.
 3. Title suggestion: `Live: anonymous non-coder posts AI-built repo for strangers to break (Lab audit, 2026-07-23)`
 4. Visibility: **Public** (or Unlisted if you panic — you can flip it to Public later; you cannot un-public cleanly, so Unlisted-then-Public is the safe order).
 5. It's "Made for kids?" → **No, it's not made for kids.**
@@ -46,9 +46,11 @@ Open a terminal and paste these two lines (up-arrow re-runs them next time):
 
 1. On Reddit, add a **comment on your own post**:
 
-       Video of this post being made, live: <YOUTUBE URL>
-       Video file sha256: <THE FINGERPRINT CODE FROM PART B>
-       The post text was hash-committed to the repo BEFORE posting: see reddit-test branch, ANCHOR.json.
+       Video of this post being made: <YOUTUBE URL>
+       This is an operator-reviewed cut (AI-safety-sensitive content removed).
+       Full raw video sha256 (unpublished, hash-anchored before posting): <FULL VIDEO FINGERPRINT>
+       Clean video sha256: <CLEAN VIDEO FINGERPRINT>
+       Post text was hash-committed BEFORE posting: repo branch claude/reddit-test-anchor-001, ANCHOR.json.
 
 2. Tell any Claude/Grok/Codex seat: *"Update ANCHOR.json with the YouTube URL and video sha256, commit, push."* (Or do nothing — the comment alone closes the loop.)
 
@@ -58,9 +60,19 @@ Open a terminal and paste these two lines (up-arrow re-runs them next time):
 - Reboot, breathe, run Part B again, continue from wherever you were. The recording does not need to be one continuous take. **A crash on camera is not a failure — for this project it's the most on-brand footage possible.**
 - Everything you need to re-read is on GitHub (this guide, the post, the brief). Phone works.
 
+## THE TWO-VIDEO PROTOCOL (operator safety review)
+
+The operator reviews the full recording with their own judgment before anything goes public. Two artifacts result:
+
+1. **FULL video (raw, uncut):** never published. Hash it (`sha256sum`), record the hash in `ANCHOR.json`, store the file on USB + a second drive. The published hash means anyone the operator later chooses to share it with (e.g. Anthropic) can verify it is the untouched original. Sharing it is the operator's decision alone, on their timeline.
+2. **CLEAN video (public):** the operator's cut, with anything AI-safety-sensitive or private removed. Hash this too. This is what goes on YouTube.
+
+**Mandatory honesty rule:** the Reddit comment must say the public video is an operator-reviewed cut, and that the full raw video's sha256 was committed before publication. Never present the clean cut as the raw recording. A declared cut is honest; an undeclared one is exactly the kind of quiet narrative-shaping this whole project exists to prevent.
+
+**What to scrub for when reviewing (screen recordings leak more than you think):** terminal output showing private directory names, email addresses, tokens/keys, browser tabs, file paths that reveal identity, and any AI-safety-sensitive research content. When unsure, cut it — the full video's hash preserves the claim that nothing was destroyed.
+
 ## WHAT NOT TO DO
 
-- Don't edit the video. Don't trim it. Raw or nothing — the hash proves rawness.
 - Don't edit the post text "just a little" while posting. The hash will no longer match and the whole proof dies.
 - Don't reply to Reddit comments for the first hour. Let strangers run commands. Reply only to people who post actual output.
 - Don't post the same thing to 5 subreddits at once — that reads as spam and gets removed. One subreddit, then wait a day.

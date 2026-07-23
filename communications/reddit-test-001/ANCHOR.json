@@ -15,8 +15,15 @@
     "exploit_on_main": "ParticipantValidationError: lottery_share_bps must be >= 0 (fail-closed confirmed)",
     "verifier": "Claude Opus 4.8 auditor seat, single-witness caveat applies"
   },
-  "video_placeholders": {
-    "youtube_url": "TO_BE_ADDED_AFTER_UPLOAD",
-    "video_sha256": "TO_BE_ADDED_AFTER_RECORDING"
+  "video_protocol": {
+    "note": "Operator reviews full recording for AI-safety-sensitive content before publication. Public video is a declared operator cut; full raw video is hash-anchored, unpublished, shareable at operator discretion (e.g. with Anthropic).",
+    "full_video_sha256": "TO_BE_ADDED_AFTER_RECORDING",
+    "clean_public_video_sha256": "TO_BE_ADDED_AFTER_CUT",
+    "youtube_url_clean": "TO_BE_ADDED_AFTER_UPLOAD"
+  },
+  "whitepaper_alongside": {
+    "note": "Operator intends to post one whitepaper alongside the repo link.",
+    "file": "TO_BE_CHOSEN_BY_OPERATOR",
+    "sha256": "TO_BE_ADDED_WHEN_CHOSEN"
   }
 }
