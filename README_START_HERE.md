@@ -36,6 +36,15 @@ NEXT_ACTION.md
 AUDIT_START_HERE.md
 ```
 
+## Operator: public spam + safe chaos
+
+| Want | Where |
+|------|--------|
+| Dump thoughts / tweets / plans in public | [`board/`](board/README.md) → `INBOX.md` or folders |
+| Thrash code without dirtying `main` | [`lab/README.md`](lab/README.md) · branches `lab/*` `play/*` · or `/home/anon/Lab-PLAY` |
+| Call a specialist AI | `CALL BREAKER` / `PLAY` / … — [`Agent-Profile-Persona`](Agent%20Resources/Agent-Profile-Persona/rails/OPERATOR_CALLS.md) |
+
+**Rule:** mess lives on `lab/*` / `play/*` / the board. **`main` only gets board posts + reviewed merges.**
 ## How an AI should enter
 
 - Every AI reads `AGENTS.md`.
