@@ -1,0 +1,26 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "proposal_id": "CONVERGENCE_LAB_001",
+  "title": "Convergence Lab — multi-model signal, theater, failure modes under Human Safety Gate",
+  "experiment_path": "experiments/CONVERGENCE_LAB_001",
+  "opened_utc": "2026-07-22",
+  "mode": "RESEARCH_PROGRAMME_PROPOSED",
+  "disposition": "PROPOSED_NOT_PROMOTED",
+  "canonical_status": "UNPROMOTED_PROPOSAL",
+  "status_authority": "NONE",
+  "human_role": "SAFETY_GATE_SUPREME_PLUS_PEER_REVIEW",
+  "ai_role": "DESIGN_EVOLVE_ATTACK_EXPERIMENTS_AND_THESES",
+  "next_action": "HUMAN_GATE_ACCEPT_HOLD_OR_KILL_PROGRAMME",
+  "pillars": [
+    "failure_modes_of_correlated_priors",
+    "residual_signal_from_convergence",
+    "measurable_theater",
+    "governance_effects"
+  ],
+  "non_claims": [
+    "Not multi-model democracy",
+    "Not product safety certificate",
+    "Not money or token economy",
+    "Agreement is not truth"
+  ]
+}

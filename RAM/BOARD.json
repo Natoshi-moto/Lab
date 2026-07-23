@@ -1,0 +1,26 @@
+{
+  "schema": "nexus.ram-board/v1",
+  "status_authority": "NONE",
+  "updated_utc": "2026-07-22",
+  "updated_by_seat": "grok",
+  "desk_intent": "Multi-seat coordination plane live; GVA-001 open; agent-resources branch active",
+  "in_flight": [],
+  "locks_open": [],
+  "last_done": {
+    "seat": "grok",
+    "action_id": "ram-bootstrap",
+    "summary": "Created RAM/ root coordination plane"
+  },
+  "do_not": [
+    "multi_pane_is_not_multi_institution_independence",
+    "no_soft_close_T01_CARD11",
+    "session_close_owns_STATUS",
+    "check_user_disclosures_TODO_URGENT_on_recording_gap"
+  ],
+  "recovery_path": "RAM/recovery/LAST.md",
+  "non_claims": [
+    "Not STATUS authority",
+    "Not independent attestation",
+    "Not a real mutex"
+  ]
+}

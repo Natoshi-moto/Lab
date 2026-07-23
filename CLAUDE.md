@@ -8,13 +8,18 @@ publish private material or weaken the existing data-handling rules.
 ## Stable re-entry
 
 1. Read `README_START_HERE.md`, `STATUS.json`, and `NEXT_ACTION.md`.
-2. Derive the accepted round, active task list, and next-action identifier from
+2. Read `Agent Resources/Tools/Skills/essential/INDEX.md` (mandatory skills router).
+3. Derive the accepted round, active task list, and next-action identifier from
    `STATUS.json`; do not infer accepted state from this file or from a branch.
-3. Treat `main` as accepted working state and every branch or pull request as a
+4. Treat `main` as accepted working state and every branch or pull request as a
    proposal until a human-authorized merge is recorded on `main`.
-4. If `STATUS.json` has no active task, do not revive a historical task. Follow
+5. If `STATUS.json` has no active task, do not revive a historical task. Follow
    the review or decision step in `NEXT_ACTION.md`, or wait for a bounded task.
-5. Read `AUDIT_START_HERE.md` only when the current action concerns an audit.
+6. Read `AUDIT_START_HERE.md` only when the current action concerns an audit.
+7. At the end of every real work round, file
+   `communications/publications/` per
+   `Agent Resources/Tools/Skills/essential/round-close-publication.md`
+   (does not replace session-close).
 
 ## Mandatory boundaries
 

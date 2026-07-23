@@ -8,10 +8,20 @@
 | Kind | Examples | Path habit |
 |------|----------|------------|
 | **Statements** | Readiness declarations, public posture, press notes | `statements/` |
+| **Publications** | **Mandatory** end-of-round seat reports (what / why / verified); cumulative evolution log | [`publications/`](publications/README.md) |
+| **Epistemic analyses** | **Mandatory** seat-on-seat + operator performance as **INFERENCE**; self-gap | [`publications/epistemic/`](publications/epistemic/INDEX.md) |
+| **Website design** | White paper + tech spec for distrust-first public surface | [`website/`](website/README.md) |
 | **Tutorials** | How to enter the lab, how to run doctor/verify, how to file a return | `tutorials/` |
 | **Docs for humans** | Plain-language explainers that may later leave the repo | `docs/` |
 | **Press / external** | Drafts for journalists, partners, public posts | `press/` |
 | **Templates** | Empty shapes for future comms | `templates/` |
+
+### Publications (all AI seats)
+
+At the end of every real work round, every AI files a report per  
+[`Agent Resources/Tools/Skills/essential/round-close-publication.md`](../Agent%20Resources/Tools/Skills/essential/round-close-publication.md)  
+into `publications/rounds/` and updates `publications/INDEX.md`.  
+This is **not** STATUS authority and cannot soft-close reds.
 
 ## What does **not** belong here
 

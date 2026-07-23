@@ -26,6 +26,14 @@
     "claude": "CLAUDE.md",
     "human": "README_START_HERE.md",
     "next_action": "NEXT_ACTION.md",
+    "skills_router": "Agent Resources/Tools/Skills/essential/INDEX.md",
+    "round_publication": "communications/publications/README.md",
+    "user_disclosures": "user-disclosures/README.md",
+    "urgent_todos": "user-disclosures/TODO_URGENT.md",
+    "ram": "RAM/README.md",
+    "ram_board": "RAM/BOARD.md",
+    "personas": "Agent Resources/Agent-Profile-Persona/README.md",
+    "persona_calls": "Agent Resources/Agent-Profile-Persona/rails/OPERATOR_CALLS.md",
     "status": "STATUS.json"
   },
   "generated_indexes": [

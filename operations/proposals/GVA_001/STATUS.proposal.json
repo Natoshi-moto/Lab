@@ -1,0 +1,27 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "proposal_id": "GVA_001",
+  "title": "Grok lightweight video archive of multi-model screen sessions / attestation instrument",
+  "experiment_path": "experiments/GROK_VIDEO_ARCHIVE_ATTESTATION_001",
+  "opened_utc": "2026-07-22",
+  "revised_utc": "2026-07-22",
+  "mode": "RESEARCH_PROPOSAL_OPEN_FOR_SCRUTINY",
+  "disposition": "PROPOSED_NOT_BUILT",
+  "canonical_status": "UNPROMOTED_PROPOSAL",
+  "status_authority": "NONE",
+  "primary_subject": "multi_model_live_screen_sessions_3plus_panes",
+  "next_action": "OPERATOR_ACCEPT_KILL_OR_COMMISSION_TIER_B_SESSION_TRIAL",
+  "hypotheses": [
+    "Sped-up video of real 3+ model operator desks can be recovered by Grok-class vision at useful accuracy",
+    "Public video post can act as a lightweight retrievable session archive stamp",
+    "Instrument must be tested on messy multi-pane sessions not only clean slides",
+    "Recovery must not be marketed as independent trusted attestation (net-zero trust)"
+  ],
+  "non_claims": [
+    "Not money or custody",
+    "Not impartial third-party attestation",
+    "Grok trust net-zero with operator for final truth",
+    "Not permanence or platform honesty"
+  ],
+  "trust_model": "trust(Grok_oracle) approx trust(operator) approx 0 for money/truth; utility may be positive for OCR recovery only"
+}
