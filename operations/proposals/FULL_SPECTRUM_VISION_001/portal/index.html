@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mithub: a public gateway from messy human thought to safe, reproducible experimental science." />
+  <title>Mithub — Full Spectrum</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2250%22 fill=%22%23c9ff45%22/><text x=%2250%22 y=%2263%22 text-anchor=%22middle%22 font-size=%2248%22 font-family=%22monospace%22 font-weight=%22900%22>M</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="sandbox-ribbon" role="status">
+    <span>🧪 FUCK-AROUND LAND</span>
+    <span>Nothing here can change canonical truth or main.</span>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Mithub home">
+      <span class="brand-mark">M/</span>
+      <span>Mithub</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="#dribble">Dribble</a>
+      <a href="#course">Course</a>
+      <a href="#universe">Universe</a>
+      <a href="#safety">Safety</a>
+    </nav>
+    <button class="where-am-i" id="where-am-i" type="button">Where am I?</button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">FULL SPECTRUM UNIVERSITY · GATEWAY 00</p>
+        <h1>Experimental science starts before your thought is tidy.</h1>
+        <p class="lede">
+          Say the strange thing. Preserve it honestly. Let agents help shape a copy.
+          Publish an experiment. Invite people to break it. Keep <code>main</code> boring.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#dribble">Start dribbling</a>
+          <a class="button ghost" href="#course">Enter the course</a>
+        </div>
+        <div class="truth-line">
+          <span>Git keeps the atoms.</span>
+          <span>LOOM keeps the meaning.</span>
+          <span>Mithub makes them breed in public.</span>
+        </div>
+      </div>
+      <div class="orbit" aria-label="Mithub experimental universe">
+        <div class="orbit-core">YOU<br /><small>raw thought</small></div>
+        <div class="orbit-ring ring-one"></div>
+        <div class="orbit-ring ring-two"></div>
+        <span class="satellite s1">fork</span>
+        <span class="satellite s2">test</span>
+        <span class="satellite s3">learn</span>
+        <span class="satellite s4">publish</span>
+      </div>
+    </section>
+
+    <section class="dribble-section" id="dribble">
+      <div class="section-heading">
+        <p class="eyebrow">YOUR FRONT DOOR</p>
+        <h2>Dribble here. The boring machinery stays underneath.</h2>
+        <p>Your original words remain untouched. Structuring creates a separate interpretation.</p>
+      </div>
+
+      <div class="workbench">
+        <div class="input-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">01</span>
+              <h3>What’s rattling around?</h3>
+            </div>
+            <span class="local-badge">Saved on this device</span>
+          </div>
+          <label class="sr-only" for="raw-thought">Your raw thought</label>
+          <textarea id="raw-thought" placeholder="I’ve got an unhinged idea about…"></textarea>
+          <div class="mode-row" aria-label="How should Mithub help?">
+            <button class="mode active" type="button" data-mode="expand">🌱 Help it grow</button>
+            <button class="mode" type="button" data-mode="attack">🧨 Attack it</button>
+            <button class="mode" type="button" data-mode="test">🧪 Help me test it</button>
+            <button class="mode" type="button" data-mode="listen">🫶 Just hold it</button>
+          </div>
+          <div class="input-actions">
+            <button class="button ghost" id="save-draft" type="button">Save private draft</button>
+            <button class="button primary" id="structure" type="button">Structure a copy →</button>
+          </div>
+          <p class="microcopy">Nothing is uploaded by this prototype. Exporting creates a file you control.</p>
+        </div>
+
+        <div class="interpretation-panel" id="interpretation-panel" aria-live="polite">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">02</span>
+              <h3>Agent-shaped copy</h3>
+            </div>
+            <span class="proposal-badge">🟡 INTERPRETATION</span>
+          </div>
+          <div class="empty-state" id="empty-state">
+            <div class="empty-glyph">↝</div>
+            <p>Your thought will become a map here—not a replacement.</p>
+          </div>
+          <div class="structured-output hidden" id="structured-output">
+            <div class="model-disclosure">
+              <strong>⚠️ Model disclosure</strong>
+              <span>Browser-only heuristic prototype. No AI model was called.</span>
+            </div>
+            <article>
+              <p class="output-label">Working title</p>
+              <h4 id="working-title"></h4>
+            </article>
+            <article>
+              <p class="output-label">Core proposition</p>
+              <p id="core-proposition"></p>
+            </article>
+            <div class="output-grid">
+              <article>
+                <p class="output-label">Claims to examine</p>
+                <ul id="claims-list"></ul>
+              </article>
+              <article>
+                <p class="output-label">Ways to test it</p>
+                <ul id="tests-list"></ul>
+              </article>
+            </div>
+            <div class="publish-actions">
+              <button class="button primary" id="export-experiment" type="button">📦 Export experiment pack</button>
+              <button class="button danger" id="make-real" type="button">🚨 Ask to make real</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="course-section" id="course">
+      <div class="course-intro">
+        <p class="eyebrow">FULL SPECTRUM UNIVERSITY</p>
+        <h2>The course is not beside Mithub. Using Mithub is the course.</h2>
+        <p>
+          Every public experiment becomes a lesson; every reproduction becomes teaching material;
+          every failure earns a place in the map. Learn by leaving inspectable wreckage.
+        </p>
+      </div>
+      <div class="course-path">
+        <article class="course-card current">
+          <span>GATEWAY 00</span>
+          <h3>Permission to think messily</h3>
+          <p>Separate raw thought, interpretation, evidence and decision.</p>
+          <button type="button" class="lesson-toggle" data-lesson="lesson-00">Open lesson</button>
+          <div class="lesson hidden" id="lesson-00">
+            <p><strong>Practice:</strong> write one claim you believe and one observation that could prove you wrong.</p>
+          </div>
+        </article>
+        <article class="course-card">
+          <span>MODULE 01</span>
+          <h3>Fork as a research instrument</h3>
+          <p>Preserve provenance, read the licence, state the divergence, run the comparison.</p>
+          <button type="button" class="lesson-toggle" data-lesson="lesson-01">Open lesson</button>
+          <div class="lesson hidden" id="lesson-01">
+            <p><strong>Practice:</strong> document upstream, licence, hypothesis, changed variable and non-affiliation before modifying anything.</p>
+          </div>
+        </article>
+        <article class="course-card">
+          <span>MODULE 02</span>
+          <h3>Break claims, not people</h3>
+          <p>Design hostile tests that produce evidence rather than heat.</p>
+          <button type="button" class="lesson-toggle" data-lesson="lesson-02">Open lesson</button>
+          <div class="lesson hidden" id="lesson-02">
+            <p><strong>Practice:</strong> steelman a claim, identify its load-bearing mechanism, then publish a reproducible failure condition.</p>
+          </div>
+        </article>
+        <article class="course-card">
+          <span>MODULE 03</span>
+          <h3>Meaning and mechanism</h3>
+          <p>Force the story, code, receipts and limitations to point at each other.</p>
+          <button type="button" class="lesson-toggle" data-lesson="lesson-03">Open lesson</button>
+          <div class="lesson hidden" id="lesson-03">
+            <p><strong>Practice:</strong> attach one stable claim ID to the prose, implementation and verification receipt.</p>
+          </div>
+        </article>
+        <article class="course-card">
+          <span>MODULE 04</span>
+          <h3>Earn canonical attention</h3>
+          <p>Turn useful chaos into a small, boring, reviewable proposal.</p>
+          <button type="button" class="lesson-toggle" data-lesson="lesson-04">Open lesson</button>
+          <div class="lesson hidden" id="lesson-04">
+            <p><strong>Practice:</strong> reduce the experiment to a clean diff, evidence bundle, risks and reversible adoption plan.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="universe-section" id="universe">
+      <div class="section-heading">
+        <p class="eyebrow">THE INFINITE UNIVERSE</p>
+        <h2>One thought can open many legitimate worlds.</h2>
+      </div>
+      <div class="universe-grid">
+        <article><span>🧠</span><h3>Thought</h3><p>Unpolished, attributed, preserved.</p></article>
+        <article><span>✍️</span><h3>Article</h3><p>An argument people can quote and challenge.</p></article>
+        <article><span>🍴</span><h3>Fork</h3><p>A licensed divergence with provenance intact.</p></article>
+        <article><span>🧪</span><h3>Experiment</h3><p>A hypothesis, method, result and limitation.</p></article>
+        <article><span>🔁</span><h3>Reproduction</h3><p>Someone else tries to make it happen again.</p></article>
+        <article><span>🧨</span><h3>Critique</h3><p>A hard attack on the claim, not its author.</p></article>
+        <article><span>📜</span><h3>Receipt</h3><p>Evidence of what actually happened.</p></article>
+        <article><span>🚨</span><h3>Proposal</h3><p>A separate request to change canonical state.</p></article>
+      </div>
+    </section>
+
+    <section class="safety-section" id="safety">
+      <div>
+        <p class="eyebrow">BORING CUSTODIANS</p>
+        <h2>Wild ideas. Tedious boundaries.</h2>
+      </div>
+      <div class="safety-grid">
+        <article class="safe-card">
+          <h3>🧪 Safe by default</h3>
+          <ul>
+            <li>Raw drafts stay in your browser.</li>
+            <li>Exports are labelled experimental.</li>
+            <li>No credentials or repository write access.</li>
+            <li>No route from this page to <code>main</code>.</li>
+          </ul>
+        </article>
+        <article class="real-card">
+          <h3>🚨 Making it real is separate</h3>
+          <ul>
+            <li>A proposal is created, never silently adopted.</li>
+            <li>Checks, evidence and human review are required.</li>
+            <li>Canonical reds remain visible.</li>
+            <li>Snapshots remain immutable.</li>
+          </ul>
+        </article>
+      </div>
+      <p class="legal-note">
+        Forking is not a magic legal exemption. Check code, data, media, patent and trademark rights.
+        Label unaffiliated research clearly. This prototype provides workflow guidance, not legal advice.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      <strong>Mithub / Full Spectrum</strong>
+      <p>A proposal route over public git records. The repository outranks this interface.</p>
+    </div>
+    <div class="footer-status">🧪 PROTOTYPE · STATUS AUTHORITY: NONE</div>
+  </footer>
+
+  <dialog id="location-dialog">
+    <button class="dialog-close" type="button" aria-label="Close">×</button>
+    <p class="eyebrow">WHERE AM I?</p>
+    <h2>🧪 FUCK-AROUND LAND</h2>
+    <p>This is a browser-only experimental gateway. It cannot push, merge, deploy or alter canonical records.</p>
+    <dl>
+      <div><dt>Your words</dt><dd>Stored locally in this browser</dd></div>
+      <div><dt>Canonical impact</dt><dd>None</dd></div>
+      <div><dt>Authority</dt><dd>Proposal route only</dd></div>
+    </dl>
+  </dialog>
+
+  <dialog id="real-dialog">
+    <button class="dialog-close" type="button" aria-label="Close">×</button>
+    <p class="eyebrow danger-text">CANONICAL BOUNDARY</p>
+    <h2>🚨 This prototype stops here.</h2>
+    <p>
+      “Make real” must create a separate proposal, evidence bundle and protected pull request.
+      It can never mean “quietly write to main.”
+    </p>
+    <button class="button primary" id="download-proposal" type="button">Download proposal request</button>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
