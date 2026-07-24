@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Natoshi-moto/Lab/blob/main/operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/schema/closed_world_economy.schema.json",
+  "title": "Closed-world economy manifest",
+  "description": "Reference shape for a candidate closed-world economy manifest. This schema documents the contract; tools/validate_closed_world_economy.py is stdlib-only and implements the authoritative checks (including cross-field consistency this schema cannot express alone, such as the leakage-ladder exact ordering and the allowed/prohibited contradiction check). A manifest that validates against this schema and passes the validator is internally consistent with selected declared invariants only — see CLAIMS_AND_NONCLAIMS.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "economy_id",
+    "accepted_lab_sha",
+    "source_doctrine_sha",
+    "implementation_sha",
+    "status_authority",
+    "prohibited_capabilities",
+    "allowed_primitives",
+    "transfer_policy",
+    "redemption_policy",
+    "external_market_policy",
+    "chance_policy",
+    "vulnerable_user_policy",
+    "monitoring_policy",
+    "halt_policy",
+    "known_exceptions",
+    "unresolved_questions",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "closed-world-economy/v1"},
+    "economy_id": {"type": "string", "minLength": 1},
+    "accepted_lab_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_doctrine_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "implementation_sha": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        {"const": "NOT_YET_IMPLEMENTED"}
+      ]
+    },
+    "status_authority": {"const": "NONE"},
+    "prohibited_capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cash_redemption", "crypto_redemption", "external_goods_services_redemption",
+        "revenue_entitlement", "ownership_claim", "debt_claim", "promised_appreciation",
+        "yield_or_interest", "official_exchange_rate", "official_liquidity_provision",
+        "price_oracle", "external_wallet_withdrawal", "blockchain_bridge",
+        "exportable_bearer_instrument", "external_trading_api",
+        "operator_escrow_for_external_trade", "official_otc_matching",
+        "account_sale_tooling", "collateral_or_lending",
+        "misleading_financial_promotion", "unbounded_transfer",
+        "paid_random_transferable_rewards"
+      ],
+      "properties": {
+        "cash_redemption": {"const": true},
+        "crypto_redemption": {"const": true},
+        "external_goods_services_redemption": {"const": true},
+        "revenue_entitlement": {"const": true},
+        "ownership_claim": {"const": true},
+        "debt_claim": {"const": true},
+        "promised_appreciation": {"const": true},
+        "yield_or_interest": {"const": true},
+        "official_exchange_rate": {"const": true},
+        "official_liquidity_provision": {"const": true},
+        "price_oracle": {"const": true},
+        "external_wallet_withdrawal": {"const": true},
+        "blockchain_bridge": {"const": true},
+        "exportable_bearer_instrument": {"const": true},
+        "external_trading_api": {"const": true},
+        "operator_escrow_for_external_trade": {"const": true},
+        "official_otc_matching": {"const": true},
+        "account_sale_tooling": {"const": true},
+        "collateral_or_lending": {"const": true},
+        "misleading_financial_promotion": {"const": true},
+        "unbounded_transfer": {"const": true},
+        "paid_random_transferable_rewards": {"const": true}
+      }
+    },
+    "allowed_primitives": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/primitive_properties"},
+      "propertyNames": {
+        "enum": [
+          "recognition", "reputation", "authorship_record", "access",
+          "creative_permissions", "participation_rights", "non_transferable_status",
+          "cosmetic_or_expressive_resources", "internal_consumable_resources",
+          "stewardship_responsibilities"
+        ]
+      }
+    },
+    "transfer_policy": {
+      "type": "object",
+      "additionalProperties": {
+        "enum": [
+          "NON_TRANSFERABLE", "OPERATOR_MEDIATED", "ONE_WAY_GIFT",
+          "BOUNDED_BILATERAL_EXCHANGE", "AUCTION", "OPEN_ORDER_BOOK",
+          "ACCOUNT_TRANSFER", "ASSET_EXPORT", "CROSS_PROJECT_TRANSFER"
+        ]
+      }
+    },
+    "redemption_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["official_redemption", "external_settlement", "notes"],
+      "properties": {
+        "official_redemption": {"const": false},
+        "external_settlement": {"const": false},
+        "notes": {"type": "string", "minLength": 1}
+      }
+    },
+    "external_market_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["official_facilitation", "tolerated_workaround_response", "prohibited_workaround_response"],
+      "properties": {
+        "official_facilitation": {"const": false},
+        "tolerated_workaround_response": {"type": "string", "minLength": 1},
+        "prohibited_workaround_response": {"type": "string", "minLength": 1}
+      }
+    },
+    "chance_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loot_boxes", "paid_randomness", "wagering", "chance_with_payment_and_transfer"],
+      "properties": {
+        "loot_boxes": {"const": false},
+        "paid_randomness": {"const": false},
+        "wagering": {"const": false},
+        "chance_with_payment_and_transfer": {"const": "BLOCKED_PENDING_SPECIALIST_REVIEW"}
+      }
+    },
+    "vulnerable_user_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minors_reachable", "safeguards"],
+      "properties": {
+        "minors_reachable": {"type": "boolean"},
+        "safeguards": {"type": "string", "minLength": 1}
+      }
+    },
+    "monitoring_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["leakage_response_ladder", "receipts_required"],
+      "properties": {
+        "leakage_response_ladder": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "OBSERVE", "INVESTIGATE", "WARN", "THROTTLE", "RESTRICT_TRANSFER",
+              "SUSPEND_MECHANIC", "FREEZE_AFFECTED_OBJECT_CLASS", "HALT_ECONOMY",
+              "RETIRE_MECHANIC"
+            ]
+          }
+        },
+        "receipts_required": {"const": true}
+      }
+    },
+    "halt_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conditions", "due_process_required"],
+      "properties": {
+        "conditions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "due_process_required": {"const": true}
+      }
+    },
+    "known_exceptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "unresolved_questions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "non_claims": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "primitive_properties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transferable", "giftable", "sellable", "redeemable", "purchasable",
+        "scarce", "inheritable", "collateralizable", "usable_for_governance",
+        "obtainable_through_chance", "convertible_to_external_value"
+      ],
+      "properties": {
+        "transferable": {"type": "boolean"},
+        "giftable": {"type": "boolean"},
+        "sellable": {"type": "boolean"},
+        "redeemable": {"const": false},
+        "purchasable": {"type": "boolean"},
+        "scarce": {"type": "boolean"},
+        "inheritable": {"type": "boolean"},
+        "collateralizable": {"const": false},
+        "usable_for_governance": {"type": "boolean"},
+        "obtainable_through_chance": {"type": "boolean"},
+        "convertible_to_external_value": {"const": false}
+      }
+    }
+  }
+}
