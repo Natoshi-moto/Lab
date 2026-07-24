@@ -1,30 +1,54 @@
 {
   "schema": "nexus.queued-operation/v1",
   "operation_id": "SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_001",
-  "status": "QUEUED_DORMANT",
+  "status": "ECONOMY_BUILDER_COMPLETE_REVIEW_PENDING",
   "status_authority": "NONE",
   "implementation_authorized": false,
   "merge_authorized": false,
   "repository": "Natoshi-moto/Lab",
   "queue_branch": "chatgpt/queued-sandbox-clearance-roadmap-001",
+  "queue_pr": 117,
   "observed_baselines": {
     "lab_main": "6c3a1e806baba1183553221f5c2f00125ce2be29",
-    "experimental_sandbox_main": "82b9a3b2a60f008ba31d2f4a9228c9074e126b1c"
+    "experimental_sandbox_main": "82b9a3b2a60f008ba31d2f4a9228c9074e126b1c",
+    "observation_date": "2026-07-24",
+    "fresh_reverification_required": true
+  },
+  "economy_builder_state": {
+    "operation_id": "CLOSED_WORLD_ECONOMY_INVARIANTS_001",
+    "draft_pr": 118,
+    "branch": "claude/closed-world-economy-invariants-001",
+    "head": "caef0e7cd689e1e77a49413210116e7590322576",
+    "tree": "2c044c46c5c23425f13a1bacd36236ce34957b3a",
+    "base": "6c3a1e806baba1183553221f5c2f00125ce2be29",
+    "changed_file_count": 20,
+    "scope": "operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/**",
+    "draft": true,
+    "immutable_commit_verification": "PASS",
+    "dedicated_tests": "22_OF_22_PASS",
+    "vectors": "4_OF_4_VALID_PASS_AND_50_OF_50_HOSTILE_REJECTED_AS_DECLARED",
+    "nexus_doctor": "PASS",
+    "promotion_origin_contract": "PASS",
+    "nexus_audit": "PASS",
+    "merge_authorization": "EXPECTED_FAIL_ABSENT_BY_DESIGN",
+    "nexus_verify": "BLOCKED_BY_MISSING_DEPENDENCY",
+    "independent_adversarial_review": "PENDING",
+    "operator_disposition": "PENDING"
   },
   "activation_dependency": {
     "operation_id": "CLOSED_WORLD_ECONOMY_INVARIANTS_001",
     "required_state": "SOURCE_BOUND_ADVERSARIAL_REVIEW_COMPLETE_AND_DISPOSITION_RECORDED",
+    "current_state": "BUILDER_COMPLETE_REVIEW_PENDING",
     "on_unverified": "STOP_READ_ONLY"
   },
   "activation_checks": [
-    "final economy receipt exists",
-    "economy draft PR or exact branch head exists",
-    "schema validator and tests inspected",
+    "freshly verify PR 118 head base draft state scope and checks",
+    "inspect the actual economy package source and diff",
     "different model or qualified human adversarial review completed",
     "confirmed defects repaired or explicitly unresolved",
-    "live GitHub head and changed-file scope verified",
-    "operator disposition recorded",
-    "fresh execution branch created from then-current accepted Lab main"
+    "any new substantive head immutably verified and re-reviewed",
+    "operator economy disposition recorded",
+    "fresh roadmap execution branch created from then-current accepted Lab main"
   ],
   "central_principle": "Terminal-velocity cognition. Snail-speed implementation.",
   "canonical_layers": {
@@ -71,15 +95,16 @@
     "different-family incentive social and user-harm attack",
     "plain-language operator decision card"
   ],
+  "next_immediate_operation": "SOURCE_BOUND_ADVERSARIAL_REVIEW_OF_PR_118",
   "next_execution_operation": "SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_EXECUTION_001",
   "next_execution_branch_suggestion": "chatgpt/sandbox-clearance-mithub-roadmap-execution-001",
   "next_execution_maximum_authority": "DRAFT_LAB_PR",
   "non_claims": [
+    "builder completion does not mean the economy framework is independently reviewed accepted or safe",
     "this queue does not implement or clear Sandbox",
     "this queue does not authorize money tokens markets real users or external targeting",
     "this queue does not make Mithub or University operational",
-    "this queue does not resolve the closed-world economy operation",
-    "this queue does not authorize merge",
+    "this queue does not authorize merging PR 118 PR 117 or a future roadmap",
     "model diversity is not automatic independence",
     "Git history does not establish truth"
   ]
