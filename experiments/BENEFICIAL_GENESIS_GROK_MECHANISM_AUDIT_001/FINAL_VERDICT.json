@@ -1,0 +1,59 @@
+{
+  "schema": "nexus.bgen.grok-mechanism-audit.final-verdict/v1",
+  "audit_id": "BGEN-GROK-MECHANISM-AUDIT-001",
+  "status_authority": "NONE",
+  "frozen_subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "working_branch": "grok/bgen-mechanism-audit-001",
+  "verdicts": {
+    "UNDERLYING_MECHANISM": {
+      "value": "CONTINUE_WITH_CONDITIONS",
+      "allowed": ["STOP_CURRENT_DIRECTION", "CONTINUE_WITH_CONDITIONS", "ADVANCE_TO_NEXT_BOUNDED_TEST"],
+      "confidence": "medium_high",
+      "strongest_support": "Coherent charity-bound migration receipt; supply-safe pro-rata; not unconditionally self-defeating under narrow scope",
+      "strongest_counterevidence": "Transferable float + identity-free anti-whale formulas fail or amplify risk; rebate/tainted residuals",
+      "assumptions": ["Conditions bind", "v1 scope can be narrowed"],
+      "falsifiers": ["Continuation impossible even under non-transferable defaults", "Arithmetic incoherence (not found)"],
+      "exact_next_action": "BGEN-PRODUCT-FUNCTION-AND-TRANSFER-REGIME-LOCK-001"
+    },
+    "TRANSFERABILITY_NECESSITY": {
+      "value": "NOT_DEMONSTRATED",
+      "allowed": ["DEMONSTRATED", "NOT_DEMONSTRATED", "UNDERDETERMINED"],
+      "confidence": "high_for_F1_F4_open_for_F7",
+      "strongest_support": "Non-transferable receipt serves F1-F4; design pack does not require alienable units",
+      "strongest_counterevidence": "Unspecified future ledger functions may want transferable units",
+      "assumptions": ["Hold F1-F4 constant in comparison"],
+      "falsifiers": ["Binding v1 function requiring transferability with no alternative"],
+      "exact_next_action": "Lock F5-F7 in product-function matrix"
+    },
+    "EVIDENCE_STATE": {
+      "value": "SUFFICIENT_FOR_BOUNDED_DECISION",
+      "allowed": ["SUFFICIENT_FOR_BOUNDED_DECISION", "UNDERDETERMINED", "CONTRADICTED_BY_COUNTEREXAMPLE"],
+      "confidence": "medium_high",
+      "strongest_support": "Independent math/probes decide CONTINUE_WITH_CONDITIONS vs gate pass vs mainnet",
+      "strongest_counterevidence": "Empirical alpha/v/participation open (not required for bounded research decision)",
+      "assumptions": ["Bounded decision is research disposition not launch"],
+      "falsifiers": ["Material counterexample to supply or Sybil results"],
+      "exact_next_action": "Product lock without waiting for denser simulation"
+    },
+    "REAL_WORLD_READINESS": {
+      "value": "RESEARCH_ONLY",
+      "allowed": ["RESEARCH_ONLY"],
+      "confidence": "high",
+      "strongest_support": "Synthetic crypto, no live funds, legal/AML open",
+      "strongest_counterevidence": "none_upgrading_readiness",
+      "assumptions": [],
+      "falsifiers": ["Only separate multi-track promotion evidence"],
+      "exact_next_action": "Keep RESEARCH_ONLY labeling"
+    }
+  },
+  "conditions": [
+    "Specify target ledger functions before defending transferability",
+    "Prefer non-transferable or delayed-transfer if float not required",
+    "Do not attach majority governance to raw allocation without durable constraints",
+    "Do not advertise concave/cap as permissionless fairness without identity",
+    "Treat rebate and tainted-title as residual social/legal surfaces",
+    "No live funds, solicitation, token issuance, or STATUS promotion from this audit"
+  ],
+  "blinding_breach": false,
+  "subject_drift": false
+}

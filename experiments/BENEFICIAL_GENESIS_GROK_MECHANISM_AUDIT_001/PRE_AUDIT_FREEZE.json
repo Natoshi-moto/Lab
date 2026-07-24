@@ -1,0 +1,366 @@
+{
+  "schema": "nexus.bgen.grok-mechanism-audit.pre-audit-freeze/v1",
+  "audit_id": "BGEN-GROK-MECHANISM-AUDIT-001",
+  "seat": "Grok Mechanism (independent)",
+  "status_authority": "NONE",
+  "frozen_subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "working_branch": "grok/bgen-mechanism-audit-001",
+  "created_at_utc": "2026-07-21T14:36:00Z",
+  "binding_check": {
+    "git_rev_parse_HEAD": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+    "head_matches_subject": true,
+    "active_branch": "grok/bgen-mechanism-audit-001",
+    "branch_matches": true,
+    "git_status_short_empty": true,
+    "subject_drift": false
+  },
+  "runtime_environment": {
+    "os": "Linux fedora 7.0.12-201.fc44.x86_64",
+    "python": "Python 3.14.6",
+    "tools": ["git", "gh", "python3", "sha256sum", "curl"],
+    "network": {
+      "github_https_reachable": true,
+      "gh_authenticated_as": "Natoshi-moto",
+      "repo": "Natoshi-moto/Lab",
+      "visibility": "PUBLIC",
+      "default_branch": "main"
+    },
+    "repository_visibility": "public remote origin https://github.com/Natoshi-moto/Lab.git",
+    "status_json_observation": {
+      "path": "STATUS.json",
+      "sha256": "df2c2c7d64ad4b32639ed1756aad2ad2481d1fa87507bb4bc17cc1f32f018c07",
+      "current_mode": "R016_USER_AUTHORIZED_PROMOTION_MERGED",
+      "current_round": "R016",
+      "canonical_target_tag": "baseline-001",
+      "canonical_target_commit": "7a8068fc6088b81cc9a7c94b49dc77e0abe592d8",
+      "next_action_id": "ACT-R017_DESIGN_MULTI_HOST_REPLICATION_AND_EXPLICIT_FORK_EVIDENCE",
+      "note": "STATUS.json records lab R016 canonical baseline; Beneficial Genesis is noncanonical research. This audit does not modify STATUS.json or assign an R-round."
+    }
+  },
+  "permanent_blindness_rule": {
+    "forbidden_until_audit_complete": [
+      "PR #40",
+      "PR #42",
+      "PR #43",
+      "branch fable/bgen-epistemic-audit-001",
+      "branch codex/bgen-technical-audit-001",
+      "branch grok/bgen-technical-audit-001",
+      "experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+      "operations/audits/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+      "operations/receipts/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/**",
+      "experiments/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+      "operations/audits/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+      "operations/receipts/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+      "experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+      "operations/audits/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+      "operations/receipts/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+      "every sibling 2x2 audit branch, PR, report, receipt, handoff, summary, or finding"
+    ],
+    "forbidden_methods": [
+      "recent issue listings",
+      "recent pull-request listings",
+      "global issue or PR search",
+      "broad branch searches",
+      "memory search",
+      "prior conversation search",
+      "sibling audit branches"
+    ],
+    "breach_action": "Stop immediately with BLINDING_BREACH"
+  },
+  "exact_sources_inspected_before_freeze": [
+    {
+      "path": "AGENTS.md",
+      "role": "repository safety instructions required to operate"
+    },
+    {
+      "path": "CLAUDE.md",
+      "role": "repository safety instructions (partially superseded for this seat by pasted contract; not used as task selection)"
+    },
+    {
+      "path": "STATUS.json",
+      "sha256": "df2c2c7d64ad4b32639ed1756aad2ad2481d1fa87507bb4bc17cc1f32f018c07",
+      "role": "lab status observation only"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md",
+      "sha256": "f86f212d917d3850f234d07883064e266e5739c05be6c7abbf307ccf38930c17"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/TECHNICAL_DESIGN.md",
+      "sha256": "db7b06696aa738914014d8dcc21fb91682f31d2c4593d73d639f560468347ffd"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/THREAT_MODEL_AND_NONCLAIMS.md",
+      "sha256": "63847120ac023c7c1aafe3f00cd8e07a508c79f176e8651b4d605655f71f6808"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/allocation.py",
+      "sha256": "1f36c5d348e4b93100085720940b6774204e090109f87dd2b0fff740c6c044ff",
+      "role": "normative fixed-pool allocation rule as specified in design pack"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/constants.py",
+      "sha256": "3b6179ea076e3d0a25899aacca42edb6847a19578b461d1946cacbe5809416f2"
+    },
+    {
+      "source": "GitHub issue #33 (exact number only)",
+      "repo": "Natoshi-moto/Lab",
+      "title": "BENEFICIAL-GENESIS-PROGRAM-001 — primary research roadmap",
+      "state": "OPEN"
+    },
+    {
+      "source": "GitHub issue #34 (exact number only)",
+      "repo": "Natoshi-moto/Lab",
+      "title": "BGEN-ECON-REDTEAM-001 — adversarial economics and mechanism necessity",
+      "state": "CLOSED"
+    },
+    {
+      "source": "pasted audit contract BGEN-GROK-MECHANISM-AUDIT-001",
+      "role": "controlling task specification for this session"
+    }
+  ],
+  "exact_sources_temporarily_unread": [
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/** (all files; hashed only)",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/** (all files; hashed only)",
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/** (all files; hashed only)",
+    "experiments/BENEFICIAL_GENESIS_RETEST_002/** (crypto retest pack; hashed only; not mechanism-primary)",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003/**",
+    "PR #35 (body and diff unread)",
+    "PR #37 (body and diff unread)",
+    "PR #39 (body and diff unread)",
+    "historical issue bodies beyond #33/#34",
+    "economics package prose conclusions and recommendation fields",
+    "sibling 2x2 audit materials (permanently forbidden for this audit)"
+  ],
+  "sha256_inventory_temporarily_unread_packages": {
+    "method": "For each package directory: sha256sum of each file; PACKAGE_DIGEST = sha256 of sorted 'sha256sum path' lines for that package.",
+    "packages": {
+      "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001": "9236b150beabae6c2583c120e0886ae71f926468239597dde44a462390537174",
+      "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001": "f5e70ed12b24d0c11f78d34af9843ca43f6ef371d93a7bda4ee6716cea286909",
+      "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003": "8cc215db03efec9f42385defa43f7098c4c4741bf0c2c5b585d7c551b0953427",
+      "experiments/BENEFICIAL_GENESIS_RETEST_002": "2dc7bfc72c98a5cc41a82f6651f5a814428c8b5f0bf72c53559cedc381068ed8",
+      "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001": "de34532d11ac794bd38ab8b432a872ea3af95a5d5c936613ce80d22f3e9c8f3c",
+      "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001": "7c56264b0c933dcdfa6501e3cbe31bca8ec64a951e39f00d9df3e1943e51fb33",
+      "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_003": "453c5fce3ac68ea98c13ba21e69854ff61660d113c03681113763e5f2e2cb1ad",
+      "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001": "1d7594f2323054315b7afa0dc9e14917311e1682d34bc26f2d13656ad2a753d2",
+      "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001": "3a9d1f232cdf8defd2410dac7f489043c7e89545bc4906761c7f5328f2e7761c",
+      "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003": "53108df8a0b9409751d34996dbcda1876baf91a28511e08a229dc62402808406"
+    },
+    "note": "Full per-file hash list recorded at freeze time in session inventory; package digests above bind package contents without reading prose."
+  },
+  "independent_mechanism_reconstruction": {
+    "statement": "Reconstructed solely from design pack + issues #33/#34 + this contract, without reading econ redteam/breaker conclusions or importing their modules.",
+    "core_hypothesis": "A finite new-ledger genesis pool can be allocated after a migration epoch by accepting claims that prove (i) source-chain control of an asset, (ii) payment of that asset to an exact genesis-committed charity script, and (iii) binding of a post-quantum destination key — all within one source transaction structure plus a PQ claim signature.",
+    "mechanism_objects": [
+      "Immutable genesis charity set with exact script-byte destinations",
+      "Finite donation/migration epoch with cutoff and confirmations",
+      "Donation commitment binding chain, epoch, charity, vout, amount, PQ destination, nonce",
+      "One-time nullifier per (source_chain, txid, vout)",
+      "Fixed integer genesis pool P of abstract quanta (not a BTC price)",
+      "Post-close proportional allocation of P by eligible satoshi weights"
+    ],
+    "allocation_rule_normative": {
+      "formula": "allocation_i = floor(P * e_i / T)",
+      "P": "fixed_bitcoin_genesis_pool (positive integer quanta)",
+      "e_i": "eligible_satoshis_i (positive integer weight for claim i)",
+      "T": "sum_j e_j = total_eligible_satoshis",
+      "remainder_handling": "UNISSUED_FLOOR_REMAINDER",
+      "remainder": "R = P - sum_i allocation_i; never issued",
+      "supply_invariant": "sum_i allocation_i + R = P and sum_i allocation_i <= P",
+      "no_fixed_exchange_rate": true,
+      "ordering": "claim rows ordered by nullifier_hex ascending"
+    },
+    "what_is_optimized_public_benefit_hypothesis": "Charity receives irreversible source-chain value; donor receives optional new-ledger allocation claim right proportional to eligible donated sats. Social benefit is hypothesized as charity net retained value plus migration/admission coordination — not token market price.",
+    "what_ledger_function_is_optimized": "Deterministic, supply-conserving genesis distribution keyed to verified charity-bound donations; admission predicate fail-closed; not ongoing consensus.",
+    "explicitly_specified_functions": [
+      "payment of source assets to charity scripts (required for eligibility)",
+      "fixed-pool proportional allocation after epoch close",
+      "nullifier uniqueness",
+      "PQ destination binding for claim right"
+    ],
+    "not_required_by_design_pack": [
+      "ongoing fees",
+      "staking",
+      "security bonding",
+      "transferable token markets",
+      "store-of-value functionality",
+      "token-weighted governance",
+      "live funds or real charities"
+    ],
+    "silently_assumed_or_under_specified": [
+      "Whether allocation units are transferable",
+      "Whether allocation confers governance",
+      "Secondary-market valuation of allocation units",
+      "Donor participation elasticity to expected allocation value",
+      "Charity rebate behavior and access frictions",
+      "Displacement of baseline charitable giving",
+      "Identity uniqueness for concave/capped alternatives"
+    ],
+    "product_function_bundle_for_comparisons": {
+      "F1_charity_receipt": "Source value transferred to immutable charity destinations",
+      "F2_migration_binding": "Cryptographic binding of donation to new-ledger claim/destination",
+      "F3_finite_genesis_distribution": "Deterministic finite pool distribution after epoch",
+      "F4_permissionless_claim": "No administrator approval of individual claims (given genesis parameters)",
+      "optional_F5_transferable_economic_unit": "NOT required by design text; often assumed in token discourse",
+      "optional_F6_governance": "NOT required by design text"
+    }
+  },
+  "expected_load_bearing_claims": [
+    {
+      "id": "C1_SUPPLY_CONSERVATION",
+      "claim": "Integer floor-proportional allocation with unissued remainder never issues more than pool P.",
+      "class": "mathematical_deduction_from_rule"
+    },
+    {
+      "id": "C2_SPLIT_INVARIANCE_LINEAR",
+      "claim": "Under pure pro-rata, splitting one identity's eligible sats across multiple nullifiers does not increase that identity's total floor allocation beyond unit-level floor effects (and may reduce it via extra remainders).",
+      "class": "mathematical_with_floor_residuals"
+    },
+    {
+      "id": "C3_CONCAVE_SYBIL",
+      "claim": "Concave weights (sqrt/log) without identity binding are Sybil-dominated: splitting increases total weight.",
+      "class": "mathematical_deduction"
+    },
+    {
+      "id": "C4_CAP_THEN_RENORMALIZE",
+      "claim": "Per-identity caps require identity; without it, caps are Sybil-evaded. Cap-then-renormalize reallocates surplus to uncapped claimants.",
+      "class": "mechanism_structure"
+    },
+    {
+      "id": "C5_DENOMINATOR_UNCERTAINTY",
+      "claim": "Individual allocation share e_i/T is unknown until T freezes; late donors and miners can shock T near cutoff.",
+      "class": "structural_pathway"
+    },
+    {
+      "id": "C6_REBATE_OUT_OF_PROTOCOL",
+      "claim": "Charity rebates are out-of-protocol; crypto verifier can admit claims that are economically circular.",
+      "class": "design_residual_risk"
+    },
+    {
+      "id": "C7_TAINTED_SOURCE",
+      "claim": "Cryptographic control ≠ legal clean title; mechanism admits stolen/tainted source if crypto predicates pass.",
+      "class": "design_residual_risk"
+    },
+    {
+      "id": "C8_TRANSFERABILITY_NOT_NECESSARY",
+      "claim": "Transferability of allocation units is not required for F1–F4; non-transferable receipts or delayed transfer can serve migration recognition with less secondary-market attack surface.",
+      "class": "mechanism_necessity_hypothesis"
+    },
+    {
+      "id": "C9_WHALE_CONCENTRATION",
+      "claim": "Pro-rata by sats concentrates allocation and any proportional governance in large donors.",
+      "class": "mathematical_from_weights"
+    },
+    {
+      "id": "C10_ENDOGENEITY",
+      "claim": "Models that hold total donations, participation, and rebate access fixed understate strategic responses and may reverse welfare conclusions.",
+      "class": "model_adequacy"
+    }
+  ],
+  "assumptions_requiring_evidence": [
+    "A1: Donors respond to expected allocation value (mercenary/rebate-seeking elasticity unknown).",
+    "A2: Charities' ability and willingness to rebate (access friction distribution unknown).",
+    "A3: Secondary-market price of allocation units (if transferable) — ungrounded without data.",
+    "A4: Share of additional vs displaced vs mercenary donations.",
+    "A5: Identity uniqueness feasibility under permissionless design.",
+    "A6: Governance rights attached to allocation (product decision, not design necessity).",
+    "A7: Opportunity cost of tainted funds for attackers (external markets, seizure risk).",
+    "A8: Miner/validator ability to influence cutoff inclusion (depends on real Bitcoin policy).",
+    "A9: Social preference weights on charity net vs donor surplus vs concentration.",
+    "A10: Legal treatment of donation-for-allocation (requires qualified counsel; not adjudicated here)."
+  ],
+  "plausible_failure_modes": [
+    "FM1: Transferable token becomes speculative contest; charity net eroded by rebates when access is easy.",
+    "FM2: Whale + colluding charity captures large share of pool and governance.",
+    "FM3: Concave weighting without identity fails via Sybil split.",
+    "FM4: Cap-without-identity fails via Sybil; identity requirement conflicts with permissionless claim.",
+    "FM5: Undersubscription: small T yields large allocation per sat; speculative coordination rushes in.",
+    "FM6: Oversubscription: allocation per sat tiny; only mercenary/tainted flow remains if EV high.",
+    "FM7: Denominator sniping / miner influence privileges late large donors.",
+    "FM8: Tainted funds laundered into 'clean' claim rights when EV of allocation exceeds retention cost.",
+    "FM9: Exchange omnibus aggregation centralizes claims and governance.",
+    "FM10: Simpler no-token direct donation dominates on F1 alone; transferability adds risk without necessary function.",
+    "FM11: Governance cap-then-renormalize still allows coalition capture via many sub-cap identities.",
+    "FM12: Floor remainder gaming in buggy reimplementations (design uses unissued remainder to prevent over-issue)."
+  ],
+  "falsifiers_for_major_claims": [
+    {
+      "claim_id": "C1_SUPPLY_CONSERVATION",
+      "falsifier": "Exhibit integers P, {e_i} with sum floor(P*e_i/T) > P under the stated rule."
+    },
+    {
+      "claim_id": "C2_SPLIT_INVARIANCE_LINEAR",
+      "falsifier": "Exhibit split of e into e1+e2=e where floor(P*e1/T')+floor(P*e2/T') > floor(P*e/T) with T'=T (same total) — should fail for pure pro-rata when T fixed; note T may change if split changes claim count only with same total e."
+    },
+    {
+      "claim_id": "C3_CONCAVE_SYBIL",
+      "falsifier": "Exhibit concave f with f(e1)+f(e2) <= f(e1+e2) for all positive e1,e2 (would contradict strict concavity of sqrt/log on positives)."
+    },
+    {
+      "claim_id": "C8_TRANSFERABILITY_NOT_NECESSARY",
+      "falsifier": "Demonstrate a required product function in the design that cannot be achieved by non-transferable or delayed-transfer receipts while holding F1–F4 fixed."
+    },
+    {
+      "claim_id": "C6_REBATE_OUT_OF_PROTOCOL",
+      "falsifier": "Show an on-protocol field that detects and rejects all economically material rebates without off-chain data."
+    },
+    {
+      "claim_id": "C10_ENDOGENEITY",
+      "falsifier": "Show that welfare ranking of mechanisms is invariant under all admissible endogenous participation/rebate responses in the planned model family."
+    }
+  ],
+  "planned_tests": {
+    "independent_code_location": "experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/model/**",
+    "no_import_of_subject_economics_modules_during_independent_phase": true,
+    "arithmetic": "exact integer / fractions.Fraction where practical",
+    "coverage": [
+      "fixed-pool proportional allocation + supply invariant",
+      "split invariance and floor residuals",
+      "concave alternatives (sqrt, log) + Sybil advantage",
+      "per-identity capped pro-rata + Sybil evasion without identity",
+      "denominator uncertainty (early vs late share)",
+      "extreme undersubscription and oversubscription",
+      "rebate incidence with access friction parameter α",
+      "collusion whale+charity net retained",
+      "tainted source opportunity-cost sensitivity grid",
+      "governance: proportional vs capped vs cap-then-renormalize",
+      "transferable vs delayed-transfer vs non-transferable vs no-token comparison holding F1–F4",
+      "combined attacks: whale+rebate, Sybil+gov, undersub+speculation, exchange timing"
+    ],
+    "metrics": [
+      "issued, remainder, share_i",
+      "top1/top10 concentration",
+      "Gini (discrete)",
+      "HHI",
+      "charity_net = donations - modeled_rebates",
+      "attacker_EV thresholds under declared price/cost assumptions",
+      "governance share under each rule"
+    ],
+    "evidence_discipline": [
+      "Label each result as mathematical / simulation under assumptions / structural pathway / unresolved",
+      "Do not call illustrative parameters realistic",
+      "Do not claim inevitability from possibility",
+      "Separate additional vs displaced vs mercenary flow as accounting identities requiring external data for magnitude"
+    ]
+  },
+  "freeze_independence_statement": "A freeze of unread economics packages and sibling audits reduces anchoring on prior econ conclusions and recommendation text, but does not prove perfect independence. Shared design documents, issue #33/#34 text, common economic vocabulary, and the same frozen subject commit remain common knowledge. This seat still reconstructs models independently in new code under the authorized audit directory.",
+  "post_freeze_authorized_inspection": [
+    "economics packages",
+    "Breaker and retest packages",
+    "PR #35",
+    "PR #37",
+    "PR #39",
+    "historical issues, receipts, and commit ancestry belonging to the frozen subject"
+  ],
+  "still_forbidden_after_freeze": [
+    "PR #40",
+    "PR #42",
+    "PR #43",
+    "Fable/Codex Tech/Grok Tech sibling 2x2 materials"
+  ]
+}

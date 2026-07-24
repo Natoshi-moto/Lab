@@ -1,0 +1,95 @@
+{
+  "whale_50": {
+    "allocations": [
+      500000000,
+      500000000
+    ],
+    "concentration": {
+      "gini": "0",
+      "hhi": "1/2",
+      "n": 2,
+      "sum": 1000000000,
+      "top10_share": "1",
+      "top1_share": "1/2"
+    },
+    "eligible": [
+      50000000,
+      50000000
+    ],
+    "pool": 1000000000,
+    "remainder_unissued": 0,
+    "rule": "proportional_floor",
+    "shares_exact": [
+      "1/2",
+      "1/2"
+    ],
+    "total_eligible": 100000000,
+    "total_issued": 1000000000,
+    "weight_shares_exact": [
+      "1/2",
+      "1/2"
+    ]
+  },
+  "whale_80": {
+    "allocations": [
+      800000000,
+      200000000
+    ],
+    "concentration": {
+      "gini": "3/10",
+      "hhi": "17/25",
+      "n": 2,
+      "sum": 1000000000,
+      "top10_share": "1",
+      "top1_share": "4/5"
+    },
+    "eligible": [
+      80000000,
+      20000000
+    ],
+    "pool": 1000000000,
+    "remainder_unissued": 0,
+    "rule": "proportional_floor",
+    "shares_exact": [
+      "4/5",
+      "1/5"
+    ],
+    "total_eligible": 100000000,
+    "total_issued": 1000000000,
+    "weight_shares_exact": [
+      "4/5",
+      "1/5"
+    ]
+  },
+  "whale_99": {
+    "allocations": [
+      990000000,
+      10000000
+    ],
+    "concentration": {
+      "gini": "49/100",
+      "hhi": "4901/5000",
+      "n": 2,
+      "sum": 1000000000,
+      "top10_share": "1",
+      "top1_share": "99/100"
+    },
+    "eligible": [
+      99000000,
+      1000000
+    ],
+    "pool": 1000000000,
+    "remainder_unissued": 0,
+    "rule": "proportional_floor",
+    "shares_exact": [
+      "99/100",
+      "1/100"
+    ],
+    "total_eligible": 100000000,
+    "total_issued": 1000000000,
+    "weight_shares_exact": [
+      "99/100",
+      "1/100"
+    ]
+  }
+}

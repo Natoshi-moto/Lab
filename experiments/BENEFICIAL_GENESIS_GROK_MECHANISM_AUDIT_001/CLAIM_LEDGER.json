@@ -1,0 +1,28 @@
+{
+  "schema": "nexus.bgen.grok-mechanism-audit.claim-ledger/v1",
+  "audit_id": "BGEN-GROK-MECHANISM-AUDIT-001",
+  "claims": [
+    {"id": "CL1", "claim": "Floor pro-rata + unissued remainder never issues more than P", "class": ["math", "reproduced"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL2", "claim": "Linear split does not increase splitter total allocation", "class": ["math", "reproduced"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL3", "claim": "Concave weights without identity are Sybil-exploitable", "class": ["math", "reproduced"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL4", "claim": "Per-identity caps without durable identity are Sybil-evaded", "class": ["math", "reproduced"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL5", "claim": "Cap-then-renormalize governance fails under multi-id whale vs outsiders", "class": ["reproduced", "structural"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL6", "claim": "Pro-rata concentrates with weight share", "class": ["math", "reproduced"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL7", "claim": "Denominator growth dilutes fixed early e", "class": ["math", "reproduced"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL8", "claim": "Fixed P makes quanta-per-sat sensitive to T", "class": ["math", "structural"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL9", "claim": "Transferability not necessary for F1-F4", "class": ["structural"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL10", "claim": "Transferability may be needed for unspecified F7 functions", "class": ["policy_open"], "confidence": "medium", "status": "UNRESOLVED_SCOPE"},
+    {"id": "CL11", "claim": "Rebates reduce charity net proportional to access*rate in model", "class": ["conditional"], "confidence": "high", "status": "CONFIRMED_IN_MODEL"},
+    {"id": "CL12", "claim": "Rational donors always destroy charity net via rebates", "class": ["empirical_open"], "confidence": "low", "status": "NOT_ESTABLISHED"},
+    {"id": "CL13", "claim": "Tainted crypto-valid claims can be admitted", "class": ["structural"], "confidence": "high", "status": "CONFIRMED_PATHWAY"},
+    {"id": "CL14", "claim": "Tainted donation-for-claim always profitable", "class": ["conditional"], "confidence": "low", "status": "NOT_ESTABLISHED"},
+    {"id": "CL15", "claim": "Token-weighted gov enables majority by large donation alone", "class": ["structural_conditional"], "confidence": "high_if_rule", "status": "CONDITIONAL"},
+    {"id": "CL16", "claim": "Exchange omnibus increases pro-rata allocation vs equal total e", "class": ["math"], "confidence": "high", "status": "FALSE"},
+    {"id": "CL17", "claim": "Exchange omnibus concentrates custody/control", "class": ["structural"], "confidence": "high", "status": "CONFIRMED_CHANNEL"},
+    {"id": "CL18", "claim": "Mechanism is mainnet-ready", "class": ["engineering"], "confidence": "n/a", "status": "REJECTED_RESEARCH_ONLY"},
+    {"id": "CL19", "claim": "Social benefit exceeds simpler alternatives under F1-only", "class": ["policy", "empirical_open"], "confidence": "low", "status": "UNDERDETERMINED"},
+    {"id": "CL20", "claim": "Non-transferable receipt can serve F1-F4", "class": ["structural"], "confidence": "high", "status": "CONFIRMED"},
+    {"id": "CL21", "claim": "Differential agreement with econ CONTINUE_WITH_CONDITIONS", "class": ["post_freeze_differential"], "confidence": "medium_high", "status": "AGREED_DIFFERENTIAL"},
+    {"id": "CL22", "claim": "Sibling 2x2 audits used", "class": ["blindness"], "confidence": "n/a", "status": "NOT_USED"}
+  ]
+}

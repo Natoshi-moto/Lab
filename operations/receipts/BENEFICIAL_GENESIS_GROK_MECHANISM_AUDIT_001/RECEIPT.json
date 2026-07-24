@@ -1,0 +1,63 @@
+{
+  "schema": "nexus.bgen.grok-mechanism-audit.receipt/v1",
+  "audit_id": "BGEN-GROK-MECHANISM-AUDIT-001",
+  "status_authority": "NONE",
+  "repository": "Natoshi-moto/Lab",
+  "frozen_subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "working_branch": "grok/bgen-mechanism-audit-001",
+  "seat": "Grok Mechanism",
+  "provider_model_label": "xAI Grok interactive CLI (grok-4.5 class)",
+  "fresh_session": true,
+  "prior_session_inherited": false,
+  "binding": {
+    "head_at_start": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+    "branch": "grok/bgen-mechanism-audit-001",
+    "status_clean_at_start": true,
+    "subject_drift": false,
+    "blinding_breach": false
+  },
+  "freeze_commit": "895f8b54d68349e470ebf853ab841de45c5a8269",
+  "package_commit": "48e53ce2d893641476cfd1f7ca0201e5184313a8",
+  "audit_commits": [
+    "895f8b54d68349e470ebf853ab841de45c5a8269",
+    "48e53ce2d893641476cfd1f7ca0201e5184313a8",
+    "b311b263e5e3b72983b636140fba004b6ff15999"
+  ],
+  "draft_pr": 45,
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/45",
+  "branch_tip_at_pr_open": "b311b263e5e3b72983b636140fba004b6ff15999",
+  "authorized_write_paths": [
+    "experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/**"
+  ],
+  "commands": [
+    {
+      "cmd": "git rev-parse HEAD",
+      "result": "8349de7a5978be6a9984aa33fd59ba3725ebaaca"
+    },
+    {
+      "cmd": "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/tests -v",
+      "exit_code": 0,
+      "summary": "5 tests OK"
+    },
+    {
+      "cmd": "python3 experiments/BENEFICIAL_GENESIS_GROK_MECHANISM_AUDIT_001/model/run_probes.py",
+      "exit_code": 0,
+      "summary": "ALL_PROBES_OK"
+    }
+  ],
+  "verdicts": {
+    "UNDERLYING_MECHANISM": "CONTINUE_WITH_CONDITIONS",
+    "TRANSFERABILITY_NECESSITY": "NOT_DEMONSTRATED",
+    "EVIDENCE_STATE": "SUFFICIENT_FOR_BOUNDED_DECISION",
+    "REAL_WORLD_READINESS": "RESEARCH_ONLY"
+  },
+  "highest_value_next": "BGEN-PRODUCT-FUNCTION-AND-TRANSFER-REGIME-LOCK-001",
+  "forbidden_materials_used": false,
+  "status_json_modified": false,
+  "live_funds": false,
+  "legal_conclusions": false,
+  "sanitized": true,
+  "secrets_included": false
+}

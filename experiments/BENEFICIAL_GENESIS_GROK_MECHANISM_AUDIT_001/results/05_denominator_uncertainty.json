@@ -1,0 +1,6 @@
+{
+  "after_denominator_doubles": 50000000,
+  "dilution_ratio": "1/2",
+  "early_expected_alloc": 100000000,
+  "note": "Late inflow dilutes early donors; miner/cutoff influence is structural pathway on real chain."
+}

@@ -1,0 +1,60 @@
+{
+  "cap_share": "1/10",
+  "one": {
+    "allocations": [
+      100000000,
+      100000000
+    ],
+    "cap_amount": 100000000,
+    "cap_share": "1/10",
+    "eligible": [
+      80000000,
+      20000000
+    ],
+    "identity": [
+      "whale",
+      "rest"
+    ],
+    "identity_allocations": {
+      "rest": 100000000,
+      "whale": 100000000
+    },
+    "identity_eligible": {
+      "rest": 20000000,
+      "whale": 80000000
+    },
+    "pool": 1000000000,
+    "remainder_unissued": 800000000,
+    "rule": "capped_pro_rata_cap_then_renormalize",
+    "total_issued": 200000000
+  },
+  "sybil": {
+    "identity_allocations": {
+      "rest": 100000000,
+      "w0": 45000000,
+      "w1": 45000000,
+      "w10": 45000000,
+      "w11": 45000000,
+      "w12": 45000000,
+      "w13": 45000000,
+      "w14": 45000000,
+      "w15": 45000000,
+      "w16": 45000000,
+      "w17": 45000000,
+      "w18": 45000000,
+      "w19": 45000000,
+      "w2": 45000000,
+      "w3": 45000000,
+      "w4": 45000000,
+      "w5": 45000000,
+      "w6": 45000000,
+      "w7": 45000000,
+      "w8": 45000000,
+      "w9": 45000000
+    },
+    "total_issued": 1000000000
+  },
+  "sybil_evades_cap": true,
+  "whale_as_20_identities_alloc": 900000000,
+  "whale_as_one_identity_alloc": 100000000
+}

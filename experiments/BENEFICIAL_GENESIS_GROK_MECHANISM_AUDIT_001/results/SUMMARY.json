@@ -1,0 +1,235 @@
+{
+  "key_conditional": [
+    "rebate destroys charity net only to the extent of access*rate",
+    "tainted-flow profitability is region-dependent on retention vs alloc value",
+    "whale collusion profitability depends on assumed v"
+  ],
+  "key_confirmed_math": [
+    "supply conservation under floor pro-rata",
+    "linear split does not increase splitter allocation (may decrease)",
+    "concave weights strictly Sybil-rewarding in tested probes",
+    "identity-free caps Sybil-evaded",
+    "transferability not structurally necessary for F1-F4"
+  ],
+  "key_unresolved_empirical": [
+    "actual access friction distribution",
+    "participation elasticity",
+    "secondary market price",
+    "displaced vs additional giving"
+  ],
+  "results_index": {
+    "audit_id": "BGEN-GROK-MECHANISM-AUDIT-001",
+    "cap_sybil_evasion": {
+      "sybil_evades_cap": true,
+      "whale_one": 100000000,
+      "whale_sybil": 900000000
+    },
+    "collusion_conditional": [
+      {
+        "alloc_value_assumed": 0,
+        "charity_net": 75000000,
+        "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+        "others_donation": 50000000,
+        "pool": 1000000000,
+        "profitable_under_assumptions": false,
+        "rebate": 25000000,
+        "token_value_per_unit": "0",
+        "whale_alloc": 500000000,
+        "whale_donation": 50000000,
+        "whale_net_assumed": -25000000
+      },
+      {
+        "alloc_value_assumed": 5000000,
+        "charity_net": 75000000,
+        "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+        "others_donation": 50000000,
+        "pool": 1000000000,
+        "profitable_under_assumptions": false,
+        "rebate": 25000000,
+        "token_value_per_unit": "1/100",
+        "whale_alloc": 500000000,
+        "whale_donation": 50000000,
+        "whale_net_assumed": -20000000
+      },
+      {
+        "alloc_value_assumed": 50000000,
+        "charity_net": 75000000,
+        "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+        "others_donation": 50000000,
+        "pool": 1000000000,
+        "profitable_under_assumptions": true,
+        "rebate": 25000000,
+        "token_value_per_unit": "1/10",
+        "whale_alloc": 500000000,
+        "whale_donation": 50000000,
+        "whale_net_assumed": 25000000
+      },
+      {
+        "alloc_value_assumed": 500000000,
+        "charity_net": 75000000,
+        "evidence_class": "conditional_model_under_assumed_v_and_rebate_access",
+        "others_donation": 50000000,
+        "pool": 1000000000,
+        "profitable_under_assumptions": true,
+        "rebate": 25000000,
+        "token_value_per_unit": "1",
+        "whale_alloc": 500000000,
+        "whale_donation": 50000000,
+        "whale_net_assumed": 475000000
+      }
+    ],
+    "concave_sybil": {
+      "log2_gain": 485828700,
+      "log2_profitable": true,
+      "sqrt_gain": 409038600,
+      "sqrt_profitable": true
+    },
+    "denominator_uncertainty": {
+      "after_denominator_doubles": 50000000,
+      "dilution_ratio": "1/2",
+      "early_expected_alloc": 100000000,
+      "note": "Late inflow dilutes early donors; miner/cutoff influence is structural pathway on real chain."
+    },
+    "exchange_omnibus": {
+      "exchange_concentration": {
+        "gini": "0",
+        "hhi": "1",
+        "n": 1,
+        "sum": 1000000000,
+        "top10_share": "1",
+        "top1_share": "1"
+      },
+      "note": "Pro-rata is linear: aggregation does not change total allocation to the economic owner if total e equal; custody/governance aggregation still concentrates control.",
+      "one_exchange_alloc": 1000000000,
+      "same_total_eligible": true,
+      "small_concentration": {
+        "gini": "0",
+        "hhi": "1/10000",
+        "n": 10000,
+        "sum": 1000000000,
+        "top10_share": "1/1000",
+        "top1_share": "1/10000"
+      },
+      "ten_thousand_small_sum_alloc": 1000000000
+    },
+    "governance": {
+      "coalition_splitting_increases_power_vs_outsiders": true,
+      "prop_top_share": "4/5",
+      "whale_gov_share_capped_one_id": "1/2",
+      "whale_gov_share_capped_sybil": "9/10"
+    },
+    "pool_default": 1000000000,
+    "rebate": {
+      "full_access_100pct_rebate_charity_net": 0,
+      "low_access_10pct_half_rebate_net": 95000000,
+      "secret_whale": {
+        "access_mask": [
+          true,
+          false,
+          false,
+          false
+        ],
+        "charity_net": 28000000,
+        "donations": [
+          50000000,
+          1000000,
+          1000000,
+          1000000
+        ],
+        "rebate_rate": "1/2",
+        "rebates": [
+          25000000,
+          0,
+          0,
+          0
+        ],
+        "total_donated": 53000000,
+        "total_rebate_paid": 25000000,
+        "whale_with_access_extracts": 25000000
+      }
+    },
+    "sign_sensitivity": {
+      "charity_net_monotone_in_rebate": true,
+      "example_v_high_may_profit": true,
+      "example_v_low_unprofitable": false,
+      "whale_profit_sign_depends_on_v": true
+    },
+    "split_invariance": {
+      "eligible_atom": 10000003,
+      "multi_alloc_sum": 999999999,
+      "multi_allocs": [
+        142857057,
+        142857057,
+        142857057,
+        142857057,
+        142857057,
+        142857057,
+        142857657
+      ],
+      "multi_remainder": 1,
+      "note": "Under pure pro-rata with fixed T=e, split cannot increase total floor allocation to the splitter; may decrease due to extra floors.",
+      "parts": 7,
+      "single_alloc": 1000000000,
+      "single_remainder": 0,
+      "split_eligible": [
+        1428571,
+        1428571,
+        1428571,
+        1428571,
+        1428571,
+        1428571,
+        1428577
+      ],
+      "split_never_increases_issued_to_splitter": true
+    },
+    "supply_stress_all_ok": true,
+    "tainted": {
+      "interpretation": "Profitability is parameter-region conditional; not inevitability. When retention value of tainted funds is low and alloc value high, structural pathway favors donation-for-claim.",
+      "n_profitable_under_assumptions": 26,
+      "n_rows": 60
+    },
+    "transferability_necessity_structural": {
+      "necessary_for_F1_to_F4": false,
+      "reasoning": "Non-transferable receipt and delayed-transfer achieve F1\u2013F4 without immediate alienable units. Transferability is a product choice that enables secondary markets, not a requirement of charity-bound migration receipts."
+    },
+    "under_over": {
+      "over_remainder": 5,
+      "oversubscription_tiny_per_sat": 0,
+      "undersubscription": {
+        "T_large": 1000000000,
+        "T_small": 1000,
+        "alloc_per_first_sat_at_T_large": 1,
+        "alloc_per_first_sat_at_T_small": 1000000,
+        "note": "Extreme undersubscription makes each sat extremely valuable in allocation units \u2014 speculative coordination pathway.",
+        "pool": 1000000000,
+        "ratio_exact": "1000000"
+      }
+    },
+    "whale_concentration": {
+      "whale_50": {
+        "gini": "0",
+        "hhi": "1/2",
+        "n": 2,
+        "sum": 1000000000,
+        "top10_share": "1",
+        "top1_share": "1/2"
+      },
+      "whale_80": {
+        "gini": "3/10",
+        "hhi": "17/25",
+        "n": 2,
+        "sum": 1000000000,
+        "top10_share": "1",
+        "top1_share": "4/5"
+      },
+      "whale_99": {
+        "gini": "49/100",
+        "hhi": "4901/5000",
+        "n": 2,
+        "sum": 1000000000,
+        "top10_share": "1",
+        "top1_share": "99/100"
+      }
+    }
+  }
+}
