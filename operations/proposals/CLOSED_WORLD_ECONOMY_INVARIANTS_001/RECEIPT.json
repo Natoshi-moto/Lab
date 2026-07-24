@@ -1,0 +1,189 @@
+{
+  "receipt_schema": "nexus.proposal-receipt.closed-world-economy-invariants/v0",
+  "label": "SANITIZED_TASK_RECEIPT_NO_SECRETS",
+  "operation_id": "CLOSED_WORLD_ECONOMY_INVARIANTS_001",
+  "task_id": "TSK-CLOSED-WORLD-ECONOMY-INVARIANTS-001",
+  "seat": "Claude Code (Sonnet 5), operator-directed",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY",
+  "class": "LAB_INTERNAL proposal (operations/process/EXPERIMENTAL_SANDBOX_PROMOTION.md contract, change_origin: LAB_INTERNAL)",
+  "branch": "claude/closed-world-economy-invariants-001",
+  "baseline_commit": "6c3a1e806baba1183553221f5c2f00125ce2be29",
+  "head_commit_at_receipt_time": "6c3a1e806baba1183553221f5c2f00125ce2be29",
+  "origin_main_at_receipt_time": "6c3a1e806baba1183553221f5c2f00125ce2be29",
+  "observed_origin": "https://github.com/Natoshi-moto/Lab.git",
+  "recovered_from_interrupted_session": true,
+  "recovery_evidence": [
+    "session-local recovery evidence outside this repository: git-status-before-resume.txt",
+    "session-local recovery evidence outside this repository: files-before-resume.txt",
+    "session-local recovery evidence outside this repository: original-session.jsonl (transcript, consulted for intent only, not quoted)"
+  ],
+  "recovery_finding": "The 15 files present on disk before this session exactly matched files-before-resume.txt's timestamped list; nothing was lost or corrupted. This session added the 4 files the operation brief flagged as likely missing, changed 2 lines in 2 pre-existing files to fix a path-precision defect found during verification, and changed nothing else.",
+  "authorized_paths": [
+    "operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/**"
+  ],
+  "scope_respected": true,
+  "paths_outside_scope_modified": [],
+  "synthetic_only": true,
+  "live_funds": false,
+  "live_transactions": false,
+  "real_keys_or_credentials": false,
+  "donor_data": false,
+  "dependency_manifests_changed": false,
+  "canonical_status_changed": false,
+  "constitutions_or_workflows_changed": false,
+  "sandbox_modified": false,
+  "lab_main_modified": false,
+  "merge_authorization_created": false,
+  "merge_performed": false,
+  "files_present_before_this_session": [
+    "README.md",
+    "SOURCE_AND_CANON_MAP.md",
+    "THREAT_MODEL.md",
+    "INVARIANTS.md",
+    "PROHIBITED_CAPABILITIES.md",
+    "ALLOWED_INTERNAL_PRIMITIVES.md",
+    "EARNING_AND_RECOGNITION_MODEL.md",
+    "SECONDARY_MARKET_AND_LEAKAGE_MODEL.md",
+    "USER_HARM_AND_POWER_MODEL.md",
+    "HALT_AND_ESCALATION_RULES.md",
+    "CLAIMS_AND_NONCLAIMS.md",
+    "IMPLEMENTATION_GATES.md",
+    "CONTRADICTION_REGISTER.md",
+    "schema/closed_world_economy.schema.json",
+    "tools/validate_closed_world_economy.py"
+  ],
+  "files_added_this_session": [
+    "TEST_VECTORS.json",
+    "tests/__init__.py",
+    "tests/test_closed_world_economy.py",
+    "HANDOFF_ANY_AI.md",
+    "RECEIPT.json"
+  ],
+  "files_edited_this_session": [
+    "INVARIANTS.md",
+    "SOURCE_AND_CANON_MAP.md"
+  ],
+  "edit_reason": "Verification step 13 (internal documentation links and paths) found both files cited TO_SATOSHI_AND_THE_MAKERS_OF_BITCOIN.md by bare filename; the file exists only at experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/TO_SATOSHI_AND_THE_MAKERS_OF_BITCOIN.md. Both citations were made path-exact. No claim, classification, or doctrine content was changed.",
+  "files_not_touched": [
+    "SOURCE_AND_CANON_MAP.md's classification table content",
+    "THREAT_MODEL.md",
+    "PROHIBITED_CAPABILITIES.md",
+    "ALLOWED_INTERNAL_PRIMITIVES.md",
+    "EARNING_AND_RECOGNITION_MODEL.md",
+    "SECONDARY_MARKET_AND_LEAKAGE_MODEL.md",
+    "USER_HARM_AND_POWER_MODEL.md",
+    "HALT_AND_ESCALATION_RULES.md",
+    "CLAIMS_AND_NONCLAIMS.md",
+    "IMPLEMENTATION_GATES.md",
+    "CONTRADICTION_REGISTER.md",
+    "schema/closed_world_economy.schema.json",
+    "tools/validate_closed_world_economy.py",
+    "README.md"
+  ],
+  "test_vectors_summary": {
+    "total_valid_vectors": 4,
+    "total_invalid_or_hostile_vectors": 50,
+    "valid_vector_names": [
+      "valid_bounded_work_recognition",
+      "valid_multi_primitive_bounded_exchange",
+      "valid_narrow_chance_carveout_no_payment_no_transfer",
+      "valid_no_primitives_declared_yet"
+    ],
+    "generation_method": "Programmatically generated and self-checked against tools/validate_closed_world_economy.py at authoring time (every vector asserted to pass or fail exactly as declared before being written to TEST_VECTORS.json), then independently re-checked by tests/test_closed_world_economy.py at test time so validator/vector drift fails a normal test run, not just the one-off generation script.",
+    "hostile_coverage_notes": "Covers every top-level policy object's required-field/exact-field/const checks, the redeemable/collateralizable/convertible_to_external_value contradiction rule, the chance+purchasable and chance+transferable combination rule, market-/export-shaped transfer policy rejection (OPEN_ORDER_BOOK, ASSET_EXPORT), the exact canonical leakage-ladder ordering check, the minors-reachable+chance-category cross-field rule, and the vague-placeholder scanner. Spot-checks (not an exhaustive 21-capability sweep) 3 of 21 prohibited-capability flips: cash_redemption, official_otc_matching, account_sale_tooling."
+  },
+  "command_results": {
+    "python -c 'json.loads every *.json under package'": {
+      "exit_code": 0,
+      "summary": "TEST_VECTORS.json and schema/closed_world_economy.schema.json both parse"
+    },
+    "python3 -m py_compile tools/validate_closed_world_economy.py tests/test_closed_world_economy.py tests/__init__.py": {
+      "exit_code": 0,
+      "summary": "clean"
+    },
+    "python3 -m unittest discover -s operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/tests -v": {
+      "exit_code": 0,
+      "summary": "Ran 22 tests — OK. Covers: all valid vectors pass; all 50 hostile vectors rejected for the exact stated reason; malformed-JSON raw-text cases (duplicate key, syntax error, non-object top level); CLI entry point parity with the library (in-process and one real subprocess invocation); schema/validator/doctrine-doc parity (5 checks); the worked-example vector matches EARNING_AND_RECOGNITION_MODEL.md's declared defaults."
+    },
+    "./nexus doctor": {
+      "exit_code": 0,
+      "summary": "PASS with WARN WORKTREE_DIRTY (expected pre-commit); required_paths, symlink_policy, json_parse, secret_patterns, privacy_ignore_rules, seed_handoff_binding, git_repository all PASS"
+    },
+    "python3 -m unittest discover -s tests -v": {
+      "exit_code": 1,
+      "summary": "Ran 190 tests — 179 passed; 9 failures + 2 errors, all in test_r013_pcx_convergence.py, test_r015_independent_durability_verifier.py, test_r016_independent_verifier.py. Confirmed pre-existing and unrelated to this package: all 11 trace to the same missing Node dependency as ./nexus verify below (node_modules/@noble/ed25519 absent); none touch this package's files or tests."
+    },
+    "./nexus verify": {
+      "exit_code": 1,
+      "summary": "BLOCKED_BY_MISSING_DEPENDENCY: Independent R013 verifier failed with Node ERR_MODULE_NOT_FOUND for '@noble/ed25519' (experiments/R013_PCX_CONSERVED_CLAIM/independent_verifier.mjs). Confirmed node_modules/@noble does not exist. Not installed or repaired, per explicit operation instruction."
+    },
+    "python3 -m unittest tests.test_control_plane -v": {
+      "exit_code": 0,
+      "summary": "Ran 5 tests — OK"
+    },
+    "git diff --check": {
+      "exit_code": 0,
+      "summary": "clean, no whitespace/conflict-marker errors"
+    },
+    "git status --short (confinement check)": {
+      "exit_code": 0,
+      "summary": "only operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/** appears as untracked/changed; nothing outside the declared package touched"
+    },
+    "secret/credential scan (api key, password, PEM headers, cloud key patterns)": {
+      "exit_code": 0,
+      "summary": "no hits"
+    },
+    "personal-data / email scan": {
+      "exit_code": 0,
+      "summary": "no hits"
+    },
+    "local absolute path scan (/home/anon)": {
+      "exit_code": 0,
+      "summary": "2 hits found and fixed: HANDOFF_ANY_AI.md's verification-commands section (hardcoded local worktree path replaced with a directory-fingerprint description), and this receipt's own recovery_evidence field (local /home/anon/claude-recovery paths replaced with path-free descriptions of the same session-local evidence, which lives outside this repository regardless). Zero hits on re-scan, excluding this summary line's own literal description of the pattern searched for."
+    },
+    "private/internal URL scan (non-github.com, non-json-schema.org)": {
+      "exit_code": 0,
+      "summary": "no hits"
+    },
+    "internal documentation link/path verification": {
+      "exit_code": 0,
+      "summary": "Every repo file cited by basename across this package's docs was confirmed to exist at the path implied by context, with one exception (see files_edited_this_session): TO_SATOSHI_AND_THE_MAKERS_OF_BITCOIN.md exists only under experiments/BENEFICIAL_GENESIS_UNIFIED_THESIS_001/, not repo root; both citing files were corrected to the exact path. STRICT_NO_SALE.md references are intentional, self-disclosed absences (CONTRADICTION_REGISTER.md CR-13), not broken links."
+    }
+  },
+  "implemented_requirements": [
+    "TEST_VECTORS.json with 4 valid and 50 hostile/invalid deterministic manifest vectors",
+    "tests/test_closed_world_economy.py: 22 deterministic unit tests over the vectors, the validator's library and CLI surfaces, and schema/validator/doctrine-doc parity",
+    "HANDOFF_ANY_AI.md: any-provider re-entry instructions, verification commands, scope boundaries, extension procedure, known limitations",
+    "RECEIPT.json: this file",
+    "path-precision fix for TO_SATOSHI_AND_THE_MAKERS_OF_BITCOIN.md citations in INVARIANTS.md and SOURCE_AND_CANON_MAP.md",
+    "local-absolute-path fix in HANDOFF_ANY_AI.md's own draft"
+  ],
+  "unimplemented_or_residual": [
+    "No implementation of any closed-world economy — this package remains proposal-only, as required",
+    "No fix to CONTRADICTION_REGISTER.md's CR-02/CR-03 (live Wallet_v4_nexus.html surface) — explicitly out of this package's write scope",
+    "No exhaustive combinatorial sweep of all 21 prohibited capabilities × all 10 primitive categories × all 11 primitive properties in TEST_VECTORS.json — a representative, doctrine-anchored subset only, per CLAIMS_AND_NONCLAIMS.md's own non-claim about test vectors",
+    "./nexus verify could not be completed due to the pre-existing missing @noble/ed25519 Node dependency, unrelated to this package"
+  ],
+  "residual_risks": [
+    "A future manifest author could construct an adversarial manifest this validator's specific 50-vector catalog does not anticipate; passing validation is internal consistency only, not a guarantee of catching every possible violation",
+    "The doctrine-doc/validator parity tests only check the specific tables this test suite extracts by regex; a doc edit that changes prose without touching a table row would not be caught",
+    "Independent (non-operator) review capacity does not exist in this Lab's structure, a limit this package names but does not solve (USER_HARM_AND_POWER_MODEL.md Part 2)"
+  ],
+  "non_claims": [
+    "not_legal_advice",
+    "not_regulatory_clearance",
+    "not_token_launch_authorization",
+    "not_permission_for_real_money_or_redeemable_assets",
+    "not_evidence_a_closed_world_economy_exists",
+    "not_proof_users_cannot_build_external_markets",
+    "not_a_harm_guarantee",
+    "not_permission_to_deploy_to_real_users",
+    "not_permission_to_weaken_any_existing_lab_invariant",
+    "passing_validator_is_not_legal_social_or_economic_safety_proof",
+    "independent_review",
+    "R_round_assignment"
+  ],
+  "decision_requested": "Review only, per README.md and this receipt. No merge authorization is requested or implied. If ever merged, merge is recorded separately per operations/merge_authorizations/README.md and is the operator's sole call, made only after a plain-language explanation of what merging this specific package would and would not do.",
+  "draft_pr_url": null
+}
