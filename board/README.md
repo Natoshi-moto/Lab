@@ -2,12 +2,14 @@
 
 **status_authority:** `NONE`
 
-This board moved to `Natoshi-moto/Experimental-Sandbox` `board/`.
+The live public operator board is now maintained in:
 
-Reason: this board's own premise — unpolished, ideas-before-experiments, "ok to be ugly," no review required — sat behind Lab `main`'s required-review branch protection (1 approving review, dismiss-stale-reviews, require-last-push-approval, enforced admins, required status check) and was never used because of that mismatch. Experimental Sandbox's `main` doesn't require the same review gate, so a spam-friendly firehose actually works there.
+<https://github.com/Natoshi-moto/Experimental-Sandbox/tree/main/board>
 
-Live board: <https://github.com/Natoshi-moto/Experimental-Sandbox/tree/main/board>
+The Sandbox board is for rough thoughts, experiments, plans, sketches, and other work that may be incomplete, contradictory, or wrong.
 
-Lab's own STATUS.json, reds, and reviewed-merge discipline are unaffected — this only ever held an empty scaffold plus one bootstrap entry, nothing load-bearing.
+Board entries do not alter Lab accepted state and do not automatically promote themselves into Lab.
 
-`status_authority: NONE`
+Anything proposed for Lab requires a separate, deliberate review and acceptance step.
+
+Lab’s status, evidence, tests, constitution, receipts, and accepted research state are unaffected by this pointer.
