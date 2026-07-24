@@ -4,11 +4,53 @@
 
 **Status authority:** `NONE`
 
-**Current state:** `QUEUED / DORMANT UNTIL ECONOMY REVIEW COMPLETES`
+**Current state:** `ECONOMY BUILDER COMPLETE / INDEPENDENT ADVERSARIAL REVIEW PENDING / ROADMAP DORMANT`
+
+## Read this first
+
+The closed-world economy builder operation is no longer running or incomplete.
+
+Its current verified public proposal is:
+
+- **Lab draft PR:** `#118`
+- **Title:** `Proposal: Closed-world economy invariants and harm gates`
+- **Branch:** `claude/closed-world-economy-invariants-001`
+- **Substantive head:** `caef0e7cd689e1e77a49413210116e7590322576`
+- **Tree:** `2c044c46c5c23425f13a1bacd36236ce34957b3a`
+- **Base:** `6c3a1e806baba1183553221f5c2f00125ce2be29`
+- **Changed files:** `20`, all under `operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/`
+- **Draft:** `true`
+- **Merge authorization:** absent by design
+- **Sandbox changes:** none
+
+Observed builder verification:
+
+- immutable-commit verification: `PASS`
+- dedicated tests: `22/22 PASS`
+- vectors: `4/4 valid PASS`; `50/50 hostile rejected for the declared reason`
+- JSON and Python committed-blob checks: `PASS`
+- `./nexus doctor`: `PASS`
+- Promotion origin contract: `PASS`
+- Nexus Audit: `PASS`
+- Merge Authorization: expected `FAIL` because no authorization exists
+- `./nexus verify`: `BLOCKED_BY_MISSING_DEPENDENCY` because `@noble/ed25519` is absent; do not silently install or treat this as package success
+
+These facts were verified before this handoff update, but **you must freshly reverify live GitHub state**. Do not treat this paragraph as authority over newer repository evidence.
 
 ## Your role
 
-You are the next control-layer assistant. Your job is not to improvise a new vision. Your job is to recover live repository state, finish the active closed-world-economy review sequence, and then execute the bounded roadmap commission in this package.
+You are the next control-layer assistant and the first different-family source-bound reviewer after Sonnet built PR #118.
+
+Your job is:
+
+1. recover live repository state;
+2. adversarially inspect PR #118 from source;
+3. record and adjudicate defects without relying on the builder summary;
+4. coordinate bounded repairs if required;
+5. obtain an explicit operator disposition for PR #118;
+6. only after that gate, execute the separate Sandbox-clearance and Mithub-roadmap commission from a fresh branch.
+
+Do not improvise a replacement vision. Do not ask the operator to restate the project when repository evidence is available.
 
 Use plain English with the operator. Use exact paths, SHAs, commands, evidence classes and non-claims in repository artifacts.
 
@@ -16,120 +58,170 @@ Use plain English with the operator. Use exact paths, SHAs, commands, evidence c
 
 Explain in substance:
 
-> I found the queued Sandbox-clearance and Mithub roadmap job. I will first verify whether the closed-world economy package is finished and independently reviewed. I will not write to its branch, merge anything, or touch Sandbox until that gate is satisfied.
+> I found the queued continuation. Sonnet's builder work is parked in Lab draft PR #118 at the recorded SHA. I will first reverify and adversarially review the actual source. I will not merge it, authorize it, change Sandbox, or begin the roadmap until the review and disposition gate is complete.
 
-Do not ask the operator to restate this project if repository evidence is available.
-
-## Step 1 — recover current accepted state
+## Step 1 — recover live state
 
 Freshly verify:
 
 1. current Lab `main` SHA;
 2. current Experimental-Sandbox `main` SHA;
-3. current `STATUS.json` and `NEXUS.json`;
-4. merged PR #110 promotion-gate state;
-5. current open PRs and their heads;
-6. branch/worktree status if local tools expose it;
-7. whether this queued package has been rebased, superseded or merged.
+3. current `STATUS.json`, `NEXUS.json` and `WHY_NOT_TO_TRUST_THIS_PROJECT.md`;
+4. PR #118 state, draft flag, head SHA, base SHA, changed files and CI;
+5. PR #117 state and head SHA;
+6. merged PR #110 promotion-gate state;
+7. current open PRs and possible supersession or overlap;
+8. local worktree state only if local tools expose it.
 
-Never assume the baseline SHAs in `README.md` remain current.
+Stop and report `UNABLE_TO_VERIFY` rather than guessing.
 
-## Step 2 — locate the economy operation
+## Step 2 — verify PR #118 identity
 
-Search for:
+The expected immutable builder state is:
 
-- operation ID `CLOSED_WORLD_ECONOMY_INVARIANTS_001`;
-- branch `claude/closed-world-economy-invariants-001` or any successor;
-- its draft PR;
-- final receipt;
-- schema;
-- validator;
-- test vectors;
-- tests;
-- handoff;
-- exact head SHA.
+```text
+PR: 118
+HEAD: caef0e7cd689e1e77a49413210116e7590322576
+TREE: 2c044c46c5c23425f13a1bacd36236ce34957b3a
+BASE: 6c3a1e806baba1183553221f5c2f00125ce2be29
+FILES: 20
+SCOPE: operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/**
+```
 
-### If it is still running or incomplete
+If the head has moved, do not reuse any review, approval or authorization tied to the old SHA. Inspect the new diff from source.
 
-- stay read-only;
-- do not write to its branch/worktree;
-- report exactly what exists and what is missing;
-- stop the roadmap operation.
+## Step 3 — perform the independent adversarial review
 
-### If it claims completion
+This is a review operation first. Do not edit PR #118 during initial inspection.
 
-Do not trust the summary alone. Inspect the actual diff and files.
+Inspect the actual files and diff, including at minimum:
 
-## Step 3 — economy acceptance review
+1. `README.md`
+2. `SOURCE_AND_CANON_MAP.md`
+3. `THREAT_MODEL.md`
+4. `INVARIANTS.md`
+5. `PROHIBITED_CAPABILITIES.md`
+6. `ALLOWED_INTERNAL_PRIMITIVES.md`
+7. `EARNING_AND_RECOGNITION_MODEL.md`
+8. `SECONDARY_MARKET_AND_LEAKAGE_MODEL.md`
+9. `USER_HARM_AND_POWER_MODEL.md`
+10. `HALT_AND_ESCALATION_RULES.md`
+11. `CLAIMS_AND_NONCLAIMS.md`
+12. `IMPLEMENTATION_GATES.md`
+13. `CONTRADICTION_REGISTER.md`
+14. `schema/closed_world_economy.schema.json`
+15. `tools/validate_closed_world_economy.py`
+16. `TEST_VECTORS.json`
+17. `tests/test_closed_world_economy.py`
+18. `HANDOFF_ANY_AI.md`
+19. `RECEIPT.json`
 
-Check at minimum:
+Review for:
 
-1. source/canon classification;
-2. architectural closure rather than labels alone;
-3. prohibited external value and redemption;
-4. transferability and unofficial secondary markets;
-5. paid-random-reward and gambling-like risk;
-6. minors and vulnerable users;
-7. social coercion and status pressure;
-8. operator discretion and capture;
-9. appeal and correction mechanisms;
-10. halt, containment and suspension conditions;
-11. document/schema/validator parity;
-12. fail-closed malformed-input handling;
-13. hostile test-vector coverage;
-14. contradiction preservation;
-15. explicit implementation non-authorization;
-16. changed-file scope;
-17. secrets, personal data, private URLs and local paths;
-18. exact head SHA and stale-authorization invalidation.
+- source/canon misclassification;
+- native vocabulary disguising a financial capability;
+- redemption, transfer, pricing, exchange, account-sale or export seams;
+- unofficial secondary-market response gaps;
+- paid chance, loot-box, wagering or gambling-like combinations;
+- minors and vulnerable-user exposure;
+- coercive labour, status pressure or disguised wages;
+- operator capture, confiscation, retaliation and appeal weakness;
+- halt, containment and suspension conditions;
+- contradiction suppression;
+- prose/schema/validator/test-vector drift;
+- validator fail-open behaviour, duplicate keys and malformed input;
+- missing prohibited combinations rather than only missing individual flags;
+- overclaims in the receipt or PR contract;
+- changed-file scope, secrets, personal data, private URLs and local paths;
+- stale or false dependency claims.
 
-Assign a different model family or qualified human to inspect source and attack the result. Multiple seats are not votes and are not automatically independent.
+The known limitations that must not be summarized away include:
 
-Repair confirmed defects on a bounded branch. Any substantive change invalidates prior authorization.
+- `CR-02` and `CR-03`: existing shipped wallet/balance/earn surfaces remain outside this proposal and unfixed;
+- no age-verification mechanism is proposed;
+- no independent non-operator institutional review capacity exists;
+- 50 hostile vectors are representative, not exhaustive;
+- full Lab verification is blocked by the missing Node dependency.
 
-## Step 4 — disposition checkpoint
+A different model name is not automatically independence. State the reviewer relationship and limits honestly.
 
-Before activating the roadmap, record one of:
+## Step 4 — return a defect ledger
+
+Classify each finding as:
+
+- `CONFIRMED_BLOCKER`
+- `CONFIRMED_NONBLOCKING`
+- `PLAUSIBLE_NEEDS_TEST`
+- `FALSE_POSITIVE`
+- `UNABLE_TO_VERIFY`
+
+For every confirmed finding provide:
+
+- exact file and line or object path;
+- violated doctrine or invariant;
+- concrete consequence;
+- smallest repair;
+- test or falsifier;
+- whether the substantive SHA must change.
+
+Do not treat a lack of findings as proof of safety, legality or external closure.
+
+## Step 5 — repair loop if required
+
+If confirmed defects exist:
+
+1. keep the review evidence immutable;
+2. commission a bounded repair on PR #118's branch or a clearly linked successor branch;
+3. change only the declared economy package scope;
+4. add or amend tests that reproduce the defect;
+5. rerun the complete dedicated suite and immutable-commit verification;
+6. re-review the new exact SHA;
+7. invalidate all conclusions tied only to `caef0e7...` when substantive bytes change.
+
+Do not allow the builder to self-certify the repair as independent review.
+
+## Step 6 — economy disposition checkpoint
+
+Before activating the roadmap, record exactly one:
 
 - `ECONOMY_FRAMEWORK_ACCEPTED_ON_MAIN`
 - `ECONOMY_FRAMEWORK_REVIEWED_BUT_OPEN`
 - `ECONOMY_FRAMEWORK_REJECTED_OR_SUPERSEDED`
 - `UNABLE_TO_VERIFY`
 
-The roadmap may proceed only when the unresolved economy state is explicitly represented and Phase A's no-real-world-value boundary remains intact. Acceptance into `main` is preferred but not to be faked or rushed.
+The operator must receive a plain-language decision card before any merge, authorization, rejection or closure action.
 
-## Step 5 — activate this queued roadmap job
+Nothing in this handoff pre-authorizes merging PR #118. The expected failing Merge Authorization check is a safety property, not a defect.
 
-Create a fresh branch and isolated worktree from the then-current accepted Lab `main`.
+## Step 7 — activate the queued roadmap only after disposition
+
+After the review is complete and the disposition is explicitly recorded, create a fresh branch and isolated worktree from the **then-current accepted Lab `main`**.
 
 Suggested operation branch:
 
 `chatgpt/sandbox-clearance-mithub-roadmap-execution-001`
 
-Do not continue writing on this historical queue branch unless the repository's current process explicitly chooses a reviewed rebase-and-repair path.
+Do not build the roadmap on PR #117's historical queue branch. Use `NEXT_OPERATION_PROMPT.md` as the commission, then revalidate it against current accepted state.
 
-Build the full proposal package described in `NEXT_OPERATION_PROMPT.md`.
-
-## Step 6 — required source inspection
+## Step 8 — required roadmap source inspection
 
 Inspect and classify at least:
 
-- `STATUS.json`;
-- `NEXUS.json`;
+- current `STATUS.json` and `NEXUS.json`;
 - `WHY_NOT_TO_TRUST_THIS_PROJECT.md`;
 - merged PR #110 and its promotion-gate files;
-- the final economy package and review evidence;
+- PR #118, its review evidence and final disposition;
 - current Experimental-Sandbox `README.md` and `CHARTER.md`;
 - Mithub Adjacent router and handoff material;
 - current board state;
-- open Commons proposal PR #107;
-- open Outside Adversary proposal PR #108;
-- open Owner Plain-Language Gate proposal PR #112;
-- housekeeping proposal PR #116 if still relevant;
-- broad Full Spectrum proposal PR #101 if still open;
+- Commons proposal PR #107 if still relevant;
+- Outside Adversary proposal PR #108 if still relevant;
+- Owner Plain-Language Gate proposal PR #112 if still relevant;
+- housekeeping PR #116 if still relevant;
+- broad Full Spectrum proposal PR #101 if still relevant;
 - any newer accepted or superseding material.
 
-Use these classes:
+Use:
 
 - `ACCEPTED_MAIN`
 - `MERGED_EVIDENCE`
@@ -138,80 +230,86 @@ Use these classes:
 - `SUPERSEDED`
 - `UNABLE_TO_VERIFY`
 
-Do not present chat memory or open proposals as accepted canon.
+Never promote chat memory or an open PR into accepted canon.
 
-## Step 7 — preserve the scope split
+## Step 9 — preserve the clearance scope split
 
-### Phase A blocks operator clearance
+### Phase A blocks formal operator Sandbox clearance
 
 Only:
 
-- explicit Sandbox canon;
+- explicit Sandbox canon as shared history/context, not truth;
 - hard red lines;
 - entry and experiment templates;
 - recovery/checkpoint method;
-- history policy;
-- wild-experiment drill;
-- recovery drill;
-- Lab-boundary drill;
+- merge/history policy;
+- one wild-experiment drill;
+- one recovery drill;
+- one Lab-boundary drill;
 - exact-SHA clearance receipt and operator authorization.
 
-### Later phases do not automatically block clearance
+### Later work does not automatically block Phase A
 
 - full personal Mithub architecture;
 - permanent adversarial Mithub pilot;
 - University v0;
 - contributor portal;
-- mature reputation/recognition mechanics;
+- mature reputation or recognition mechanics;
 - full corpus ingestion;
 - Hermes integration;
 - polished UI;
 - complete expert-team staffing.
 
-Do not convert the roadmap into an endless prerequisite machine.
+Do not turn the roadmap into an endless prerequisite machine.
 
-## Step 8 — open a draft PR only
+## Step 10 — roadmap output boundary
 
-The execution operation should:
+The roadmap execution operation may:
 
+- create a fresh Lab proposal branch;
+- write only under its declared proposal scope;
 - use the merged PR #110 `LAB_INTERNAL` contract;
-- write only under its declared scope;
+- run deterministic checks;
 - open a draft PR;
-- add no merge authorization;
-- make no Sandbox changes;
-- make no direct `main` writes;
 - stop with a plain-language decision card.
 
-## Required final handoff
+It may not:
+
+- modify Experimental-Sandbox;
+- merge PR #118 or PR #117;
+- add merge authorization;
+- write directly to Lab `main`;
+- implement Mithub, University or an economy;
+- deploy real users;
+- authorize external value.
+
+## Required final return
 
 Return:
 
-1. verified starting Lab SHA;
-2. economy disposition and exact supporting SHA/PR;
-3. execution branch;
-4. draft PR URL and number;
-5. exact proposal head SHA;
-6. files created;
+1. verified current Lab and Sandbox SHAs;
+2. PR #118 review verdict and exact reviewed SHA;
+3. defect ledger and repair status;
+4. economy disposition;
+5. roadmap execution branch;
+6. roadmap draft PR and exact head;
 7. Phase A blockers;
 8. later non-blocking milestones;
 9. source classifications;
-10. tests and limitations;
-11. risks and non-claims;
-12. exact operator decision requested.
+10. tests, limitations and non-claims;
+11. the next exact operator decision requested.
 
 ## Absolute non-authority
 
 Nothing in this handoff authorizes:
 
-- merging this queue proposal;
-- merging the future roadmap;
+- merging PR #118, PR #117 or any future roadmap;
 - changing Sandbox;
 - installing an economy;
-- external value or redemption;
+- external value, redemption, transfer, pricing or markets;
 - real-user deployment;
-- deleting evidence;
-- closing criticism;
+- deleting evidence or criticism;
 - rewriting history;
-- bypassing the operator's exact-SHA authorization gate.
+- bypassing exact-SHA operator authorization.
 
 Stop rather than silently broadening authority.
