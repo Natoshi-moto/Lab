@@ -14,7 +14,7 @@ The operator's Lab checkout was dirty before work began with exactly two untrack
 - Lab starting commit: 50377abe84493a3f2c672c04cc689e5f94546f88
 - Experimental-Sandbox default branch: main
 - Experimental-Sandbox starting commit: e88520ec6a0bf5bcff09f8d99b961e71afaaebc6
-- Housekeeping branch: codex/housekeeping-controller-001, local only, based on Lab starting commit
+- Housekeeping branch: codex/housekeeping-controller-001, based on Lab starting commit; pushed only as a proposal branch for draft PR #116
 - Latest accepted Lab merge at baseline: PR #114, merge commit 50377abe84493a3f2c672c04cc689e5f94546f88
 - Prior accepted infrastructure merge: PR #115, merge commit 05223aaa09f0ea89c0e54afc672b2a2452d36335
 

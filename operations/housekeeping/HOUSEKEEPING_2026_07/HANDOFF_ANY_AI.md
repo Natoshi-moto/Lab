@@ -2,7 +2,7 @@
 
 status_authority: NONE
 
-This folder is a proposal/report pack on local branch codex/housekeeping-controller-001. Lab main remains canonical accepted working state; Experimental-Sandbox main remains public, reversible and noncanonical. Nothing in this pack promotes Sandbox material.
+This folder is a proposal/report pack on branch codex/housekeeping-controller-001, published only through draft Lab PR #116. Lab main remains canonical accepted working state; Experimental-Sandbox main remains public, reversible and noncanonical. Nothing in this pack promotes Sandbox material.
 
 Read in order:
 

@@ -69,6 +69,7 @@
       2,
       3
     ],
+    "housekeeping_draft_pr": 116,
     "open_lab_pr_count": 30,
     "open_sandbox_pr_count": 2
   },
@@ -177,7 +178,9 @@
   ],
   "mutations_performed": [
     "Created local isolated worktree and branch codex/housekeeping-controller-001 from Lab origin/main cache",
-    "Added housekeeping reports only on the local housekeeping branch"
+    "Added housekeeping reports only on the housekeeping branch",
+    "Pushed codex/housekeeping-controller-001 to Lab",
+    "Opened draft Lab PR #116; it remains unmerged"
   ],
   "mutations_deliberately_not_performed": [
     "No merge",
