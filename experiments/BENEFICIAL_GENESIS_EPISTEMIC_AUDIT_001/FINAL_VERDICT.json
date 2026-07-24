@@ -1,0 +1,60 @@
+{
+  "schema": "bgen.epistemic-audit.final-verdict/v1",
+  "task": "BGEN-EPISTEMIC-AUDIT-001",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "auditor": "Claude Fable 5 (claude-fable-5), independent epistemic auditor seat",
+  "status_authority": "NONE",
+  "date_utc": "2026-07-21",
+  "verdicts": {
+    "evidence_package": {
+      "verdict": "TRUSTWORTHY_WITH_STATED_LIMITS",
+      "confidence": "HIGH for executable and deductive content; limits carry the process caveats",
+      "strongest_supporting": "35/35 independent reproductions exact; 33/33 adversarial probes fail closed; byte-identical simulator regeneration; all 72 clean-room hashes verified; all receipt commit bindings verified; 43/0/0 cross-implementation differential re-executed",
+      "strongest_counterevidence": "controlling adjudications lack receipts/seat identity; provider-family independence asserted not evidenced (C-20); Breaker confirmations anchored by design (C-19); npm-ci prerequisite missing from receipts; AUD-SEM-01/02 minor semantic defects",
+      "unresolved_assumptions": ["self-declared provider/model labels accurate", "fixture corpus approximates attack surface"],
+      "falsifiers": ["any committed result failing reproduction", "any receipt binding failing verification", "evidence a freeze inventory postdated content access"],
+      "next_action": "adopt process fixes: receipted adjudications, evidenced provider identity, environment prerequisites in receipts"
+    },
+    "underlying_mechanism": {
+      "verdict": "CONTINUE_WITH_CONDITIONS",
+      "confidence": "MODERATE; UNDERDETERMINED between CONTINUE_WITH_CONDITIONS and STOP_CURRENT_DIRECTION is a defensible alternative reading; chosen because the attached conditions are cheap, decisive, and falsifying, making continuation the uncertainty-minimizing move — not because the mechanism is affirmatively justified (it currently is not)",
+      "concurrence_note": "concurs with the record's disposition on independent grounds; the record's own version was operator-prescribed before repair and retest (AUD-PROC-04), so this is the first arms-length arrival at it",
+      "strongest_supporting": "allocation-layer soundness is finished, twice-implemented, third-time reproduced; every alleged unconditional economic failure reduced to conditional or policy questions; real precedent for denominator-uncertain voluntary genesis participation (Counterparty 2014); next step is a cheap specification decision",
+      "strongest_counterevidence": "core causal premise (transferable reward induces additional giving) unmodelled and unevidenced (C-16); proven properties describe failure surfaces that scale with success (C-05, C-07, C-11, C-12); only autonomous full-seat verdict in the record was REJECT_OR_REDESIGN; non-transferable variant weakly dominates under evidence in hand",
+      "conditions": [
+        "ledger-function specification before further work assuming transferability",
+        "run the filtered design matrix (DECISIVE_NEXT_EXPERIMENT.md)",
+        "non-transferable/delayed designs remain live candidates until participation-elasticity evidence exists",
+        "the seven FAILURE_CONDITIONS.md continuation conditions remain in force",
+        "the record must not be cited as independent multi-seat convergence"
+      ],
+      "falsifiers": [
+        "design matrix shows no design serves the REQUIRED function set within proven constraints (-> STOP)",
+        "participation-elasticity evidence of near-zero or adverse induced flow (-> STOP)",
+        "specified functions requiring transferability plus favorable elasticity evidence (-> strengthens continuation)"
+      ],
+      "next_action": "BGEN-LEDGER-FUNCTION-SPEC-001 (specification), then the necessity decision matrix"
+    },
+    "real_world_readiness": {
+      "verdict": "RESEARCH_ONLY",
+      "confidence": "HIGH",
+      "strongest_supporting": "all cryptography is synthetic stand-ins; no real charity/donor/key/transaction anywhere; Tracks B-F open; economic gate explicitly not passed; the record itself claims no readiness",
+      "strongest_counterevidence": "none",
+      "unresolved_assumptions": [],
+      "falsifiers": ["completed specification + design matrix with a surviving concrete design would justify READY_FOR_EXTERNAL_EXPERT_REVIEW"],
+      "next_action": "as in underlying_mechanism; Track F counsel scoping (OPEN_QUESTIONS 10-15) may begin at operator discretion"
+    }
+  },
+  "five_most_important_supported_claims": ["C-01", "C-04", "C-05", "C-07", "C-11"],
+  "five_most_important_unresolved_or_overclaimed": ["C-16 (UNDERDETERMINED, audit-original)", "C-20 (NOT_AUDITABLE)", "C-18 (process-directed disposition)", "C-10 (OVERCLAIMED, retracted)", "C-12 (conditional; success-scales-risk reading understated)"],
+  "highest_value_next_experiment": "BGEN-LEDGER-FUNCTION-SPEC-001 + filtered necessity decision matrix (see DECISIVE_NEXT_EXPERIMENT.md)",
+  "audit_original_findings": ["AUD-MODEL-03 participation elasticity unmodelled everywhere", "AUD-PROC-01 Breaker anchored by directed REV items pre-freeze", "AUD-PROC-04 final disposition prescribed before repair/retest", "AUD-SEM-01 sensitivity-grid token-value semantics inconsistency", "AUD-SEM-02 cross-model input-domain divergence", "receipts omit npm-ci prerequisite (11 environmental test failures on fresh clone)"],
+  "nonclaims": [
+    "no status promotion, R-round, or STATUS.json change",
+    "no merge of the audit PR",
+    "no live funds, solicitation, token issuance, charity selection, deployment, or production authorization",
+    "no legal conclusions",
+    "cross-model agreement is not treated as proof of truth",
+    "the pre-audit freeze reduces but does not eliminate anchoring; auditor is a Claude-family model reviewing partly Claude-attributed work"
+  ]
+}

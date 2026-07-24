@@ -1,0 +1,59 @@
+{
+  "schema": "bgen.epistemic-audit.source-inventory/v1",
+  "task": "BGEN-EPISTEMIC-AUDIT-001",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "subject_binding": {
+    "repository": "Natoshi-moto/Lab",
+    "visibility": "PUBLIC",
+    "subject_equals_origin_main_at_audit_start": true,
+    "audit_branch": "fable/bgen-epistemic-audit-001",
+    "audit_worktree_isolated_from_user_checkout": true
+  },
+  "environment": {
+    "python": "3.14.6",
+    "node": "24.14.0",
+    "npm_ci_required_for_full_lab_suite": "yes — 9 failures + 2 errors without node_modules (@noble/ed25519 missing), all environmental; 185/185 OK after npm ci",
+    "network": "available"
+  },
+  "repository_sources_inspected": [
+    "STATUS.json (unchanged, current_round R016, no Beneficial Genesis fields)",
+    "CLAUDE.md, AGENTS.md, README_START_HERE.md excerpt via CLAUDE.md pointer",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/** (README, TECHNICAL_DESIGN, THREAT_MODEL_AND_NONCLAIMS, protocol/allocation.py in full; file listing for the rest; tests + verify_evidence executed)",
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/** (all .md docs, model/*.py, scenario + result JSONs for scenarios 05/06/10/13/14/19/26/27; simulator + tests executed)",
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/** (CLEANROOM_INTERPRETATION, DIFFERENTIAL_REVIEW, DECISION.json, CLEANROOM_FREEZE.json incl. full 72-hash verification, model/allocation.py; simulator + tests executed)",
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003/** (README, DECISION, VERIFICATION_MATRIX via receipt)",
+    "experiments/BENEFICIAL_GENESIS_RETEST_002/results/* (43-agreement differential re-executed via verify.mjs)",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_{REDTEAM,BREAKER,RETEST}_*/AUDIT_REPORT.md",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_{REDTEAM,BREAKER,RETEST}_*/RECEIPT.json",
+    "operations/receipts/BENEFICIAL_GENESIS_DESIGN_001 (referenced)",
+    "pre-repair package bytes at b5887791338b146daad8f5233ce0e25bf24fe357 via git show (model/allocation.py, model/scenario.py, FAILURE_CONDITIONS.md)"
+  ],
+  "github_sources_inspected": [
+    "issue #33 (program), #34 (econ red-team task), #36 (breaker task), #38 (repair task) — full bodies, zero comments each",
+    "PR #35 — body, both controlling reviews (10:17:09Z on b588779; 10:41:50Z repair contract on d8523b2), merge metadata",
+    "PR #37 — body, controlling adjudication review (10:39:38Z), merge metadata",
+    "PR #39 — body (no reviews), merge metadata",
+    "commit graph 22ce8c1..8349de7 (16 commits with timestamps and authors)"
+  ],
+  "commands_executed": [
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_DESIGN_001/tests (37 OK)",
+    "python3 experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py (PASS, 34 executable invalid vectors)",
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/simulate.py (27 scenarios, zero byte diff after rerun)",
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests (72 OK)",
+    "python3 experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/simulate.py (28 scenarios, zero byte diff after rerun)",
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests (25 OK)",
+    "python3 -m unittest discover -s tests (185 OK after npm ci; 9F/2E before, environmental)",
+    "node experiments/BENEFICIAL_GENESIS_RETEST_002/verify.mjs (43 agreements, 0 disagreements, 0 crashes)",
+    "./nexus doctor (PASS)",
+    "git diff --check (clean)",
+    "experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/repro/independent_repro.py (35/35 PASS)",
+    "experiments/BENEFICIAL_GENESIS_EPISTEMIC_AUDIT_001/repro/adversarial_probes.py (33/33 PASS)"
+  ],
+  "sources_not_inspected": [
+    "full contents of every fixture under BENEFICIAL_GENESIS_DESIGN_001/fixtures (executed via the evidence gate, not each read byte-by-byte)",
+    "the earlier non-BGEN lab history (R001-R016) beyond STATUS.json and operating instructions",
+    "PR #27 and earlier design-lineage PR discussions (summarized in README/receipts; not independently re-adjudicated here)",
+    "any off-repository operator records of which AI model actually produced which artifact (none exist in the repository)"
+  ],
+  "external_sources": "see EXTERNAL_EVIDENCE_REGISTER.md"
+}
