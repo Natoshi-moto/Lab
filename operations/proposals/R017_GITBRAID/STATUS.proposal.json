@@ -1,0 +1,26 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "round": "R017",
+  "mode": "R017_GITBRAID_PROPOSED_AWAITING_STRIPDOWN_AND_CLAUDE_REVIEW",
+  "disposition": "BOLD_DRAFT_SYNTHESIZING_CPL_BRAID_CRL_BRAID_NEXUS_CONTROL_PLANE_AND_PULSE_RAG_INTO_A_GITHUB_NATIVE_CHECKIN_TOPOLOGY_AND_SKILL_RAG_ARCHITECTURE",
+  "canonical_status": "UNPROMOTED_PROPOSAL",
+  "base_head": "7026b66",
+  "status_authority": "NONE",
+  "next_action": "OPERATOR_STRIPDOWN_PASS_THEN_CLAUDE_REVIEW_THEN_PROMOTION_DECISION",
+  "sister_material": [
+    "CPL-BRAID_Whitepaper_v1.0 (nexus_consolidated/04_whitepapers_and_design_docs/)",
+    "CRL_BRAID_Technical_Spec_v0_1.md (~/Downloads/)",
+    "codex_research_lab_blueprint.md (~/Downloads/)",
+    "NEXUS_CONTROL_PLANE_MASTER_PLAN.md (~/Downloads/)",
+    "PULSE_RAG_24K_RAG_CORE.md (NEXUS_ORGANIZED/02_whitepapers_and_design/)"
+  ],
+  "non_claims": [
+    "not_empirically_validated",
+    "not_a_model_capability_upgrade",
+    "not_a_truth_guarantee",
+    "not_tamper_proof",
+    "not_a_cure_for_same_model_review_weakness",
+    "multi_ai_agreement_not_independence",
+    "proposal_not_permission_to_implement"
+  ]
+}
