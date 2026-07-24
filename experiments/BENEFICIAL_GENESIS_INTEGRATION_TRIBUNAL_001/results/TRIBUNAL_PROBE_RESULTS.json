@@ -1,0 +1,121 @@
+{
+  "schema": "bgen.tribunal.probe-results/v1",
+  "subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "probes": [
+    {
+      "probe_id": "T-001",
+      "claim": "negative lottery_share_bps over-issues pool (Codex CODEX-TECH-001)",
+      "outcome": "CONFIRMED",
+      "allocation": {
+        "only_donor": 110
+      },
+      "total_issued": 110,
+      "unissued_remainder": -10,
+      "expected_if_defect": {
+        "total_issued": 110,
+        "unissued_remainder": -10
+      }
+    },
+    {
+      "probe_id": "T-002",
+      "claim": "lottery_share_bps=20000 rejected only accidentally via negative sub-pool",
+      "outcome": "FAIL_CLOSED_ACCIDENTAL",
+      "error": "pool must be a non-negative int, got -100",
+      "note": "rejection comes from exact_pro_rata's pool>=0 check on the derived sub-pool, not from validating lottery_share_bps itself"
+    },
+    {
+      "probe_id": "T-003",
+      "claim": "lottery_share_bps=True silently accepted as 1 bps",
+      "outcome": "FAIL_OPEN",
+      "allocation": {
+        "d": 100
+      },
+      "total_issued": 100
+    },
+    {
+      "probe_id": "T-004",
+      "claim": "float lottery_share_bps rejected accidentally via float sub-pool",
+      "outcome": "FAIL_CLOSED_ACCIDENTAL",
+      "error": "pool must be a non-negative int, got 98.0"
+    },
+    {
+      "probe_id": "T-005",
+      "claim": "string lottery_share_bps crashes with raw TypeError (not a domain rejection)",
+      "outcome": "FAIL_CLOSED_ACCIDENTAL",
+      "error": "unsupported operand type(s) for //: 'str' and 'int'"
+    },
+    {
+      "probe_id": "T-006",
+      "claim": "early_bonus_bps=-5000 accepted; late donor outearns early donor against documented semantics",
+      "outcome": "FAIL_OPEN_SEMANTIC_INVERSION",
+      "allocation": {
+        "early": 333,
+        "late": 666
+      },
+      "total_issued": 999,
+      "pool": 1000,
+      "supply_invariant_held": true
+    },
+    {
+      "probe_id": "T-007",
+      "claim": "epoch_close_block < epoch_open_block accepted without rejection",
+      "outcome": "FAIL_OPEN",
+      "allocation": {
+        "early": 500,
+        "late": 500
+      },
+      "total_issued": 1000,
+      "supply_invariant_held": true
+    },
+    {
+      "probe_id": "T-008",
+      "claim": "arbitrary non-Random rng object accepted (winner fully attacker-chosen)",
+      "outcome": "FAIL_OPEN",
+      "allocation": {
+        "a": 1000,
+        "b": 0
+      }
+    },
+    {
+      "probe_id": "T-009",
+      "claim": "winners=True rejected by validate_participants",
+      "outcome": "FAIL_CLOSED",
+      "error": "winners must be a positive int, got True"
+    },
+    {
+      "probe_id": "T-010",
+      "claim": "scenario runner accepts hostile manifest and emits unissued_remainder=-10",
+      "outcome": "CONFIRMED",
+      "unissued_remainder": -10,
+      "total_issued": 0
+    },
+    {
+      "probe_id": "T-011",
+      "claim": "design-pack allocate_proportional conserves supply over 200 random cases and rejects negative pool",
+      "outcome": "CONFIRMED",
+      "random_cases": 200,
+      "violations": 0,
+      "negative_pool_rejected": true
+    },
+    {
+      "probe_id": "T-012",
+      "claim": "Breaker allocate rejects out-of-range lottery params",
+      "outcome": "FAIL_CLOSED",
+      "error": "contribution[0].eligible_sats must be exact int, got NoneType"
+    },
+    {
+      "probe_id": "T-013",
+      "claim": "1-sat sole donor receives the entire fixed pool in both the REDTEAM model and the normative design pack",
+      "outcome": "CONFIRMED",
+      "redteam_alloc": 1000000000,
+      "design_total_issued": 1000000000
+    },
+    {
+      "probe_id": "T-014",
+      "claim": "oversubscription floors 1-sat donors to zero allocation; supply conserved",
+      "outcome": "CONFIRMED",
+      "zero_allocated_small_donors": 100,
+      "total_issued": 999
+    }
+  ]
+}
