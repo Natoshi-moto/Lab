@@ -1,0 +1,58 @@
+{
+  "schema": "nexus.experimental-sandbox-promotion/v1",
+  "change_origin": "SANDBOX_PROMOTION",
+  "sandbox_repository": "Natoshi-moto/Experimental-Sandbox",
+  "sandbox_commit": "2222222222222222222222222222222222222222",
+  "sandbox_tag": "promotion/annotated-001",
+  "sandbox_record_url": "https://github.com/Natoshi-moto/Experimental-Sandbox/releases/tag/promotion/annotated-001",
+  "sandbox_context": "Annotated-tag fixture metadata only; no Sandbox content is executed.",
+  "task_or_route_id": "SBX-TEST-ANNOTATED-001",
+  "baseline_lab_commit": "187f6bf61de8a46a7f41e41d62c3bd23eed9d9ed",
+  "authority_used": "operator-authorized fixture test",
+  "allowed_write_scope": ["operations/process/**"],
+  "files_proposed_for_lab": [
+    {"path": "operations/process/example.md", "disposition": "EVIDENCE_ONLY"}
+  ],
+  "claim": "The annotated tag resolves to the declared commit in the fixture.",
+  "falsifier": "The peeled tag target differs from the declared commit.",
+  "evidence_class": "SOURCE",
+  "tests_run": [
+    {"command": "tag resolver fixture", "result": "PASS", "details": "One peeled commit was returned."}
+  ],
+  "test_results": ["Annotated tag dereference passed."],
+  "known_failures": [],
+  "known_unknowns": ["Future tag immutability is not proven by one resolution."],
+  "non_claims": ["Tag resolution is provenance evidence only, not correctness proof."],
+  "adversarial_review": {
+    "performed": true,
+    "summary": "Tag ambiguity was tested.",
+    "findings": ["A missing peeled target is rejected."],
+    "limitations": ["The resolver uses a local test double." ]
+  },
+  "rights_and_licences": {
+    "original_author_or_source": "Fixture author",
+    "source_repository": "Natoshi-moto/Experimental-Sandbox",
+    "source_commit": "2222222222222222222222222222222222222222",
+    "source_licence": "Declared MIT fixture.",
+    "files_modified": "No source file is copied.",
+    "third_party_material": "None declared.",
+    "submitter_rights": "Fixture is operator-authorized.",
+    "lab_mit_compatibility": "Documentation-only fixture; legal compatibility is not verified.",
+    "exceptions": "None declared."
+  },
+  "security_and_privacy_impact": {
+    "summary": "Metadata-only fixture.",
+    "secrets_checked": "No secrets are present.",
+    "personal_data_checked": "No personal data is present.",
+    "external_systems": "No external systems are contacted.",
+    "risks": "A passing resolver test does not prove the cited experiment."
+  },
+  "known_lab_red_impact": "NONE",
+  "operator_decision_requested": {
+    "action": "PARK",
+    "rationale": "Keep as a validator fixture.",
+    "reversible": true,
+    "stop_conditions": "Stop on any ambiguous tag resolution."
+  },
+  "status_authority": "NONE"
+}

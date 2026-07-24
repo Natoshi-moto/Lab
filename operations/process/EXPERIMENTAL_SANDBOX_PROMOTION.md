@@ -2,62 +2,92 @@
 
 **status_authority:** `NONE`
 
-Nexus Lab is canonical accepted working state. [`Experimental-Sandbox`](https://github.com/Natoshi-moto/Experimental-Sandbox) is public, reversible and noncanonical. A promotion is a request for Lab review, never a tunnel between repositories.
+Sandbox makes experimentation cheap. Promotion makes claims expensive. The
+public Sandbox is noncanonical; Lab `main` is accepted working state, not a
+claim of truth. A promotion package is a request for review, never an automatic
+bridge, copy operation, or status upgrade.
 
 ## Ordinary-language flow
 
 ```text
-messy idea → public experiment → evidence and adversarial review
-→ promotion package → small Lab PR → protected Human Gate
+rough Sandbox work
+→ exact frozen candidate
+→ promotion package
+→ small Lab PR
+→ technical and adversarial review
+→ plain-English operator card
+→ accept / reject / return / park
 ```
 
-The operator should receive a plain decision card, not Git instructions.
+The gate checks declarations and selected invariants. It does not fetch,
+checkout, execute, copy, or trust Sandbox code. It reads remote Git metadata
+only when resolving a declared tag. A passing gate is not proof of safety,
+security, correctness, usefulness, independence, licence compatibility beyond
+the declaration, successful reproduction, or deployment suitability.
 
-## Required package
+## One contract, two modes
 
-1. **Origin** — immutable Sandbox tag, full commit SHA and experiment record.
-2. **Claim** — one falsifiable sentence.
-3. **Falsifier** — what observable result would have killed it?
-4. **Evidence** — reproduction command/output, or `DOCUMENTARY_ONLY`.
-5. **Non-claims** — what the experiment does not establish.
-6. **Adversarial review** — builder, breaker, evidence, rights and lay roles; model/provider and context disclosed; agreement does not imply independence.
-7. **Red impact** — which known Lab red moves, which declared question deepens, or `NONE`.
+The single machine-readable contract is
+`operations/process/experimental-sandbox-promotion.schema.json`. The PR
+template, validator, workflow, and tests use the same field names.
 
-The canonical template lives at:
+### `LAB_INTERNAL`
 
-`https://github.com/Natoshi-moto/Experimental-Sandbox/blob/main/templates/PROMOTION.md`
+For work that originated inside Lab, set every Sandbox field to exactly
+`NOT_APPLICABLE`. Still declare the task or route, full Lab baseline commit,
+authority, allowed scope, exact proposed files and each file's disposition,
+claim, falsifier, evidence class, tests and detailed results, known failures,
+known unknowns, non-claims, adversarial review, rights and licences, security
+and privacy impact, Lab red impact, operator decision, and
+`status_authority: NONE`.
 
-## Provenance
+### `SANDBOX_PROMOTION`
 
-- Sandbox `main` is protected against force-push and deletion.
-- Promotions cite an immutable tag and SHA.
-- Lab’s promotion-origin workflow verifies the tag still resolves to that SHA.
-- Reimplementation on a clean Lab branch must preserve that citation.
-- No submodule, subtree or workflow credential crosses the boundary.
+For Sandbox-origin work, declare exactly:
 
-## AI context disclosure
+- repository `Natoshi-moto/Experimental-Sandbox`;
+- a full 40-character commit SHA;
+- a tag whose direct or peeled target resolves to that SHA;
+- a record URL tied to that exact commit or tag, never a branch, `main`,
+  `HEAD`, or `latest` URL;
+- context, task or route, Lab baseline, authority, and allowed scope;
+- the exact files proposed for Lab and whether each is copied, rewritten,
+  independently reimplemented, documentation-only, or evidence-only;
+- claim limits, falsifier, evidence class, test commands and detailed results;
+- known failures, unknowns, non-claims, adversarial review, rights/licences,
+  security/privacy impact, Lab red impact, and the operator decision requested.
 
-Every proposing or reviewing seat states which repositories and experimental materials were in context. Same-provider seats are differential reviewers, not automatically independent.
+The PR changed-file set must exactly equal the declared proposed-file set and
+must remain inside the declared allowed scope. Nothing else is imported:
+branches, histories, build output, generated files, dependencies, credentials,
+local configuration, and unrelated experiments stay out unless deliberately
+listed and reviewed.
 
-## Operator card
+## Rights and licence boundary
 
-Before `OPEN_LAB_PR`, translate the package into:
+Every package declares the original author or source, source repository and
+commit, source licence, modifications, third-party material, submitter rights,
+whether proposed files can be accepted under Lab's MIT licence, and exceptions.
+The gate checks that these declarations exist and are internally shaped. It
+does not legally verify ownership or licence compatibility. An unresolved
+rights question remains a merge blocker.
 
-- What is this?
-- Why does it matter to the declared project intent?
-- What actually happened?
-- What remains speculation?
-- Who or what could be harmed?
-- Was another project forked and under what rights?
-- What did adversaries disagree about?
-- Can this affect `main`?
-- What exact, reversible change is requested?
+## Operator card and hard boundaries
 
-## Hard boundaries
+The package must answer what this is, why it might matter, what happened, what
+enters Lab, what stays in Sandbox, what was tested, what failed, what remains
+unknown, what rights apply, who could be harmed, what reviewers disagree about,
+what reversible decision is requested, and what is not being claimed.
 
-- No automatic merge.
-- No hidden authority promotion.
-- No snapshot mutation.
-- No shared secrets or write credentials.
-- No unverified provenance.
-- No requirement that controversial ideas become polite before they become testable.
+Even rough Sandbox work must not publish secrets or credentials, expose private
+personal material without deliberate consent, target systems without ownership
+or explicit authorization, automatically write to Lab, automatically post
+externally beyond the chosen GitHub action, claim Lab authority, claim safety
+or correctness without evidence, or silently import incompatible rights.
+
+Heavy process begins when someone asks to promote work, make a public factual or
+safety claim, deploy, affect real users/money/infrastructure, merge into
+accepted state, or publish consequential material.
+
+The promotion workflow is read-only. It never approves or merges a PR, grants
+Sandbox credentials, copies files, or turns tests into proof.

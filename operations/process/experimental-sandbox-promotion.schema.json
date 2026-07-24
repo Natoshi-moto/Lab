@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Natoshi-moto/Lab/blob/main/operations/process/experimental-sandbox-promotion.schema.json",
+  "title": "Nexus promotion package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "change_origin",
+    "sandbox_repository",
+    "sandbox_commit",
+    "sandbox_tag",
+    "sandbox_record_url",
+    "sandbox_context",
+    "task_or_route_id",
+    "baseline_lab_commit",
+    "authority_used",
+    "allowed_write_scope",
+    "files_proposed_for_lab",
+    "claim",
+    "falsifier",
+    "evidence_class",
+    "tests_run",
+    "test_results",
+    "known_failures",
+    "known_unknowns",
+    "non_claims",
+    "adversarial_review",
+    "rights_and_licences",
+    "security_and_privacy_impact",
+    "known_lab_red_impact",
+    "operator_decision_requested",
+    "status_authority"
+  ],
+  "properties": {
+    "schema": {"const": "nexus.experimental-sandbox-promotion/v1"},
+    "change_origin": {"enum": ["LAB_INTERNAL", "SANDBOX_PROMOTION"]},
+    "sandbox_repository": {"type": "string"},
+    "sandbox_commit": {
+      "type": "string",
+      "pattern": "^(NOT_APPLICABLE|[0-9a-f]{40})$"
+    },
+    "sandbox_tag": {"type": "string", "minLength": 1},
+    "sandbox_record_url": {"type": "string", "minLength": 1},
+    "sandbox_context": {"type": "string", "minLength": 1},
+    "task_or_route_id": {"type": "string", "minLength": 1},
+    "baseline_lab_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "authority_used": {"type": "string", "minLength": 1},
+    "allowed_write_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "files_proposed_for_lab": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "disposition"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "disposition": {
+            "enum": [
+              "COPIED",
+              "REWRITTEN",
+              "INDEPENDENT_REIMPLEMENTATION",
+              "DOCUMENTATION_ONLY",
+              "EVIDENCE_ONLY"
+            ]
+          }
+        }
+      }
+    },
+    "claim": {"type": "string", "minLength": 1},
+    "falsifier": {"type": "string", "minLength": 1},
+    "evidence_class": {"type": "string", "minLength": 1},
+    "tests_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "result", "details"],
+        "properties": {
+          "command": {"type": "string", "minLength": 1},
+          "result": {"type": "string", "minLength": 1},
+          "details": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "test_results": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "known_failures": {"type": "array", "items": {"type": "string"}},
+    "known_unknowns": {"type": "array", "items": {"type": "string"}},
+    "non_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "adversarial_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "summary", "findings", "limitations"],
+      "properties": {
+        "performed": {"type": "boolean"},
+        "summary": {"type": "string", "minLength": 1},
+        "findings": {"type": "array", "items": {"type": "string"}},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "rights_and_licences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "original_author_or_source",
+        "source_repository",
+        "source_commit",
+        "source_licence",
+        "files_modified",
+        "third_party_material",
+        "submitter_rights",
+        "lab_mit_compatibility",
+        "exceptions"
+      ],
+      "properties": {
+        "original_author_or_source": {"type": "string", "minLength": 1},
+        "source_repository": {"type": "string", "minLength": 1},
+        "source_commit": {"type": "string", "minLength": 1},
+        "source_licence": {"type": "string", "minLength": 1},
+        "files_modified": {"type": "string", "minLength": 1},
+        "third_party_material": {"type": "string", "minLength": 1},
+        "submitter_rights": {"type": "string", "minLength": 1},
+        "lab_mit_compatibility": {"type": "string", "minLength": 1},
+        "exceptions": {"type": "string", "minLength": 1}
+      }
+    },
+    "security_and_privacy_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "secrets_checked",
+        "personal_data_checked",
+        "external_systems",
+        "risks"
+      ],
+      "properties": {
+        "summary": {"type": "string", "minLength": 1},
+        "secrets_checked": {"type": "string", "minLength": 1},
+        "personal_data_checked": {"type": "string", "minLength": 1},
+        "external_systems": {"type": "string", "minLength": 1},
+        "risks": {"type": "string", "minLength": 1}
+      }
+    },
+    "known_lab_red_impact": {"type": "string", "minLength": 1},
+    "operator_decision_requested": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "rationale", "reversible", "stop_conditions"],
+      "properties": {
+        "action": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1},
+        "reversible": {"type": "boolean"},
+        "stop_conditions": {"type": "string", "minLength": 1}
+      }
+    },
+    "status_authority": {"const": "NONE"}
+  }
+}

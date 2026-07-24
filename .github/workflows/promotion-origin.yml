@@ -2,47 +2,48 @@ name: Promotion origin
 
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, edited, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
 
+concurrency:
+  group: promotion-origin-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
-  declare-origin:
-    name: Promotion origin declaration
+  validate-contract:
+    name: Promotion origin contract
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      PR_BODY: ${{ github.event.pull_request.body }}
-      PR_ACTOR: ${{ github.actor }}
     steps:
-      - name: Require origin declaration
+      - name: Check out Lab PR metadata only
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate one structured promotion package
         shell: bash
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
+          body_file="$RUNNER_TEMP/promotion-body.md"
+          changed_file_list="$RUNNER_TEMP/promotion-changed-files.txt"
 
-          if [[ "$PR_ACTOR" == "dependabot[bot]" || "$PR_ACTOR" == "github-actions[bot]" ]]; then
-            echo "Automation PR: origin inferred from authenticated GitHub App."
-            exit 0
-          fi
+          python3 - "$body_file" <<'PY'
+          import os
+          import pathlib
+          import sys
+          pathlib.Path(sys.argv[1]).write_text(os.environ.get("PR_BODY", ""), encoding="utf-8")
+          PY
 
-          if ! grep -Eq '^[-* ]*Change-Origin:[[:space:]]*(`?LAB_INTERNAL`?|https://github\.com/Natoshi-moto/Experimental-Sandbox/)' <<<"$PR_BODY"; then
-            echo "::error::Declare Change-Origin: LAB_INTERNAL or an immutable Experimental Sandbox record URL."
-            exit 1
-          fi
-
-          if grep -Eq '^[-* ]*Change-Origin:[[:space:]]*https://github\.com/Natoshi-moto/Experimental-Sandbox/' <<<"$PR_BODY"; then
-            sha="$(sed -nE 's/^[-* ]*Sandbox-Commit:[[:space:]]*`?([0-9a-f]{40})`?.*/\1/p' <<<"$PR_BODY" | head -n1)"
-            tag="$(sed -nE 's/^[-* ]*Sandbox-Tag:[[:space:]]*`?([^`[:space:]]+)`?.*/\1/p' <<<"$PR_BODY" | head -n1)"
-            test -n "$sha" || { echo "::error::Sandbox promotion requires a full 40-character Sandbox-Commit."; exit 1; }
-            test -n "$tag" || { echo "::error::Sandbox promotion requires an immutable Sandbox-Tag."; exit 1; }
-
-            resolved="$(git ls-remote --tags https://github.com/Natoshi-moto/Experimental-Sandbox.git "refs/tags/$tag" | awk '{print $1}' | head -n1)"
-            test "$resolved" = "$sha" || {
-              echo "::error::Sandbox tag does not resolve to the declared commit."
-              echo "declared=$sha resolved=${resolved:-MISSING}"
-              exit 1
-            }
-          fi
-
-          echo "Promotion origin declaration: PASS"
+          # This reads Lab's PR diff only. It never checks out or executes a
+          # promoted Sandbox repository, and it never writes to Lab.
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" | sort > "$changed_file_list"
+          python3 operations/process/validate_promotion.py \
+            --body-file "$body_file" \
+            --changed-files-file "$changed_file_list"
