@@ -1,43 +1,80 @@
 # NEXT OPERATION PROMPT
 
-Paste or treat everything below as the commission for the next capable ChatGPT/controller **only after the activation gate in `README.md` is satisfied**.
+Use this only after reading `HANDOFF_ANY_AI.md` and freshly verifying current Lab state.
 
----
+## Immediate operation — review PR #118 first
 
-You are starting a bounded Lab planning operation.
+You are the next different-family control-layer reviewer for `Natoshi-moto/Lab`.
 
-# OPERATION
+### Target
 
-`SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_EXECUTION_001`
+- PR: `#118`
+- expected title: `Proposal: Closed-world economy invariants and harm gates`
+- expected branch: `claude/closed-world-economy-invariants-001`
+- expected head: `caef0e7cd689e1e77a49413210116e7590322576`
+- expected tree: `2c044c46c5c23425f13a1bacd36236ce34957b3a`
+- expected base: `6c3a1e806baba1183553221f5c2f00125ce2be29`
+- expected scope: `operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/**`
+- expected changed files: `20`
 
-# REPOSITORY
-
-`Natoshi-moto/Lab`
-
-# PRECONDITION
-
-Do not write until you have read this queued package and verified the final disposition of `CLOSED_WORLD_ECONOMY_INVARIANTS_001`.
-
-If the economy operation is still running, incomplete, unreviewed, or `UNABLE_TO_VERIFY`, remain read-only and stop.
-
-# PURPOSE
-
-Create one rigorous Lab-internal proposal that records the staged programme for:
-
-1. safely clearing Experimental-Sandbox for unrestricted creative and adversarial experimentation within hard red lines;
-2. later building personal Mithubs;
-3. later building the university and curriculum;
-4. preserving permanent hostile dissent;
-5. preparing Lab for serious expert contributors;
-6. keeping accepted implementation deliberately slower than collaboration and ideation.
-
-This operation creates a roadmap and clearance specification only.
-
-It does not implement the university, Mithub platform, live internal economy, token, blockchain, marketplace, student system or contributor platform.
+### Authority
 
 `status_authority: NONE`
 
-# CENTRAL PRINCIPLE
+This is initially a read-only review. Do not edit, authorize, merge, close, rebase or mark the PR ready.
+
+### Required method
+
+1. Freshly verify Lab `main`, PR #118 head/base/draft state, changed files and checks.
+2. Inspect every file in the proposal package from source.
+3. Run or independently reproduce the dedicated validator and tests when tools permit.
+4. Attack the package for source/canon errors, disguised financial capabilities, unofficial markets, transfer/export seams, paid chance, vulnerable-user harm, operator capture, weak appeals, weak halt rules, contradiction suppression and prose/schema/validator/test drift.
+5. Preserve known limitations: CR-02/CR-03, no age verification, no independent institutional review capacity, representative rather than exhaustive vectors, and the missing `@noble/ed25519` dependency block.
+6. Produce a defect ledger using:
+   - `CONFIRMED_BLOCKER`
+   - `CONFIRMED_NONBLOCKING`
+   - `PLAUSIBLE_NEEDS_TEST`
+   - `FALSE_POSITIVE`
+   - `UNABLE_TO_VERIFY`
+7. For each confirmed finding provide exact evidence, consequence, smallest repair and falsifier.
+8. If repair is needed, commission a bounded repair, rerun immutable verification and re-review the new exact SHA.
+9. Give the operator a plain-language disposition card. Do not create merge authorization without a later explicit exact-SHA instruction.
+
+Record one disposition:
+
+- `ECONOMY_FRAMEWORK_ACCEPTED_ON_MAIN`
+- `ECONOMY_FRAMEWORK_REVIEWED_BUT_OPEN`
+- `ECONOMY_FRAMEWORK_REJECTED_OR_SUPERSEDED`
+- `UNABLE_TO_VERIFY`
+
+## Later operation — roadmap execution after disposition
+
+Only after the review and disposition gate above is complete, start:
+
+`SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_EXECUTION_001`
+
+Create a fresh isolated branch/worktree from the then-current accepted Lab `main`.
+
+Suggested branch:
+
+`chatgpt/sandbox-clearance-mithub-roadmap-execution-001`
+
+Do not continue implementation work on the historical PR #117 queue branch.
+
+## Roadmap proposal purpose
+
+Create one rigorous Lab-internal proposal recording the staged programme for:
+
+1. safely clearing Experimental-Sandbox for unrestricted creative and adversarial experimentation within hard red lines;
+2. later building personal Mithubs;
+3. later building Full Spectrum University;
+4. preserving permanent good-faith hostile dissent;
+5. preparing Lab for serious expert contributors;
+6. keeping accepted implementation much slower than collaboration and ideation.
+
+This roadmap operation creates a proposal only. It does not implement the university, Mithub platform, live internal economy, token, blockchain, marketplace, student system or contributor platform.
+
+## Central principle
 
 > Terminal-velocity cognition. Snail-speed implementation.
 
@@ -45,92 +82,27 @@ Humans and AI may collaborate, argue, fork, test, simulate and prototype rapidly
 
 Accepted implementation, external effects, real users, economic mechanics and Lab authority move only through slow, exact, evidence-bound gates.
 
-# CURRENT SYSTEM MODEL
+## Required canonical layers
 
-The proposal must define three distinct canonical layers.
+### Lab
 
-## Lab
+Lab `main` is canonical accepted institutional working state, not automatic truth.
 
-Lab `main` is canonical accepted institutional working state.
+### Experimental-Sandbox
 
-It records what the institution is prepared to retain after review and explicit authorization. It does not thereby prove truth, safety, legality or product readiness.
+Propose and later test:
 
-## Experimental-Sandbox
+> Everything deliberately accepted onto Experimental-Sandbox `main` is canonical as shared history and context. Nothing there is automatically true, safe, correct, legal, deployable or accepted by Lab.
 
-Sandbox `main` should be defined as canonical shared history, activity and context.
+### Mithub
 
-Everything deliberately accepted onto Sandbox `main` becomes part of the public creative civilisation's real history.
+A Mithub's accepted state is canonical for that participant's attributable intellectual lineage. It does not automatically bind Sandbox, Lab or external truth.
 
-It is not automatically canonical as:
+## Phase A — minimum Sandbox clearance
 
-- truth;
-- safety;
-- correctness;
-- technical quality;
-- legal status;
-- Lab acceptance;
-- deployment suitability.
+Do not make later infrastructure a blocker.
 
-The proposal must identify and later repair the current wording conflict between broad `noncanonical` language and the charter's accepted-record/history discipline.
-
-## Mithub
-
-A Mithub's accepted state is canonical for that participant's attributable intellectual lineage.
-
-It does not automatically bind Sandbox, Lab or external truth.
-
-# CRITICAL SCOPE DISTINCTION
-
-The proposal must clearly separate:
-
-## Phase A — Required before operator Sandbox clearance
-
-Only the minimum rails needed for the operator to begin unrestricted creative experimentation safely.
-
-## Phase B and later — Long-horizon implementation
-
-Mithubs, university infrastructure, critic programmes, contributor tooling, serious-team onboarding and mature automation.
-
-Do not make all later work a blocker for Phase A.
-
-# REQUIRED PACKAGE
-
-Create a new package under:
-
-`operations/proposals/SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_EXECUTION_001/`
-
-Include at minimum:
-
-1. `README.md`
-2. `CURRENT_STATE_AND_DEPENDENCIES.md`
-3. `SOURCE_AND_CANON_MAP.md`
-4. `CANONICAL_LAYER_MODEL.md`
-5. `PHASE_A_SANDBOX_CLEARANCE.md`
-6. `PHASE_B_MITHUB_FOUNDATION.md`
-7. `PHASE_C_PERMANENT_DISSENT.md`
-8. `PHASE_D_UNIVERSITY_V0.md`
-9. `PHASE_E_SERIOUS_TEAM_READINESS.md`
-10. `MODEL_AND_HUMAN_ROLE_MATRIX.md`
-11. `EXECUTION_AND_REVIEW_PROTOCOL.md`
-12. `DRILLS_AND_ACCEPTANCE_TESTS.md`
-13. `RISKS_AND_NONCLAIMS.md`
-14. `MILESTONE_GRAPH.json`
-15. `HANDOFF_ANY_AI.md`
-16. `RECEIPT.json`
-
-Use fewer files only if the same concerns remain clearly separated.
-
-Do not create a new constitution.
-
-# PHASE A — SANDBOX OPERATIONAL CLEARANCE
-
-This phase must be deliberately small.
-
-Its purpose is to clear the operator to use Sandbox aggressively without waiting for the full university.
-
-## Required later Sandbox deliverables
-
-Propose a separate bounded Experimental-Sandbox PR containing approximately:
+Propose a bounded later Sandbox PR containing approximately:
 
 - `SANDBOX_CANON.md`
 - `SANDBOX_STATUS.json`
@@ -139,334 +111,76 @@ Propose a separate bounded Experimental-Sandbox PR containing approximately:
 - `EXPERIMENT_TEMPLATE.md`
 - `RECOVERY_AND_CHECKPOINTS.md`
 - minimal contributor/AI instructions
-- lightweight checks limited to hard red lines
-- one machine-readable operational-clearance receipt
+- lightweight hard-red-line checks
+- machine-readable clearance receipt
 
-Do not modify Sandbox during this Lab roadmap operation.
+Hard red lines:
 
-## Sandbox doctrine
+- no committed secrets or credentials;
+- no non-consensual private personal data;
+- no unauthorized targeting of real systems or people;
+- no automatic Lab writes or promotion;
+- no external financial value, redemption or live financial mechanisms;
+- no false authority claims;
+- no silent history rewriting;
+- no licence laundering or unattributed third-party material;
+- no real-user deployment without a separate gate.
 
-Use:
+Required drills:
 
-> Everything deliberately accepted onto Experimental-Sandbox `main` is canonical as shared history and context. Nothing there is automatically true, safe, correct or accepted by Lab.
+1. one genuinely wild but bounded experiment;
+2. one reversible mistake and recovery without rewriting history;
+3. one harmless Lab-bound proposal proving nothing moves automatically.
 
-## Minimal acceptance burden
+Phase A ends only with an exact Sandbox SHA, a checkpoint tag such as `SANDBOX-OPERATIONAL-V1`, a clearance receipt and explicit operator authorization.
 
-A Sandbox contribution may be wild, incomplete, contradictory or wrong.
+## Later non-blocking phases
 
-It requires only:
+Record but do not implement:
 
-- attributable origin;
-- declared intent or question;
-- an honest artifact class such as experiment, theory, prototype, attack, wreckage or observation;
-- compliance with hard red lines;
-- no false Lab authority claim;
-- enough information to identify what happened.
+- Mithub architecture pilots;
+- permanent adversarial Mithub;
+- University v0 cold entry;
+- serious-team contributor front door;
+- reproducible clone-to-verification repair;
+- mature recognition mechanics;
+- full corpus ingestion;
+- Hermes integration;
+- polished UI.
 
-Do not impose Lab-grade promotion paperwork on ordinary Sandbox experimentation.
+## Permanent dissent
 
-## Hard red lines
-
-Phase A must prohibit:
-
-- committed secrets and credentials;
-- non-consensual private personal data;
-- unauthorized targeting of real systems or people;
-- automatic writes or promotion into Lab;
-- external financial value, redemption or live financial mechanisms;
-- false claims of Lab or external authority;
-- silent history rewriting;
-- licence laundering or unattributed third-party material;
-- deployment to real users without a separate gate.
-
-## Recovery requirements
-
-Phase A must include:
-
-- exact current Sandbox SHA;
-- checkpoint-tag method;
-- rollback without history rewriting;
-- preservation of failed state;
-- recovery instructions;
-- handling of accidental merges;
-- branch-retention or branch-deletion policy;
-- explicit choice about squash versus history-preserving merges.
-
-## Mandatory clearance drills
-
-### Drill 1 — Wild experiment
-
-Accept one genuinely strange or rough experiment into Sandbox.
-
-Verify that it is attributable and cannot be mistaken for Lab truth.
-
-### Drill 2 — Recovery
-
-Introduce and recover from one reversible Sandbox mistake.
-
-Verify:
-
-- prior state is identifiable;
-- rollback uses normal Git history;
-- failed state remains inspectable;
-- no history rewrite is required.
-
-### Drill 3 — Lab-boundary test
-
-Attempt a harmless proposal toward Lab.
-
-Verify that nothing moves automatically and the promotion gate requires exact declared state.
-
-## Phase A exit artifact
-
-Propose:
-
-- exact accepted Sandbox SHA;
-- tag such as `SANDBOX-OPERATIONAL-V1`;
-- operational-clearance receipt;
-- explicit non-claims;
-- required operator authorization phrase:
-
-`AUTHORIZE SANDBOX OPERATIONAL CLEARANCE AT <FULL_SHA>`
-
-Only after this phase passes may the operator receive:
-
-> Experimental-Sandbox is cleared for unrestricted creative and adversarial experimentation within the hard red lines.
-
-# PHASE B — MITHUB FOUNDATION
-
-This phase is later work and must not block Phase A.
-
-Define the proposed minimum Mithub manifest:
-
-- participant name or pseudonym;
-- source Sandbox repository and exact SHA;
-- creation timestamp;
-- declared project intent;
-- AI seats and model/provider disclosure;
-- authority boundaries;
-- accepted branch;
-- current status;
-- divergence record;
-- promotion route;
-- rights and licence declaration;
-- optional public-media trace references;
-- status-authority boundaries.
-
-Evaluate two architectures:
-
-1. branch-based Mithubs inside a shared repository;
-2. one fork or repository per participant.
-
-Do not choose permanently without a pilot.
-
-Prefer the design that best preserves:
-
-- permission isolation;
-- independent lineage;
-- portability;
-- critic permanence;
-- recovery;
-- attribution.
-
-# PHASE C — PERMANENT DISSENT
-
-Define:
-
-`orientation: PERMANENT_ADVERSARIAL`
-
-A participant may spend their entire involvement trying to disprove Lab.
-
-They must have:
-
-- no obligation to support project goals;
-- right to publish negative findings;
-- access to exact public claims and SHAs;
-- permanent dissent archive;
-- appeal route;
-- protection from retaliation for good-faith criticism;
-- promotion path for confirmed defects;
-- no direct Lab mutation authority;
-- lawful-scope, privacy, rights and anti-harassment requirements.
-
-Use this load-bearing rule:
+Preserve:
 
 > The framework must preserve the strongest good-faith challenge to Lab, including when it is humiliating, expensive or directionally inconvenient.
 
-Define mechanisms ensuring:
+Critics may maintain permanent adverse lineages and publish negative findings, but receive no direct Lab mutation authority and remain subject to lawful-scope, privacy, rights and anti-harassment limits.
 
-- rejected findings remain visible;
-- rejection includes reasons;
-- operator disagreement does not erase evidence;
-- access and rankings cannot be used to punish valid criticism;
-- confirmed findings can route toward Lab review;
-- critics retain control of their own lineage.
+## Required package
 
-# PHASE D — UNIVERSITY V0
+Create a fresh proposal package under a newly declared operation path. Include at minimum:
 
-The university must teach orchestration through real repository work.
+1. `README.md`
+2. `CURRENT_STATE_AND_DEPENDENCIES.md`
+3. `CANONICAL_LAYER_MODEL.md`
+4. `PHASE_A_SANDBOX_CLEARANCE.md`
+5. `PHASE_B_MITHUB_FOUNDATION.md`
+6. `PHASE_C_PERMANENT_DISSENT.md`
+7. `PHASE_D_UNIVERSITY_V0.md`
+8. `PHASE_E_SERIOUS_TEAM_READINESS.md`
+9. `MODEL_AND_HUMAN_ROLE_MATRIX.md`
+10. `EXECUTION_AND_REVIEW_PROTOCOL.md`
+11. `DRILLS_AND_ACCEPTANCE_TESTS.md`
+12. `RISKS_AND_NONCLAIMS.md`
+13. `MILESTONE_GRAPH.json`
+14. `HANDOFF_ANY_AI.md`
+15. `RECEIPT.json`
 
-Propose one initial learner journey:
+Use fewer files only if the same concerns remain clearly separated.
 
-1. enter from an exact Sandbox SHA;
-2. create a personal Mithub;
-3. define a bounded task;
-4. use varied AI roles;
-5. preserve one failure;
-6. perform one adversarial review;
-7. correct one claim;
-8. produce one Sandbox candidate;
-9. prepare one valid Lab promotion package.
+## Source classification
 
-Graduation is demonstrated repository history, not a quiz score.
-
-Include a cold-entry test:
-
-A fresh human or model receives only public entry documentation and must be able to start without private chat context.
-
-# PHASE E — SERIOUS TEAM READINESS
-
-Record later work such as:
-
-- small newcomer front door;
-- architecture map;
-- current unsafe-state page;
-- reproducible clone-to-verification setup;
-- Commons/MIT norm;
-- third-party notices;
-- contributor model;
-- specialist role boundaries;
-- active expert tasks;
-- PR queue reduction;
-- stale and superseded proposal classification.
-
-The `@noble/ed25519` reproducibility repair belongs here or in its own independent operation.
-
-It is important, but it must not automatically block Phase A Sandbox clearance unless evidence shows Sandbox safety depends on it.
-
-# EXECUTION PROTOCOL
-
-Record the required operating loop:
-
-1. pin exact starting SHA;
-2. create isolated branch/worktree;
-3. commission one bounded builder;
-4. produce draft PR;
-5. run deterministic tests;
-6. assign a different model or human to inspect source and attack the work;
-7. return findings to the controller;
-8. repair confirmed defects;
-9. invalidate stale authorization after substantive changes;
-10. authorize one exact SHA;
-11. add only merge-authorization bookkeeping;
-12. pass checks;
-13. merge with expected-head protection;
-14. verify resulting accepted state;
-15. stop.
-
-## Parallelism rule
-
-- read-only research may run in parallel;
-- non-overlapping branches may run in parallel;
-- no two writers use the same branch/worktree;
-- accepted-state merges remain serial.
-
-## Model diversity rule
-
-Use varied models and humans, but never count multiple models as votes or automatic independence.
-
-Relay interpretations, but require later reviewers to inspect source material.
-
-# MODEL AND HUMAN ROLES
-
-Propose:
-
-- Controller/plain-English adjudicator
-- Builder
-- Breaker
-- Evidence verifier
-- Rights/licensing reviewer
-- User-harm reviewer
-- Domain specialist
-- Cold-entry tester
-- Operator/governor
-
-No seat receives authority merely from confidence or technical fluency.
-
-# EFFICIENCY RULES
-
-The roadmap must prevent setup work becoming endless.
-
-Include:
-
-- one load-bearing write PR at a time;
-- smaller staged PRs;
-- no giant all-system implementation;
-- no polished UI before pilot success;
-- no full corpus import before Sandbox recovery rules;
-- no requirement to manually index every screen recording;
-- no university platform before one learner journey works;
-- no mature Mithub architecture before two pilot Mithubs;
-- no implementation claim merely because the roadmap was merged.
-
-# MILESTONE GRAPH
-
-Create a machine-readable milestone graph with:
-
-- milestone IDs;
-- dependencies;
-- blocking versus non-blocking status;
-- responsible role;
-- required evidence;
-- exit conditions;
-- next authorized operation;
-- current status;
-- `status_authority: NONE`.
-
-At minimum include:
-
-- economy-framework resolution;
-- Sandbox canon implementation;
-- Phase A drills;
-- Sandbox operational clearance;
-- reproducibility repair;
-- learner Mithub pilot;
-- critic Mithub pilot;
-- university cold-entry pilot;
-- serious-team front door.
-
-# NON-CLAIMS
-
-Prominently state:
-
-- roadmap acceptance is not implementation;
-- roadmap acceptance is not proof;
-- Sandbox clearance does not authorize real users, money or external targeting;
-- Mithubs do not grant Lab authority;
-- dissent protection does not permit harassment or unlawful conduct;
-- rapid collaboration does not justify rapid acceptance;
-- GitHub history improves traceability but does not establish factual truth;
-- no model review is independent merely because the model name differs;
-- future legal, economic and security review remains necessary.
-
-# SOURCE AND CANON REQUIREMENTS
-
-Freshly inspect and cite:
-
-- current Lab `main`;
-- merged promotion-gate state;
-- current Sandbox `main`;
-- closed-world economy proposal or accepted state, depending on its disposition;
-- `STATUS.json`;
-- `NEXUS.json`;
-- `WHY_NOT_TO_TRUST_THIS_PROJECT.md`;
-- existing Mithub/router material;
-- public board state;
-- relevant Commons/language material;
-- relevant open proposals on governance, external adversaries and university concepts;
-- this queued package.
-
-Classify every source:
+Freshly inspect current sources and classify them as:
 
 - `ACCEPTED_MAIN`
 - `MERGED_EVIDENCE`
@@ -475,76 +189,58 @@ Classify every source:
 - `SUPERSEDED`
 - `UNABLE_TO_VERIFY`
 
-Do not present prior chat plans as repository canon unless they are committed and classified.
+Do not present prior chats or open PRs as accepted canon.
 
-# BRANCH AND PR
+## Execution protocol
 
-Create a fresh branch from the then-current accepted Lab `main`.
+1. pin exact starting SHA;
+2. create isolated branch/worktree;
+3. bounded builder;
+4. draft PR;
+5. deterministic tests;
+6. different-seat source-bound attack;
+7. plain-English adjudication;
+8. bounded repairs;
+9. invalidate stale authorization;
+10. authorize exact substantive SHA;
+11. add only authorization bookkeeping;
+12. pass checks;
+13. expected-head merge;
+14. verify accepted state;
+15. stop.
 
-Suggested branch:
+Read-only research and non-overlapping branches may run in parallel. Accepted-state merges remain serial.
 
-`chatgpt/sandbox-clearance-mithub-roadmap-execution-001`
-
-Open a draft PR titled approximately:
-
-`Proposal: Sandbox operational clearance and Mithub roadmap`
+## Roadmap PR boundary
 
 Use the merged PR #110 `LAB_INTERNAL` contract.
 
-Do not merge.
+Open a draft PR only.
 
-Do not add merge authorization.
+Do not:
 
-Do not modify Sandbox during this operation.
+- modify Experimental-Sandbox;
+- merge PR #118 or #117;
+- add merge authorization;
+- write directly to Lab `main`;
+- implement Mithub, University or an economy;
+- deploy real users;
+- authorize external value.
 
-# VERIFICATION
-
-Run:
-
-- promotion-contract validation;
-- JSON validation;
-- machine-readable milestone graph checks;
-- link/path checks;
-- `git diff --check`;
-- changed-file scope check;
-- frozen-path check;
-- secret scan;
-- personal-data scan;
-- local-path scan;
-- private-URL scan;
-- `./nexus doctor`.
-
-Run the full verifier only if existing dependencies allow it.
-
-If blocked by `@noble/ed25519`, record:
-
-`BLOCKED_BY_MISSING_DEPENDENCY`
-
-Do not repair it during this operation.
-
-# FINAL RESPONSE
+## Final return
 
 Return:
 
 1. starting Lab SHA;
-2. economy disposition and exact source;
-3. branch name;
-4. draft PR number and URL;
-5. exact head SHA;
-6. files created;
-7. immediate Phase A blockers;
-8. later non-blocking milestones;
-9. source classifications;
-10. tests and checks;
-11. risks and non-claims;
-12. exact operator decision requested.
-
-Use:
-
-`AUTHORIZE SANDBOX CLEARANCE ROADMAP MERGE AT <FULL_HEAD_SHA>`
-
-Do not create authorization or merge.
+2. PR #118 disposition and supporting review SHA/evidence;
+3. execution branch;
+4. draft roadmap PR and head SHA;
+5. files created;
+6. Phase A blockers;
+7. later non-blocking milestones;
+8. source classifications;
+9. tests and limitations;
+10. risks and non-claims;
+11. exact operator decision requested.
 
 Stop after the draft PR and decision card.
-
----
