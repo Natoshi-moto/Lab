@@ -6,7 +6,7 @@
 > new experiments should use the separate repository so “Lab” always means canonical Nexus Lab.
 
 **status_authority:** `NONE`  
-**Human Gate:** merges require explicit human authorization recorded for the exact PR commit; this is not independent review.  
+**Human Gate:** merges require explicit human authorization recorded for the exact PR commit; this is not independent review.
 
 This is the documented, public contract for **parallel chaos**.
 
