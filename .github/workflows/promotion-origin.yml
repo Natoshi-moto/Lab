@@ -29,6 +29,7 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           body_file="$RUNNER_TEMP/promotion-body.md"
@@ -44,6 +45,9 @@ jobs:
           # This reads Lab's PR diff only. It never checks out or executes a
           # promoted Sandbox repository, and it never writes to Lab.
           git diff --name-only "$BASE_SHA" "$HEAD_SHA" | sort > "$changed_file_list"
+          # PR_NUMBER is trusted event metadata, not PR-body content. The
+          # validator uses it to recognize only this PR's exact bookkeeping path.
           python3 operations/process/validate_promotion.py \
             --body-file "$body_file" \
-            --changed-files-file "$changed_file_list"
+            --changed-files-file "$changed_file_list" \
+            --pr-number "$PR_NUMBER"

@@ -21,6 +21,8 @@ REPO = "Natoshi-moto/Experimental-Sandbox"
 SCHEMA = "nexus.experimental-sandbox-promotion/v1"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 TAG_RE = re.compile(r"^[^\s~^:?*\\\[\]\.]+$")
+AUTHORIZATION_DIR = "operations/merge_authorizations/"
+AUTHORIZATION_PATH_RE = re.compile(r"^operations/merge_authorizations/PR-([1-9][0-9]*)\.json$")
 DISPOSITIONS = {
     "COPIED",
     "REWRITTEN",
@@ -112,6 +114,48 @@ def _relative_path(path: str, field: str) -> None:
         raise ContractError(f"{field} contains an unsafe path: {path!r}")
 
 
+def _validate_pr_number(pr_number: int | None) -> None:
+    if pr_number is not None and (isinstance(pr_number, bool) or not isinstance(pr_number, int) or pr_number < 1):
+        raise ContractError("trusted pull-request number must be a positive integer")
+
+
+def split_changed_files(changed_files: list[str], pr_number: int | None) -> tuple[list[str], list[str]]:
+    """Separate one exact current-PR authorization file from substantive files.
+
+    The PR number is supplied by the trusted GitHub event context. Nothing in
+    the promotion package can select or widen this exemption.
+    """
+    _validate_pr_number(pr_number)
+    normalized: list[str] = []
+    for item in changed_files:
+        if not isinstance(item, str) or not item.strip():
+            raise ContractError("changed file must be a non-empty string")
+        if item != item.strip():
+            raise ContractError(f"changed file contains leading or trailing whitespace: {item!r}")
+        normalized.append(item)
+    if len(set(normalized)) != len(normalized):
+        raise ContractError("changed-file list contains duplicate paths")
+
+    substantive: list[str] = []
+    authorization: list[str] = []
+    for path in normalized:
+        if path.startswith(AUTHORIZATION_DIR):
+            match = AUTHORIZATION_PATH_RE.fullmatch(path)
+            if not match:
+                raise ContractError(f"unexpected authorization bookkeeping path: {path!r}")
+            if pr_number is None:
+                raise ContractError("trusted pull-request number is required for authorization bookkeeping")
+            if int(match.group(1)) != pr_number:
+                raise ContractError(f"authorization bookkeeping is for a different PR: {path!r}")
+            authorization.append(path)
+        else:
+            substantive.append(path)
+
+    if len(authorization) > 1:
+        raise ContractError("more than one current-PR authorization bookkeeping file is not allowed")
+    return sorted(substantive), authorization
+
+
 def _all_strings(value: Any) -> Iterable[str]:
     if isinstance(value, str):
         yield value
@@ -143,7 +187,10 @@ def _reject_positive_authority_claims(package: dict[str, Any]) -> None:
                 raise ContractError("free text attempts to claim canonical authority")
 
 
-def _validate_common(package: dict[str, Any], changed_files: list[str] | None) -> None:
+def _validate_common(
+    package: dict[str, Any], changed_files: list[str] | None, pr_number: int | None
+) -> list[str]:
+    _validate_pr_number(pr_number)
     missing = sorted(REQUIRED - package.keys())
     extra = sorted(package.keys() - REQUIRED)
     if missing:
@@ -245,11 +292,14 @@ def _validate_common(package: dict[str, Any], changed_files: list[str] | None) -
     _text(decision["rationale"], "operator_decision_requested.rationale")
     _text(decision["stop_conditions"], "operator_decision_requested.stop_conditions")
 
+    authorization_files: list[str] = []
     if changed_files is not None:
-        actual = sorted({_text(item, "changed file") for item in changed_files if item.strip()})
+        actual, authorization_files = split_changed_files(changed_files, pr_number)
+        if any(path in authorization_files for path in proposed_paths):
+            raise ContractError("authorization bookkeeping must not be listed as proposed Lab content")
         if sorted(proposed_paths) != actual:
             raise ContractError(
-                "files_proposed_for_lab must exactly match the PR changed-file set; "
+                "files_proposed_for_lab must exactly match the substantive PR changed-file set; "
                 f"declared={sorted(proposed_paths)} actual={actual}"
             )
         for path in actual:
@@ -257,6 +307,7 @@ def _validate_common(package: dict[str, Any], changed_files: list[str] | None) -
                 raise ContractError(f"changed file outside allowed_write_scope: {path}")
 
     _reject_positive_authority_claims(package)
+    return authorization_files
 
 
 def _validate_record_url(url: str, sha: str, tag: str) -> None:
@@ -284,15 +335,16 @@ def validate_package(
     package: dict[str, Any],
     *,
     changed_files: list[str] | None = None,
+    pr_number: int | None = None,
     tag_resolver: Callable[[str, str], dict[str, Any]] | None = None,
-) -> None:
-    _validate_common(package, changed_files)
+) -> list[str]:
+    authorization_files = _validate_common(package, changed_files, pr_number)
     origin = package["change_origin"]
     if origin == "LAB_INTERNAL":
         for field in LAB_FIELDS:
             if package[field] != "NOT_APPLICABLE":
                 raise ContractError(f"{field} must be NOT_APPLICABLE for LAB_INTERNAL")
-        return
+        return authorization_files
 
     if package["sandbox_repository"] != REPO:
         raise ContractError(f"sandbox_repository must be exactly {REPO}")
@@ -317,6 +369,7 @@ def validate_package(
         raise ContractError("Sandbox tag did not resolve to one full commit SHA")
     if resolved != sha:
         raise ContractError(f"Sandbox tag resolves to {resolved}, not declared {sha}")
+    return authorization_files
 
 
 def resolve_tag_from_git(repository: str, tag: str) -> dict[str, Any]:
@@ -343,13 +396,20 @@ def resolve_tag_from_git(repository: str, tag: str) -> dict[str, Any]:
     raise ContractError("tag missing")
 
 
-def validate_files(body_file: Path, changed_files_file: Path | None) -> None:
+def validate_files(body_file: Path, changed_files_file: Path | None, pr_number: int | None) -> None:
     package = parse_pr_body(body_file.read_text(encoding="utf-8"))
     changed = None
     if changed_files_file is not None:
         changed = changed_files_file.read_text(encoding="utf-8").splitlines()
-    validate_package(package, changed_files=changed)
+    authorization_files = validate_package(package, changed_files=changed, pr_number=pr_number)
     print(f"Promotion contract PASS: {package['change_origin']}; status_authority=NONE")
+    if authorization_files:
+        print(
+            "Excluded authorization bookkeeping from substantive scope: "
+            f"{authorization_files[0]}; the Human merge authorization workflow validates it separately."
+        )
+    else:
+        print("No authorization bookkeeping file was present in the PR diff.")
     print("Provenance was checked as declared metadata only; no Sandbox content was fetched or executed.")
     print("A passing contract check is not proof of safety, security, correctness, usefulness, rights, or deployment suitability.")
 
@@ -358,9 +418,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--body-file", type=Path, required=True)
     parser.add_argument("--changed-files-file", type=Path)
+    parser.add_argument("--pr-number", type=int, help="trusted GitHub pull-request number")
     args = parser.parse_args(argv)
     try:
-        validate_files(args.body_file, args.changed_files_file)
+        validate_files(args.body_file, args.changed_files_file, args.pr_number)
     except (ContractError, OSError) as exc:
         print(f"PROMOTION CONTRACT REJECTED: {exc}", file=sys.stderr)
         return 1

@@ -19,6 +19,8 @@ LAB_SHA = "187f6bf61de8a46a7f41e41d62c3bd23eed9d9ed"
 SANDBOX_SHA = "1111111111111111111111111111111111111111"
 ANNOTATED_SHA = "2222222222222222222222222222222222222222"
 CHANGED = ["operations/process/example.md"]
+AUTH_110 = "operations/merge_authorizations/PR-110.json"
+AUTH_111 = "operations/merge_authorizations/PR-111.json"
 
 
 def load_fixture(name: str) -> dict:
@@ -34,13 +36,92 @@ def sandbox_resolver(_repo: str, tag: str) -> dict:
 
 
 class PromotionContractTests(unittest.TestCase):
-    def assert_rejected(self, name: str, package: dict, resolver=sandbox_resolver, changed=CHANGED) -> None:
+    def assert_rejected(
+        self,
+        name: str,
+        package: dict,
+        resolver=sandbox_resolver,
+        changed=CHANGED,
+        pr_number: int | None = None,
+    ) -> None:
         with self.subTest(case=name):
             with self.assertRaises(ContractError):
-                validate_package(package, changed_files=changed, tag_resolver=resolver)
+                validate_package(package, changed_files=changed, pr_number=pr_number, tag_resolver=resolver)
 
     def test_valid_lab_internal(self) -> None:
         validate_package(load_fixture("valid_lab_internal.json"), changed_files=CHANGED)
+
+    def test_current_pr_authorization_is_separate_bookkeeping(self) -> None:
+        validate_package(
+            load_fixture("valid_lab_internal.json"),
+            changed_files=CHANGED + [AUTH_110],
+            pr_number=110,
+        )
+
+    def test_pr_body_cannot_select_authorization_path(self) -> None:
+        package = load_fixture("valid_lab_internal.json")
+        package["task_or_route_id"] = "PR-111 claimed in body; trusted event is PR-110"
+        validate_package(package, changed_files=CHANGED + [AUTH_110], pr_number=110)
+
+    def test_authorization_bookkeeping_requires_trusted_pr_number(self) -> None:
+        self.assert_rejected(
+            "missing trusted PR number",
+            load_fixture("valid_lab_internal.json"),
+            changed=CHANGED + [AUTH_110],
+        )
+
+    def test_authorization_path_attacks_fail_closed(self) -> None:
+        package = load_fixture("valid_lab_internal.json")
+        invalid_paths = [
+            AUTH_111,
+            "operations/merge_authorizations/anything.json",
+            "operations/merge_authorizations/archive/PR-110.json",
+            "operations/merge_authorizations/pr-110.json",
+            "operations/merge_authorizations/PR-110.json.bak",
+            "operations/merge_authorizations/PR-110.json ",
+            "operations/merge_authorizations/../PR-110.json",
+        ]
+        for path in invalid_paths:
+            self.assert_rejected(
+                f"invalid authorization path {path}",
+                copy.deepcopy(package),
+                changed=CHANGED + [path],
+                pr_number=110,
+            )
+        self.assert_rejected(
+            "two authorization files",
+            copy.deepcopy(package),
+            changed=CHANGED + [AUTH_110, AUTH_111],
+            pr_number=110,
+        )
+
+    def test_undeclared_substantive_file_stays_rejected_with_auth(self) -> None:
+        self.assert_rejected(
+            "undeclared substantive file with valid authorization bookkeeping",
+            load_fixture("valid_lab_internal.json"),
+            changed=CHANGED + ["operations/process/undeclared.md", AUTH_110],
+            pr_number=110,
+        )
+
+    def test_authorization_file_cannot_be_listed_as_promoted_content(self) -> None:
+        package = load_fixture("valid_lab_internal.json")
+        package["files_proposed_for_lab"].append({"path": AUTH_110, "disposition": "EVIDENCE_ONLY"})
+        self.assert_rejected(
+            "authorization file included in proposed content",
+            package,
+            changed=CHANGED + [AUTH_110],
+            pr_number=110,
+        )
+
+    def test_invalid_trusted_pr_numbers_fail_closed(self) -> None:
+        package = load_fixture("valid_lab_internal.json")
+        for value in (0, -110, True, "110"):
+            self.assert_rejected(
+                f"invalid trusted PR number {value!r}",
+                copy.deepcopy(package),
+                changed=CHANGED + [AUTH_110],
+                pr_number=value,
+            )
 
     def test_valid_sandbox_promotion_with_exact_commit_and_tag(self) -> None:
         validate_package(load_fixture("valid_sandbox_promotion.json"), changed_files=CHANGED, tag_resolver=sandbox_resolver)

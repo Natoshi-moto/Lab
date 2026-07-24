@@ -63,6 +63,23 @@ branches, histories, build output, generated files, dependencies, credentials,
 local configuration, and unrelated experiments stay out unless deliberately
 listed and reviewed.
 
+### Composition with merge authorization
+
+Promotion scope describes substantive Lab content only. When the trusted
+GitHub pull-request event supplies a PR number, the validator may exclude one
+and only one bookkeeping path from that substantive comparison:
+`operations/merge_authorizations/PR-<CURRENT_PR_NUMBER>.json`. It does not
+exclude the directory broadly, another PR's authorization, malformed paths,
+reports, receipts, workflows, or any other file. The exact bookkeeping path is
+not allowed in `files_proposed_for_lab` and is not added to the declared
+substantive write scope.
+
+The separate Human merge authorization workflow validates that bookkeeping
+file. Both checks must pass before a merge is possible, but neither check is
+proof of correctness, safety, security, rights compatibility, usefulness, or
+suitability. Any substantive commit after an operator authorization makes that
+authorization stale and requires a new exact-head decision.
+
 ## Rights and licence boundary
 
 Every package declares the original author or source, source repository and
