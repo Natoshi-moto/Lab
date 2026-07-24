@@ -42,7 +42,7 @@ Continuation prompt: “After confirming Sandbox PR #2 is merged, re-check Lab P
 
 ## Card 3 — Promotion gate repair and eventual merge
 
-Action: repair Lab PR #110 so it fails closed, then consider merging the corrected head.
+Action: authorize preparation and execution of a repair to Lab PR #110 so it fails closed. This card authorizes repair work only; it does not authorize a merge.
 
 What changes: the workflow and accompanying promotion contract would require complete provenance/authority/scope/evidence/operator metadata and prevent automatic promotion claims.
 
@@ -54,9 +54,15 @@ Evidence: current head checks only origin/SHA/tag equality and misses required f
 
 Remaining uncertainty: exact remote protection and all repository workflows are not fully verified; repair scope needs a fresh diff.
 
-Exact authorization phrase: AUTHORIZE PROMOTION GATE MERGE
+Exact authorization phrase: AUTHORIZE PROMOTION GATE REPAIR
 
-Continuation prompt: “Prepare and run the negative-test repair for Lab PR #110. Show me a new decision card for the corrected head; do not merge until I say AUTHORIZE PROMOTION GATE MERGE.”
+Continuation prompt: “Prepare and run the negative-test repair for Lab PR #110. This authorization covers repair work only; do not merge. After adversarial retesting, show a separate merge decision card bound to the repaired PR’s exact full 40-character head SHA.”
+
+## Future placeholder — repaired promotion-gate merge
+
+This is not an authorization and is not executable now. After repair and adversarial retesting, any merge requires a new decision card that names the repaired PR’s exact full 40-character head SHA, records the retest results, and states what remains uncertain.
+
+Future authorization phrase format: AUTHORIZE REPAIRED PROMOTION GATE MERGE FOR SHA <EXACT_FULL_40_CHARACTER_HEAD_SHA>
 
 ## Card 4 — Close superseded PR #113
 

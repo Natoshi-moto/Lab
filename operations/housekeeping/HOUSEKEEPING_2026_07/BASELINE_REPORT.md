@@ -26,7 +26,7 @@ Branch protection and rulesets were not accessible: local gh API calls failed be
 
 ## Open PR inventory
 
-Lab currently has 30 open PRs: #14, #22, #23, #24, #40, #42, #43, #44, #45, #46, #47, #49, #60, #61, #62, #78, #93, #94, #95, #97, #98, #99, #100, #101, #107, #108, #109, #110, #111, #112, and #113. The requested housekeeping set is adjudicated in PR_ADJUDICATION_MATRIX.md; older open work is retained as open proposals in the branch inventory and is not silently closed.
+Lab currently has 31 open PRs: #14, #22, #23, #24, #40, #42, #43, #44, #45, #46, #47, #49, #60, #61, #62, #78, #93, #94, #95, #97, #98, #99, #100, #101, #107, #108, #109, #110, #111, #112, and #113. The requested housekeeping set is adjudicated in PR_ADJUDICATION_MATRIX.md; older open work is retained as open proposals in the branch inventory and is not silently closed.
 
 Experimental-Sandbox currently has two open PRs: #2 and #3. PR #1 is merged into Sandbox main and is part of accepted Sandbox state, not Lab state.
 
