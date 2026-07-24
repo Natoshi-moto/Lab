@@ -1,0 +1,58 @@
+{
+  "schema": "nexus.experimental-sandbox-promotion/v1",
+  "change_origin": "LAB_INTERNAL",
+  "sandbox_repository": "NOT_APPLICABLE",
+  "sandbox_commit": "NOT_APPLICABLE",
+  "sandbox_tag": "NOT_APPLICABLE",
+  "sandbox_record_url": "NOT_APPLICABLE",
+  "sandbox_context": "NOT_APPLICABLE",
+  "task_or_route_id": "LAB-INTERNAL-TEST-001",
+  "baseline_lab_commit": "187f6bf61de8a46a7f41e41d62c3bd23eed9d9ed",
+  "authority_used": "bounded operator task",
+  "allowed_write_scope": ["operations/process/**"],
+  "files_proposed_for_lab": [
+    {"path": "operations/process/example.md", "disposition": "DOCUMENTATION_ONLY"}
+  ],
+  "claim": "The validator rejects malformed promotion packages.",
+  "falsifier": "A documented malformed package is accepted.",
+  "evidence_class": "TEST",
+  "tests_run": [
+    {"command": "python3 -m unittest", "result": "PASS", "details": "Deterministic fixture test completed."}
+  ],
+  "test_results": ["one fixture test passed"],
+  "known_failures": [],
+  "known_unknowns": ["This fixture does not establish semantic correctness."],
+  "non_claims": ["The package is not canonical and the validator is not a safety proof."],
+  "adversarial_review": {
+    "performed": true,
+    "summary": "Negative fixture review was performed.",
+    "findings": ["Duplicate keys are rejected."],
+    "limitations": ["This is a local fixture." ]
+  },
+  "rights_and_licences": {
+    "original_author_or_source": "Lab test author",
+    "source_repository": "Natoshi-moto/Lab",
+    "source_commit": "187f6bf61de8a46a7f41e41d62c3bd23eed9d9ed",
+    "source_licence": "MIT as declared by the repository",
+    "files_modified": "No source file is copied.",
+    "third_party_material": "None declared.",
+    "submitter_rights": "Operator-authorized test fixture.",
+    "lab_mit_compatibility": "Documentation-only fixture is compatible by declaration.",
+    "exceptions": "None declared."
+  },
+  "security_and_privacy_impact": {
+    "summary": "Validator-only fixture with no external write path.",
+    "secrets_checked": "No secrets are present.",
+    "personal_data_checked": "No personal data is present.",
+    "external_systems": "No external system is contacted by this fixture.",
+    "risks": "Passing the fixture is not a security or correctness claim."
+  },
+  "known_lab_red_impact": "NONE",
+  "operator_decision_requested": {
+    "action": "PARK",
+    "rationale": "Use only as a deterministic validator fixture.",
+    "reversible": true,
+    "stop_conditions": "Stop if the fixture is treated as proof."
+  },
+  "status_authority": "NONE"
+}

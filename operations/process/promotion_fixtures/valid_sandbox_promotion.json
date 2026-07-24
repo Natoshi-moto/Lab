@@ -1,0 +1,58 @@
+{
+  "schema": "nexus.experimental-sandbox-promotion/v1",
+  "change_origin": "SANDBOX_PROMOTION",
+  "sandbox_repository": "Natoshi-moto/Experimental-Sandbox",
+  "sandbox_commit": "1111111111111111111111111111111111111111",
+  "sandbox_tag": "promotion/test-001",
+  "sandbox_record_url": "https://github.com/Natoshi-moto/Experimental-Sandbox/commit/1111111111111111111111111111111111111111",
+  "sandbox_context": "Public Sandbox experiment record; no Sandbox code was executed by the provenance gate.",
+  "task_or_route_id": "SBX-TEST-001",
+  "baseline_lab_commit": "187f6bf61de8a46a7f41e41d62c3bd23eed9d9ed",
+  "authority_used": "operator-authorized promotion proposal",
+  "allowed_write_scope": ["operations/process/**"],
+  "files_proposed_for_lab": [
+    {"path": "operations/process/example.md", "disposition": "INDEPENDENT_REIMPLEMENTATION"}
+  ],
+  "claim": "The declared experiment produces the documented output under the declared conditions.",
+  "falsifier": "A clean reproduction fails to produce the documented output.",
+  "evidence_class": "DRAFT",
+  "tests_run": [
+    {"command": "./reproduce.sh", "result": "PASS", "details": "Fixture output matched the declared example."}
+  ],
+  "test_results": ["The bounded fixture reproduction matched the declared output."],
+  "known_failures": ["No independent reproduction has been completed."],
+  "known_unknowns": ["Security and deployment suitability remain unknown."],
+  "non_claims": ["This does not establish safety, correctness, usefulness, independence, or Lab authority."],
+  "adversarial_review": {
+    "performed": true,
+    "summary": "Builder and breaker reviewed the bounded fixture.",
+    "findings": ["The declared scope is narrow."],
+    "limitations": ["The reviewers share one operator account." ]
+  },
+  "rights_and_licences": {
+    "original_author_or_source": "Sandbox experiment author",
+    "source_repository": "Natoshi-moto/Experimental-Sandbox",
+    "source_commit": "1111111111111111111111111111111111111111",
+    "source_licence": "MIT as declared by the source repository.",
+    "files_modified": "The proposed Lab file is independently reimplemented.",
+    "third_party_material": "None declared.",
+    "submitter_rights": "Submitter declares the right to propose the reimplementation.",
+    "lab_mit_compatibility": "Declared compatible; legal ownership is not verified by this gate.",
+    "exceptions": "None declared."
+  },
+  "security_and_privacy_impact": {
+    "summary": "No Lab write or external-posting path is part of the package.",
+    "secrets_checked": "Declared secret scan found no secrets.",
+    "personal_data_checked": "Declared review found no personal data.",
+    "external_systems": "No external system is contacted by the gate.",
+    "risks": "The source claim may be wrong or unsafe despite passing declared tests."
+  },
+  "known_lab_red_impact": "NONE",
+  "operator_decision_requested": {
+    "action": "MORE_TESTING",
+    "rationale": "Request another bounded review before any Lab proposal.",
+    "reversible": true,
+    "stop_conditions": "Stop if provenance, rights, or declared scope changes."
+  },
+  "status_authority": "NONE"
+}

@@ -1,0 +1,53 @@
+name: Promotion origin
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promotion-origin-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate-contract:
+    name: Promotion origin contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out Lab PR metadata only
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate one structured promotion package
+        shell: bash
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          body_file="$RUNNER_TEMP/promotion-body.md"
+          changed_file_list="$RUNNER_TEMP/promotion-changed-files.txt"
+
+          python3 - "$body_file" <<'PY'
+          import os
+          import pathlib
+          import sys
+          pathlib.Path(sys.argv[1]).write_text(os.environ.get("PR_BODY", ""), encoding="utf-8")
+          PY
+
+          # This reads Lab's PR diff only. It never checks out or executes a
+          # promoted Sandbox repository, and it never writes to Lab.
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" | sort > "$changed_file_list"
+          # PR_NUMBER is trusted event metadata, not PR-body content. The
+          # validator uses it to recognize only this PR's exact bookkeeping path.
+          python3 operations/process/validate_promotion.py \
+            --body-file "$body_file" \
+            --changed-files-file "$changed_file_list" \
+            --pr-number "$PR_NUMBER"

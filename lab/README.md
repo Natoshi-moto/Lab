@@ -1,7 +1,12 @@
 # Safe Lab Mode — go nuts, keep `main` clean
 
+> **SUPERSEDED FOR NEW EXPERIMENTS:** The distinct public chaos environment is
+> [`Natoshi-moto/Experimental-Sandbox`](https://github.com/Natoshi-moto/Experimental-Sandbox).
+> Existing `lab/*` and `play/*` branches remain historical and may finish bounded work;
+> new experiments should use the separate repository so “Lab” always means canonical Nexus Lab.
+
 **status_authority:** `NONE`  
-**Human Gate:** still only you merge to `main`  
+**Human Gate:** merges require explicit human authorization recorded for the exact PR commit; this is not independent review.
 
 This is the documented, public contract for **parallel chaos**.
 
