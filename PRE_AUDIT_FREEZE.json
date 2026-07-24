@@ -1,0 +1,78 @@
+{
+  "schema": "nexus.bgen-codex-technical-audit-pre-freeze/v1",
+  "audit_id": "BGEN-CODEX-TECH-AUDIT-001",
+  "created_at_utc": "2026-07-21T13:38:06Z",
+  "status_authority": "NONE",
+  "repository": "Natoshi-moto/Lab",
+  "audit_branch": "codex/bgen-technical-audit-001",
+  "audit_baseline_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "historical_research_base_commit": "22ce8c11297ad4c08606277ee83dc845797ba220",
+  "historical_base_is_ancestor_of_audit_baseline": true,
+  "worktree_at_freeze": "CLEAN",
+  "controlling_contract": "operator-pasted clean-restart contract; exact GitHub issues 33 and 34 were the only pre-freeze GitHub task objects inspected",
+  "pre_freeze_inspected_scopes": [
+    "repository operating instructions and constitution",
+    "STATUS.json",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/**",
+    "https://github.com/Natoshi-moto/Lab/issues/33",
+    "https://github.com/Natoshi-moto/Lab/issues/34"
+  ],
+  "temporarily_unread_inventory_algorithm": "For each listed directory: SHA-256 of the byte stream emitted by sha256sum over every regular file, with paths sorted bytewise using find -print0 | sort -z. file_count counts regular files.",
+  "temporarily_unread_packages": [
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001",
+      "file_count": 79,
+      "sha256_inventory_digest": "a85a2b6b457081159e202e0795214f73ac2e328e02d512c9ce96d6093fdde81b"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001",
+      "file_count": 80,
+      "sha256_inventory_digest": "96c795be05f76247f3370447d7d14fccbc6e147d01c6c64db0b6fe7a0bab0b56"
+    },
+    {
+      "path": "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003",
+      "file_count": 3,
+      "sha256_inventory_digest": "8cc215db03efec9f42385defa43f7098c4c4741bf0c2c5b585d7c551b0953427"
+    },
+    {
+      "path": "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001",
+      "file_count": 1,
+      "sha256_inventory_digest": "1d7594f2323054315b7afa0dc9e14917311e1682d34bc26f2d13656ad2a753d2"
+    },
+    {
+      "path": "operations/audits/BENEFICIAL_GENESIS_ECON_BREAKER_001",
+      "file_count": 1,
+      "sha256_inventory_digest": "3a9d1f232cdf8defd2410dac7f489043c7e89545bc4906761c7f5328f2e7761c"
+    },
+    {
+      "path": "operations/audits/BENEFICIAL_GENESIS_ECON_RETEST_003",
+      "file_count": 1,
+      "sha256_inventory_digest": "53108df8a0b9409751d34996dbcda1876baf91a28511e08a229dc62402808406"
+    },
+    {
+      "path": "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001",
+      "file_count": 1,
+      "sha256_inventory_digest": "de34532d11ac794bd38ab8b432a872ea3af95a5d5c936613ce80d22f3e9c8f3c"
+    },
+    {
+      "path": "operations/receipts/BENEFICIAL_GENESIS_ECON_BREAKER_001",
+      "file_count": 1,
+      "sha256_inventory_digest": "7c56264b0c933dcdfa6501e3cbe31bca8ec64a951e39f00d9df3e1943e51fb33"
+    },
+    {
+      "path": "operations/receipts/BENEFICIAL_GENESIS_ECON_RETEST_003",
+      "file_count": 1,
+      "sha256_inventory_digest": "453c5fce3ac68ea98c13ba21e69854ff61660d113c03681113763e5f2e2cb1ad"
+    }
+  ],
+  "permanent_blindness": {
+    "active_for_entire_audit": true,
+    "forbidden_material_surfaced": false,
+    "scope": "PR 40; fable/bgen-epistemic-audit-001; Fable audit experiment/audit/receipt paths; every sibling 2x2 audit branch, PR, report, receipt, summary, or finding"
+  },
+  "nonclaims": [
+    "Hashing unread package bytes for inventory did not constitute semantic inspection.",
+    "This freeze does not endorse, validate, or promote the frozen subject.",
+    "The audit baseline is a proposal-branch commit, not accepted or canonical status."
+  ]
+}

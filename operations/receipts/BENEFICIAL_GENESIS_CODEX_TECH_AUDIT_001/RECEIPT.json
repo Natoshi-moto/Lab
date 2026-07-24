@@ -1,0 +1,55 @@
+{
+  "schema": "bgen.codex-tech-audit-001.receipt/v1",
+  "label": "SANITIZED_AUDIT_RECEIPT",
+  "audit_id": "BGEN-CODEX-TECH-AUDIT-001",
+  "github_issue": 41,
+  "seat": "OpenAI Codex technical/evidence auditor",
+  "status_authority": "NONE",
+  "mode": "REPORT_ONLY",
+  "subject_repository": "Natoshi-moto/Lab",
+  "subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "historical_research_base_commit": "22ce8c11297ad4c08606277ee83dc845797ba220",
+  "pre_audit_freeze_commit": "6b74f63fd01484088589b2beebf94f62db20db69",
+  "branch": "codex/bgen-technical-audit-001",
+  "decision": "TECHNICAL_EVIDENCE_HOLD_FOR_REPAIR",
+  "economic_gate_pass": false,
+  "underlying_mechanism_disposition": "NOT_ADJUDICATED_BY_THIS_TECHNICAL_SEAT",
+  "observations": [
+    {
+      "id": "CODEX-TECH-001",
+      "severity": "HIGH_MODEL_INVARIANT_BOUNDED_SYNTHETIC_SCOPE",
+      "evidence_classes": ["SOURCE", "TEST"],
+      "summary": "Unchecked negative lottery_share_bps causes total issuance above pool and a negative unissued remainder."
+    }
+  ],
+  "command_results": {
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/tests -v": "PASS_72",
+    "python3 -m unittest discover -s experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001/tests -v": "PASS_25",
+    "python3 -m unittest discover -s tests -q": "PASS_185_AFTER_NPM_CI",
+    "./nexus doctor": "PASS",
+    "./nexus verify": "PASS_AFTER_NPM_CI",
+    "python3 experiments/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/adversarial_probe.py": "REPRODUCED_INVARIANT_FAILURE"
+  },
+  "environment_note": "The initial full-suite and nexus-verify runs failed because @noble/ed25519 was absent. npm ci installed the lockfile-pinned dependency; reruns passed. No tracked subject bytes changed.",
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_CODEX_TECH_AUDIT_001/**"
+  ],
+  "subject_paths_modified": false,
+  "status_json_modified": false,
+  "live_activity_authorized": false,
+  "legal_conclusions_made": false,
+  "permanent_blindness_respected": true,
+  "operator_reported_prior_attempts": [
+    "abandoned on SUBJECT_DRIFT before subject inspection",
+    "abandoned on BLINDING_BREACH after PR 40 metadata/body appeared"
+  ],
+  "prior_attempt_transcripts_inspected": false,
+  "nonclaims": [
+    "No merge, promotion, or R-round authority.",
+    "No economic gate pass.",
+    "No exhaustive parameter-space proof.",
+    "No empirical, legal, market-price, or live-funds conclusion."
+  ]
+}
