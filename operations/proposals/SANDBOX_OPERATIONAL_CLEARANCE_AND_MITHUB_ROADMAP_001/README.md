@@ -1,6 +1,6 @@
 # SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_001
 
-**Status:** `QUEUED_PROPOSAL`
+**Status:** `QUEUED_PROPOSAL / ECONOMY_BUILDER_COMPLETE / ADVERSARIAL_REVIEW_PENDING`
 
 **Status authority:** `NONE`
 
@@ -8,7 +8,25 @@
 
 **Merge authorized:** `false`
 
-**Queued after:** `CLOSED_WORLD_ECONOMY_INVARIANTS_001`
+**Queued after:** reviewed disposition of `CLOSED_WORLD_ECONOMY_INVARIANTS_001`
+
+## Current observed state
+
+The economy builder stage is complete and publicly parked as Lab draft PR `#118`:
+
+- branch: `claude/closed-world-economy-invariants-001`
+- head: `caef0e7cd689e1e77a49413210116e7590322576`
+- tree: `2c044c46c5c23425f13a1bacd36236ce34957b3a`
+- base: `6c3a1e806baba1183553221f5c2f00125ce2be29`
+- 20 files, all under `operations/proposals/CLOSED_WORLD_ECONOMY_INVARIANTS_001/`
+- immutable builder verification: `PASS`
+- dedicated tests: `22/22 PASS`
+- vectors: `4/4 valid PASS`, `50/50 hostile rejected as declared`
+- Promotion origin and Nexus Audit: `PASS`
+- Merge Authorization: expected `FAIL`, because no authorization exists
+- `./nexus verify`: `BLOCKED_BY_MISSING_DEPENDENCY`
+
+This state must be freshly reverified. It is not independent review, acceptance or merge authority.
 
 ## Why this exists
 
@@ -22,20 +40,31 @@ Humans and AI should be able to think, argue, fork, prototype, reproduce, attack
 
 ## Activation condition
 
-**DO NOT EXECUTE THIS JOB YET.**
+**DO NOT EXECUTE THE ROADMAP YET.**
 
-It becomes eligible to begin only after all of the following are true:
+The economy builder-completion requirement has been satisfied at the observed PR #118 SHA. The roadmap becomes eligible only after all remaining conditions are true:
 
-1. `CLOSED_WORLD_ECONOMY_INVARIANTS_001` has produced a final branch or draft PR, complete receipt, schema, validator and tests.
-2. A different model or human has inspected the actual source and adversarially reviewed it.
-3. Confirmed defects have been repaired or explicitly recorded as unresolved.
-4. The controller has verified the live GitHub head SHA, changed-file scope, checks and non-claims.
-5. The operator has decided the economy package's disposition.
-6. The next execution branch is created from the then-current accepted Lab `main`, not blindly from this proposal's historical base.
+1. a different model or qualified human inspects the actual PR #118 source and diff adversarially;
+2. findings are classified with exact evidence;
+3. confirmed defects are repaired or explicitly preserved as unresolved;
+4. any changed substantive SHA is reverified and re-reviewed;
+5. the controller verifies the live GitHub head, changed-file scope, checks and non-claims;
+6. the operator records an explicit economy disposition;
+7. the next execution branch is created from the then-current accepted Lab `main`, not this queue branch's historical base.
 
 If any condition is false or `UNABLE_TO_VERIFY`, stop at read-only inspection.
 
-## What this proposal queues
+## Immediate next operation
+
+The immediate next job is:
+
+`SOURCE_BOUND_ADVERSARIAL_REVIEW_OF_PR_118`
+
+The next AI should read `HANDOFF_ANY_AI.md`, reverify PR #118, inspect its actual files, return a defect ledger, coordinate bounded repairs where necessary and stop for the operator's plain-language disposition decision.
+
+The original Sonnet builder must not be treated as its own independent reviewer.
+
+## What this proposal queues after the review gate
 
 After activation, create a rigorous staged Lab roadmap covering:
 
@@ -68,7 +97,7 @@ Current Sandbox wording still describes the repository broadly as `noncanonical`
 
 A Mithub's accepted state should be canonical for that participant's attributable intellectual lineage. It must not automatically bind Sandbox, Lab or external truth.
 
-## Phase A: minimum work before the operator goes wild in Sandbox
+## Phase A: minimum work before formal operator Sandbox clearance
 
 Phase A must remain deliberately smaller than the full Mithub/University programme.
 
@@ -157,16 +186,16 @@ Read-only research may run in parallel. Non-overlapping branches may run in para
 - `NEXUS.json` retains `proposal_is_not_action`, `action_is_not_truth`, `evidence_is_not_interpretation`, `computation_is_not_authority`, `no_silent_mutation`, and `audit_overlays_do_not_rewrite_targets`.
 - Existing Mithub Adjacent material in Experimental-Sandbox is an experimental precursor, not a complete Mithub architecture.
 
-All of these observations must be freshly reverified when the job activates.
+All observations must be freshly reverified when used.
 
 ## Non-claims
 
+- Builder completion does not mean independent review, acceptance or safety.
 - This proposal does not implement or clear Sandbox.
 - This proposal does not authorize money, a token, a market, real users or external targeting.
 - This proposal does not make Mithub or University operational.
 - This proposal does not promote any open Lab proposal.
-- This proposal does not resolve the closed-world economy package.
-- This proposal does not authorize a merge.
+- This proposal does not authorize merging PR #118, PR #117 or a future roadmap.
 - Model diversity is useful differential review, not automatic independence.
 - Git history improves attribution and replay; it does not establish truth.
 
