@@ -1,0 +1,42 @@
+test_canonical_order_by_nullifier (test_allocation.TestAllocation.test_canonical_order_by_nullifier) ... ok
+test_duplicate_nullifier_rejected (test_allocation.TestAllocation.test_duplicate_nullifier_rejected) ... ok
+test_floor_proportional_and_remainder_unissued (test_allocation.TestAllocation.test_floor_proportional_and_remainder_unissued) ... ok
+test_issuance_never_exceeds_pool (test_allocation.TestAllocation.test_issuance_never_exceeds_pool) ... ok
+test_large_product_still_bounded (test_allocation.TestAllocation.test_large_product_still_bounded) ... ok
+test_overflow_attack_vectors_report (test_allocation.TestAllocation.test_overflow_attack_vectors_report) ... ok
+test_rejects_bool_and_negative (test_allocation.TestAllocation.test_rejects_bool_and_negative) ... ok
+test_rejects_manipulated_total_eligible (test_allocation.TestAllocation.test_rejects_manipulated_total_eligible) ... ok
+test_single_claim_takes_entire_pool (test_allocation.TestAllocation.test_single_claim_takes_entire_pool) ... ok
+test_d001_domain_field_unknown_and_wrong_domain_signature_fails (test_diff_repair_002.TestDiffRepair002.test_d001_domain_field_unknown_and_wrong_domain_signature_fails) ... ok
+test_d002_bool_integer_fields_are_rejected (test_diff_repair_002.TestDiffRepair002.test_d002_bool_integer_fields_are_rejected) ... ok
+test_d002_commitment_version_is_exact_uint32_without_coercion (test_diff_repair_002.TestDiffRepair002.test_d002_commitment_version_is_exact_uint32_without_coercion) ... ok
+test_d003_nullifier_is_required_lowercase_exact_and_no_alias (test_diff_repair_002.TestDiffRepair002.test_d003_nullifier_is_required_lowercase_exact_and_no_alias) ... ok
+test_d004_unknown_nested_keys_and_duplicate_raw_keys (test_diff_repair_002.TestDiffRepair002.test_d004_unknown_nested_keys_and_duplicate_raw_keys) ... ok
+test_d005_checkpoint_conflict_and_post_reorg_rollback (test_diff_repair_002.TestDiffRepair002.test_d005_checkpoint_conflict_and_post_reorg_rollback) ... ok
+test_d005_complete_short_chain_is_insufficient (test_diff_repair_002.TestDiffRepair002.test_d005_complete_short_chain_is_insufficient) ... ok
+test_d005_cutoff_boundary_and_cutoff_plus_one (test_diff_repair_002.TestDiffRepair002.test_d005_cutoff_boundary_and_cutoff_plus_one) ... ok
+test_d007_carrier_multiplicity_and_multi_donation (test_diff_repair_002.TestDiffRepair002.test_d007_carrier_multiplicity_and_multi_donation) ... ok
+test_d008_malformed_hex_is_contained (test_diff_repair_002.TestDiffRepair002.test_d008_malformed_hex_is_contained) ... ok
+test_consume_once (test_nullifier.TestNullifier.test_consume_once) ... ok
+test_cross_chain_differs (test_nullifier.TestNullifier.test_cross_chain_differs) ... ok
+test_different_vout_different_nullifier (test_nullifier.TestNullifier.test_different_vout_different_nullifier) ... ok
+test_domain_omission_differs (test_nullifier.TestNullifier.test_domain_omission_differs) ... ok
+test_allocation_requires_closed_epoch (test_verifier_adversarial.TestAdversarialFixtures.test_allocation_requires_closed_epoch) ... ok
+test_charity_set_forgery_and_duplicates_rejected_at_constructor (test_verifier_adversarial.TestAdversarialFixtures.test_charity_set_forgery_and_duplicates_rejected_at_constructor) ... ok
+test_checkpoint_height_and_forged_intermediate_rejected (test_verifier_adversarial.TestAdversarialFixtures.test_checkpoint_height_and_forged_intermediate_rejected) ... ok
+test_closed_epoch_rejects_plain_claim (test_verifier_adversarial.TestAdversarialFixtures.test_closed_epoch_rejects_plain_claim) ... ok
+test_commitment_carrier_is_exact (test_verifier_adversarial.TestAdversarialFixtures.test_commitment_carrier_is_exact) ... ok
+test_expected_catalog_present (test_verifier_adversarial.TestAdversarialFixtures.test_expected_catalog_present) ... ok
+test_invalid_fixtures (test_verifier_adversarial.TestAdversarialFixtures.test_invalid_fixtures) ... ok
+test_negative_merkle_index_rejected (test_verifier_adversarial.TestAdversarialFixtures.test_negative_merkle_index_rejected) ... ok
+test_allocation_record_matches_fixture (test_verifier_adversarial.TestValidClaims.test_allocation_record_matches_fixture) ... ok
+test_charity_rebate_note (test_verifier_adversarial.TestValidClaims.test_charity_rebate_note) ... ok
+test_cutoff_boundary (test_verifier_adversarial.TestValidClaims.test_cutoff_boundary) ... ok
+test_double_claim_rejected_after_first (test_verifier_adversarial.TestValidClaims.test_double_claim_rejected_after_first) ... ok
+test_single_and_multi_output_claims (test_verifier_adversarial.TestValidClaims.test_single_and_multi_output_claims) ... ok
+test_stolen_source_key_crypto_ok (test_verifier_adversarial.TestValidClaims.test_stolen_source_key_crypto_ok) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 0.060s
+
+OK

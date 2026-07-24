@@ -1,0 +1,22 @@
+{
+  "experiments/BENEFICIAL_GENESIS_DESIGN_001": {
+    "tree_sha256": "76c3199bb5ee0479199678c83a6e71567e55fafc20aad6af7af3bc73c098ab97",
+    "file_count": 72
+  },
+  "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001": {
+    "tree_sha256": "f7020124512187bbba876cdc3a5161dcc9c05e56291381da15557957258bc853",
+    "file_count": 79
+  },
+  "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001": {
+    "tree_sha256": "24cb221cb6fd54a7c375e482c12d6d4873b88263fb00169d05e67cf4807b6459",
+    "file_count": 80
+  },
+  "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003": {
+    "tree_sha256": "e6cf2cd861e8fcc3468abb112363d6e6527f46acb777aa2f3f556c83ba510078",
+    "file_count": 3
+  },
+  "experiments/BENEFICIAL_GENESIS_RETEST_002": {
+    "tree_sha256": "3a2bd86a32ad6d86893105a87c85a8ae1863a1c0c068ad5b2940f69b8a41cc15",
+    "file_count": 24
+  }
+}

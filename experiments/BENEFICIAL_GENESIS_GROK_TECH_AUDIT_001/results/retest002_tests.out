@@ -1,0 +1,27 @@
+✔ normative domain tags match protocol_constants.json (2.087863ms)
+✔ charity set / commit / nullifier / txid / header / merkle match alpha fixture (2.500399ms)
+✔ duplicate JSON keys reject before object verification (0.68614ms)
+✔ commitment_version type traps (0.307228ms)
+✔ allocation floor remainder and ordering (0.5105ms)
+✔ allocation rejects boolean eligible weight (0.192585ms)
+✔ PQ message bytes and optional seed round-trip (1.616047ms)
+✔ domain_hash length framing smoke (0.374154ms)
+✔ F-001: unexpected pq_sig_domain_bytes is UNKNOWN_FIELD (no crash) (5.881803ms)
+✔ F-002: commitment_version true / string / float-ish / neg / 2 / 2^32 reject (1.486065ms)
+✔ F-003: missing / malformed / uppercase / disagreeing nullifier_hex reject (2.998986ms)
+✔ F-004: unexpected keys at nested levels reject (2.003471ms)
+✔ F-005: raw duplicate JSON keys (0.849887ms)
+✔ accepted tip later than last-eligible; boundary eligibility (1.471376ms)
+✔ insufficient confirmations with consistent shorter tip (1.214345ms)
+✔ quantum cutoff independent of eligibility (1.414611ms)
+✔ same-carrier duplication rejects (2.269262ms)
+✔ atomic nullifier rebuild: failed revalidation retains prior state (3.360504ms)
+✔ supported commitment_version constant is 1 (0.193326ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127.895016

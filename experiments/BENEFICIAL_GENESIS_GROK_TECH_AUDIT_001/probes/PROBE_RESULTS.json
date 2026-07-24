@@ -1,0 +1,328 @@
+{
+  "schema": "bgen.grok-tech-audit.probe-results/v1",
+  "probe_count": 37,
+  "outcome_counts": {
+    "PASS": 26,
+    "OBSERVED": 10,
+    "FAIL": 1
+  },
+  "probes": [
+    {
+      "probe_id": "P-DES-001",
+      "claim": "bool eligible rejected",
+      "outcome": "PASS",
+      "code": "ARITHMETIC_OVERFLOW"
+    },
+    {
+      "probe_id": "P-DES-002",
+      "claim": "supply conserved 50 random",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-DES-003",
+      "claim": "dup keys rejected",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-DES-004",
+      "claim": "upper hex rejected",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-DES-005",
+      "claim": "0x prefix rejected",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-DES-006",
+      "claim": "NUL length framing",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-DES-007",
+      "claim": "domain omission differs from canonical",
+      "outcome": "PASS",
+      "n1": "f4c0f74fed0de99a80a3d472489a52b56d1e58c46bb77ab3d60b9fe6c29b0973",
+      "omitted": "f144ee105895036e4eea17193fcb2c1f521511afef8e4c275f09482404532624"
+    },
+    {
+      "probe_id": "P-DES-008",
+      "claim": "empty rejected",
+      "outcome": "PASS",
+      "code": "AMOUNT_NOT_POSITIVE"
+    },
+    {
+      "probe_id": "P-DES-009",
+      "claim": "neg pool rejected",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-DES-010",
+      "claim": "total_eligible>MAX_SATS rejected (sum MAX_SATS+1)",
+      "outcome": "PASS",
+      "code": "AMOUNT_NOT_POSITIVE",
+      "note": "Individual eligibles within MAX_SATS but sum exceeds MAX_SATS fails closed"
+    },
+    {
+      "probe_id": "P-DES-010b",
+      "claim": "single MAX_SATS claimant gets full pool",
+      "outcome": "PASS",
+      "issued": 18446744073709551615
+    },
+    {
+      "probe_id": "P-DES-011",
+      "claim": "unicode ascii escape",
+      "outcome": "PASS",
+      "b1": "{\"label\":\"caf\\u00e9\"}"
+    },
+    {
+      "probe_id": "P-COMP-001",
+      "claim": "claude vs design pro-rata",
+      "outcome": "PASS",
+      "claude": {
+        "d1": 297029702,
+        "d2": 693069306,
+        "d3": 9900990
+      },
+      "design": [
+        297029702,
+        693069306,
+        9900990
+      ]
+    },
+    {
+      "probe_id": "P-ECON-001",
+      "claim": "bool weight all public fns",
+      "outcome": "PASS",
+      "fails": []
+    },
+    {
+      "probe_id": "P-ECON-002",
+      "claim": "lottery unique det",
+      "outcome": "PASS",
+      "winners": [
+        "d0",
+        "d2",
+        "d3"
+      ]
+    },
+    {
+      "probe_id": "P-ECON-003",
+      "claim": "lottery remainder unissued",
+      "outcome": "PASS",
+      "issued": 999,
+      "remainder": 1
+    },
+    {
+      "probe_id": "P-ECON-004",
+      "claim": "SCHEMES omits lottery",
+      "outcome": "OBSERVED",
+      "schemes": [
+        "EXACT_PRO_RATA",
+        "CAPPED_PRO_RATA",
+        "CONCAVE_SQRT",
+        "CONCAVE_LOG",
+        "TIME_WEIGHTED"
+      ],
+      "note": "scenario runner must special-case lottery; not auto-registered"
+    },
+    {
+      "probe_id": "P-ECON-005",
+      "claim": "cap_then_renormalize stages+exceed",
+      "outcome": "PASS",
+      "keys": [
+        "rule",
+        "transferable",
+        "weights",
+        "weight_sum",
+        "notes",
+        "raw_proportional_weights",
+        "pre_normalization_clipped_weights",
+        "clipped_holders",
+        "holders_exceeding_nominal_cap_after_renormalization"
+      ],
+      "final_a": "1/2",
+      "notes": [
+        "cap_bps=1000 (1/10 of pre-cap issued weight)",
+        "this is a cap-THEN-renormalize rule, not a hard final per-holder cap: raw proportional weight is clipped at the nominal fraction, then the clipped weights are renormalized to sum to 1 again",
+        "known property: when several holders are clipped at once, renormalization can push an individual holder's final weight back above the nominal cap fraction; this is disclosed, not hidden, and is a documented limitation of cap-then-renormalize schemes, not a bug"
+      ]
+    },
+    {
+      "probe_id": "P-ECON-006",
+      "claim": "zero weights",
+      "outcome": "PASS",
+      "out": {
+        "a": 0,
+        "b": 0
+      }
+    },
+    {
+      "probe_id": "P-ECON-007",
+      "claim": "dup id rejected",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-ECON-008",
+      "claim": "cap0 rejected",
+      "outcome": "PASS"
+    },
+    {
+      "probe_id": "P-ECON-009",
+      "claim": "collusion surface",
+      "outcome": "OBSERVED",
+      "public": [
+        "Any",
+        "Fraction",
+        "annotations",
+        "conditional_and_expected_rebate"
+      ]
+    },
+    {
+      "probe_id": "P-ECON-011",
+      "claim": "issued vs pool denom",
+      "outcome": "PASS",
+      "of_issued": {
+        "num": 1,
+        "den": 2,
+        "float": 0.5
+      },
+      "of_pool": {
+        "num": 1,
+        "den": 4,
+        "float": 0.25
+      }
+    },
+    {
+      "probe_id": "P-ECON-010",
+      "claim": "tainted surface",
+      "outcome": "OBSERVED",
+      "public": [
+        "Any",
+        "Fraction",
+        "annotations",
+        "decompose_tainted_fund_economics",
+        "tainted_fund_sensitivity_grid"
+      ]
+    },
+    {
+      "probe_id": "P-ECON-010c",
+      "claim": "sig Any",
+      "outcome": "OBSERVED",
+      "sig": "(*args, **kwargs)"
+    },
+    {
+      "probe_id": "P-ECON-010c",
+      "claim": "sig Fraction",
+      "outcome": "OBSERVED",
+      "sig": "(numerator=0, denominator=None)"
+    },
+    {
+      "probe_id": "P-ECON-010c",
+      "claim": "sig decompose_tainted_fund_economics",
+      "outcome": "OBSERVED",
+      "sig": "(*, donated_sats: 'int', allocation_units: 'int', token_value_per_unit: 'Fraction', legal_cost_basis: 'Fraction' = Fraction(0, 1), alternative_realization_fraction: 'Fraction' = Fraction(7, 10), seizure_probability_alternative_path: 'Fraction' = Fraction(3, 10), seizure_probability_migration_path: 'Fraction' = Fraction(1, 5), liquidation_haircut: 'Fraction' = Fraction(3, 20), lockup_months: 'int' = 0, transaction_cost_sats: 'Fraction' = Fraction(0, 1)) -> 'dict[str, Any]'"
+    },
+    {
+      "probe_id": "P-ECON-010c",
+      "claim": "sig tainted_fund_sensitivity_grid",
+      "outcome": "OBSERVED",
+      "sig": "(*, donated_sats: 'int', allocation_units: 'int', token_value_multipliers: 'list[Fraction]', alternative_realization_fractions: 'list[Fraction]') -> 'list[dict[str, Any]]'"
+    },
+    {
+      "probe_id": "P-DOC-001",
+      "claim": "README 29/6 vs catalog",
+      "outcome": "FAIL",
+      "executable_files": 35,
+      "documentary": [
+        "charity_destination_key_compromise_assumption"
+      ],
+      "invalid_files": 36,
+      "residual_risks": 8,
+      "readme_excerpt": [
+        "`EXPECTED.json` reports 29 executable invalid vectors, 6 documentary-only",
+        "executable vector and regenerates fixtures in a temporary directory for an"
+      ]
+    },
+    {
+      "probe_id": "P-DOC-002",
+      "claim": "rejection code vs fixture name semantic alignment",
+      "outcome": "OBSERVED",
+      "anomalies": [
+        "wrong_output_index->AMOUNT_MISMATCH",
+        "unsupported_script_form->UNSUPPORTED_TX_FORM",
+        "nullifier_domain_omission->NULLIFIER_INVALID (not NULLIFIER_DOMAIN_OMISSION)",
+        "inclusion_after_cutoff->HEADER_ANCESTRY_INVALID"
+      ],
+      "severity": "medium if operators use fixture names as code taxonomy; executable behavior may still be fail-closed"
+    },
+    {
+      "probe_id": "P-DES-012",
+      "claim": "genesis context keys",
+      "outcome": "OBSERVED",
+      "keys": [
+        "charity_set",
+        "eligibility_cutoff_hash_hex",
+        "epoch_closed",
+        "epoch_open",
+        "fixed_bitcoin_genesis_pool",
+        "headers",
+        "label",
+        "new_ledger_chain_id",
+        "public_test_seeds_are_not_secrets",
+        "seed_labels",
+        "source_chain",
+        "tip_hash_hex",
+        "tip_height"
+      ]
+    },
+    {
+      "probe_id": "P-DES-013",
+      "claim": "EXPECTED residual risks count 8",
+      "outcome": "PASS",
+      "n": 8
+    },
+    {
+      "probe_id": "P-BRK-001",
+      "claim": "breaker allocate",
+      "outcome": "OBSERVED",
+      "e": "allocate() got an unexpected keyword argument 'scheme'",
+      "e2": "allocate() takes 0 positional arguments but 3 were given",
+      "src": "def allocate(\n    *,\n    pool: int = DEFAULT_POOL,\n    contributions: Sequence[Mapping[str, Any]],\n    rule: str = \"pro_rata\",\n    cap_sats_per_identity: int | None = None,\n    lottery_seed: int = 0,\n    lottery_winner_slots: int | None = None,\n) -> dict[str, Any]:\n    \"\"\"Return a deterministic allocation record.\n\n    Fields:\n      - allocations: list of {donor_id, eligible_sats, weight, allocation,\n        share_of_pool, share_of_issued}\n      - total_eligible_sats, total_weight, total_issued, remainder_unissued\n      - rule, pool\n    \"\"\"\n    pool = _require_int(\"pool\", pool, min_v=1)\n    if "
+    },
+    {
+      "probe_id": "P-ECON-012",
+      "claim": "concave sqrt sybil mass gain",
+      "outcome": "PASS",
+      "single": 1000000,
+      "split_total": 1000000,
+      "note": "equal total weight 10000; split increases isqrt sum"
+    },
+    {
+      "probe_id": "P-ECON-013",
+      "claim": "zero pool lottery",
+      "outcome": "PASS",
+      "z": {
+        "a": 0
+      }
+    },
+    {
+      "probe_id": "P-ECON-014",
+      "claim": "winners>population clamps",
+      "outcome": "PASS",
+      "z2": {
+        "a": 500,
+        "b": 500
+      }
+    },
+    {
+      "probe_id": "P-COMP-002",
+      "claim": "3-equal remainder both models",
+      "outcome": "PASS",
+      "claude_issued": 999999999,
+      "design_issued": 999999999,
+      "design_rem": 1,
+      "claude_rem": 1
+    }
+  ]
+}

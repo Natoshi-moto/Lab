@@ -1,0 +1,43 @@
+{
+  "schema": "nexus.receipt/v1",
+  "task_id": "TSK-BGEN-GROK-TECH-AUDIT-001",
+  "audit_id": "BGEN-GROK-TECH-AUDIT-001",
+  "seat": "Independent Grok Technical",
+  "provider_model_label": "xAI Grok interactive CLI (grok-4.5 class)",
+  "status_authority": "NONE",
+  "mode": "PROPOSE_ONLY / FRESH_BLIND_TECHNICAL_AUDIT",
+  "round_assignment": null,
+  "independent_review_claimed": true,
+  "independence_note": "Different provider family from Claude design/economics authors for this technical audit seat; fresh session; permanent blindness to sibling epistemic/codex 2x2 audits. Same-provider prior Grok packages on subject are historical artifacts under audit, not co-authors of this report.",
+  "branch": "grok/bgen-technical-audit-001",
+  "subject_repository": "Natoshi-moto/Lab",
+  "exact_frozen_subject_commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "pre_audit_freeze_commit": "a07ff58a446a66d8492435cfb441f6fb03b0bf06",
+  "authorized_paths": [
+    "experiments/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_GROK_TECH_AUDIT_001/**"
+  ],
+  "scope_respected": true,
+  "paths_outside_scope_modified": [],
+  "status_json_modified": false,
+  "subject_packages_modified": false,
+  "forbidden_materials_opened": false,
+  "blinding_breach": false,
+  "live_funds": false,
+  "real_charities_selected": false,
+  "token_issued": false,
+  "legal_conclusions": false,
+  "verdicts": {
+    "TECHNICAL_PACKAGE": "PASS_WITH_STATED_LIMITS",
+    "CLAIM_EVIDENCE": "SUPPORTED_WITH_STATED_LIMITS",
+    "REAL_WORLD_READINESS": "RESEARCH_ONLY"
+  },
+  "highest_value_next_repair": "Update BENEFICIAL_GENESIS_DESIGN_001/README.md fixture catalog counts to match EXPECTED.json/evidence gate (34/1/8).",
+  "timestamp_utc": "2026-07-21T14:23:05Z",
+  "receipt_self_binding_note": "Logic commit hash fields are filled in a follow-up binding commit so this receipt does not contain the SHA of the commit that finalizes its own bytes.",
+  "audit_logic_commit": "7e59f822682f727c882f824cae89da4879b81ffa",
+  "receipt_binding_parent_commit": "7e59f822682f727c882f824cae89da4879b81ffa",
+  "draft_pr": 43,
+  "draft_pr_url": "https://github.com/Natoshi-moto/Lab/pull/43"
+}

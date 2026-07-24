@@ -1,0 +1,49 @@
+{
+  "pre_tree_all_files": {
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001": {
+      "tree_sha256": "76c3199bb5ee0479199678c83a6e71567e55fafc20aad6af7af3bc73c098ab97",
+      "file_count": 72
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001": {
+      "tree_sha256": "f7020124512187bbba876cdc3a5161dcc9c05e56291381da15557957258bc853",
+      "file_count": 79
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001": {
+      "tree_sha256": "24cb221cb6fd54a7c375e482c12d6d4873b88263fb00169d05e67cf4807b6459",
+      "file_count": 80
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003": {
+      "tree_sha256": "e6cf2cd861e8fcc3468abb112363d6e6527f46acb777aa2f3f556c83ba510078",
+      "file_count": 3
+    },
+    "experiments/BENEFICIAL_GENESIS_RETEST_002": {
+      "tree_sha256": "3a2bd86a32ad6d86893105a87c85a8ae1863a1c0c068ad5b2940f69b8a41cc15",
+      "file_count": 24
+    }
+  },
+  "post_tracked_after_simulations": {
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001": {
+      "tracked_file_count": 72,
+      "tracked_aggregate_sha256": "deca6c51aea6e3fcde84e9607c57206009590e0bd79bd3ffd0538d27082958df"
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001": {
+      "tracked_file_count": 79,
+      "tracked_aggregate_sha256": "44fb95428830ab375090e82c5fdc49c5d7b054256eede883b695622b8889cd14"
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_BREAKER_001": {
+      "tracked_file_count": 80,
+      "tracked_aggregate_sha256": "022d972e3be3b5828270bb7280a2b05cd2303ceec6f1f6f5f893a608b2b34c10"
+    },
+    "experiments/BENEFICIAL_GENESIS_ECON_RETEST_003": {
+      "tracked_file_count": 3,
+      "tracked_aggregate_sha256": "132b32b4a58039815e8c44fbcc3fe5ae44323d399f5428ef3b14edbf6c8d59ff"
+    },
+    "experiments/BENEFICIAL_GENESIS_RETEST_002": {
+      "tracked_file_count": 24,
+      "tracked_aggregate_sha256": "57b2e83293fd039a50186fd739f309e4afd200fec69bc652df719c68cb8ebfb8"
+    }
+  },
+  "clean_worktree_git_status_short": "",
+  "subject_paths_modified": false,
+  "note": "Tree hash pre-run included potential untracked pycache after tests; tracked-file aggregates confirm no subject path mutation."
+}
