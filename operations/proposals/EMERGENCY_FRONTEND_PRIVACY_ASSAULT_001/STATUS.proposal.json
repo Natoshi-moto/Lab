@@ -1,0 +1,17 @@
+{
+  "schema": "nexus.proposal-status/v1",
+  "proposal_id": "EMERGENCY-FRONTEND-PRIVACY-ASSAULT-001",
+  "status_authority": "NONE",
+  "research_only": true,
+  "severity": "EMERGENCY_RESEARCH_PROPOSAL",
+  "target_commit": "47578a86e41267a2aa41c523b3b4297bd6d3becb",
+  "disposition": "FOLLOW_UP_REQUIRED",
+  "confirmed_cases": ["F-01", "F-02", "F-03", "F-04"],
+  "implementation_authorized": false,
+  "next_action": "OPERATOR_DECISION_AND_MODEL_REPRODUCTION",
+  "non_claims": [
+    "This is not a security certification.",
+    "No real credentials were used.",
+    "Green core gates do not cover the browser paths in this packet."
+  ]
+}

@@ -47,4 +47,7 @@ python3 -m unittest tests.test_control_plane -v
 
 Work only on a review branch within the current task's declared scope. Record
 exact commands, outcomes, limitations, and non-claims. Merge remains
-human-authorized.
+human-authorized. Human authorization is recorded as
+`operations/merge_authorizations/PR-<number>.json` (see that directory's
+README), not a GitHub review approval — every seat shares one account, so
+native review approval cannot be independent.

@@ -1,0 +1,14 @@
+{
+  "schema": "nexus.merge-authorization/v1",
+  "pr_number": 114,
+  "authorized_head_sha": "e28334598a149eb4c085c4c64b3cab110cf4013b",
+  "authorized_by": "operator (GitHub: Natoshi-moto)",
+  "authorized_at_utc": "2026-07-23T20:52:55Z",
+  "statement": "Reviewed the NOTED frontend privacy assault vault entry and WHY_NOT_TO_TRUST short-index addition across this full session: original candidate audit (7-question review), whitespace fix, rebase onto current main, and full gate re-verification (nexus doctor, 190 tests, nexus verify) on this exact commit. Understand this documents already-existing, unpatched vulnerabilities in the Noted product (disposition FOLLOW_UP_REQUIRED, no fix included) and accept the timing/disclosure tradeoff of publishing this report before a fix ships. Authorize merging this exact commit into main.",
+  "status_authority": "OPERATOR_EXPLICIT",
+  "non_claims": [
+    "This is not independent review.",
+    "This authorization covers only commit e28334598a149eb4c085c4c64b3cab110cf4013b; any new substantive commit requires a new authorization file.",
+    "This does not certify the vault report's content is complete or exhaustive — only that the operator reviewed it and the verification results, and accepts merging this exact commit."
+  ]
+}
