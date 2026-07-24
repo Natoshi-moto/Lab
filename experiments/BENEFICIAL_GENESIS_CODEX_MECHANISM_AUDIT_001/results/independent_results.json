@@ -1,0 +1,238 @@
+{
+  "arithmetic": "Python integers and Fraction except integer square root",
+  "cap_then_renormalize": {
+    "hard_cap_falsified": true,
+    "single_holder_final_share_nominal_cap_10pct": "1",
+    "weights_90_10_nominal_cap_10pct": [
+      "1/2",
+      "1/2"
+    ]
+  },
+  "combined_attacks": {
+    "charity_capture_plus_side_agreement": "exact-script payment cannot establish net retention or beneficial use",
+    "exchange_plus_timing": "omnibus custody aggregates entitlement; privileged denominator information changes irreversible entry utility",
+    "miner_plus_denominator_shock": "censorship/inclusion near cutoff changes denominator and relative shares; probability and magnitude are UNABLE_TO_VERIFY",
+    "secondary_accumulation_plus_governance": "transferable token-weighted control defeats genesis-only concentration limits",
+    "sybil_plus_governance": "identity-based allocation mitigation fails before transferable or delegated governance is even acquired",
+    "tainted_plus_rebate": "low private opportunity cost and rebate access expand the profitable region while social harm remains external",
+    "undersubscription_plus_speculation": "one minimum-unit donor receives the pool and can coordinate scarcity narratives; price response is UNABLE_TO_VERIFY",
+    "whale_plus_charity_rebate": "profitable iff token_multiple + rebate*access > opportunity_cost + friction"
+  },
+  "denominator_sensitivity": [
+    {
+      "allocation": 1000000,
+      "eligible_source": 1,
+      "remainder": 0,
+      "units_per_source": "1000000"
+    },
+    {
+      "allocation": 1000000,
+      "eligible_source": 10,
+      "remainder": 0,
+      "units_per_source": "100000"
+    },
+    {
+      "allocation": 1000000,
+      "eligible_source": 1000,
+      "remainder": 0,
+      "units_per_source": "1000"
+    },
+    {
+      "allocation": 1000000,
+      "eligible_source": 1000000,
+      "remainder": 0,
+      "units_per_source": "1"
+    }
+  ],
+  "fixed_pool": {
+    "conservation_property_checked": true,
+    "same_actor_split_units": 35,
+    "same_actor_unsplit_units": 35,
+    "split": {
+      "allocations": [
+        15,
+        20,
+        65
+      ],
+      "remainder": 1
+    },
+    "unsplit": {
+      "allocations": [
+        35,
+        65
+      ],
+      "remainder": 1
+    }
+  },
+  "product_functions": {
+    "bootstrap_ownership_distribution": "PLAUSIBLE_BUT_UNSPECIFIED_AS_REQUIREMENT",
+    "fees": "UNSPECIFIED",
+    "governance": "UNSPECIFIED",
+    "payment": "UNSPECIFIED",
+    "recognition": "SUPPORTED_BY_RECEIPT_WITHOUT_TRANSFER",
+    "security_bonding": "UNSPECIFIED",
+    "staking": "UNSPECIFIED",
+    "store_of_value": "UNSPECIFIED_AND_NOT_DEMONSTRATED"
+  },
+  "rebate_profit_sign_grid": [
+    {
+      "access": "0",
+      "profit": "-105",
+      "sign": -1,
+      "token_multiple": "0"
+    },
+    {
+      "access": "0",
+      "profit": "-55",
+      "sign": -1,
+      "token_multiple": "1/2"
+    },
+    {
+      "access": "0",
+      "profit": "-5",
+      "sign": -1,
+      "token_multiple": "1"
+    },
+    {
+      "access": "0",
+      "profit": "45",
+      "sign": 1,
+      "token_multiple": "3/2"
+    },
+    {
+      "access": "1/10",
+      "profit": "-97",
+      "sign": -1,
+      "token_multiple": "0"
+    },
+    {
+      "access": "1/10",
+      "profit": "-47",
+      "sign": -1,
+      "token_multiple": "1/2"
+    },
+    {
+      "access": "1/10",
+      "profit": "3",
+      "sign": 1,
+      "token_multiple": "1"
+    },
+    {
+      "access": "1/10",
+      "profit": "53",
+      "sign": 1,
+      "token_multiple": "3/2"
+    },
+    {
+      "access": "1/2",
+      "profit": "-65",
+      "sign": -1,
+      "token_multiple": "0"
+    },
+    {
+      "access": "1/2",
+      "profit": "-15",
+      "sign": -1,
+      "token_multiple": "1/2"
+    },
+    {
+      "access": "1/2",
+      "profit": "35",
+      "sign": 1,
+      "token_multiple": "1"
+    },
+    {
+      "access": "1/2",
+      "profit": "85",
+      "sign": 1,
+      "token_multiple": "3/2"
+    },
+    {
+      "access": "1",
+      "profit": "-25",
+      "sign": -1,
+      "token_multiple": "0"
+    },
+    {
+      "access": "1",
+      "profit": "25",
+      "sign": 1,
+      "token_multiple": "1/2"
+    },
+    {
+      "access": "1",
+      "profit": "75",
+      "sign": 1,
+      "token_multiple": "1"
+    },
+    {
+      "access": "1",
+      "profit": "125",
+      "sign": 1,
+      "token_multiple": "3/2"
+    }
+  ],
+  "schema": "bgen.codex-mechanism-results/v1",
+  "sybil_countermodels": {
+    "cap_100_sybil_actor_units": 500000,
+    "cap_unsplit_actor_units": 100000,
+    "sqrt_100_sybil_actor_share": "101000/111101",
+    "sqrt_unsplit_actor_share": "1/2"
+  },
+  "welfare_sign_grid": [
+    {
+      "additional_fraction": "0",
+      "rebate_access": "0",
+      "sign": -1,
+      "welfare": "-200"
+    },
+    {
+      "additional_fraction": "0",
+      "rebate_access": "1/2",
+      "sign": -1,
+      "welfare": "-200"
+    },
+    {
+      "additional_fraction": "0",
+      "rebate_access": "1",
+      "sign": -1,
+      "welfare": "-200"
+    },
+    {
+      "additional_fraction": "1/4",
+      "rebate_access": "0",
+      "sign": 1,
+      "welfare": "50"
+    },
+    {
+      "additional_fraction": "1/4",
+      "rebate_access": "1/2",
+      "sign": -1,
+      "welfare": "-50"
+    },
+    {
+      "additional_fraction": "1/4",
+      "rebate_access": "1",
+      "sign": -1,
+      "welfare": "-150"
+    },
+    {
+      "additional_fraction": "1",
+      "rebate_access": "0",
+      "sign": 1,
+      "welfare": "800"
+    },
+    {
+      "additional_fraction": "1",
+      "rebate_access": "1/2",
+      "sign": 1,
+      "welfare": "400"
+    },
+    {
+      "additional_fraction": "1",
+      "rebate_access": "1",
+      "sign": 0,
+      "welfare": "0"
+    }
+  ]
+}

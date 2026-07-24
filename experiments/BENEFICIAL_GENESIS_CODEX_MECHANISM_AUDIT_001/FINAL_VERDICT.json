@@ -1,0 +1,18 @@
+{
+  "schema": "bgen.codex-mechanism-final-verdict/v1",
+  "audit_id": "BGEN-CODEX-MECHANISM-AUDIT-001",
+  "subject": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+  "status_authority": "NONE",
+  "verdicts": {
+    "UNDERLYING_MECHANISM": "CONTINUE_WITH_CONDITIONS",
+    "TRANSFERABILITY_NECESSITY": "NOT_DEMONSTRATED",
+    "EVIDENCE_STATE": "UNDERDETERMINED",
+    "REAL_WORLD_READINESS": "RESEARCH_ONLY"
+  },
+  "strongest_supporting_evidence": "Supply-conserving receipt/allocation arithmetic and a viable bounded non-transferable research path.",
+  "strongest_counterevidence": "Sybil and cap countermodels, extreme undersubscription, combined attack pathways, and welfare sign reversals under unmeasured assumptions.",
+  "assumptions": ["Only currently specified product functions are treated as required.", "Synthetic parameters are conditional and not empirical."],
+  "confidence": {"arithmetic":"HIGH","transferability_within_specified_functions":"HIGH","aggregate_welfare":"LOW_UNTIL_EMPIRICAL","research_only":"HIGH"},
+  "falsifiers": ["A required executable ledger function uniquely needs transferable allocation.", "Empirical evidence closes sign-controlling welfare variables.", "An enforceable permissionless actor boundary defeats the Sybil countermodel."],
+  "exact_next_action": "Run the preregistered no-token/non-transferable-receipt product-function challenge in DECISIVE_NEXT_EXPERIMENT.md."
+}

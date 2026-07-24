@@ -1,0 +1,158 @@
+{
+  "schema": "bgen.codex-mechanism.pre-audit-freeze/v1",
+  "audit_id": "BGEN-CODEX-MECHANISM-AUDIT-001",
+  "created_at_utc": "2026-07-21T14:35:31Z",
+  "status_authority": "NONE",
+  "subject": {
+    "repository": "Natoshi-moto/Lab",
+    "commit": "8349de7a5978be6a9984aa33fd59ba3725ebaaca",
+    "branch": "codex/bgen-mechanism-audit-001",
+    "binding_checks": {
+      "head_exact": true,
+      "branch_exact": true,
+      "worktree_clean_before_audit_write": true
+    }
+  },
+  "runtime": {
+    "kernel": "Linux 7.0.12-201.fc44.x86_64",
+    "python": "3.14.6",
+    "git": "2.54.0",
+    "github_cli": "2.94.0",
+    "network": "GitHub API reachable for exact issues 33 and 34",
+    "github_authentication": "authenticated; credential value not recorded",
+    "repository_visibility_observed": "PUBLIC",
+    "status_json_observed": {
+      "active_tasks": [],
+      "current_mode": "R016_USER_AUTHORIZED_PROMOTION_MERGED",
+      "current_round": "R016",
+      "next_action_id": "ACT-R017_DESIGN_MULTI_HOST_REPLICATION_AND_EXPLICIT_FORK_EVIDENCE",
+      "staleness_note": "STATUS.json does not record this commissioned audit; controlling authority is the pasted task contract and STATUS.json will not be modified."
+    }
+  },
+  "sources_inspected": [
+    "pasted controlling task contract BGEN-CODEX-MECHANISM-AUDIT-001",
+    "AGENTS.md",
+    "README_START_HERE.md",
+    "STATUS.json",
+    "STATUS.md",
+    "NEXT_ACTION.md",
+    "AUDIT_START_HERE.md",
+    "constitution/AUDIT.md",
+    "constitution/AUTHORITY.md",
+    "constitution/CANONICALITY.md",
+    "constitution/EVIDENCE.md",
+    "constitution/MUTATION.md",
+    "constitution/PRIVACY.md",
+    "constitution/ROUTING.md",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/README.md",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/TECHNICAL_DESIGN.md",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/THREAT_MODEL_AND_NONCLAIMS.md",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/genesis/CHARITY_SET.json",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/genesis/CONTEXT.json",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/genesis/EPOCH_CLOSED.json",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/genesis/EPOCH_OPEN.json",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/fixtures/EXPECTED.json",
+    "GitHub issue #33 by exact-number API read",
+    "GitHub issue #34 by exact-number API read"
+  ],
+  "sources_temporarily_unread": [
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/protocol/**",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/tests/**",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/generate_fixtures.py",
+    "experiments/BENEFICIAL_GENESIS_DESIGN_001/verify_evidence.py",
+    "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+    "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+    "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001/**",
+    "PR #35",
+    "PR #37",
+    "PR #39",
+    "historical subject issues, receipts, and ancestry not listed above"
+  ],
+  "unread_package_sha256_inventory": {
+    "method": "SHA-256 over the lexicographically sorted sha256sum lines for every regular file in the three temporarily unread economics package roots; individual file digests were generated mechanically without semantic inspection",
+    "combined_manifest_sha256": "f689069245947b3be04b4efc685600dd8df6edb9b6490db87ea07bb4a012730b",
+    "package_git_tree_ids": {
+      "experiments/BENEFICIAL_GENESIS_ECON_REDTEAM_001": "eebcadc7048fe3a76874d1d0eb9df7846c725bad",
+      "operations/audits/BENEFICIAL_GENESIS_ECON_REDTEAM_001": "165dd4eb489a10755f3c7ad14dd135b5faf8bde8",
+      "operations/receipts/BENEFICIAL_GENESIS_ECON_REDTEAM_001": "1494c1401a7ebbb0c548a853b8273999c4acc9e2"
+    },
+    "file_count": 87
+  },
+  "independent_reconstruction": {
+    "mechanism": "During a finite epoch, an eligible source-asset payment to a genesis-fixed charity destination binds a new-ledger recipient. After close, a fixed integer pool P is allocated by weights derived from eligible source amounts. Under the specified baseline, a_i=floor(P*x_i/sum(x)); residual P-sum(a_i) is unissued. The receipt verifier establishes bounded cryptographic predicates, not ownership, welfare, charity retention, or need for a transferable asset.",
+    "fixed_pool_properties": [
+      "Supply conservation follows from the floor-sum inequality when all accepted x_i are positive integers and the denominator is their exact sum.",
+      "Exact proportional shares are invariant to splitting before floors; integer floors are not: splitting can only weakly reduce a participant's summed allocation under simple per-claim flooring, while changing residual placement.",
+      "Linear allocation preserves concentration in contributed value; it does not itself redistribute from whales.",
+      "With no minimum participation condition, arbitrarily small total donations can allocate almost the entire fixed pool, so source-value-per-unit is endogenous and unbounded as total donations approaches the minimum unit."
+    ],
+    "alternatives": [
+      "Concave per-identity weights reduce concentration only if identity is costly or verified; otherwise splitting raises total weight.",
+      "Per-identity caps have the same identity dependency and cap-then-renormalize requires explicit semantics for residual capacity and termination.",
+      "Transferability is separable from receipt verification and initial allocation. Delayed transfer changes timing but preserves eventual acquisition; a non-transferable receipt can provide recognition without a secondary market; no-token donation is the minimum mechanism if recognition or ledger bootstrap is not required.",
+      "Economic ownership and governance authority are separate design dimensions; token-weighted governance imports allocation and secondary-market concentration into control unless independently constrained."
+    ],
+    "welfare_identity": "Net public benefit must be based on additional charity-retained value minus displacement, rebates, access/transaction costs, tainted-asset harms, governance/security externalities, and opportunity cost; gross eligible flow is not welfare.",
+    "rebate_condition": "For donor i with token value V_i, source opportunity cost C_i, rebate rate r_i, access probability q_i, and friction F_i, private participation can be profitable when V_i+q_i*r_i*C_i-F_i exceeds C_i, while charity expected retention is approximately C_i*(1-q_i*r_i) before downstream use. The sign depends on access and valuation assumptions.",
+    "tainted_asset_condition": "A stolen/tainted controller with low private opportunity cost can rationally participate even when an honest owner would not; whether this increases or reduces social welfare depends on recovery probability, charity acceptance costs, enforcement externalities, and the social value assigned to retained source assets.",
+    "governance_condition": "If governance follows transferable allocations, donation concentration, Sybil aggregation, custodial aggregation, and later market accumulation are cumulative control pathways; an initial cap alone is not durable after transfer unless governance units or constraints remain separate and enforceable."
+  },
+  "expected_load_bearing_claims": [
+    "The fixed-pool arithmetic is supply-conserving and deterministically replayable.",
+    "Receipt binding can separate qualifying source payment from new-ledger destination control in the bounded model.",
+    "The mechanism creates incremental public benefit rather than merely relabeling displaced giving or mercenary flow.",
+    "Transferability, fees, staking, bonding, and governance are necessary for specified product functions rather than silently assumed.",
+    "Strategic access to rebates, custody, cutoff influence, and secondary markets does not create unacceptable privilege or control.",
+    "Mitigations remain effective under combined attacks and after transfer, not only against isolated actors at genesis."
+  ],
+  "assumptions_requiring_evidence": [
+    "Participation volume and donor composition",
+    "Additional-versus-displaced donation fraction",
+    "Token demand, liquidity, and valuation",
+    "Rebate prevalence, access probability, and enforcement",
+    "Charity retention and beneficial-use rates",
+    "Identity cost and Sybil resistance",
+    "Exchange/custodian participation and aggregation",
+    "Miner/cutoff influence probabilities",
+    "Tainted-source incidence, recovery, and externality costs",
+    "Governance participation, delegation, coalition, and acquisition behavior",
+    "Real Bitcoin and post-quantum implementation feasibility",
+    "Jurisdiction-specific legal treatment"
+  ],
+  "plausible_failure_modes": [
+    "Extreme undersubscription creates a giveaway with negligible public benefit per allocated unit.",
+    "Whale or omnibus participation directly concentrates economic ownership and any coupled governance.",
+    "Concavity or per-identity caps become Sybil subsidies.",
+    "Private rebate access makes the mechanism regressive and reduces charity retention.",
+    "A late denominator shock or miner censorship changes expected allocation after donations become irreversible.",
+    "Stolen or tainted assets obtain new allocation rights while imposing recovery or compliance harms.",
+    "A fixed charity set is captured or side agreements defeat on-chain payment semantics.",
+    "Transferability creates speculation and secondary governance capture without serving a required ledger function.",
+    "Delayed transfer postpones rather than removes concentration and speculation.",
+    "Cap-then-renormalize is underspecified, infeasible, or transfers excess weight to coalitions.",
+    "Synthetic verifier passes are mistaken for economic, legal, Bitcoin, or PQ readiness."
+  ],
+  "major_claim_falsifiers": {
+    "supply_conservation": "Any accepted integer input producing issued units above P or a non-deterministic record.",
+    "split_invariance": "Any partition changing exact pre-floor proportional entitlement; floor-level differences must be classified separately.",
+    "concavity_controls_concentration": "A permissionless split that increases one actor's aggregate share.",
+    "cap_controls_concentration": "Multiple identities or later transfers that restore control above the intended actor cap.",
+    "incremental_public_benefit": "A defensible parameter region where retained additional benefit net of displacement and harms is non-positive.",
+    "rebates_are_bounded": "A feasible side agreement that is profitable and materially lowers retention while passing protocol checks.",
+    "transferability_is_necessary": "A non-transferable, delayed-transfer, snapshot, fee-directed, burn, or no-token design meeting every explicitly required function with weakly lower relevant risk.",
+    "governance_is_safe": "A donation, custody, delegation, coalition, or secondary-acquisition path to practical control.",
+    "real_world_readiness": "Missing empirical, legal, Bitcoin, PQ, operational, or governance evidence is itself sufficient to falsify readiness beyond research."
+  },
+  "planned_tests": [
+    "Implement a new stdlib-only exact-integer/Fraction model without importing subject economics modules.",
+    "Property-test fixed-pool conservation, split behavior, floors, zero/near-zero denominator boundaries, and deterministic ordering.",
+    "Compare linear, square-root-like integer, capped, cap-then-renormalize, and identity-split allocations.",
+    "Sweep whale shares, undersubscription, denominator shocks, token-value/opportunity-cost ratios, rebate access/friction, displacement, and tainted-source costs; search for sign reversals.",
+    "Separate economic allocation from proportional, capped, non-transferable, and no-governance authority mappings.",
+    "Evaluate transfer, delayed transfer, non-transferable receipt, and no-token products against explicit function vectors.",
+    "Construct combined attack countermodels for every actor combination required by the contract.",
+    "After freeze only, reproduce subject tests/results and compare claims against independent outputs without treating agreement as independence.",
+    "Run repository doctor, unit tests, and verifier; record exact results and limitations."
+  ],
+  "independence_statement": "This freeze reduces anchoring by recording the reconstruction before semantic inspection of the subject economics, Breaker/retest history, and allowed PRs. It does not prove perfect independence. Mechanical hashing and prior knowledge of filenames/scopes also do not constitute semantic inspection."
+}
