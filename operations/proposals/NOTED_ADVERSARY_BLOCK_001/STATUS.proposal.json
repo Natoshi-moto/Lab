@@ -1,0 +1,30 @@
+{
+  "schema": "nexus.status/v2",
+  "lab_id": "NEXUS-LAB",
+  "current_round": "NOTED_ADVERSARY_BLOCK_001",
+  "current_mode": "NOTED_ADVERSARY_BLOCK_001_PROPOSED_AWAITING_CLAUDE_AND_OPERATOR",
+  "foundation_status": "PROPOSAL_ONLY",
+  "status_authority": "NONE",
+  "last_completed_action": "CLAUDE_DESIGN_ADVERSARY_BLOCK_PACKET_DRAFTED",
+  "next_action_id": "ACT-NOTED-ADVERSARY-001_CLAUDE_REVIEW_THEN_OPERATOR",
+  "grounded_main_tip_docs": "7026b66",
+  "grounded_main_tip_product": "c2bbfb8",
+  "sister_packets": [
+    "operations/proposals/NOTED_SOVEREIGNTY_ASSAULT_001",
+    "operations/proposals/NOTED_STOP_THE_LINE_001",
+    "operations/proposals/NOTED_MEMBRANE_HARDENING_001",
+    "WHY_NOT_TO_TRUST_THIS_PROJECT.md"
+  ],
+  "active_tasks": [],
+  "assurance_blocks": [],
+  "open_assurance_blocks": 0,
+  "open_defect_blocks": 0,
+  "non_claims": [
+    "not_security_certification",
+    "not_implementation_authorization",
+    "not_real_world_economic_value",
+    "multi_ai_agreement_not_independence",
+    "successful_attack_run_is_expected_not_a_pass",
+    "block_existing_is_not_a_security_improvement"
+  ]
+}
