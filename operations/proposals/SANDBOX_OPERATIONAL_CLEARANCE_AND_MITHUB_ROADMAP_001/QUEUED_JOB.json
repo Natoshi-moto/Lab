@@ -1,0 +1,86 @@
+{
+  "schema": "nexus.queued-operation/v1",
+  "operation_id": "SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_001",
+  "status": "QUEUED_DORMANT",
+  "status_authority": "NONE",
+  "implementation_authorized": false,
+  "merge_authorized": false,
+  "repository": "Natoshi-moto/Lab",
+  "queue_branch": "chatgpt/queued-sandbox-clearance-roadmap-001",
+  "observed_baselines": {
+    "lab_main": "6c3a1e806baba1183553221f5c2f00125ce2be29",
+    "experimental_sandbox_main": "82b9a3b2a60f008ba31d2f4a9228c9074e126b1c"
+  },
+  "activation_dependency": {
+    "operation_id": "CLOSED_WORLD_ECONOMY_INVARIANTS_001",
+    "required_state": "SOURCE_BOUND_ADVERSARIAL_REVIEW_COMPLETE_AND_DISPOSITION_RECORDED",
+    "on_unverified": "STOP_READ_ONLY"
+  },
+  "activation_checks": [
+    "final economy receipt exists",
+    "economy draft PR or exact branch head exists",
+    "schema validator and tests inspected",
+    "different model or qualified human adversarial review completed",
+    "confirmed defects repaired or explicitly unresolved",
+    "live GitHub head and changed-file scope verified",
+    "operator disposition recorded",
+    "fresh execution branch created from then-current accepted Lab main"
+  ],
+  "central_principle": "Terminal-velocity cognition. Snail-speed implementation.",
+  "canonical_layers": {
+    "lab": "canonical accepted institutional working state, not automatic truth",
+    "sandbox": "canonical shared history and context, not automatic truth safety correctness legality deployment or Lab acceptance",
+    "mithub": "canonical participant intellectual lineage, not authority over Sandbox Lab or external truth"
+  },
+  "phase_a_blockers": [
+    "Sandbox canon doctrine",
+    "hard red lines",
+    "entry and experiment templates",
+    "recovery and checkpoint procedure",
+    "history and merge policy",
+    "wild experiment drill",
+    "recovery drill",
+    "Lab boundary drill",
+    "exact SHA operational clearance receipt and authorization"
+  ],
+  "later_non_blocking_milestones": [
+    "Mithub architecture pilots",
+    "permanent adversarial Mithub",
+    "University v0 cold entry",
+    "serious team contributor front door",
+    "reproducible clone to verification repair",
+    "mature recognition mechanics",
+    "full corpus ingestion",
+    "Hermes integration",
+    "polished UI"
+  ],
+  "hard_red_lines": [
+    "no committed secrets or credentials",
+    "no non-consensual private personal data",
+    "no unauthorized targeting of real systems or people",
+    "no automatic Lab writes or promotion",
+    "no external financial value redemption or live financial mechanisms",
+    "no false authority claims",
+    "no silent history rewriting",
+    "no licence laundering or unattributed third-party material",
+    "no real-user deployment without a separate gate"
+  ],
+  "required_reviews": [
+    "controller source and canon adjudication",
+    "mechanical schema validator and test review",
+    "different-family incentive social and user-harm attack",
+    "plain-language operator decision card"
+  ],
+  "next_execution_operation": "SANDBOX_OPERATIONAL_CLEARANCE_AND_MITHUB_ROADMAP_EXECUTION_001",
+  "next_execution_branch_suggestion": "chatgpt/sandbox-clearance-mithub-roadmap-execution-001",
+  "next_execution_maximum_authority": "DRAFT_LAB_PR",
+  "non_claims": [
+    "this queue does not implement or clear Sandbox",
+    "this queue does not authorize money tokens markets real users or external targeting",
+    "this queue does not make Mithub or University operational",
+    "this queue does not resolve the closed-world economy operation",
+    "this queue does not authorize merge",
+    "model diversity is not automatic independence",
+    "Git history does not establish truth"
+  ]
+}
