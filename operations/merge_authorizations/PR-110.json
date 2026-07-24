@@ -1,0 +1,16 @@
+{
+  "schema": "nexus.merge-authorization/v1",
+  "pr_number": 110,
+  "authorized_head_sha": "e2e74eb6a16421a784e3143c279603f430208cbe",
+  "authorized_by": "operator (GitHub: Natoshi-moto)",
+  "authorized_at_utc": "2026-07-24T05:54:35Z",
+  "statement": "The operator reviewed and explicitly authorized merging the exact substantive Lab PR #110 content at commit e2e74eb6a16421a784e3143c279603f430208cbe. That content establishes a structured, read-only, adversarially tested promotion gate for proposals from Experimental-Sandbox into Lab. This authorization permits only merge-authorization bookkeeping after the authorized content commit.",
+  "status_authority": "OPERATOR_EXPLICIT",
+  "non_claims": [
+    "This is not independent review.",
+    "This authorization covers only the exact substantive content commit e2e74eb6a16421a784e3143c279603f430208cbe; any later substantive change requires new operator authorization.",
+    "This does not certify the PR content is correct, safe, secure, private, or complete.",
+    "This does not authorize any change outside operations/merge_authorizations/ after the authorized substantive commit.",
+    "This does not authorize any other pull request, branch, repository, setting, deletion, promotion, dependency change, or Hermes action."
+  ]
+}
